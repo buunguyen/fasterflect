@@ -22,9 +22,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest
 {
-    /// <summary>
-    /// Summary description for PropertyTest
-    /// </summary>
     [TestClass]
     public class PropertyTest
     {

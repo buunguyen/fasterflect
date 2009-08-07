@@ -23,9 +23,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest
 {
-    /// <summary>
-    /// Summary description for MethodTest
-    /// </summary>
     [TestClass]
     public class MethodTest
     {
