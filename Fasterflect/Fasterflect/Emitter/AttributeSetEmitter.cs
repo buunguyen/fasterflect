@@ -63,9 +63,7 @@ namespace Fasterflect.Emitter
             var memberType = member is FieldInfo
                                  ? ((FieldInfo)member).FieldType
                                  : ((PropertyInfo)member).PropertyType;
-            generator.Emit(memberType.IsValueType
-                ? OpCodes.Unbox_Any
-                : OpCodes.Castclass, memberType);
+            UnboxOrCast(generator, memberType);
             if (member.MemberType == MemberTypes.Field)
             {
                 generator.Emit(callInfo.IsStatic ? OpCodes.Stsfld : OpCodes.Stfld, (FieldInfo)member);

@@ -24,8 +24,8 @@ namespace Fasterflect
     public delegate void StaticAttributeSetter(object value);
     public delegate void AttributeSetter(object target, object value);
 
-    public delegate object StaticMethodInvoker(object[] parameters);
-    public delegate object MethodInvoker(object target, object[] parameters);
+    public delegate object StaticMethodInvoker(params object[] parameters);
+    public delegate object MethodInvoker(object target, params object[] parameters);
 
-    public delegate object ConstructorInvoker(object[] parameters);
+    public delegate object ConstructorInvoker(params object[] parameters);
 }

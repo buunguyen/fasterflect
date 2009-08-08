@@ -28,7 +28,6 @@ namespace Fasterflect
     {
         #region Fields
         public static readonly Type[] ArrayOfObjectType = new[] { typeof(object) };
-        public static readonly Type[] EmptyTypeArray = new Type[0];
         public static readonly object[] EmptyObjectArray = new object[0];
         public const string IndexerSetterName = "set_Item";
         public const string IndexerGetterName = "get_Item";

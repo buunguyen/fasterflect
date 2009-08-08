@@ -21,14 +21,15 @@ using System;
 namespace Fasterflect
 {
     /// <summary>
-    /// Offers an alternative API to use FastReflector.  This API comprises of extensions
+    /// Offers the API to use Fasterflect.  This API comprises of extensions
     /// methods for <see cref="Type"/> and <see cref="object"/>.  
     /// 
-    /// A single instance of <see cref="Reflector"/> is used internally to receive all
-    /// invocations.  Therefore, all invocations made through this API are cached.
+    /// This API is the wrapper for the core API available in <see cref="Reflector"/> 
+    /// which can be used directly. A single instance of <see cref="Reflector"/> is 
+    /// used internally to receive all invocations.  
     /// 
     /// This API is the recommended API.  Check the documentation of <see cref="Reflector"/>
-    /// to see when the other API makes sense.
+    /// to see when that API makes sense.
     /// </summary>
     public static class ExtensionApi
     {
