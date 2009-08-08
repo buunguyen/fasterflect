@@ -42,7 +42,7 @@
   <ItemGroup>
     <Compile Include="ConstructorTest.cs" />
     <Compile Include="DelegateCacheTest.cs" />
-    <Compile Include="ExtApiTest.cs" />
+    <Compile Include="ExtensionApiTest.cs" />
     <Compile Include="FieldTest.cs" />
     <Compile Include="IndexerTest.cs" />
     <Compile Include="MethodTest.cs" />
