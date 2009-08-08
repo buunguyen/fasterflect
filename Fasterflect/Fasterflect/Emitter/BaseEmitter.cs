@@ -67,5 +67,20 @@ namespace Fasterflect.Emitter
                 return callInfo.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
             }
         }
+
+        protected void BoxIfValueType(ILGenerator generator, Type type)
+        {
+            if (type.IsValueType)
+            {
+                generator.Emit(OpCodes.Box, type);
+            }
+        }
+
+        protected void UnboxOrCast(ILGenerator generator, Type type)
+        {
+            generator.Emit(type.IsValueType
+                               ? OpCodes.Unbox_Any
+                               : OpCodes.Castclass, type);
+        }
     }
 }

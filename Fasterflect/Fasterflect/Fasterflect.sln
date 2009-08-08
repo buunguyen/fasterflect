@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterflectBenchmark", "..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterflectTest", "..\FasterflectTest\FasterflectTest.csproj", "{5D173B59-4C94-433C-8068-464EBABDE593}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterflectSample", "..\FasterflectSample\FasterflectSample.csproj", "{4A6052E6-7583-40BA-9AF5-13EEAF419BF0}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -29,6 +31,10 @@ Global
 		{5D173B59-4C94-433C-8068-464EBABDE593}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D173B59-4C94-433C-8068-464EBABDE593}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D173B59-4C94-433C-8068-464EBABDE593}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A6052E6-7583-40BA-9AF5-13EEAF419BF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A6052E6-7583-40BA-9AF5-13EEAF419BF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A6052E6-7583-40BA-9AF5-13EEAF419BF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A6052E6-7583-40BA-9AF5-13EEAF419BF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -62,20 +62,14 @@ namespace Fasterflect.Emitter
             {
                 var field = member as FieldInfo;
                 generator.Emit(callInfo.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, field);
-                if (field.FieldType.IsValueType)
-                {
-                    generator.Emit(OpCodes.Box, field.FieldType);
-                }
+                BoxIfValueType(generator, field.FieldType);
             }
             else
             {
                 var prop = member as PropertyInfo;
                 MethodInfo getMethod = GetPropertyGetMethod();
                 generator.Emit(callInfo.IsStatic ? OpCodes.Call : OpCodes.Callvirt, getMethod);
-                if (prop.PropertyType.IsValueType)
-                {
-                    generator.Emit(OpCodes.Box, prop.PropertyType);
-                }
+                BoxIfValueType(generator, prop.PropertyType);
             }
             generator.Emit(OpCodes.Ret);
 

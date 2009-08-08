@@ -23,8 +23,8 @@ using Fasterflect.Emitter;
 namespace Fasterflect
 {
     /// <summary>
-    /// Provides the API to perform reflection calls.  The alternative extension-method-based
-    /// API, declared in <see cref="ExtensionApi"/> should be used instead of this API.  
+    /// Provides the API to perform reflection calls.  The alternative extension method-based
+    /// API, declared in <see cref="ExtensionApi"/> should be the default API.  
     /// 
     /// You should only consider this API only if you need fine-grained control 
     /// of <see cref="Reflector"/> instances and their cache (e.g. use an instance 
@@ -240,7 +240,7 @@ namespace Fasterflect
         #region Static Methods
         public Reflector Invoke(Type targetType, string methodName)
         {
-            return Invoke(targetType, methodName, ReflectorUtils.EmptyTypeArray,
+            return Invoke(targetType, methodName, Type.EmptyTypes,
                 ReflectorUtils.EmptyObjectArray);
         }
 
@@ -253,7 +253,7 @@ namespace Fasterflect
 
         public TReturn Invoke<TReturn>(Type targetType, string methodName)
         {
-            return Invoke<TReturn>(targetType, methodName, ReflectorUtils.EmptyTypeArray, ReflectorUtils.EmptyObjectArray);
+            return Invoke<TReturn>(targetType, methodName, Type.EmptyTypes, ReflectorUtils.EmptyObjectArray);
         }
 
         public TReturn Invoke<TReturn>(Type targetType, string methodName, Type[] paramTypes, object[] parameters)
@@ -264,7 +264,7 @@ namespace Fasterflect
 
         public StaticMethodInvoker DelegateForStaticInvoke(Type targetType, string methodName)
         {
-            return DelegateForStaticInvoke(targetType, methodName, ReflectorUtils.EmptyTypeArray);
+            return DelegateForStaticInvoke(targetType, methodName, Type.EmptyTypes);
         }
 
         public StaticMethodInvoker DelegateForStaticInvoke(Type targetType, string methodName, Type[] paramTypes)
@@ -278,7 +278,7 @@ namespace Fasterflect
         #region Instance Methods
         public Reflector Invoke(object target, string methodName)
         {
-            return Invoke(target, methodName, ReflectorUtils.EmptyTypeArray,
+            return Invoke(target, methodName, Type.EmptyTypes,
                 ReflectorUtils.EmptyObjectArray);
         }
 
@@ -291,7 +291,7 @@ namespace Fasterflect
 
         public TReturn Invoke<TReturn>(object target, string methodName)
         {
-            return Invoke<TReturn>(target, methodName, ReflectorUtils.EmptyTypeArray, ReflectorUtils.EmptyObjectArray);
+            return Invoke<TReturn>(target, methodName, Type.EmptyTypes, ReflectorUtils.EmptyObjectArray);
         }
 
         public TReturn Invoke<TReturn>(object target, string methodName, Type[] paramTypes, object[] parameters)
@@ -302,7 +302,7 @@ namespace Fasterflect
 
         public MethodInvoker DelegateForInvoke(Type targetType, string methodName)
         {
-            return DelegateForInvoke(targetType, methodName, ReflectorUtils.EmptyTypeArray);
+            return DelegateForInvoke(targetType, methodName, Type.EmptyTypes);
         }
 
         public MethodInvoker DelegateForInvoke(Type targetType, string methodName, Type[] paramTypes)
@@ -342,7 +342,7 @@ namespace Fasterflect
         #region Construction
         public object Construct(Type targetType)
         {
-            return Construct(targetType, ReflectorUtils.EmptyTypeArray, ReflectorUtils.EmptyObjectArray);
+            return Construct(targetType, Type.EmptyTypes, ReflectorUtils.EmptyObjectArray);
         }
 
         public object Construct(Type targetType, Type[] paramTypes, object[] parameters)
@@ -353,7 +353,7 @@ namespace Fasterflect
 
         public ConstructorInvoker DelegateForConstruct(Type targetType)
         {
-            return DelegateForConstruct(targetType, ReflectorUtils.EmptyTypeArray);
+            return DelegateForConstruct(targetType, Type.EmptyTypes);
         }
 
         public ConstructorInvoker DelegateForConstruct(Type targetType, Type[] paramTypes)

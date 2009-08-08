@@ -36,14 +36,7 @@ namespace Fasterflect.Emitter
                 generator.Emit(OpCodes.Ldarg, paramArrayIndex);
                 generator.Emit(OpCodes.Ldc_I4, i);
                 generator.Emit(OpCodes.Ldelem_Ref);
-                if (paramType.IsValueType)
-                {
-                    generator.Emit(OpCodes.Unbox_Any, paramType);
-                }
-                else
-                {
-                    generator.Emit(OpCodes.Castclass, paramType);
-                }
+                UnboxOrCast(generator, paramType);
                 generator.Emit(OpCodes.Stloc, i);
             }
         }
@@ -71,10 +64,7 @@ namespace Fasterflect.Emitter
             }
             else
             {
-                if (returnType.IsValueType)
-                {
-                    generator.Emit(OpCodes.Box, returnType);
-                }
+                BoxIfValueType(generator, returnType);
                 generator.Emit(OpCodes.Ret);
             }
         }
