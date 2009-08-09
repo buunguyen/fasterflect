@@ -51,9 +51,9 @@ namespace Fasterflect.Emitter
         public object[] Parameters { get; set; }
 
         /// <summary>
-        /// Two <code>CallInfo</code> instances are considered equaled if the following properties
-        /// are equaled: <code>TargetType</code>, <code>MemberTypes</code>, <code>Name</code>,
-        /// and <code>ParamTypes</code>.
+        /// Two <c>CallInfo</c> instances are considered equaled if the following properties
+        /// are equaled: <c>TargetType</c>, <c>MemberTypes</c>, <c>Name</c>,
+        /// and <c>ParamTypes</c>.
         /// </summary>
         public override bool Equals(object obj)
         {

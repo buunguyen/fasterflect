@@ -23,33 +23,34 @@ using Fasterflect.Emitter;
 namespace Fasterflect
 {
     /// <summary>
-    /// Provides the API to perform reflection calls.  The alternative extension method-based
-    /// API, declared in <see cref="ExtensionApi"/> should be the default API.  
+    /// An low-level API for Fasterflect.  The extension method-based
+    /// wrapper API, declared in <see cref="ExtensionApi"/>, should be used as the default API.  
     /// 
-    /// You should only consider this API only if you need fine-grained control 
+    /// You should only consider this API only if you need fine-grain control 
     /// of <see cref="Reflector"/> instances and their cache (e.g. use an instance 
     /// for a certain period and then have it garbaged collected to release
     /// memory of the cached methods).
     /// </summary>
+    /// <seealso cref="ExtensionApi"/>
     public class Reflector
     {
         /// <summary>
-        /// Used to cache all generated delegates in this <code>Reflector</code> instance.
+        /// Used to cache all generated delegates in the declaring  <see cref="Reflector"/> instance.
         /// </summary>
         private readonly DelegateCache cache = new DelegateCache();
         
         private Reflector() { }
 
         /// <summary>
-        /// Factory method to create an instance of <code>Reflector</code>.  
+        /// Factory method to create an instance of <see cref="Reflector"/>.  
         /// Reflection invocations done through this instance are optimized in a way
         /// that subsequent invocations (of the same operation) happen faster.  This
         /// is possible by internal cache used to cache necessary invocation information.
         /// 
         /// Other instances of this type will have their own cache.  Therefore, consider
-        /// reuse an instance created by this method for as long as it makes sense.
+        /// reusing an instance created by this method for as long as it makes sense.
         /// </summary>
-        /// <returns>An instance of <see cref="Reflector"/></returns>
+        /// <returns>An instance of <see cref="Reflector"/>.</returns>
         public static Reflector Create()
         {
             return new Reflector();
