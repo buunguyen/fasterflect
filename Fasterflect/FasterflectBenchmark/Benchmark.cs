@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using Fasterflect;
 
@@ -45,9 +46,12 @@ namespace FasterflectBenchmark
             internal string GetName(string prefix) { return prefix + " " + name; }
         }
 
-        private static readonly int[] Iterations = new[] { 1, 100, 10000, 1000000 };
+        private static readonly int[] Iterations = new[] { 20000, 2000000 };
         private static readonly object[] NoArgArray = new object[0];
         private static readonly object[] ArgArray = new object[]{10};
+        private static readonly Type TargetType = typeof (Person);
+        private static readonly Person TargetPerson = new Person();
+        private static readonly Stopwatch Watch = new Stopwatch();
 
         public static void Main(string[] args)
         {
@@ -63,9 +67,13 @@ namespace FasterflectBenchmark
 
         private static void RunConstructorBenchmark()
         {
-            var ctorInfo = typeof (Person).GetConstructor(BindingFlags.Instance | 
-                BindingFlags.NonPublic, null, new Type[0], null);
-            ConstructorInvoker invoker = typeof(Person).DelegateForConstruct();
+            ConstructorInfo ctorInfo = null;
+            ConstructorInvoker invoker = null;;
+            var initMap = new Dictionary<string, Action>
+                              {
+                                  {"Init info", () => { ctorInfo = typeof (Person).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[0], null); }},
+                                  {"Init ctorInvoker", () => {invoker = typeof(Person).DelegateForConstruct();}}
+                              };
             var actionMap = new Dictionary<string, Action>
                               {
                                   {"Direct ctor", () => new Person() },
@@ -73,186 +81,232 @@ namespace FasterflectBenchmark
                                   {"Fasterflect ctor", () => typeof(Person).Construct() },
                                   {"Fasterflect cached ctor", () => invoker(NoArgArray) },
                               };
-            Execute("Construction", actionMap);
+            Execute("Construction Benchmark", initMap, actionMap);
         }
 
         private static void RunFieldBenchmark()
         {
-            var person = new Person();
-            var fieldInfo = person.GetType().GetField("name", BindingFlags.NonPublic | BindingFlags.Instance);
-            AttributeSetter setter = person.GetType().DelegateForSetField("name");
-            AttributeGetter getter = person.GetType().DelegateForGetField("name");
+            FieldInfo fieldInfo = null;
+            AttributeSetter setter = null;
+            AttributeGetter getter = null;
+            var initMap = new Dictionary<string, Action>
+                              {
+                                  {"Init info", () => { fieldInfo = TargetType.GetField("name", BindingFlags.NonPublic | BindingFlags.Instance); }},
+                                  {"Init setter", () => { setter = TargetType.DelegateForSetField("name"); }},
+                                  {"Init getter", () => {getter = TargetType.DelegateForGetField("name");}}
+                              };
 
             var actionMap = new Dictionary<string, Action>
                               {
-                                  {"Direct set", () => { person.name = "John"; }},
-                                  {"Direct get", () => { var name = person.name; }},
-                                  {"Reflection set", () => fieldInfo.SetValue(person, "John")},
-                                  {"Reflection get", () => fieldInfo.GetValue(person)},
-                                  {"Fasterflect set", () => person.SetField("name", "John")},
-                                  {"Fasterflect get", () => person.GetField<string>("name")},
-                                  {"Fasterflect cached set", () => setter(person, "John")},
-                                  {"Fasterflect cached get", () => getter(person)},
+                                  {"Direct set", () => { TargetPerson.name = "John"; }},
+                                  {"Direct get", () => { var name = TargetPerson.name; }},
+                                  {"Reflection set", () => fieldInfo.SetValue(TargetPerson, "John")},
+                                  {"Reflection get", () => fieldInfo.GetValue(TargetPerson)},
+                                  {"Fasterflect set", () => TargetPerson.SetField("name", "John")},
+                                  {"Fasterflect get", () => TargetPerson.GetField<string>("name")},
+                                  {"Fasterflect cached set", () => setter(TargetPerson, "John")},
+                                  {"Fasterflect cached get", () => getter(TargetPerson)},
                               };
-            Execute("Field Accesses", actionMap);
+            Execute("Field Benchmark", initMap, actionMap);
         }
 
         private static void RunStaticFieldBenchmark()
         {
-            Type type = typeof(Person);
-            var fieldInfo = type.GetField("counter", BindingFlags.NonPublic | BindingFlags.Static);
-            StaticAttributeSetter setter = type.DelegateForSetStaticField("counter");
-            StaticAttributeGetter getter = type.DelegateForGetStaticField("counter");
+            FieldInfo fieldInfo = null;
+            StaticAttributeSetter setter = null;
+            StaticAttributeGetter getter = null;
+            var initMap = new Dictionary<string, Action>
+                              {
+                                  {"Init info", () => { fieldInfo = TargetType.GetField("counter", BindingFlags.NonPublic | BindingFlags.Static); }},
+                                  {"Init setter", () => { setter = TargetType.DelegateForSetStaticField("counter"); }},
+                                  {"Init getter", () => { getter = TargetType.DelegateForGetStaticField("counter"); }}
+                              };
 
             var actionMap = new Dictionary<string, Action>
                               {
                                   {"Direct set", () => { Person.counter = 1; }},
                                   {"Direct get", () => { var counter = Person.counter; }},
-                                  {"Reflection set", () => fieldInfo.SetValue(type, 1)},
-                                  {"Reflection get", () => fieldInfo.GetValue(type)},
-                                  {"Fasterflect set", () => type.SetField("counter", 1)},
-                                  {"Fasterflect get", () => type.GetField<int>("counter")},
+                                  {"Reflection set", () => fieldInfo.SetValue(TargetType, 1)},
+                                  {"Reflection get", () => fieldInfo.GetValue(TargetType)},
+                                  {"Fasterflect set", () => TargetType.SetField("counter", 1)},
+                                  {"Fasterflect get", () => TargetType.GetField<int>("counter")},
                                   {"Fasterflect cached set", () => setter(1)},
                                   {"Fasterflect cached get", () => getter()},
                               };
-            Execute("Static Field Accesses", actionMap);
+            Execute("Static Field Benchmark", initMap, actionMap);
         }
 
         private static void RunPropertyBenchmark()
         {
-            var person = new Person();
-            var propInfo = person.GetType().GetProperty("Age", BindingFlags.NonPublic | BindingFlags.Instance);
-            AttributeSetter setter = person.GetType().DelegateForSetProperty("Age");
-            AttributeGetter getter = person.GetType().DelegateForGetProperty("Age");
+            PropertyInfo propInfo = null;
+            AttributeSetter setter = null;
+            AttributeGetter getter = null;
+            var initMap = new Dictionary<string, Action>
+                              {
+                                  {"Init info", () => { propInfo = TargetType.GetProperty("Age", BindingFlags.NonPublic | BindingFlags.Instance); }},
+                                  {"Init setter", () => { setter = TargetType.DelegateForSetProperty("Age"); }},
+                                  {"Init getter", () => { getter = TargetType.DelegateForGetProperty("Age"); }}
+                              };
       
             var actionMap = new Dictionary<string, Action>
                               {
-                                  {"Direct set", () => { person.Age = 10; }},
-                                  {"Direct get", () => { var age = person.Age; }},
-                                  {"Reflection set", () => propInfo.SetValue(person, 10, null)},
-                                  {"Reflection get", () => propInfo.GetValue(person, null)},
-                                  {"Fasterflect set", () => person.SetProperty("Age", 10)},
-                                  {"Fasterflect get", () => person.GetProperty<int>("Age")},
-                                  {"Fasterflect cached set", () => setter(person, 10)},
-                                  {"Fasterflect cached get", () => getter(person)},
+                                  {"Direct set", () => { TargetPerson.Age = 10; }},
+                                  {"Direct get", () => { var age = TargetPerson.Age; }},
+                                  {"Reflection set", () => propInfo.SetValue(TargetPerson, 10, null)},
+                                  {"Reflection get", () => propInfo.GetValue(TargetPerson, null)},
+                                  {"Fasterflect set", () => TargetPerson.SetProperty("Age", 10)},
+                                  {"Fasterflect get", () => TargetPerson.GetProperty<int>("Age")},
+                                  {"Fasterflect cached set", () => setter(TargetPerson, 10)},
+                                  {"Fasterflect cached get", () => getter(TargetPerson)},
                               };
-            Execute("Property Accesses", actionMap);
+            Execute("Property Benchmark", initMap, actionMap);
         }
 
         private static void RunStaticPropertyBenchmark()
         {
-            var type = typeof(Person);
-            var person = new Person();
-            var propInfo = person.GetType().GetProperty("Counter", BindingFlags.NonPublic | BindingFlags.Static);
-            StaticAttributeSetter setter = person.GetType().DelegateForSetStaticProperty("Counter");
-            StaticAttributeGetter getter = person.GetType().DelegateForGetStaticProperty("Counter");
-         
+            PropertyInfo propInfo = null;
+            StaticAttributeSetter setter = null;
+            StaticAttributeGetter getter = null;
+
+            var initMap = new Dictionary<string, Action>
+                              {
+                                  {"Init info", () => { propInfo = TargetType.GetProperty("Counter", BindingFlags.NonPublic | BindingFlags.Static); }},
+                                  {"Init setter", () => { setter = TargetType.DelegateForSetStaticProperty("Counter"); }},
+                                  {"Init getter", () => { getter = TargetType.DelegateForGetStaticProperty("Counter"); }}
+                              };
+
             var actionMap = new Dictionary<string, Action>
                               {
                                   {"Direct set", () => { Person.Counter = 10; }},
                                   {"Direct get", () => { var counter = Person.Counter; }},
-                                  {"Reflection set", () => propInfo.SetValue(type, 10, null)},
-                                  {"Reflection get", () => propInfo.GetValue(type, null)},
-                                  {"Fasterflect set", () => type.SetProperty("Counter", 10)},
-                                  {"Fasterflect get", () => type.GetProperty<int>("Counter")},
+                                  {"Reflection set", () => propInfo.SetValue(TargetType, 10, null)},
+                                  {"Reflection get", () => propInfo.GetValue(TargetType, null)},
+                                  {"Fasterflect set", () => TargetType.SetProperty("Counter", 10)},
+                                  {"Fasterflect get", () => TargetType.GetProperty<int>("Counter")},
                                   {"Fasterflect cached set", () => setter(10)},
                                   {"Fasterflect cached get", () => getter()},
                               };
-            Execute("Static Property Accesses", actionMap);
+            Execute("Static Property Benchmark", initMap, actionMap);
         }
 
         private static void RunIndexerBenchmark()
         {
-            var person = new Person();
-            var setterInfo = person.GetType().GetMethod("set_Item", new[] { typeof(int), typeof(int), 
-                typeof(object) });
-            var getterInfo = person.GetType().GetMethod("get_Item", new[] { typeof(int), typeof(int) });
-            MethodInvoker setter = person.GetType().DelegateForSetIndexer(new[] { typeof(int), typeof(int), typeof(object) });
-            MethodInvoker getter = person.GetType().DelegateForGetIndexer(new[] { typeof(int), typeof(int) });
+            MethodInfo setterInfo = null;
+            MethodInfo getterInfo = null;
+            MethodInvoker setter = null;
+            MethodInvoker getter = null;
+
+            var initMap = new Dictionary<string, Action>
+                              {
+                                  {"Init setter info", () => { setterInfo = TargetType.GetMethod("set_Item", new[] { typeof(int), typeof(int), typeof(object) }); }},
+                                  {"Init getter info", () => { getterInfo = TargetType.GetMethod("get_Item", new[] { typeof(int), typeof(int) }); }},
+                                  {"Init setter", () => { setter = TargetType.DelegateForSetIndexer(new[] { typeof(int), typeof(int), typeof(object) }); }},
+                                  {"Init getter", () => { getter = TargetType.DelegateForGetIndexer(new[] { typeof(int), typeof(int) }); }}
+                              };
 
             var actionMap = new Dictionary<string, Action>
                               {
-                                  {"Direct set", () => { person[1, 2] = null; }},
-                                  {"Direct get", () => { var tmp = person[1, 2]; }},
-                                  {"Reflection set", () => setterInfo.Invoke(person, new object[]{1, 2, null})},
-                                  {"Reflection get", () => getterInfo.Invoke(person, new object[]{1, 2 })},
-                                  {"Fasterflect set", () => person.SetIndexer(new[] { typeof(int), typeof(int), typeof(object) }, new object[]{1, 2, null})},
-                                  {"Fasterflect get", () => person.GetIndexer<object>(new[] { typeof(int), typeof(int) }, new object[]{1, 2})},
-                                  {"Fasterflect cached set", () => setter(person, new object[]{1, 2, null})},
-                                  {"Fasterflect cached get", () => getter(person, new object[]{1, 2})},
+                                  {"Direct set", () => { TargetPerson[1, 2] = null; }},
+                                  {"Direct get", () => { var tmp = TargetPerson[1, 2]; }},
+                                  {"Reflection set", () => setterInfo.Invoke(TargetPerson, new object[]{1, 2, null})},
+                                  {"Reflection get", () => getterInfo.Invoke(TargetPerson, new object[]{1, 2 })},
+                                  {"Fasterflect set", () => TargetPerson.SetIndexer(new[] { typeof(int), typeof(int), typeof(object) }, new object[]{1, 2, null})},
+                                  {"Fasterflect get", () => TargetPerson.GetIndexer<object>(new[] { typeof(int), typeof(int) }, new object[]{1, 2})},
+                                  {"Fasterflect cached set", () => setter(TargetPerson, 1, 2, null)},
+                                  {"Fasterflect cached get", () => getter(TargetPerson, 1, 2)},
                               };
-            Execute("Indexer Invocation", actionMap);
+            Execute("Indexer Benchmark", initMap, actionMap);
         }
 
         private static void RunMethodInvocationBenchmark()
         {
-            var person = new Person();
-            var noArgMethodInfo = person.GetType().GetMethod("Walk", BindingFlags.NonPublic | BindingFlags.Instance,
-                null, new Type[0], null);
-            var argMethodInfo = person.GetType().GetMethod("Walk", BindingFlags.NonPublic | BindingFlags.Instance,
-                null, new Type[]{typeof(int)}, null);
+            MethodInfo noArgMethodInfo = null;
+            MethodInfo argMethodInfo = null;
 
-            MethodInvoker noArgInvoker = person.GetType().DelegateForInvoke("Walk");
-            MethodInvoker argInvoker = person.GetType().DelegateForInvoke("Walk", new[] { typeof(int) });
+            MethodInvoker noArgInvoker = null;
+            MethodInvoker argInvoker = null;
+
+            var initMap = new Dictionary<string, Action>
+                              {
+                                  {"Init no-arg info", () => { noArgMethodInfo = TargetType.GetMethod("Walk", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[0], null); }},
+                                  {"Init arg info", () => { argMethodInfo = TargetType.GetMethod("Walk", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[]{typeof(int)}, null); }},
+                                  {"Init no-arg invoker", () => { noArgInvoker = TargetType.DelegateForInvoke("Walk"); }},
+                                  {"Init arg invoker", () => { argInvoker = TargetType.DelegateForInvoke("Walk", new[] { typeof(int) }); }}
+                              };
 
             var actionMap = new Dictionary<string, Action>
                               {
-                                  {"Direct invoke", () => person.Walk()},
-                                  {"Direct invoke (arg)", () => person.Walk(10)},
-                                  {"Reflection invoke", () => noArgMethodInfo.Invoke(person, NoArgArray)},
-                                  {"Reflection invoke (arg)", () => argMethodInfo.Invoke(person, ArgArray)},
-                                  {"Fasterflect invoke", () => person.Invoke("Walk")},
-                                  {"Fasterflect invoke (arg)", () => person.Invoke("Walk", new[]{typeof(int)}, ArgArray)},
-                                  {"Fasterflect cached invoke", () => noArgInvoker(person, NoArgArray)},
-                                  {"Fasterflect cached invoke (arg)", () => argInvoker(person, ArgArray)}
+                                  {"Direct invoke", () => TargetPerson.Walk()},
+                                  {"Direct invoke (arg)", () => TargetPerson.Walk(10)},
+                                  {"Reflection invoke", () => noArgMethodInfo.Invoke(TargetPerson, NoArgArray)},
+                                  {"Reflection invoke (arg)", () => argMethodInfo.Invoke(TargetPerson, ArgArray)},
+                                  {"Fasterflect invoke", () => TargetPerson.Invoke("Walk")},
+                                  {"Fasterflect invoke (arg)", () => TargetPerson.Invoke("Walk", new[]{typeof(int)}, ArgArray)},
+                                  {"Fasterflect cached invoke", () => noArgInvoker(TargetPerson, NoArgArray)},
+                                  {"Fasterflect cached invoke (arg)", () => argInvoker(TargetPerson, ArgArray)}
                               };
-            Execute("Method Invocations", actionMap);
+            Execute("Method Benchmark", initMap, actionMap);
         }
 
         private static void RunStaticMethodInvocationBenchmark()
         {
-            var type = typeof(Person);
-            var noArgMethodInfo = type.GetMethod("Generate", BindingFlags.NonPublic | BindingFlags.Static,
-                null, new Type[0], null);
-            var argMethodInfo = type.GetMethod("Generate", BindingFlags.NonPublic | BindingFlags.Static,
-                null, new[] { typeof(int) }, null);
+            MethodInfo noArgMethodInfo = null;
+            MethodInfo argMethodInfo = null;
+            StaticMethodInvoker noArgInvoker = null;
+            StaticMethodInvoker argInvoker = null;
 
-            StaticMethodInvoker noArgInvoker = type.DelegateForStaticInvoke("Generate");
-            StaticMethodInvoker argInvoker = type.DelegateForStaticInvoke("Generate", new[] { typeof(int) });
+            var initMap = new Dictionary<string, Action>
+                              {
+                                  {"Init no-arg info", () => { noArgMethodInfo = TargetType.GetMethod("Generate", BindingFlags.NonPublic | BindingFlags.Static, null, new Type[0], null); }},
+                                  {"Init arg info", () => { argMethodInfo = TargetType.GetMethod("Generate", BindingFlags.NonPublic | BindingFlags.Static, null, new[] { typeof(int) }, null); }},
+                                  {"Init no-arg invoker", () => { noArgInvoker = TargetType.DelegateForStaticInvoke("Generate"); }},
+                                  {"Init arg invoker", () => { argInvoker = TargetType.DelegateForStaticInvoke("Generate", new[] { typeof(int) }); }}
+                              };
 
             var actionMap = new Dictionary<string, Action>
                               {
                                   {"Direct invoke", () => Person.Generate() },
                                   {"Direct invoke (arg)", () => Person.Generate(10) },
-                                  {"Reflection invoke", () => noArgMethodInfo.Invoke(type, NoArgArray)},
-                                  {"Reflection invoke (arg)", () => argMethodInfo.Invoke(type, ArgArray)},
-                                  {"Fasterflect invoke", () => type.Invoke("Generate")},
-                                  {"Fasterflect invoke (arg)", () => type.Invoke("Generate", new[]{typeof(int)}, ArgArray)},
+                                  {"Reflection invoke", () => noArgMethodInfo.Invoke(TargetType, NoArgArray)},
+                                  {"Reflection invoke (arg)", () => argMethodInfo.Invoke(TargetType, ArgArray)},
+                                  {"Fasterflect invoke", () => TargetType.Invoke("Generate")},
+                                  {"Fasterflect invoke (arg)", () => TargetType.Invoke("Generate", new[]{typeof(int)}, ArgArray)},
                                   {"Fasterflect cached invoke", () => noArgInvoker(NoArgArray)},
                                   {"Fasterflect cached invoke (arg)", () => argInvoker(ArgArray)}
                               };
-            Execute("Static Method Invocations", actionMap);
+            Execute("Static Method Invocations", initMap, actionMap);
         }
 
-        private static void Execute(string name, Dictionary<string, Action> actionMap)
+        private static void Execute(string name, Dictionary<string, Action> initMap, 
+            Dictionary<string, Action> actionMap)
         {
             Console.WriteLine("------------- {0} ------------- ", name);
-            foreach (var iteration in Iterations)
+
+            Console.WriteLine("*** Initialization");
+            Measure(Watch, initMap, 1);
+            Console.WriteLine();
+
+            foreach (var iterationCount in Iterations)
             {
-                Console.WriteLine("* Executing for {0} iterations", iteration);
-                foreach (var entry in actionMap)
-                {
-                    long start = Environment.TickCount;
-                    for (int i = 0; i < iteration; i++)
-                    {
-                        entry.Value();
-                    }
-                    long end = Environment.TickCount;
-                    Console.WriteLine("{0,-35} {1} millis", entry.Key + ":", end - start);
-                }
+                Console.WriteLine("*** Executing for {0} iterations", iterationCount);
+                Measure(Watch, actionMap, iterationCount);
                 Console.WriteLine();
             }
             Console.WriteLine();
+        }
+
+        private static void Measure(Stopwatch watch, Dictionary<string, Action> actionMap, 
+            int iterationCount)
+        {
+            foreach (var entry in actionMap)
+            {
+                watch.Start();
+                for (int i = 0; i < iterationCount; i++)
+                    entry.Value();
+                watch.Stop();
+                Console.WriteLine("{0,-35} {1,6} ms", entry.Key + ":", watch.ElapsedMilliseconds);
+                watch.Reset();
+            }
         }
     }
 }

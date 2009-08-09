@@ -60,13 +60,12 @@ namespace Fasterflect.Emitter
             if (returnType == VoidType)
             {
                 generator.Emit(OpCodes.Ldnull);
-                generator.Emit(OpCodes.Ret);
             }
             else
             {
                 BoxIfValueType(generator, returnType);
-                generator.Emit(OpCodes.Ret);
             }
+            generator.Emit(OpCodes.Ret);
         }
     }
 }
