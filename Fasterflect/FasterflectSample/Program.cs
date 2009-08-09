@@ -1,4 +1,22 @@
-﻿using System;
+﻿#region License
+// Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
+// 
+// Licensed under the Apache License, Version 2.0 (the "License"); 
+// you may not use this file except in compliance with the License. 
+// You may obtain a copy of the License at 
+// 
+// http://www.apache.org/licenses/LICENSE-2.0 
+// 
+// Unless required by applicable law or agreed to in writing, software 
+// distributed under the License is distributed on an "AS IS" BASIS, 
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+// See the License for the specific language governing permissions and 
+// limitations under the License.
+// 
+// The latest version of this file can be found at http://fasterflect.codeplex.com/
+#endregion
+
+using System;
 using System.Linq;
 using System.Reflection;
 using Fasterflect;
@@ -10,7 +28,7 @@ namespace FasterflectSample
         static void Main()
         {
             // Load a type reflectively, just to look like real-life scenario
-            Type type = LoadType("FasterflectSample.Person");
+            Type type = Assembly.GetExecutingAssembly().GetType("FasterflectSample.Person");
             ExecuteNormalApi(type);
             ExecuteCacheApi(type);
         }
@@ -28,6 +46,10 @@ namespace FasterflectSample
 
             // Now, Person.InstanceCount should be 1
             AssertTrue(1 == type.GetField<int>("InstanceCount"));
+            
+            // What if we don't know the type of InstanceCount?  
+            // Just specify object as the type parameter
+            Console.WriteLine(type.GetField<object>("InstanceCount"));
 
             // We can bypass the constructor to change the value of Person.InstanceCount
             type.SetField("InstanceCount", 2);
@@ -114,12 +136,6 @@ namespace FasterflectSample
             MethodInvoker walk = type.DelegateForInvoke("Walk", new[] { typeof(int) });
             range.ForEach(i => walk(person, i));
             AssertTrue(range.Sum() == person.GetField<int>("milesTraveled"));
-        }
-
-
-        private static Type LoadType(string name)
-        {
-            return Assembly.GetExecutingAssembly().GetType(name);
         }
 
         public static void AssertTrue(bool expression)
