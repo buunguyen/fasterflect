@@ -62,6 +62,22 @@ namespace FasterflectTest
             }
         }
 
+        class Utils
+        {
+            private static int Update(int i, ref int j, int k, out string s)
+            {
+                j = 2;
+                s = "changed";
+                return i + k;
+            }
+
+            private static void Update(out int i, out string s, int j)
+            {
+                i = j;
+                s = "changed";
+            }
+        }
+
         private Reflector reflector;
         private object target;
 
@@ -70,6 +86,41 @@ namespace FasterflectTest
         {
             reflector = Reflector.Create();
             target = new Person();
+        }
+
+        [TestMethod]
+        public void test_invoke_method_with_ref_params()
+        {
+            var parameters = new object[] { 1, 1, 3, "original"};
+            var result = reflector.Invoke<int>(typeof(Utils), "Update", 
+                new[] { typeof(int), typeof(int).MakeByRefType(), 
+                    typeof(int), typeof(string).MakeByRefType() }, parameters);
+            Assert.AreEqual(4, result);
+            Assert.AreEqual(2, parameters[1]);
+            Assert.AreEqual("changed", parameters[3]);
+        }
+
+        [TestMethod]
+        public void test_invoke_method_with_ref_params_without_returning()
+        {
+            var parameters = new object[] { 1, 1, 3, "original" };
+            reflector.Invoke(typeof(Utils), "Update",
+                new[] { typeof(int), typeof(int).MakeByRefType(), 
+                    typeof(int), typeof(string).MakeByRefType() }, parameters);
+            Assert.AreEqual(2, parameters[1]);
+            Assert.AreEqual("changed", parameters[3]);
+        }
+
+        [TestMethod]
+        public void test_invoke_no_ret_method_with_ref_params()
+        {
+            var parameters = new object[] { 1, "original", 2 };
+            reflector.Invoke(typeof(Utils), "Update",
+                new[] { typeof(int).MakeByRefType(), 
+                        typeof(string).MakeByRefType(),
+                        typeof(int)}, parameters);
+            Assert.AreEqual(2, parameters[0]);
+            Assert.AreEqual("changed", parameters[1]);
         }
 
         [TestMethod]

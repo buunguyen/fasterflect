@@ -34,7 +34,11 @@ namespace FasterflectTest
             public Person Peer;
             public Person[] Peers;
 
-            private Person(){}
+            private Person() { }
+            internal Person(out int i, out string s) {
+                i = 1;
+                s = "changed";
+            }
             internal Person(int age) { Age = age; }
             internal Person(int? id) { Id = id; }
             protected Person(string name) { Name = name; }
@@ -57,6 +61,20 @@ namespace FasterflectTest
         public void TestInitialize()
         {
             reflector = Reflector.Create();
+        }
+
+        [TestMethod]
+        public void test_use_constructor_with_byref_params()
+        {
+            var parameters = new object[] {0, "original"};
+            var obj = reflector.Construct(typeof(Person), new[]
+                                                    {
+                                                        typeof(int).MakeByRefType(),
+                                                        typeof(string).MakeByRefType()
+                                                    }, parameters);
+            Assert.IsNotNull(obj);
+            Assert.AreEqual(1, parameters[0]);
+            Assert.AreEqual("changed", parameters[1]);
         }
 
         [TestMethod]

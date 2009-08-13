@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Fasterflect.Emitter
@@ -39,16 +40,27 @@ namespace Fasterflect.Emitter
             TargetType = targetType;
             MemberTypes = memberTypes;
             Name = name;
-            ParamTypes = paramTypes;
+            ParamTypes = paramTypes.Length == 0 ? EmptyTypeArray : paramTypes;
         }
 
         public Type TargetType { get; private set; }
         public MemberTypes MemberTypes { get; set; }
         public Type[] ParamTypes { get; private set; }
+        public bool HasNoParam { get { return ParamTypes == EmptyTypeArray; } }
         public string Name { get; private set; }
         public bool IsStatic { get; set; }
         public object Target { get; set; }
         public object[] Parameters { get; set; }
+
+        public bool IsTargetTypeStruct
+        {
+            get { return TargetType.IsValueType; }
+        }
+
+        public bool HasRefParam
+        {
+            get { return ParamTypes.Any(t => t.IsByRef); }
+        }
 
         /// <summary>
         /// Two <c>CallInfo</c> instances are considered equaled if the following properties
