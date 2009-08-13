@@ -56,7 +56,9 @@ namespace Fasterflect.Emitter
             generator.Emit(OpCodes.Ldarg_0);
             if (!callInfo.IsStatic)
             {
-                generator.Emit(OpCodes.Castclass, callInfo.TargetType);
+                generator.Emit(callInfo.IsTargetTypeStruct
+                    ? OpCodes.Unbox_Any
+                    : OpCodes.Castclass, callInfo.TargetType);
                 generator.Emit(OpCodes.Ldarg_1);
             }
 
@@ -71,7 +73,8 @@ namespace Fasterflect.Emitter
             else
             {
                 MethodInfo setMethod = GetPropertySetMethod();
-                generator.Emit(callInfo.IsStatic ? OpCodes.Call : OpCodes.Callvirt, setMethod);
+                generator.Emit((callInfo.IsStatic || callInfo.IsTargetTypeStruct)
+                    ? OpCodes.Call : OpCodes.Callvirt, setMethod);
             }
             generator.Emit(OpCodes.Ret);
 

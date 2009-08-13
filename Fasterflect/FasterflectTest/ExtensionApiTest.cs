@@ -25,28 +25,30 @@ namespace FasterflectTest
     public class ExtensionApiTest
     {
         [TestMethod]
-        public void test_uses_of_ext_api()
+        public void test_uses_of_ext_api_for_class()
         {
-            typeof(Person).Invoke("SetMiles", new[]{ typeof(int) }, new object[] { 2 });
-            Assert.AreEqual(2, typeof(Person).Invoke<int>("GetMiles"));
-            Assert.AreEqual(5, typeof(Person).Invoke<int>("GetMiles", new[] { typeof(int) }, new object[] { 3 }));
+            var type = typeof (Person);
 
-            typeof(Person).SetField("miles", 3);
-            Assert.AreEqual(3, typeof(Person).GetField<int>("miles"));
+            type.Invoke("SetMiles", new[]{ typeof(int) }, new object[] { 2 });
+            Assert.AreEqual(2, type.Invoke<int>("GetMiles"));
+            Assert.AreEqual(5, type.Invoke<int>("GetMiles", new[] { typeof(int) }, new object[] { 3 }));
 
-            typeof(Person).SẹtFields(new {miles = 4});
-            Assert.AreEqual(4, typeof(Person).GetField<int>("miles"));
+            type.SetField("miles", 3);
+            Assert.AreEqual(3, type.GetField<int>("miles"));
 
-            typeof(Person).SetProperty("Miles", 5);
-            Assert.AreEqual(5, typeof(Person).GetProperty<int>("Miles"));
+            type.SẹtFields(new {miles = 4});
+            Assert.AreEqual(4, type.GetField<int>("miles"));
 
-            typeof(Person).SetProperties(new { Miles = 6 });
-            Assert.AreEqual(6, typeof(Person).GetProperty<int>("Miles"));
+            type.SetProperty("Miles", 5);
+            Assert.AreEqual(5, type.GetProperty<int>("Miles"));
 
-            object obj = typeof(Person).Construct();
-            Assert.IsInstanceOfType(obj, typeof(Person));
+            type.SetProperties(new { Miles = 6 });
+            Assert.AreEqual(6, type.GetProperty<int>("Miles"));
 
-            obj = typeof(Person).Construct(new[] { typeof(int) }, new object[] { 2 });
+            object obj = type.Construct();
+            Assert.IsInstanceOfType(obj, type);
+
+            obj = type.Construct(new[] { typeof(int) }, new object[] { 2 });
             Assert.AreEqual(2, obj.GetField<int>("id"));
             Assert.AreEqual(2, obj.Invoke<int>("GetId"));
 
@@ -75,7 +77,7 @@ namespace FasterflectTest
             Assert.AreSame(tmp, obj.Invoke<object>("GetItself", new[] { typeof(object) }, new[] { tmp }));
 
             typeof (Person).Invoke("Generate");
-            typeof(Person).Invoke("Generate", new[] { typeof(Person) }, new[] { typeof(Person).Construct() });
+            type.Invoke("Generate", new[] { type }, new[] { type.Construct() });
         }
     }
 }

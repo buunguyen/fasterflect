@@ -60,5 +60,12 @@ namespace FasterflectSample
         {
             return InstanceCount;
         }
+        
+        public static void Swap(ref int i, ref int j)
+        {
+            int tmp = i;
+            i = j;
+            j = tmp;
+        }
     }
 }

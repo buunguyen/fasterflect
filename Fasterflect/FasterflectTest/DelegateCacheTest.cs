@@ -99,6 +99,18 @@ namespace FasterflectTest
         }
 
         [TestMethod]
+        public void test_delegate_is_property_cached_for_method_with_byref_params()
+        {
+            var action = reflector.DelegateForStaticInvoke(typeof (Utils), "Swap",
+                                              new[]{typeof(int).MakeByRefType(),
+                                                    typeof(int).MakeByRefType()});
+            var parameters = new object[] {1, 2};
+            action(parameters);
+            Assert.AreEqual(2, parameters[0]);
+            Assert.AreEqual(1, parameters[1]);
+        }
+
+        [TestMethod]
         public void test_delegate_retrieval_methods_return_correct_delegate_type()
         {
             var funcs = new Func<Delegate>[]

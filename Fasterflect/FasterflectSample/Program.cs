@@ -49,7 +49,7 @@ namespace FasterflectSample
             
             // What if we don't know the type of InstanceCount?  
             // Just specify object as the type parameter
-            Console.WriteLine(type.GetField<object>("InstanceCount"));
+            AssertTrue(1 == (int)type.GetField<object>("InstanceCount"));
 
             // We can bypass the constructor to change the value of Person.InstanceCount
             type.SetField("InstanceCount", 2);
@@ -69,6 +69,13 @@ namespace FasterflectSample
             AssertTrue(4 == type.Invoke("GetInstanceCount")
                                 .Invoke("GetInstanceCount")
                                 .Invoke<int>("GetInstanceCount"));
+
+            // Invoke method receiving ref/out params
+            var parameters = new object[] { 1, 2 };
+            type.Invoke("Swap", new[] { typeof(int).MakeByRefType(), typeof(int).MakeByRefType() }, 
+                parameters);
+            AssertTrue(2 == (int)parameters[0]);
+            AssertTrue(1 == (int)parameters[1]);
 
             // Now, invoke the 2-arg constructor
             obj = type.Construct(new[] {typeof (int), typeof (string)}, new object[] {1, "Doe"});
