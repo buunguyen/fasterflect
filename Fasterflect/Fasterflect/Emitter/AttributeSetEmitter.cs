@@ -46,20 +46,25 @@ namespace Fasterflect.Emitter
 
         protected override Delegate CreateDelegate()
         {
-            MemberInfo member = GetAttribute(callInfo);
+            MemberInfo member = GetAttribute();
             var method = callInfo.IsStatic
                 ? CreateDynamicMethod("setter", callInfo.TargetType, null, new[] { ObjectType })
                 : CreateDynamicMethod("setter", callInfo.TargetType, null, new[] { ObjectType, ObjectType });
             
             ILGenerator generator = method.GetILGenerator();
+            var handleInnerStruct = callInfo.ShouldHandleInnerStruct;
 
-            generator.Emit(OpCodes.Ldarg_0);
-            if (!callInfo.IsStatic)
+            generator.Emit(OpCodes.Ldarg_0); // arg0;
+            if (handleInnerStruct)
             {
-                generator.Emit(callInfo.IsTargetTypeStruct
-                    ? OpCodes.Unbox_Any
-                    : OpCodes.Castclass, callInfo.TargetType);
-                generator.Emit(OpCodes.Ldarg_1);
+                generator.DeclareLocal(callInfo.ActualTargetType); // loc_0: T tmp;
+                LoadInnerStructToLocal(generator, 0); // tmp = ((Struct)arg0)).Value;
+                generator.Emit(OpCodes.Ldarg_1); // arg1;
+            }
+            else if (!callInfo.IsStatic)
+            {
+                generator.Emit(OpCodes.Castclass, callInfo.TargetType); // (T)arg0
+                generator.Emit(OpCodes.Ldarg_1); // arg1;
             }
 
             var memberType = member is FieldInfo
@@ -68,14 +73,23 @@ namespace Fasterflect.Emitter
             UnboxOrCast(generator, memberType);
             if (member.MemberType == MemberTypes.Field)
             {
+                // ((T)arg0).field = arg1;
                 generator.Emit(callInfo.IsStatic ? OpCodes.Stsfld : OpCodes.Stfld, (FieldInfo)member);
             }
             else
             {
                 MethodInfo setMethod = GetPropertySetMethod();
+                
+                // ((T)arg0).set_XXX(arg1);
                 generator.Emit((callInfo.IsStatic || callInfo.IsTargetTypeStruct)
                     ? OpCodes.Call : OpCodes.Callvirt, setMethod);
             }
+
+            if (handleInnerStruct)
+            {
+                StoreLocalToInnerStruct(generator, 0); // ((Struct)arg0)).Value = tmp; 
+            }
+
             generator.Emit(OpCodes.Ret);
 
             return callInfo.IsStatic

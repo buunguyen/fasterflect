@@ -39,34 +39,34 @@ namespace Fasterflect.Emitter
 
         private MethodInfo GetPropertyMethod(string infoPrefix, string errorPrefix)
         {
-            MethodInfo setMethod = callInfo.TargetType.GetMethod(infoPrefix + callInfo.Name,
-                                                                 BindingFlags.Public | BindingFlags.NonPublic | ScopeFlag);
+            MethodInfo setMethod = callInfo.ActualTargetType.GetMethod(infoPrefix + callInfo.Name,
+                BindingFlags.Public | BindingFlags.NonPublic | ScopeFlag);
             if (setMethod == null)
                 throw new MissingMemberException(errorPrefix + " method for property " + callInfo.Name + " does not exist");
             return setMethod;
         }
 
-        protected MemberInfo GetAttribute(CallInfo call)
+        protected MemberInfo GetAttribute()
         {
-            if (call.MemberTypes == MemberTypes.Property)
+            if (callInfo.MemberTypes == MemberTypes.Property)
             {
-                PropertyInfo member = call.TargetType.GetProperty(call.Name,
+                PropertyInfo member = callInfo.ActualTargetType.GetProperty(callInfo.Name,
                     BindingFlags.NonPublic | BindingFlags.Public | ScopeFlag);
                 if (member != null)
                     return member;
-                throw new MissingMemberException((call.IsStatic ? "Static property" : "Property") +
-                    " '" + call.Name + "' does not exist");
+                throw new MissingMemberException((callInfo.IsStatic ? "Static property" : "Property") +
+                    " '" + callInfo.Name + "' does not exist");
             }
-            if (call.MemberTypes == MemberTypes.Field)
+            if (callInfo.MemberTypes == MemberTypes.Field)
             {
-                FieldInfo field = call.TargetType.GetField(call.Name,
+                FieldInfo field = callInfo.ActualTargetType.GetField(callInfo.Name,
                     BindingFlags.NonPublic | BindingFlags.Public | ScopeFlag);
                 if (field != null)
                     return field;
-                throw new MissingFieldException((call.IsStatic ? "Static field" : "Field") + 
-                    " '" + call.Name + "' does not exist");
+                throw new MissingFieldException((callInfo.IsStatic ? "Static field" : "Field") +
+                    " '" + callInfo.Name + "' does not exist");
             }
-            throw new ArgumentException(call.MemberTypes + " is not supported");
+            throw new ArgumentException(callInfo.MemberTypes + " is not supported");
         }
     }
 }

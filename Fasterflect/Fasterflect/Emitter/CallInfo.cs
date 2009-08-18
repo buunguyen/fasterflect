@@ -57,6 +57,38 @@ namespace Fasterflect.Emitter
             get { return TargetType.IsValueType; }
         }
 
+        /// <summary>
+        /// Returns the actual type that is to be used for the CIL invocation.
+        /// If there's an inner struct, the inner struct type is returned.
+        /// </summary>
+        public Type ActualTargetType 
+        { 
+            get
+            {
+                if (ShouldHandleInnerStruct && Target is Struct)
+                {
+                    return ((Struct)Target).Value.GetType();
+                }
+                return TargetType;
+            }
+        }
+
+        /// <summary>
+        /// The CIL should handle inner struct only when the target type is 
+        /// a value type or the wrapper Struct type.  In addition, the call 
+        /// must also be executed in the non-static context since static 
+        /// context doesn't need to handle inner struct case (cos' it has no arg).
+        /// </summary>
+        public bool ShouldHandleInnerStruct
+        {
+            get
+            {
+                return ((TargetType == typeof(Struct) && Target != null) || 
+                        TargetType.IsValueType) && 
+                       !IsStatic;
+            }
+        }
+
         public bool HasRefParam
         {
             get { return ParamTypes.Any(t => t.IsByRef); }

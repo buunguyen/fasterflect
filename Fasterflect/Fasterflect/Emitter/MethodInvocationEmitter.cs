@@ -42,22 +42,6 @@ namespace Fasterflect.Emitter
             }
         }
 
-        private void LoadTarget(ILGenerator generator)
-        {
-            generator.Emit(OpCodes.Ldarg_0);
-            if (callInfo.IsTargetTypeStruct)
-            {
-                generator.DeclareLocal(callInfo.TargetType);
-                generator.Emit(OpCodes.Unbox_Any, callInfo.TargetType);
-                generator.Emit(OpCodes.Stloc_0);
-                generator.Emit(OpCodes.Ldloca_S, 0);
-            }
-            else
-            {
-                generator.Emit(OpCodes.Castclass, callInfo.TargetType);    
-            }
-        }
-
         protected override Delegate CreateDelegate()
         {
             MethodInfo methodInfo = GetMethodInfo();
@@ -67,41 +51,71 @@ namespace Fasterflect.Emitter
             int paramArrayIndex = callInfo.IsStatic ? 0 : 1;
             bool hasReturnType = methodInfo.ReturnType != VoidType;
 
+            int startUsableLocalIndex = 0;
             if (callInfo.HasRefParam)
             {
-                int byRefParamsCount = CreateLocalsForByRefParams(generator, paramArrayIndex);
+                startUsableLocalIndex = CreateLocalsForByRefParams(generator, paramArrayIndex);
+                generator.DeclareLocal(hasReturnType
+                    ? methodInfo.ReturnType
+                    : ObjectType); // T result;
+                GenerateInvocation(methodInfo, generator, paramArrayIndex, startUsableLocalIndex + 1);
                 if (hasReturnType) 
-                    generator.DeclareLocal(methodInfo.ReturnType);
-                GenerateInvocation(methodInfo, generator, paramArrayIndex);
-                if (hasReturnType) 
-                    generator.Emit(OpCodes.Stloc, byRefParamsCount);
+                    generator.Emit(OpCodes.Stloc, startUsableLocalIndex); // result = <stack>;
                 AssignByRefParamsToArray(generator, paramArrayIndex);
-                if (hasReturnType) 
-                    generator.Emit(OpCodes.Ldloc, byRefParamsCount);
             }
             else
             {
-                GenerateInvocation(methodInfo, generator, paramArrayIndex);
+                generator.DeclareLocal(hasReturnType 
+                    ? methodInfo.ReturnType
+                    : ObjectType); // T result;
+                GenerateInvocation(methodInfo, generator, paramArrayIndex, startUsableLocalIndex + 1);
+                if (hasReturnType)
+                    generator.Emit(OpCodes.Stloc, startUsableLocalIndex); // result = <stack>;
             } 
+            
+            if (callInfo.ShouldHandleInnerStruct)
+            {
+                StoreLocalToInnerStruct(generator, startUsableLocalIndex + 1); // ((Struct)arg0)).Value = tmp; 
+            }
+            if (hasReturnType)
+            {
+                generator.Emit(OpCodes.Ldloc, startUsableLocalIndex); // push result;
+                BoxIfValueType(generator, methodInfo.ReturnType); // (box)result;
+            }
+            else
+            {
+                generator.Emit(OpCodes.Ldnull);
+            }  
+            generator.Emit(OpCodes.Ret);
 
-            ReturnValue(generator, methodInfo.ReturnType);
             return method.CreateDelegate(callInfo.IsStatic
                 ? typeof(StaticMethodInvoker)
                 : typeof(MethodInvoker));
         }
 
         private void GenerateInvocation(MethodInfo methodInfo, ILGenerator generator, 
-            int paramArrayIndex)
+            int paramArrayIndex, int structLocalPosition)
         {
             if (!callInfo.IsStatic)
-                LoadTarget(generator);
-            PushLocalsToStack(generator, paramArrayIndex);
+            {
+                generator.Emit(OpCodes.Ldarg_0); // arg0;
+                if (callInfo.ShouldHandleInnerStruct)
+                {
+                    generator.DeclareLocal(callInfo.ActualTargetType); // T tmp;
+                    LoadInnerStructToLocal(generator, structLocalPosition); // tmp = ((Struct)arg0)).Value;
+                }
+                else
+                {
+                    generator.Emit(OpCodes.Castclass, callInfo.TargetType); // (T)arg0;
+                }
+            }
+            PushParamsOrLocalsToStack(generator, paramArrayIndex);
             generator.Emit(callInfo.IsStatic ? OpCodes.Call : OpCodes.Callvirt, methodInfo);
         }
 
         protected MethodInfo GetMethodInfo()
         {
-            var methodInfo = callInfo.TargetType.GetMethod(callInfo.Name,
+            var methodInfo = callInfo.ActualTargetType.GetMethod(callInfo.Name,
                 BindingFlags.ExactBinding | ScopeFlag |
                 BindingFlags.Public | BindingFlags.NonPublic,
                 null, callInfo.ParamTypes, null);

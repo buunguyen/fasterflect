@@ -25,6 +25,7 @@ namespace Fasterflect.Emitter
     internal abstract class BaseEmitter
     {
         protected static readonly Type ObjectType = typeof(object);
+        protected static readonly Type StructType = typeof(Struct);
         protected static readonly Type VoidType = typeof(void);
         protected CallInfo callInfo;
         protected DelegateCache cache;
@@ -66,6 +67,28 @@ namespace Fasterflect.Emitter
             {
                 return callInfo.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
             }
+        }
+
+        protected void LoadInnerStructToLocal(ILGenerator generator, int localPosition)
+        {
+            generator.Emit(OpCodes.Castclass, StructType);
+            var getMethod = StructType.GetMethod("get_Value", BindingFlags.Public |
+                                                                       BindingFlags.Instance);
+            generator.Emit(OpCodes.Callvirt, getMethod);
+            generator.Emit(OpCodes.Unbox_Any, callInfo.ActualTargetType);
+            generator.Emit(OpCodes.Stloc, localPosition);
+            generator.Emit(OpCodes.Ldloca_S, localPosition);
+        }
+
+        protected void StoreLocalToInnerStruct(ILGenerator generator, int localPosition)
+        {
+            generator.Emit(OpCodes.Ldarg_0);
+            generator.Emit(OpCodes.Castclass, StructType);
+            var setMethod = StructType.GetMethod("set_Value", BindingFlags.Public |
+                                                                       BindingFlags.Instance);
+            generator.Emit(OpCodes.Ldloc, localPosition);
+            BoxIfValueType(generator, callInfo.ActualTargetType);
+            generator.Emit(OpCodes.Callvirt, setMethod);
         }
 
         protected void BoxIfValueType(ILGenerator generator, Type type)
