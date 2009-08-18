@@ -46,6 +46,11 @@ namespace FasterflectBenchmark
             internal string GetName(string prefix) { return prefix + " " + name; }
         }
 
+        struct Animal
+        {
+            internal int id;
+        }
+
         private static readonly int[] Iterations = new[] { 20000, 2000000 };
         private static readonly object[] NoArgArray = new object[0];
         private static readonly object[] ArgArray = new object[]{10};
@@ -63,6 +68,7 @@ namespace FasterflectBenchmark
             RunMethodInvocationBenchmark();
             RunStaticMethodInvocationBenchmark();
             RunIndexerBenchmark();
+            RunStructFieldBenchmark();
         }
 
         private static void RunConstructorBenchmark()
@@ -106,6 +112,35 @@ namespace FasterflectBenchmark
                                   {"Fasterflect get", () => TargetPerson.GetField<string>("name")},
                                   {"Fasterflect cached set", () => setter(TargetPerson, "John")},
                                   {"Fasterflect cached get", () => getter(TargetPerson)},
+                              };
+            Execute("Field Benchmark", initMap, actionMap);
+        }
+
+        private static void RunStructFieldBenchmark()
+        {
+            var targetType = typeof (Animal);
+            var targetAnimal = new Animal();
+            var wrapper = new Struct(targetAnimal);
+            FieldInfo fieldInfo = null;
+            AttributeSetter setter = null;
+            AttributeGetter getter = null;
+            var initMap = new Dictionary<string, Action>
+                              {
+                                  {"Init info", () => { fieldInfo = targetType.GetField("id", BindingFlags.NonPublic | BindingFlags.Instance); }},
+                                  {"Init setter", () => { setter = targetType.DelegateForSetField("id"); }},
+                                  {"Init getter", () => { getter = targetType.DelegateForGetField("id");}}
+                              };
+
+            var actionMap = new Dictionary<string, Action>
+                              {
+                                  {"Direct set", () => { targetAnimal.id = 10; }},
+                                  {"Direct get", () => { var id = targetAnimal.id; }},
+                                  {"Reflection set", () => fieldInfo.SetValue(targetAnimal, 10)},
+                                  {"Reflection get", () => fieldInfo.GetValue(targetAnimal)},
+                                  {"Fasterflect set", () => wrapper.SetField("id", 10)},
+                                  {"Fasterflect get", () => wrapper.GetField<int>("id")},
+                                  {"Fasterflect cached set", () => setter(wrapper, 10)},
+                                  {"Fasterflect cached get", () => getter(wrapper)},
                               };
             Execute("Field Benchmark", initMap, actionMap);
         }

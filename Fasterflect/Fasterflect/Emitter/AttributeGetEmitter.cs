@@ -45,35 +45,57 @@ namespace Fasterflect.Emitter
 
         protected override Delegate CreateDelegate()
         {
-            MemberInfo member = GetAttribute(callInfo);
+            MemberInfo member = GetAttribute();
             var method = callInfo.IsStatic 
                 ? CreateDynamicMethod("getter", callInfo.TargetType, ObjectType, null)
                 : CreateDynamicMethod("getter", callInfo.TargetType, ObjectType, new[] { ObjectType });
-            
-            ILGenerator generator = method.GetILGenerator();
 
-            if (!callInfo.IsStatic)
+            ILGenerator generator = method.GetILGenerator();
+            var handleInnerStruct = callInfo.ShouldHandleInnerStruct;
+
+            if (handleInnerStruct)
             {
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(callInfo.IsTargetTypeStruct
-                    ? OpCodes.Unbox_Any
-                    : OpCodes.Castclass, callInfo.TargetType);
+                generator.Emit(OpCodes.Ldarg_0); // arg0
+                generator.DeclareLocal(callInfo.ActualTargetType); // loc_0: T tmp;
+                LoadInnerStructToLocal(generator, 0); // tmp = ((Struct)arg0)).Value;
+                generator.DeclareLocal(ObjectType); // loc_1: T result;
+            }
+            else if (!callInfo.IsStatic)
+            {
+                generator.Emit(OpCodes.Ldarg_0); // arg0
+                generator.Emit(OpCodes.Castclass, callInfo.TargetType); // (T)arg0
             }
 
             if (member.MemberType == MemberTypes.Field)
             {
                 var field = member as FieldInfo;
+
+                // (object)((T)arag0|tmp).field
                 generator.Emit(callInfo.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, field);
+
+                // (object)((T)arag0|tmp).field
                 BoxIfValueType(generator, field.FieldType);
             }
             else
             {
                 var prop = member as PropertyInfo;
                 MethodInfo getMethod = GetPropertyGetMethod();
+
+                // ((T)arag0|tmp).prop
                 generator.Emit((callInfo.IsStatic || callInfo.IsTargetTypeStruct) 
                     ? OpCodes.Call : OpCodes.Callvirt, getMethod);
+
+                // (object)((T)arag0|tmp).prop
                 BoxIfValueType(generator, prop.PropertyType);
             }
+
+            if (handleInnerStruct)
+            {
+                generator.Emit(OpCodes.Stloc_1); // result = <stack>
+                StoreLocalToInnerStruct(generator, 0); // ((Struct)arg0)).Value = tmp; 
+                generator.Emit(OpCodes.Ldloc_1); // push result
+            }
+
             generator.Emit(OpCodes.Ret);
 
             return callInfo.IsStatic 

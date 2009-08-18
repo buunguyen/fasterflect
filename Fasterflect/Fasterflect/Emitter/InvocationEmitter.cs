@@ -68,7 +68,7 @@ namespace Fasterflect.Emitter
             }
         }
 
-        protected void PushLocalsToStack(ILGenerator generator, int paramArrayIndex)
+        protected void PushParamsOrLocalsToStack(ILGenerator generator, int paramArrayIndex)
         {
             int currentByRefParam = 0;
             for (int i = 0; i < callInfo.ParamTypes.Length; i++)

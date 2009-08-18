@@ -28,13 +28,23 @@ namespace FasterflectSample
         static void Main()
         {
             // Load a type reflectively, just to look like real-life scenario
-            Type type = Assembly.GetExecutingAssembly().GetType("FasterflectSample.Person");
-            ExecuteNormalApi(type);
-            ExecuteCacheApi(type);
+            var types = new[]
+                            {
+                                Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonClass"),
+                                Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonStruct")
+                            };
+            Array.ForEach(types, type =>
+                                     {
+                                         ExecuteNormalApi(type);
+                                         ExecuteCacheApi(type);
+                                     }
+                );
         }
 
         private static void ExecuteNormalApi(Type type)
         {
+            bool isStruct = type.IsValueType;
+
             // Person.InstanceCount should be 0 since no instance is created yet
             AssertTrue(type.GetField<int>("InstanceCount") == 0);
             
@@ -44,12 +54,16 @@ namespace FasterflectSample
             // Double-check if the constructor is invoked successfully or not
             AssertTrue(null != obj);
 
-            // Now, Person.InstanceCount should be 1
-            AssertTrue(1 == type.GetField<int>("InstanceCount"));
-            
-            // What if we don't know the type of InstanceCount?  
-            // Just specify object as the type parameter
-            AssertTrue(1 == (int)type.GetField<object>("InstanceCount"));
+            // struct doesn't have no-arg constructor, thus instanceCount won't be increased
+            if (!isStruct)
+            {
+                // Now, Person.InstanceCount should be 1
+                AssertTrue(1 == type.GetField<int>("InstanceCount"));
+
+                // What if we don't know the type of InstanceCount?  
+                // Just specify object as the type parameter
+                AssertTrue(1 == (int) type.GetField<object>("InstanceCount"));
+            }
 
             // We can bypass the constructor to change the value of Person.InstanceCount
             type.SetField("InstanceCount", 2);
@@ -79,6 +93,9 @@ namespace FasterflectSample
 
             // Now, invoke the 2-arg constructor
             obj = type.Construct(new[] {typeof (int), typeof (string)}, new object[] {1, "Doe"});
+
+            if (isStruct)
+                obj = new Struct(obj);
 
             // The id field should be 1, so is Id property
             AssertTrue(1 == obj.GetField<int>("id"));
@@ -113,6 +130,7 @@ namespace FasterflectSample
 
         private static void ExecuteCacheApi(Type type)
         {
+            bool isStruct = type.IsValueType;
             var range = Enumerable.Range(0, 10).ToList();
 
             // Let's cache the getter for InstanceCount
@@ -123,7 +141,9 @@ namespace FasterflectSample
             ConstructorInvoker ctor = type.DelegateForConstruct(new[] { typeof(int), typeof(string) });
             range.ForEach(i =>
             {
-                var obj = ctor(i, "_" + i);
+                object obj = isStruct
+                    ? new Struct(ctor(i, "_" + i))
+                    : ctor(i, "_" + i);
                 AssertTrue(++currentInstanceCount == (int)count());
                 AssertTrue(i == obj.GetField<int>("id"));
                 AssertTrue("_" + i == obj.GetProperty<string>("Name"));
@@ -133,13 +153,18 @@ namespace FasterflectSample
             // For example:
             AttributeSetter nameSetter = type.DelegateForSetProperty("Name");
             AttributeGetter nameGetter = type.DelegateForGetProperty("Name");
-            object person = ctor(1, "Buu");
+ 
+            object person = isStruct
+                ? new Struct(ctor(1, "Buu"))
+                : ctor(1, "Buu");
             AssertTrue("Buu" == nameGetter(person));
             nameSetter(person, "Doe");
             AssertTrue("Doe" == nameGetter(person));
 
             // Another example
-            person = type.Construct();
+            person = isStruct
+                ? new Struct(type.Construct())
+                : type.Construct();
             MethodInvoker walk = type.DelegateForInvoke("Walk", new[] { typeof(int) });
             range.ForEach(i => walk(person, i));
             AssertTrue(range.Sum() == person.GetField<int>("milesTraveled"));

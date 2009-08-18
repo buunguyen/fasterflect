@@ -43,10 +43,10 @@ namespace Fasterflect.Emitter
 
             if (callInfo.IsTargetTypeStruct && callInfo.HasNoParam)
             {
-                generator.DeclareLocal(callInfo.TargetType);
-                generator.Emit(OpCodes.Ldloca_S, 0);
-                generator.Emit(OpCodes.Initobj, callInfo.TargetType);
-                generator.Emit(OpCodes.Ldloc, 0);
+                generator.DeclareLocal(callInfo.TargetType); // loc_0: T tmp;
+                generator.Emit(OpCodes.Ldloca_S, 0); // &tmp;
+                generator.Emit(OpCodes.Initobj, callInfo.TargetType); // init_obj(&tmp);
+                generator.Emit(OpCodes.Ldloc, 0); // tmp;;
             }
             else
             {
@@ -60,24 +60,24 @@ namespace Fasterflect.Emitter
                 if (callInfo.HasRefParam)
                 {
                     int byRefParamsCount = CreateLocalsForByRefParams(generator, 0);
-                    generator.DeclareLocal(callInfo.TargetType);
-                    GenerateNewObjInvocation(generator, ctorInfo);
-                    generator.Emit(OpCodes.Stloc, byRefParamsCount);
-                    AssignByRefParamsToArray(generator, 0);
-                    generator.Emit(OpCodes.Ldloc, byRefParamsCount);
+                    generator.DeclareLocal(callInfo.TargetType); // T tmp;
+                    GenerateNewObjInvocation(generator, ctorInfo); // new T();
+                    generator.Emit(OpCodes.Stloc, byRefParamsCount); // tmp = <stack>;
+                    AssignByRefParamsToArray(generator, 0); // 
+                    generator.Emit(OpCodes.Ldloc, byRefParamsCount); // tmp;
                 }
                 else
                 {
-                    GenerateNewObjInvocation(generator, ctorInfo);
+                    GenerateNewObjInvocation(generator, ctorInfo); // new T();
                 }
             }
-            ReturnValue(generator, callInfo.TargetType);
+            ReturnValue(generator, callInfo.TargetType); // return (box)<stack>;
             return method.CreateDelegate(typeof(ConstructorInvoker));
         }
 
         private void GenerateNewObjInvocation(ILGenerator generator, ConstructorInfo ctorInfo)
         {
-            PushLocalsToStack(generator, 0);
+            PushParamsOrLocalsToStack(generator, 0);
             generator.Emit(OpCodes.Newobj, ctorInfo);
         }
     }

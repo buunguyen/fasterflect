@@ -16,6 +16,7 @@
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
 #endregion
 
+using System;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -26,7 +27,7 @@ namespace FasterflectTest
     {
         internal struct Animal
         {
-            private int id;
+            internal int id;
             private static int miles;
             private static int Miles
             {
@@ -48,6 +49,14 @@ namespace FasterflectTest
                 this.id = id;
             }
 
+            internal Animal(out int i, out string s)
+                : this()
+            {
+                this.id = id;
+                i = 1;
+                s = "changed";
+            }
+
             private int GetId() { return id; }
             private void SetId(int id) { this.id = id; }
             private static void SetMiles(int m) { miles = m; }
@@ -58,6 +67,19 @@ namespace FasterflectTest
             private void Run(float speed) { }
             private static void Generate() { }
             private static void Generate(Animal sample) { }
+
+            private int Update(int i, ref int j, int k, out string s)
+            {
+                j = 2;
+                s = "changed";
+                return id = i + k;
+            }
+
+            private void Update(out int i, out string s, int j)
+            {
+                id = i = j;
+                s = "changed";
+            }
         }
 
         private Reflector reflector;
@@ -95,44 +117,117 @@ namespace FasterflectTest
             Assert.IsInstanceOfType(obj, type);
 
             obj = type.Construct(new[] { typeof(int) }, new object[] { 2 });
-            Assert.AreEqual(2, obj.GetField<int>("id"));
-            Assert.AreEqual(2, obj.Invoke<int>("GetId"));
+            Assert.AreEqual(2, ((Animal)obj).id);
 
             type.Invoke("Generate");
             type.Invoke("Generate", new[] { type }, new[] { type.Construct() });
         }
 
-        // [TestMethod] // struct instance support is being worked on
+        [TestMethod] // struct instance support is being worked on
         public void test_invoke_instance_members_of_struct()
         {
-            object obj = target;
-            reflector.SetField(obj, "id", 3);
-            Assert.AreEqual(3, target.GetField<int>("id"));
+            var wrapper = new Struct(target);
+            wrapper.SetField("id", 3);
+            Assert.AreEqual(3, wrapper.GetField<int>("id"));
 
-            target.SetField("id", 3);
-            Assert.AreEqual(3, target.GetField<int>("id"));
+            wrapper.SetFields(new { id = 4 });
+            Assert.AreEqual(4, wrapper.GetField<int>("id"));
 
-            target.SetFields(new { id = 4 });
-            Assert.AreEqual(4, target.GetField<int>("id"));
+            wrapper.SetProperty("Id", 4);
+            Assert.AreEqual(4, wrapper.GetProperty<int>("Id"));
 
-            target.SetProperty("Id", 4);
-            Assert.AreEqual(4, target.GetProperty<int>("Id"));
+            wrapper.SetProperties(new { Id = 5 });
+            Assert.AreEqual(5, wrapper.GetProperty<int>("Id"));
 
-            target.SetProperties(new { Id = 5 });
-            Assert.AreEqual(5, target.GetProperty<int>("Id"));
+            wrapper.SetIndexer(new[] { typeof(string), typeof(object) }, new object[] { "a", null });
 
-            reflector.SetIndexer(target, new[] { typeof(string), typeof(object) }, new object[] { "a", null });
+            wrapper.GetIndexer<object>(new[] { typeof(string) }, new object[] { "a" });
 
-            target.GetIndexer<object>(new[] { typeof(string) }, new object[] { "a" });
+            wrapper.Invoke("SetId", new[] { typeof(int) }, new object[] { 4 });
+            Assert.AreEqual(4, wrapper.Invoke<int>("GetId"));
 
-            target.Invoke("SetId", new[] { typeof(int) }, new object[] { 4 });
-            Assert.AreEqual(4, target.Invoke<int>("GetId"));
-
-            target.Invoke("Run");
-            target.Invoke("Run", new[] { typeof(float) }, new object[] { 4.4f });
+            wrapper.Invoke("Run");
+            wrapper.Invoke("Run", new[] { typeof(float) }, new object[] { 4.4f });
 
             var tmp = new object();
-            Assert.AreSame(tmp, target.Invoke<object>("GetItself", new[] { typeof(object) }, new[] { tmp }));
+            Assert.AreSame(tmp, wrapper.Invoke<object>("GetItself", new[] { typeof(object) }, new[] { tmp }));
+        }
+
+        [TestMethod]
+        public void test_use_constructor_with_byref_params()
+        {
+            var parameters = new object[] { 0, "original" };
+            var obj = reflector.Construct(typeof(Animal), new[]
+                                                    {
+                                                        typeof(int).MakeByRefType(),
+                                                        typeof(string).MakeByRefType()
+                                                    }, parameters);
+            Assert.IsNotNull(obj);
+            Assert.AreEqual(1, parameters[0]);
+            Assert.AreEqual("changed", parameters[1]);
+        }
+
+        [TestMethod]
+        public void test_invoke_method_with_ref_params()
+        {
+            var parameters = new object[] { 1, 1, 3, "original" };
+            var wrapper = new Struct(target);
+            var result = wrapper.Invoke<int>("Update",
+                new[] { typeof(int), typeof(int).MakeByRefType(), 
+                    typeof(int), typeof(string).MakeByRefType() }, parameters);
+            Assert.AreEqual(4, result);
+            Assert.AreEqual(4, wrapper.GetField<int>("id"));
+            Assert.AreEqual(2, parameters[1]);
+            Assert.AreEqual("changed", parameters[3]);
+        }
+
+        [TestMethod]
+        public void test_invoke_method_with_ref_params_without_returning()
+        {
+            var parameters = new object[] { 1, 1, 3, "original" };
+            var wrapper = new Struct(target);
+            wrapper.Invoke("Update",
+                new[] { typeof(int), typeof(int).MakeByRefType(), 
+                    typeof(int), typeof(string).MakeByRefType() }, parameters);
+            Assert.AreEqual(2, parameters[1]);
+            Assert.AreEqual(4, wrapper.GetField<int>("id"));
+            Assert.AreEqual("changed", parameters[3]);
+        }
+
+        [TestMethod]
+        public void test_invoke_no_ret_method_with_ref_params()
+        {
+            var parameters = new object[] { 1, "original", 2 };
+            var wrapper = new Struct(target);
+            wrapper.Invoke("Update",
+                new[] { typeof(int).MakeByRefType(), 
+                        typeof(string).MakeByRefType(),
+                        typeof(int)}, parameters);
+            Assert.AreEqual(2, parameters[0]);
+            Assert.AreEqual(2, wrapper.GetField<int>("id"));
+            Assert.AreEqual("changed", parameters[1]);
+        }
+
+        [TestMethod]
+        public void test_cache_api()
+        {
+            var type = typeof (Animal);
+            StaticAttributeGetter getCount = type.DelegateForGetStaticField("miles");
+            StaticAttributeSetter setCount = type.DelegateForSetStaticField("miles");
+            setCount(10);
+            Assert.AreEqual(10, getCount());
+
+            ConstructorInvoker ctor = type.DelegateForConstruct(new[] { typeof(int) });
+            var animal = (Animal)ctor(2);
+            Assert.AreEqual(2, animal.id);
+
+            var wrapper = new Struct(ctor(0));
+            AttributeSetter idSetter = type.DelegateForSetProperty("Id");
+            AttributeGetter idGetter = type.DelegateForGetProperty("Id");
+            idSetter(wrapper, 20);
+            Assert.AreEqual(20, idGetter(wrapper));
+            idSetter(wrapper, 12);
+            Assert.AreEqual(12, idGetter(wrapper));
         }
     }
 }
