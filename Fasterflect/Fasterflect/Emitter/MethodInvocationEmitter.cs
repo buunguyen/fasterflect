@@ -116,8 +116,7 @@ namespace Fasterflect.Emitter
         protected MethodInfo GetMethodInfo()
         {
             var methodInfo = callInfo.ActualTargetType.GetMethod(callInfo.Name,
-                BindingFlags.ExactBinding | ScopeFlag |
-                BindingFlags.Public | BindingFlags.NonPublic,
+                ScopeFlag | BindingFlags.Public | BindingFlags.NonPublic,
                 null, callInfo.ParamTypes, null);
             if (methodInfo == null)
                 throw new MissingMethodException(callInfo.IsStatic ?

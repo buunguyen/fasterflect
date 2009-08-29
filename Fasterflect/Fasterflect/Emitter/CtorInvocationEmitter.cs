@@ -51,8 +51,7 @@ namespace Fasterflect.Emitter
             else
             {
                 ConstructorInfo ctorInfo = callInfo.TargetType.GetConstructor(
-                                BindingFlags.ExactBinding | BindingFlags.Instance |
-                                BindingFlags.Public | BindingFlags.NonPublic,
+                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
                                 null, CallingConventions.HasThis, callInfo.ParamTypes, null);
                 if (ctorInfo == null)
                     throw new MissingMemberException("Constructor does not exist");

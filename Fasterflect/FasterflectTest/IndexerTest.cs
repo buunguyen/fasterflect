@@ -24,9 +24,15 @@ namespace FasterflectTest
     [TestClass]
     public class IndexerTest
     {
-        private class Country
+        private class Region {}
+        private class Country : Region
         {
             private string[] cities = new string[100];
+            private Region this[Region region]
+            {
+                get { return region;}
+                set {}
+            }
             private string this[int pos]
             {
                 get
@@ -69,6 +75,15 @@ namespace FasterflectTest
 
             reflector.SetIndexer(target, new[] { typeof(int), typeof(int), typeof(string) }, new object[] { 1, 2, "Jane" });
             Assert.AreEqual("Jane", reflector.GetIndexer<string>(target, new[] { typeof(int), typeof(int) }, new object[] { 1, 2 }));
+        }
+
+        [TestMethod]
+        public void test_invoke_with_co_variant_return_and_param_type()
+        {
+            var country = new Country();
+            var result = reflector.GetIndexer<Country>(target,
+                new[] { typeof(Country) }, new object[] { country });
+            Assert.AreSame(country, result);
         }
     }
 }
