@@ -55,6 +55,11 @@ namespace FasterflectTest
             }
         }
 
+        class Employee : Person
+        {
+            internal Employee(int age) : base(age){}
+        }
+
         private Reflector reflector;
 
         [TestInitialize()]
@@ -117,10 +122,12 @@ namespace FasterflectTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(MissingMemberException))]
-        public void test_use_not_existance_constructor()
+        public void test_invoke_with_co_variant_return_and_param_type()
         {
-            reflector.Construct(typeof(Person), new[]{typeof(double)}, new object[]{1.1});
+            var peer = new Employee(1);
+            var obj = reflector.Construct(typeof(Person), new[] { typeof(Employee) },
+                new object[] { peer });
+            Assert.AreSame(peer, reflector.GetField<Employee>(obj, "Peer"));
         }
 
         [TestMethod]

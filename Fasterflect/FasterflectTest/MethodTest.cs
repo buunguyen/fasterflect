@@ -60,6 +60,16 @@ namespace FasterflectTest
                 milesTraveled += miles;
                 return milesTraveled;
             }
+
+            private Person AddPeer(Person person)
+            {
+                return person;
+            }
+        }
+
+        private class Employee : Person
+        {
+            
         }
 
         class Utils
@@ -86,6 +96,15 @@ namespace FasterflectTest
         {
             reflector = Reflector.Create();
             target = new Person();
+        }
+
+        [TestMethod]
+        public void test_invoke_with_co_variant_return_and_param_type()
+        {
+            var employee = new Employee();
+            var result = reflector.Invoke<Employee>(target, "AddPeer",
+                new[] { typeof(Employee) }, new object[] { employee });
+            Assert.AreSame(employee, result);
         }
 
         [TestMethod]
