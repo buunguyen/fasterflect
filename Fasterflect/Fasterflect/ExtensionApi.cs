@@ -309,6 +309,23 @@ namespace Fasterflect
         /// </summary>
         /// <param name="targetType">The type whose static method is to be invoked.</param>
         /// <param name="methodName">The name of the static method to be invoked.</param>
+        /// <param name="parameters">The parameters of the static method (must be in the right order).  
+        /// The parameter types are determined from these parameters, therefore no parameter can be <code>null</code>.
+        /// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
+        /// use a different overload of this method.</param>
+        /// <returns>The type whose static method is to be invoked.</returns>
+        public static Type Invoke(this Type targetType, string methodName, params object[] parameters)
+        {
+            return Invoke(targetType, methodName, parameters.GetTypeArray(), parameters);
+        }
+
+        /// <summary>
+        /// Invokes the static method specified by <paramref name="methodName"/> of type
+        /// <paramref name="targetType"/>.  Use this overload when the static method has no return type or 
+        /// developers are not interested in the return value.
+        /// </summary>
+        /// <param name="targetType">The type whose static method is to be invoked.</param>
+        /// <param name="methodName">The name of the static method to be invoked.</param>
         /// <param name="paramTypes">The types of the static method's parameters (must be in the right order).</param>
         /// <param name="parameters">The parameters of the static method (must be in the right order).</param>
         /// <returns>The type whose static method is to be invoked.</returns>
@@ -330,6 +347,23 @@ namespace Fasterflect
         {
             Reflector.Invoke(target, methodName);
             return target;
+        }
+
+        /// <summary>
+        /// Invokes the method specified by <paramref name="methodName"/> of object
+        /// <paramref name="target"/>.  Use this overload when the method has no return type or 
+        /// developers are not interested in the return value.
+        /// </summary>
+        /// <param name="target">The object whose method is to be invoked.</param>
+        /// <param name="methodName">The name of the method to be invoked.</param>
+        /// <param name="parameters">The parameters of the method (must be in the right order).
+        /// The parameter types are determined from these parameters, therefore no parameter can be <code>null</code>.
+        /// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
+        /// use a different overload of this method.</param>
+        /// <returns>The object whose method is to be invoked.</returns>
+        public static object Invoke(this object target, string methodName, params object[] parameters)
+        {
+            return Invoke(target, methodName, parameters.GetTypeArray(), parameters);
         }
 
         /// <summary>
@@ -381,12 +415,46 @@ namespace Fasterflect
         /// <typeparam name="TReturn">The return type of the static method.</typeparam>
         /// <param name="targetType">The type whose static method is to be invoked.</param>
         /// <param name="methodName">The name of the static method to be invoked.</param>
+        /// <param name="parameters">The parameters of the static method (must be in the right order).
+        /// The parameter types are determined from these parameters, therefore no parameter can be <code>null</code>.
+        /// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
+        /// use a different overload of this method.</param>
+        /// <returns>The return value of the static method.</returns>
+        public static TReturn Invoke<TReturn>(this Type targetType, string methodName, params object[] parameters)
+        {
+            return Invoke<TReturn>(targetType, methodName, parameters.GetTypeArray(), parameters);
+        }
+
+        /// <summary>
+        /// Invokes the static method specified by <paramref name="methodName"/> of type <paramref name="targetType"/>
+        /// and get back the return value, casted to <typeparamref name="TReturn"/>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of the static method.</typeparam>
+        /// <param name="targetType">The type whose static method is to be invoked.</param>
+        /// <param name="methodName">The name of the static method to be invoked.</param>
         /// <param name="paramTypes">The types of the static method's parameters (must be in the right order).</param>
         /// <param name="parameters">The parameters of the static method (must be in the right order).</param>
         /// <returns>The return value of the static method.</returns>
         public static TReturn Invoke<TReturn>(this Type targetType, string methodName, Type[] paramTypes, object[] parameters)
         {
             return Reflector.Invoke<TReturn>(targetType, methodName, paramTypes, parameters);
+        }
+
+        /// <summary>
+        /// Invokes the method specified by <paramref name="methodName"/> of object <paramref name="target"/>
+        /// and get back the return value, casted to <typeparamref name="TReturn"/>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of the method.</typeparam>
+        /// <param name="target">The object whose method is to be invoked.</param>
+        /// <param name="methodName">The name of the method to be invoked.</param>
+        /// <param name="parameters">The parameters of the method (must be in the right order).
+        /// The parameter types are determined from these parameters, therefore no parameter can be <code>null</code>.
+        /// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
+        /// use a different overload of this method.</param>
+        /// <returns>The return value of the method.</returns>
+        public static TReturn Invoke<TReturn>(this object target, string methodName, params object[] parameters)
+        {
+            return Invoke<TReturn>(target, methodName, parameters.GetTypeArray(), parameters);
         }
 
         /// <summary>
@@ -458,6 +526,27 @@ namespace Fasterflect
         /// Sets the value of the indexer of object <paramref name="target"/>
         /// </summary>
         /// <param name="target">The object whose indexer is to be set.</param>
+        /// <param name="parameters">The list of the indexer parameters plus the value to be set to the indexer.
+        /// The parameter types are determined from these parameters, therefore no parameter can be <code>null</code>.
+        /// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
+        /// use a different overload of this method.</param>
+        /// <returns>The object whose indexer is to be set.</returns>
+        /// <example>
+        /// If the indexer is of type <c>string</c> and accepts one parameter of type <c>int</c>, this 
+        /// method should be invoked as follow:
+        /// <code>
+        /// target.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
+        /// </code>
+        /// </example>
+        public static object SetIndexer(this object target, params object[] parameters)
+        {
+            return SetIndexer(target, parameters.GetTypeArray(), parameters);
+        }
+
+        /// <summary>
+        /// Sets the value of the indexer of object <paramref name="target"/>
+        /// </summary>
+        /// <param name="target">The object whose indexer is to be set.</param>
         /// <param name="paramTypes">The types of the indexer parameters (must be in the right order), plus
         /// the type of the indexer.</param>
         /// <param name="parameters">The list of the indexer parameters plus the value to be set to the indexer.
@@ -474,6 +563,21 @@ namespace Fasterflect
         {
             Reflector.SetIndexer(target, paramTypes, parameters);
             return target;
+        }
+
+        /// <summary>
+        /// Gets the value of the indexer of object <paramref name="target"/>
+        /// </summary>
+        /// <typeparam name="TReturn">The type of the indexer.</typeparam>
+        /// <param name="target">The object whose indexer is to be retrieved.</param>
+        /// <param name="parameters">The list of the indexer parameters.
+        /// The parameter types are determined from these parameters, therefore no parameter can be <code>null</code>.
+        /// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
+        /// use a different overload of this method.</param>
+        /// <returns>The value returned by the indexer.</returns>
+        public static TReturn GetIndexer<TReturn>(this object target, params object[] parameters)
+        {
+            return GetIndexer<TReturn>(target, parameters.GetTypeArray(), parameters);
         }
 
         /// <summary>
@@ -529,6 +633,20 @@ namespace Fasterflect
         public static object Construct(this Type targetType)
         {
             return Reflector.Construct(targetType);
+        }
+
+        /// <summary>
+        /// Invokes a constructor specified by <param name="parameters" /> on the type <paramref name="targetType"/>.
+        /// </summary>
+        /// <param name="targetType">The type whose constructor is to be invoked.</param>
+        /// <param name="parameters">The parameters of the constructor (must be in the right order).
+        /// The parameter types are determined from these parameters, therefore no parameter can be <code>null</code>.
+        /// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
+        /// use a different overload of this method.</param>
+        /// <returns>An instance of type <paramref name="targetType"/>.</returns>
+        public static object Construct(this Type targetType, params object[] parameters)
+        {
+            return Construct(targetType, parameters.GetTypeArray(), parameters);
         }
 
         /// <summary>

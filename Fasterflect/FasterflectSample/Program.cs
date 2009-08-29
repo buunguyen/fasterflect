@@ -92,14 +92,24 @@ namespace FasterflectSample
             AssertTrue(1 == (int)parameters[1]);
 
             // Now, invoke the 2-arg constructor
-            obj = type.Construct(new[] {typeof (int), typeof (string)}, new object[] {1, "Doe"});
+            obj = type.Construct(1, "Doe");
 
             if (isStruct)
                 obj = new Struct(obj);
 
-            // The id field should be 1, so is Id property
+            // id and name should have been set properly
             AssertTrue(1 == obj.GetField<int>("id"));
-            AssertTrue(1 == obj.GetProperty<int>("Id"));
+            AssertTrue("Doe" == obj.GetField<string>("name"));
+
+            // If there's null param, must explicitly specify the param type array
+            obj = type.Construct(new[] { typeof(int), typeof(string) }, new object[] { 1, null });
+
+            if (isStruct)
+                obj = new Struct(obj);
+
+            // id and name should have been set properly
+            AssertTrue(1 == obj.GetField<int>("id"));
+            AssertTrue(null == obj.GetField<string>("name"));
 
             // Now, modify the id
             obj.SetField("id", 2);
@@ -107,7 +117,7 @@ namespace FasterflectSample
             AssertTrue(2 == obj.GetProperty<int>("Id"));
 
             // Let's use the indexer to retrieve the character at index 1st
-            AssertTrue('o' == obj.GetIndexer<char>(new[] {typeof (int)}, new object[] {1}));
+            AssertTrue('o' == obj.GetIndexer<char>(1));
 
             // We can chain calls
             obj.SetField("id", 3).SetProperty("Name", "Buu");
@@ -120,9 +130,7 @@ namespace FasterflectSample
             AssertTrue("Nguyen" == obj.GetProperty<string>("Name"));
 
             // Let's have the folk walk 6 miles (and try chaining again)
-            obj.Invoke("Walk", new[] { typeof(int) }, new object[] { 1 })
-               .Invoke("Walk", new[] { typeof(int) }, new object[] { 2 })
-               .Invoke("Walk", new[] { typeof(int) }, new object[] { 3 });
+            obj.Invoke("Walk", 1).Invoke("Walk", 2).Invoke("Walk", 3);
 
             // Double-check the current value of the milesTravelled field
             AssertTrue(6 == obj.GetField<int>("milesTraveled"));
