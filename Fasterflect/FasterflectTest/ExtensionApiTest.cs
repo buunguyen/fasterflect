@@ -29,9 +29,9 @@ namespace FasterflectTest
         {
             var type = typeof (Person);
 
-            type.Invoke("SetMiles", new[]{ typeof(int) }, new object[] { 2 });
+            type.Invoke("SetMiles", 2);
             Assert.AreEqual(2, type.Invoke<int>("GetMiles"));
-            Assert.AreEqual(5, type.Invoke<int>("GetMiles", new[] { typeof(int) }, new object[] { 3 }));
+            Assert.AreEqual(5, type.Invoke<int>("GetMiles", 3));
 
             type.SetField("miles", 3);
             Assert.AreEqual(3, type.GetField<int>("miles"));
@@ -48,12 +48,12 @@ namespace FasterflectTest
             object obj = type.Construct();
             Assert.IsInstanceOfType(obj, type);
 
-            obj = type.Construct(new[] { typeof(int) }, new object[] { 2 });
+            obj = type.Construct(2);
             Assert.AreEqual(2, obj.GetField<int>("id"));
             Assert.AreEqual(2, obj.Invoke<int>("GetId"));
 
             obj.SetIndexer(new[] { typeof(string), typeof(object) }, new object[] { "a", null });
-            obj.GetIndexer<object>(new[] { typeof(string) }, new object[] { "a" });
+            obj.GetIndexer<object>("a");
 
             obj.SetField("id", 3);
             Assert.AreEqual(3, obj.GetField<int>("id"));
@@ -67,17 +67,17 @@ namespace FasterflectTest
             obj.SetProperties(new { Id = 5 });
             Assert.AreEqual(5, obj.GetProperty<int>("Id"));
 
-            obj.Invoke("SetId", new[] { typeof(int) }, new object[] { 4 });
+            obj.Invoke("SetId", 4);
             Assert.AreEqual(4, obj.Invoke<int>("GetId"));
 
             obj.Invoke("Run");
-            obj.Invoke("Run", new[] { typeof(float) }, new object[] { 4.4f });
+            obj.Invoke("Run", 4.4f);
 
             var tmp = new object();
-            Assert.AreSame(tmp, obj.Invoke<object>("GetItself", new[] { typeof(object) }, new[] { tmp }));
+            Assert.AreSame(tmp, obj.Invoke<object>("GetItself", tmp));
 
             typeof (Person).Invoke("Generate");
-            type.Invoke("Generate", new[] { type }, new[] { type.Construct() });
+            type.Invoke("Generate", type.Construct());
         }
     }
 }

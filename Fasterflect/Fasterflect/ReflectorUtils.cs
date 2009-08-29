@@ -43,6 +43,20 @@ namespace Fasterflect
         {
             return prop.GetGetMethod().Invoke(sample, EmptyObjectArray);
         }
+
+        public static Type[] GetTypeArray(this object[] objects)
+        {
+            /*
+             * Readable code with a LINQ query, but it's pretty slow
+             * return objects.Select(o => o.GetType()).ToArray();
+             */
+            var types = new Type[objects.Length];
+            for (int i = 0; i < types.Length; i++)
+            {
+                types[i] = objects[i].GetType();
+            }
+            return types;
+        }
         #endregion
 
         #region CallInfo Construction
