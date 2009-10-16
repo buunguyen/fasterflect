@@ -75,7 +75,7 @@ namespace Fasterflect.Emitter
             
             if (callInfo.ShouldHandleInnerStruct)
             {
-                StoreLocalToInnerStruct(generator, startUsableLocalIndex + 1); // ((Struct)arg0)).Value = tmp; 
+                StoreLocalToInnerStruct(generator, startUsableLocalIndex + 1); // ((ValueTypeHolder)arg0)).Value = tmp; 
             }
             if (hasReturnType)
             {
@@ -102,7 +102,7 @@ namespace Fasterflect.Emitter
                 if (callInfo.ShouldHandleInnerStruct)
                 {
                     generator.DeclareLocal(callInfo.ActualTargetType); // T tmp;
-                    LoadInnerStructToLocal(generator, structLocalPosition); // tmp = ((Struct)arg0)).Value;
+                    LoadInnerStructToLocal(generator, structLocalPosition); // tmp = ((ValueTypeHolder)arg0)).Value;
                 }
                 else
                 {

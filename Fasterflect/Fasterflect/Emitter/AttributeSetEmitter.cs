@@ -58,7 +58,7 @@ namespace Fasterflect.Emitter
             if (handleInnerStruct)
             {
                 generator.DeclareLocal(callInfo.ActualTargetType); // loc_0: T tmp;
-                LoadInnerStructToLocal(generator, 0); // tmp = ((Struct)arg0)).Value;
+                LoadInnerStructToLocal(generator, 0); // tmp = ((ValueTypeHolder)arg0)).Value;
                 generator.Emit(OpCodes.Ldarg_1); // arg1;
             }
             else if (!callInfo.IsStatic)
@@ -87,7 +87,7 @@ namespace Fasterflect.Emitter
 
             if (handleInnerStruct)
             {
-                StoreLocalToInnerStruct(generator, 0); // ((Struct)arg0)).Value = tmp; 
+                StoreLocalToInnerStruct(generator, 0); // ((ValueTypeHolder)arg0)).Value = tmp; 
             }
 
             generator.Emit(OpCodes.Ret);

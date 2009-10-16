@@ -25,7 +25,7 @@ namespace Fasterflect.Emitter
     internal abstract class BaseEmitter
     {
         protected static readonly Type ObjectType = typeof(object);
-        protected static readonly Type StructType = typeof(Struct);
+        protected static readonly Type StructType = typeof(ValueTypeHolder);
         protected static readonly Type VoidType = typeof(void);
         protected CallInfo callInfo;
         protected DelegateCache cache;

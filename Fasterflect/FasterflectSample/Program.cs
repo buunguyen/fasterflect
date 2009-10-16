@@ -92,32 +92,27 @@ namespace FasterflectSample
             AssertTrue(1 == (int)parameters[1]);
 
             // Now, invoke the 2-arg constructor
-            obj = type.Construct(1, "Doe");
-
-            if (isStruct)
-                obj = new Struct(obj);
+            obj = type.Construct(1, "Doe").CreateHolderIfValueType();
 
             // id and name should have been set properly
             AssertTrue(1 == obj.GetField<int>("id"));
-            AssertTrue("Doe" == obj.GetField<string>("name"));
+            AssertTrue("Doe" == obj.GetProperty<string>("Name"));
+
+            // Let's use the indexer to retrieve the character at index 1st
+            AssertTrue('o' == obj.GetIndexer<char>(1));
 
             // If there's null param, must explicitly specify the param type array
-            obj = type.Construct(new[] { typeof(int), typeof(string) }, new object[] { 1, null });
-
-            if (isStruct)
-                obj = new Struct(obj);
+            obj = type.Construct(new[] { typeof(int), typeof(string) }, new object[] { 1, null })
+                .CreateHolderIfValueType();
 
             // id and name should have been set properly
             AssertTrue(1 == obj.GetField<int>("id"));
-            AssertTrue(null == obj.GetField<string>("name"));
+            AssertTrue(null == obj.GetProperty<string>("Name"));
 
             // Now, modify the id
             obj.SetField("id", 2);
             AssertTrue(2 == obj.GetField<int>("id"));
             AssertTrue(2 == obj.GetProperty<int>("Id"));
-
-            // Let's use the indexer to retrieve the character at index 1st
-            AssertTrue('o' == obj.GetIndexer<char>(1));
 
             // We can chain calls
             obj.SetField("id", 3).SetProperty("Name", "Buu");
@@ -138,7 +133,6 @@ namespace FasterflectSample
 
         private static void ExecuteCacheApi(Type type)
         {
-            bool isStruct = type.IsValueType;
             var range = Enumerable.Range(0, 10).ToList();
 
             // Let's cache the getter for InstanceCount
@@ -149,9 +143,7 @@ namespace FasterflectSample
             ConstructorInvoker ctor = type.DelegateForConstruct(new[] { typeof(int), typeof(string) });
             range.ForEach(i =>
             {
-                object obj = isStruct
-                    ? new Struct(ctor(i, "_" + i))
-                    : ctor(i, "_" + i);
+                object obj = ctor(i, "_" + i).CreateHolderIfValueType();
                 AssertTrue(++currentInstanceCount == (int)count());
                 AssertTrue(i == obj.GetField<int>("id"));
                 AssertTrue("_" + i == obj.GetProperty<string>("Name"));
@@ -161,18 +153,14 @@ namespace FasterflectSample
             // For example:
             AttributeSetter nameSetter = type.DelegateForSetProperty("Name");
             AttributeGetter nameGetter = type.DelegateForGetProperty("Name");
- 
-            object person = isStruct
-                ? new Struct(ctor(1, "Buu"))
-                : ctor(1, "Buu");
+
+            object person = ctor(1, "Buu").CreateHolderIfValueType();
             AssertTrue("Buu" == nameGetter(person));
             nameSetter(person, "Doe");
             AssertTrue("Doe" == nameGetter(person));
 
             // Another example
-            person = isStruct
-                ? new Struct(type.Construct())
-                : type.Construct();
+            person = type.Construct().CreateHolderIfValueType();
             MethodInvoker walk = type.DelegateForInvoke("Walk", new[] { typeof(int) });
             range.ForEach(i => walk(person, i));
             AssertTrue(range.Sum() == person.GetField<int>("milesTraveled"));

@@ -120,7 +120,7 @@ namespace FasterflectBenchmark
         {
             var targetType = typeof (Animal);
             var targetAnimal = new Animal();
-            var wrapper = new Struct(targetAnimal);
+            var wrapper = targetAnimal.CreateHolderIfValueType();
             FieldInfo fieldInfo = null;
             AttributeSetter setter = null;
             AttributeGetter getter = null;

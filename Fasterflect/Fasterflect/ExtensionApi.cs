@@ -36,6 +36,20 @@ namespace Fasterflect
         private static readonly Reflector Reflector = Reflector.Create();
 
         #region Property
+        ///<summary>
+        /// Returns a wrapper <seealso cref="ValueTypeHolder"/> instance if <paramref name="obj"/> 
+        /// is a value type.  Otherwise, returns <paramref name="obj"/>.
+        ///</summary>
+        ///<param name="obj">An object to be examined.</param>
+        ///<returns>A wrapper <seealso cref="ValueTypeHolder"/> instance if <paramref name="obj"/>
+        /// is a value type, or <paramref name="obj"/> itself if it's a reference type.</returns>
+        public static object CreateHolderIfValueType(this object obj)
+        {
+            return obj.GetType().IsValueType 
+                ? new ValueTypeHolder(obj) 
+                : obj;
+        }
+
         /// <summary>
         /// Sets the static properties of <paramref name="targetType"/> based on
         /// the properties available in <paramref name="sample"/>. 
