@@ -126,7 +126,7 @@ namespace FasterflectTest
         [TestMethod] // struct instance support is being worked on
         public void test_invoke_instance_members_of_struct()
         {
-            var wrapper = new Struct(target);
+            var wrapper = target.CreateHolderIfValueType();
             wrapper.SetField("id", 3);
             Assert.AreEqual(3, wrapper.GetField<int>("id"));
 
@@ -171,7 +171,7 @@ namespace FasterflectTest
         public void test_invoke_method_with_ref_params()
         {
             var parameters = new object[] { 1, 1, 3, "original" };
-            var wrapper = new Struct(target);
+            var wrapper = target.CreateHolderIfValueType();
             var result = wrapper.Invoke<int>("Update",
                 new[] { typeof(int), typeof(int).MakeByRefType(), 
                     typeof(int), typeof(string).MakeByRefType() }, parameters);
@@ -185,7 +185,7 @@ namespace FasterflectTest
         public void test_invoke_method_with_ref_params_without_returning()
         {
             var parameters = new object[] { 1, 1, 3, "original" };
-            var wrapper = new Struct(target);
+            var wrapper = target.CreateHolderIfValueType();
             wrapper.Invoke("Update",
                 new[] { typeof(int), typeof(int).MakeByRefType(), 
                     typeof(int), typeof(string).MakeByRefType() }, parameters);
@@ -198,7 +198,7 @@ namespace FasterflectTest
         public void test_invoke_no_ret_method_with_ref_params()
         {
             var parameters = new object[] { 1, "original", 2 };
-            var wrapper = new Struct(target);
+            var wrapper = target.CreateHolderIfValueType();
             wrapper.Invoke("Update",
                 new[] { typeof(int).MakeByRefType(), 
                         typeof(string).MakeByRefType(),
@@ -221,7 +221,7 @@ namespace FasterflectTest
             var animal = (Animal)ctor(2);
             Assert.AreEqual(2, animal.id);
 
-            var wrapper = new Struct(ctor(0));
+            var wrapper = ctor(0).CreateHolderIfValueType();
             AttributeSetter idSetter = type.DelegateForSetProperty("Id");
             AttributeGetter idGetter = type.DelegateForGetProperty("Id");
             idSetter(wrapper, 20);

@@ -65,9 +65,9 @@ namespace Fasterflect.Emitter
         { 
             get
             {
-                if (ShouldHandleInnerStruct && Target is Struct)
+                if (ShouldHandleInnerStruct && Target is ValueTypeHolder)
                 {
-                    return ((Struct)Target).Value.GetType();
+                    return ((ValueTypeHolder)Target).Value.GetType();
                 }
                 return TargetType;
             }
@@ -75,7 +75,7 @@ namespace Fasterflect.Emitter
 
         /// <summary>
         /// The CIL should handle inner struct only when the target type is 
-        /// a value type or the wrapper Struct type.  In addition, the call 
+        /// a value type or the wrapper ValueTypeHolder type.  In addition, the call 
         /// must also be executed in the non-static context since static 
         /// context doesn't need to handle inner struct case (cos' it has no arg).
         /// </summary>
@@ -83,7 +83,7 @@ namespace Fasterflect.Emitter
         {
             get
             {
-                return ((TargetType == typeof(Struct) && Target != null) || 
+                return ((TargetType == typeof(ValueTypeHolder) && Target != null) || 
                         TargetType.IsValueType) && 
                        !IsStatic;
             }
