@@ -114,9 +114,7 @@ namespace Fasterflect
         private Reflector SetFieldOrProperty(Type targetType, MemberTypes memberTypes,
             string fieldOrProperty, object value)
         {
-            var callInfo = ReflectorUtils.CreateStaticSetCallInfo(targetType, memberTypes, 
-                fieldOrProperty, value);
-            new AttributeSetEmitter(callInfo, cache).Execute();
+            DelegateForSetStaticFieldOrProperty(targetType, memberTypes, fieldOrProperty)(value);
             return this;
         }
 
@@ -124,9 +122,8 @@ namespace Fasterflect
             MemberTypes memberTypes,
             string fieldOrProperty)
         {
-            var callInfo = ReflectorUtils.CreateStaticSetCallInfo(targetType, memberTypes, 
-                fieldOrProperty, null);
-            return (StaticAttributeSetter)new AttributeSetEmitter(callInfo, cache).GetDelegate();
+            return (StaticAttributeSetter)
+                new AttributeSetEmitter(cache, targetType, memberTypes, fieldOrProperty, true).GetDelegate();
         }
         #endregion
 
@@ -154,15 +151,14 @@ namespace Fasterflect
         private TReturn GetFieldOrProperty<TReturn>(Type targetType, MemberTypes memberTypes, 
             string fieldOrPropertyName)
         {
-            var callInfo = ReflectorUtils.CreateStaticGetCallInfo(targetType, memberTypes, fieldOrPropertyName);
-            return new AttributeGetEmitter(callInfo, cache).Execute<TReturn>();
+            return (TReturn) DelegateForGetStaticFieldOrProperty(targetType, memberTypes, fieldOrPropertyName)();
         }
 
         private StaticAttributeGetter DelegateForGetStaticFieldOrProperty(Type targetType, MemberTypes memberTypes,
             string fieldOrPropertyName)
         {
-            var callInfo = ReflectorUtils.CreateStaticGetCallInfo(targetType, memberTypes, fieldOrPropertyName);
-            return (StaticAttributeGetter)new AttributeGetEmitter(callInfo, cache).GetDelegate();
+            return (StaticAttributeGetter)new AttributeGetEmitter(
+                cache, targetType, memberTypes, fieldOrPropertyName, true).GetDelegate();
         }
         #endregion
 
@@ -190,17 +186,15 @@ namespace Fasterflect
         private Reflector SetFieldOrProperty(object target, MemberTypes memberTypes,
             string fieldOrProperty, object value)
         {
-            var callInfo = ReflectorUtils.CreateSetCallInfo(target.GetType(), target,
-                memberTypes, fieldOrProperty, value);
-            new AttributeSetEmitter(callInfo, cache).Execute();
+            DelegateForSetFieldOrProperty(target.GetTypeAdjusted(), memberTypes, fieldOrProperty)(target, value);
             return this;
         }
 
         private AttributeSetter DelegateForSetFieldOrProperty(Type targetType, MemberTypes memberTypes,
             string fieldOrProperty)
         {
-            var callInfo = ReflectorUtils.CreateSetCallInfo(targetType, null, memberTypes, fieldOrProperty, null);
-            return (AttributeSetter)new AttributeSetEmitter(callInfo, cache).GetDelegate();
+            return (AttributeSetter)new AttributeSetEmitter(
+                cache, targetType, memberTypes, fieldOrProperty, false).GetDelegate();
         }
         #endregion
 
@@ -227,14 +221,15 @@ namespace Fasterflect
 
         private TReturn GetFieldOrProperty<TReturn>(object target, MemberTypes memberTypes, string fieldOrPropertyName)
         {
-            var callInfo = ReflectorUtils.CreateGetCallInfo(target.GetType(), target, memberTypes, fieldOrPropertyName);
-            return new AttributeGetEmitter(callInfo, cache).Execute<TReturn>();
+            return
+                (TReturn)
+                DelegateForGetFieldOrProperty(target.GetTypeAdjusted(), memberTypes, fieldOrPropertyName)(target);
         }
 
         private AttributeGetter DelegateForGetFieldOrProperty(Type targetType, MemberTypes memberTypes, string fieldOrPropertyName)
         {
-            var callInfo = ReflectorUtils.CreateGetCallInfo(targetType, null, memberTypes, fieldOrPropertyName);
-            return (AttributeGetter)new AttributeGetEmitter(callInfo, cache).GetDelegate();
+            return (AttributeGetter)new AttributeGetEmitter(
+                cache, targetType, memberTypes, fieldOrPropertyName, false).GetDelegate();
         }
         #endregion
 
@@ -242,25 +237,34 @@ namespace Fasterflect
         public Reflector Invoke(Type targetType, string methodName)
         {
             return Invoke(targetType, methodName, Type.EmptyTypes,
-                ReflectorUtils.EmptyObjectArray);
+                Constants.EmptyObjectArray);
+        }
+
+        public Reflector Invoke(Type targetType, string methodName, object[] parameters)
+        {
+            DelegateForStaticInvoke(targetType, methodName, parameters.GetTypeArray())(parameters);
+            return this;
         }
 
         public Reflector Invoke(Type targetType, string methodName, Type[] paramTypes, object[] parameters)
         {
-            var callInfo = ReflectorUtils.CreateStaticMethodCallInfo(targetType, methodName, paramTypes, parameters);
-            new MethodInvocationEmitter(callInfo, cache).Execute();
+            DelegateForStaticInvoke(targetType, methodName, paramTypes)(parameters);
             return this;
         }
 
         public TReturn Invoke<TReturn>(Type targetType, string methodName)
         {
-            return Invoke<TReturn>(targetType, methodName, Type.EmptyTypes, ReflectorUtils.EmptyObjectArray);
+            return Invoke<TReturn>(targetType, methodName, Type.EmptyTypes, Constants.EmptyObjectArray);
+        }
+
+        public TReturn Invoke<TReturn>(Type targetType, string methodName, object[] parameters)
+        {
+            return (TReturn)DelegateForStaticInvoke(targetType, methodName, parameters.GetTypeArray())(parameters);
         }
 
         public TReturn Invoke<TReturn>(Type targetType, string methodName, Type[] paramTypes, object[] parameters)
         {
-            var callInfo = ReflectorUtils.CreateStaticMethodCallInfo(targetType, methodName, paramTypes, parameters);
-            return new MethodInvocationEmitter(callInfo, cache).Execute<TReturn>();
+            return (TReturn)DelegateForStaticInvoke(targetType, methodName, paramTypes)(parameters);
         }
 
         public StaticMethodInvoker DelegateForStaticInvoke(Type targetType, string methodName)
@@ -270,9 +274,8 @@ namespace Fasterflect
 
         public StaticMethodInvoker DelegateForStaticInvoke(Type targetType, string methodName, Type[] paramTypes)
         {
-            var callInfo = ReflectorUtils.CreateStaticMethodCallInfo(targetType, methodName,
-                paramTypes, null);
-            return (StaticMethodInvoker)new MethodInvocationEmitter(callInfo, cache).GetDelegate();
+            return (StaticMethodInvoker)new MethodInvocationEmitter(
+                cache, methodName, targetType, paramTypes, true).GetDelegate();
         }
         #endregion
 
@@ -280,25 +283,34 @@ namespace Fasterflect
         public Reflector Invoke(object target, string methodName)
         {
             return Invoke(target, methodName, Type.EmptyTypes,
-                ReflectorUtils.EmptyObjectArray);
+                Constants.EmptyObjectArray);
+        }
+
+        public Reflector Invoke(object target, string methodName, object[] parameters)
+        {
+            DelegateForInvoke(target.GetTypeAdjusted(), methodName, parameters.GetTypeArray())(target, parameters);
+            return this;
         }
 
         public Reflector Invoke(object target, string methodName, Type[] paramTypes, object[] parameters)
         {
-            var callInfo = ReflectorUtils.CreateMethodCallInfo(target.GetType(), target, methodName, paramTypes, parameters);
-            new MethodInvocationEmitter(callInfo, cache).Execute();
+            DelegateForInvoke(target.GetTypeAdjusted(), methodName, paramTypes)(target, parameters);
             return this;
         }
 
         public TReturn Invoke<TReturn>(object target, string methodName)
         {
-            return Invoke<TReturn>(target, methodName, Type.EmptyTypes, ReflectorUtils.EmptyObjectArray);
+            return Invoke<TReturn>(target, methodName, Type.EmptyTypes, Constants.EmptyObjectArray);
+        }
+
+        public TReturn Invoke<TReturn>(object target, string methodName, object[] parameters)
+        {
+            return (TReturn)DelegateForInvoke(target.GetTypeAdjusted(), methodName, parameters.GetTypeArray())(target, parameters);
         }
 
         public TReturn Invoke<TReturn>(object target, string methodName, Type[] paramTypes, object[] parameters)
         {
-            var callInfo = ReflectorUtils.CreateMethodCallInfo(target.GetType(), target, methodName, paramTypes, parameters);
-            return new MethodInvocationEmitter(callInfo, cache).Execute<TReturn>();
+            return (TReturn) DelegateForInvoke(target.GetTypeAdjusted(), methodName, paramTypes)(target, parameters);
         }
 
         public MethodInvoker DelegateForInvoke(Type targetType, string methodName)
@@ -308,48 +320,84 @@ namespace Fasterflect
 
         public MethodInvoker DelegateForInvoke(Type targetType, string methodName, Type[] paramTypes)
         {
-            var callInfo = ReflectorUtils.CreateMethodCallInfo(targetType, null, methodName, paramTypes, null);
-            return (MethodInvoker)new MethodInvocationEmitter(callInfo, cache).GetDelegate();
+            return (MethodInvoker)new MethodInvocationEmitter(
+                cache, methodName, targetType, paramTypes, false).GetDelegate();
         }
         #endregion
 
+        #region Array
+        public Reflector SetElement(object target, int index, object parameter)
+        {
+            DelegateForSetElement(target.GetTypeAdjusted())(target, index, parameter);
+            return this;
+        }
+
+        public TReturn GetElement<TReturn>(object target, int index)
+        {
+            return (TReturn)DelegateForGetElement(target.GetTypeAdjusted())(target, index);
+        }
+
+        public ArrayElementSetter DelegateForSetElement(Type targetType)
+        {
+            return (ArrayElementSetter)new ArraySetEmitter(cache, targetType).GetDelegate();
+        }
+
+        public ArrayElementGetter DelegateForGetElement(Type targetType)
+        {
+            return (ArrayElementGetter)new ArrayGetEmitter(cache, targetType).GetDelegate();
+        }        
+        #endregion
+
         #region Indexers
+        public Reflector SetIndexer(object target, object[] parameters)
+        {
+            DelegateForSetIndexer(target.GetTypeAdjusted(), parameters.GetTypeArray())(target, parameters);
+            return this;
+        }
+
         public Reflector SetIndexer(object target, Type[] paramTypes, object[] parameters)
         {
-            var callInfo = ReflectorUtils.CreateIndexerSetCallInfo(target.GetType(), target, paramTypes, parameters);
-            new MethodInvocationEmitter(callInfo, cache).Execute();
+            DelegateForSetIndexer(target.GetTypeAdjusted(), paramTypes)(target, parameters);
             return this;
+        }
+
+        public TReturn GetIndexer<TReturn>(object target, object[] parameters)
+        {
+            return (TReturn)DelegateForGetIndexer(target.GetTypeAdjusted(), parameters.GetTypeArray())(target, parameters);
         }
 
         public TReturn GetIndexer<TReturn>(object target, Type[] paramTypes, object[] parameters)
         {
-            var callInfo = ReflectorUtils.CreateIndexerGetCallInfo(target.GetType(), target, paramTypes, parameters);
-            return new MethodInvocationEmitter(callInfo, cache).Execute<TReturn>();
+            return (TReturn)DelegateForGetIndexer(target.GetTypeAdjusted(), paramTypes)(target, parameters);
         }
 
         public MethodInvoker DelegateForSetIndexer(Type targetType, Type[] paramTypes)
         {
-            var callInfo = ReflectorUtils.CreateIndexerSetCallInfo(targetType, null, paramTypes, null);
-            return (MethodInvoker)new MethodInvocationEmitter(callInfo, cache).GetDelegate();
+            return (MethodInvoker)new MethodInvocationEmitter(
+                cache, Constants.IndexerSetterName, targetType, paramTypes, false).GetDelegate();
         }
 
         public MethodInvoker DelegateForGetIndexer(Type targetType, Type[] paramTypes)
         {
-            var callInfo = ReflectorUtils.CreateIndexerGetCallInfo(targetType, null, paramTypes, null);
-            return (MethodInvoker)new MethodInvocationEmitter(callInfo, cache).GetDelegate();
+            return (MethodInvoker)new MethodInvocationEmitter(
+                cache, Constants.IndexerGetterName, targetType, paramTypes, false).GetDelegate();
         }
         #endregion
 
         #region Construction
         public object Construct(Type targetType)
         {
-            return Construct(targetType, Type.EmptyTypes, ReflectorUtils.EmptyObjectArray);
+            return Construct(targetType, Type.EmptyTypes, Constants.EmptyObjectArray);
+        }
+
+        public object Construct(Type targetType, object[] parameters)
+        {
+            return DelegateForConstruct(targetType, parameters.GetTypeArray())(parameters);
         }
 
         public object Construct(Type targetType, Type[] paramTypes, object[] parameters)
         {
-            var callInfo = ReflectorUtils.GetConstructorCallInfo(targetType, paramTypes, parameters);
-            return new CtorInvocationEmitter(callInfo, cache).Execute<object>();
+            return DelegateForConstruct(targetType, paramTypes)(parameters);
         }
 
         public ConstructorInvoker DelegateForConstruct(Type targetType)
@@ -359,8 +407,8 @@ namespace Fasterflect
 
         public ConstructorInvoker DelegateForConstruct(Type targetType, Type[] paramTypes)
         {
-            var callInfo = ReflectorUtils.GetConstructorCallInfo(targetType, paramTypes, null);
-            return (ConstructorInvoker)new CtorInvocationEmitter(callInfo, cache).GetDelegate();
+            return (ConstructorInvoker)
+                new CtorInvocationEmitter(cache, targetType, paramTypes).GetDelegate();
         }
         #endregion
     }

@@ -23,7 +23,7 @@ namespace Fasterflect.Emitter
 {
     internal abstract class AttributeEmitter : BaseEmitter
     {
-        protected AttributeEmitter(CallInfo callInfo, DelegateCache cache) : base(callInfo, cache)
+        protected AttributeEmitter(DelegateCache cache) : base(cache)
         {
         }
 
@@ -39,7 +39,7 @@ namespace Fasterflect.Emitter
 
         private MethodInfo GetPropertyMethod(string infoPrefix, string errorPrefix)
         {
-            MethodInfo setMethod = callInfo.ActualTargetType.GetMethod(infoPrefix + callInfo.Name,
+            MethodInfo setMethod = callInfo.TargetType.GetMethod(infoPrefix + callInfo.Name,
                 BindingFlags.Public | BindingFlags.NonPublic | ScopeFlag);
             if (setMethod == null)
                 throw new MissingMemberException(errorPrefix + " method for property " + callInfo.Name + " does not exist");
@@ -50,7 +50,7 @@ namespace Fasterflect.Emitter
         {
             if (callInfo.MemberTypes == MemberTypes.Property)
             {
-                PropertyInfo member = callInfo.ActualTargetType.GetProperty(callInfo.Name,
+                PropertyInfo member = callInfo.TargetType.GetProperty(callInfo.Name,
                     BindingFlags.NonPublic | BindingFlags.Public | ScopeFlag);
                 if (member != null)
                     return member;
@@ -59,7 +59,7 @@ namespace Fasterflect.Emitter
             }
             if (callInfo.MemberTypes == MemberTypes.Field)
             {
-                FieldInfo field = callInfo.ActualTargetType.GetField(callInfo.Name,
+                FieldInfo field = callInfo.TargetType.GetField(callInfo.Name,
                     BindingFlags.NonPublic | BindingFlags.Public | ScopeFlag);
                 if (field != null)
                     return field;

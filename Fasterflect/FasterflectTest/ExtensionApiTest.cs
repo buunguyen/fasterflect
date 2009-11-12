@@ -78,6 +78,8 @@ namespace FasterflectTest
 
             typeof (Person).Invoke("Generate");
             type.Invoke("Generate", type.Construct());
+
+            
         }
     }
 }

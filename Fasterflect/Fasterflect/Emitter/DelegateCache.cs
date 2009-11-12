@@ -55,7 +55,11 @@ namespace Fasterflect.Emitter
             rwLock.EnterWriteLock();
             try
             {
-                if (!map.ContainsKey(callInfo))
+                if (map.ContainsKey(callInfo))
+                {
+                    action = map[callInfo];
+                }
+                else
                 {
                     action = func();
                     map.Add(callInfo, action);

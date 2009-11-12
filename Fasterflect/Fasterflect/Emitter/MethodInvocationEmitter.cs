@@ -24,22 +24,11 @@ namespace Fasterflect.Emitter
 {
     internal class MethodInvocationEmitter : InvocationEmitter
     {
-        public MethodInvocationEmitter(CallInfo callInfo, DelegateCache cache) : base(callInfo, cache)
+        public MethodInvocationEmitter(DelegateCache cache, string name, Type targetType, 
+            Type[] paramTypes, bool isStatic) 
+            : base(cache)
         {
-        }
-
-        protected override object Invoke(Delegate action)
-        {
-            if (callInfo.IsStatic)
-            {
-                var invocation = (StaticMethodInvoker)action;
-                return invocation.Invoke(callInfo.Parameters);
-            }
-            else
-            {
-                var invocation = (MethodInvoker)action;
-                return invocation.Invoke(callInfo.Target, callInfo.Parameters);
-            }
+            callInfo = new CallInfo(targetType, MemberTypes.Method, name, paramTypes, isStatic);
         }
 
         protected override Delegate CreateDelegate()
@@ -49,7 +38,7 @@ namespace Fasterflect.Emitter
             ILGenerator generator = method.GetILGenerator();
 
             int paramArrayIndex = callInfo.IsStatic ? 0 : 1;
-            bool hasReturnType = methodInfo.ReturnType != VoidType;
+            bool hasReturnType = methodInfo.ReturnType != Constants.VoidType;
 
             int startUsableLocalIndex = 0;
             if (callInfo.HasRefParam)
@@ -57,7 +46,7 @@ namespace Fasterflect.Emitter
                 startUsableLocalIndex = CreateLocalsForByRefParams(generator, paramArrayIndex);
                 generator.DeclareLocal(hasReturnType
                     ? methodInfo.ReturnType
-                    : ObjectType); // T result;
+                    : Constants.ObjectType); // T result;
                 GenerateInvocation(methodInfo, generator, paramArrayIndex, startUsableLocalIndex + 1);
                 if (hasReturnType) 
                     generator.Emit(OpCodes.Stloc, startUsableLocalIndex); // result = <stack>;
@@ -67,7 +56,7 @@ namespace Fasterflect.Emitter
             {
                 generator.DeclareLocal(hasReturnType 
                     ? methodInfo.ReturnType
-                    : ObjectType); // T result;
+                    : Constants.ObjectType); // T result;
                 GenerateInvocation(methodInfo, generator, paramArrayIndex, startUsableLocalIndex + 1);
                 if (hasReturnType)
                     generator.Emit(OpCodes.Stloc, startUsableLocalIndex); // result = <stack>;
@@ -101,7 +90,7 @@ namespace Fasterflect.Emitter
                 generator.Emit(OpCodes.Ldarg_0); // arg0;
                 if (callInfo.ShouldHandleInnerStruct)
                 {
-                    generator.DeclareLocal(callInfo.ActualTargetType); // T tmp;
+                    generator.DeclareLocal(callInfo.TargetType); // T tmp;
                     LoadInnerStructToLocal(generator, structLocalPosition); // tmp = ((ValueTypeHolder)arg0)).Value;
                 }
                 else
@@ -115,7 +104,7 @@ namespace Fasterflect.Emitter
 
         protected MethodInfo GetMethodInfo()
         {
-            var methodInfo = callInfo.ActualTargetType.GetMethod(callInfo.Name,
+            var methodInfo = callInfo.TargetType.GetMethod(callInfo.Name,
                 ScopeFlag | BindingFlags.Public | BindingFlags.NonPublic,
                 null, callInfo.ParamTypes, null);
             if (methodInfo == null)
@@ -126,10 +115,10 @@ namespace Fasterflect.Emitter
 
         protected DynamicMethod CreateDynamicMethod()
         {
-            return CreateDynamicMethod("invoke", callInfo.TargetType, ObjectType,
+            return CreateDynamicMethod("invoke", callInfo.TargetType, Constants.ObjectType,
                                        callInfo.IsStatic
-                                           ? new[] { ObjectType.MakeArrayType() }
-                                           : new[] { ObjectType, ObjectType.MakeArrayType() });
+                                           ? new[] { Constants.ObjectType.MakeArrayType() }
+                                           : new[] { Constants.ObjectType, Constants.ObjectType.MakeArrayType() });
         }
     }
 }

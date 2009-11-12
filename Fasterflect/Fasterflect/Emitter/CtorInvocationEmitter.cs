@@ -24,21 +24,16 @@ namespace Fasterflect.Emitter
 {
     internal class CtorInvocationEmitter : InvocationEmitter
     {
-        public CtorInvocationEmitter(CallInfo callInfo, DelegateCache cache)
-            : base(callInfo, cache)
+        public CtorInvocationEmitter(DelegateCache cache, Type targetType, Type[] paramTypes)
+            : base(cache)
         {
-        }
-
-        protected override object Invoke(Delegate action)
-        {
-            var invocation = (ConstructorInvoker)action;
-            return invocation.Invoke(callInfo.Parameters);
+            callInfo = new CallInfo(targetType, MemberTypes.Constructor, targetType.Name, paramTypes);
         }
 
         protected override Delegate CreateDelegate()
         {
             var method = CreateDynamicMethod("ctor",
-                callInfo.TargetType, ObjectType, new[] { ObjectType });
+                callInfo.TargetType, Constants.ObjectType, new[] { Constants.ObjectType });
             ILGenerator generator = method.GetILGenerator();
 
             if (callInfo.IsTargetTypeStruct && callInfo.HasNoParam)
@@ -47,6 +42,14 @@ namespace Fasterflect.Emitter
                 generator.Emit(OpCodes.Ldloca_S, 0); // &tmp;
                 generator.Emit(OpCodes.Initobj, callInfo.TargetType); // init_obj(&tmp);
                 generator.Emit(OpCodes.Ldloc, 0); // tmp;;
+            }
+            else if (callInfo.TargetType.IsArray)
+            {
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldc_I4_0);
+                generator.Emit(OpCodes.Ldelem_Ref);
+                generator.Emit(OpCodes.Unbox_Any, typeof(int));
+                generator.Emit(OpCodes.Newarr, callInfo.TargetType.GetElementType());
             }
             else
             {

@@ -24,31 +24,20 @@ namespace Fasterflect.Emitter
 {
     internal class AttributeGetEmitter : AttributeEmitter
     {
-        public AttributeGetEmitter(CallInfo callInfo, DelegateCache cache)
-            : base(callInfo, cache)
+        public AttributeGetEmitter(DelegateCache cache, Type targetType, 
+            MemberTypes memberTypes, string fieldOrPropertyName, bool isStatic)
+            : base(cache)
         {
-        }
-
-        protected override object Invoke(Delegate action)
-        {
-            if (callInfo.IsStatic)
-            {
-                var invocation = (StaticAttributeGetter)action;
-                return invocation.Invoke();
-            }
-            else
-            {
-                var invocation = (AttributeGetter)action;
-                return invocation.Invoke(callInfo.Target);
-            }
+            callInfo = new CallInfo(targetType, memberTypes, fieldOrPropertyName, 
+                Constants.EmptyTypeArray, isStatic);
         }
 
         protected override Delegate CreateDelegate()
         {
             MemberInfo member = GetAttribute();
             var method = callInfo.IsStatic 
-                ? CreateDynamicMethod("getter", callInfo.TargetType, ObjectType, null)
-                : CreateDynamicMethod("getter", callInfo.TargetType, ObjectType, new[] { ObjectType });
+                ? CreateDynamicMethod("getter", callInfo.TargetType, Constants.ObjectType, null)
+                : CreateDynamicMethod("getter", callInfo.TargetType, Constants.ObjectType, new[] { Constants.ObjectType });
 
             ILGenerator generator = method.GetILGenerator();
             var handleInnerStruct = callInfo.ShouldHandleInnerStruct;
@@ -56,9 +45,9 @@ namespace Fasterflect.Emitter
             if (handleInnerStruct)
             {
                 generator.Emit(OpCodes.Ldarg_0); // arg0
-                generator.DeclareLocal(callInfo.ActualTargetType); // loc_0: T tmp;
+                generator.DeclareLocal(callInfo.TargetType); // loc_0: T tmp;
                 LoadInnerStructToLocal(generator, 0); // tmp = ((ValueTypeHolder)arg0)).Value;
-                generator.DeclareLocal(ObjectType); // loc_1: T result;
+                generator.DeclareLocal(Constants.ObjectType); // loc_1: T result;
             }
             else if (!callInfo.IsStatic)
             {

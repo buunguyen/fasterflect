@@ -15,7 +15,7 @@
     <StartupObject>
     </StartupObject>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>bn.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>bnk.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,9 +52,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Delegates.cs" />
+    <Compile Include="Emitter\ArrayGetEmitter.cs" />
+    <Compile Include="Emitter\ArraySetEmitter.cs" />
     <Compile Include="Emitter\AttributeEmitter.cs" />
     <Compile Include="Emitter\BaseEmitter.cs" />
     <Compile Include="Emitter\CallInfo.cs" />
+    <Compile Include="Emitter\Constants.cs" />
     <Compile Include="Emitter\CtorInvocationEmitter.cs" />
     <Compile Include="Emitter\InvocationEmitter.cs" />
     <Compile Include="Emitter\MethodInvocationEmitter.cs" />
@@ -68,7 +71,7 @@
     <Compile Include="ValueTypeHolder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bn.snk" />
+    <None Include="bnk.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

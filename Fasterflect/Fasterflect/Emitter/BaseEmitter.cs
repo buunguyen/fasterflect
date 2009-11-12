@@ -24,15 +24,11 @@ namespace Fasterflect.Emitter
 {
     internal abstract class BaseEmitter
     {
-        protected static readonly Type ObjectType = typeof(object);
-        protected static readonly Type StructType = typeof(ValueTypeHolder);
-        protected static readonly Type VoidType = typeof(void);
         protected CallInfo callInfo;
         protected DelegateCache cache;
 
-        protected BaseEmitter(CallInfo callInfo, DelegateCache cache)
+        protected BaseEmitter(DelegateCache cache)
         {
-            this.callInfo = callInfo;
             this.cache = cache;
         }
 
@@ -41,24 +37,14 @@ namespace Fasterflect.Emitter
             return cache.GetDelegate(callInfo, CreateDelegate);
         }
 
-        public void Execute()
-        {
-            Invoke(GetDelegate());
-        }
-
-        public T Execute<T>()
-        {
-            return (T)Invoke(GetDelegate());
-        }
-
         protected abstract Delegate CreateDelegate();
-        protected abstract object Invoke(Delegate action);
 
         protected static DynamicMethod CreateDynamicMethod(string name, Type targetType, Type returnType, Type[] paramTypes)
         {
             return new DynamicMethod(name, MethodAttributes.Static | MethodAttributes.Public,
                                      CallingConventions.Standard, returnType, paramTypes,
-                                     targetType, true);
+                                     targetType.IsArray ? targetType.GetElementType() : targetType, 
+                                     true);
         }
 
         protected BindingFlags ScopeFlag
@@ -71,11 +57,11 @@ namespace Fasterflect.Emitter
 
         protected void LoadInnerStructToLocal(ILGenerator generator, int localPosition)
         {
-            generator.Emit(OpCodes.Castclass, StructType);
-            var getMethod = StructType.GetMethod("get_Value", BindingFlags.Public |
+            generator.Emit(OpCodes.Castclass, Constants.StructType);
+            var getMethod = Constants.StructType.GetMethod("get_Value", BindingFlags.Public |
                                                                        BindingFlags.Instance);
             generator.Emit(OpCodes.Callvirt, getMethod);
-            generator.Emit(OpCodes.Unbox_Any, callInfo.ActualTargetType);
+            generator.Emit(OpCodes.Unbox_Any, callInfo.TargetType);
             generator.Emit(OpCodes.Stloc, localPosition);
             generator.Emit(OpCodes.Ldloca_S, localPosition);
         }
@@ -83,11 +69,11 @@ namespace Fasterflect.Emitter
         protected void StoreLocalToInnerStruct(ILGenerator generator, int localPosition)
         {
             generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Castclass, StructType);
-            var setMethod = StructType.GetMethod("set_Value", BindingFlags.Public |
+            generator.Emit(OpCodes.Castclass, Constants.StructType);
+            var setMethod = Constants.StructType.GetMethod("set_Value", BindingFlags.Public |
                                                                        BindingFlags.Instance);
             generator.Emit(OpCodes.Ldloc, localPosition);
-            BoxIfValueType(generator, callInfo.ActualTargetType);
+            BoxIfValueType(generator, callInfo.TargetType);
             generator.Emit(OpCodes.Callvirt, setMethod);
         }
 
