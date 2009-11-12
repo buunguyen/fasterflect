@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Fasterflect")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Fast & Simple Reflection Invocation Library")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Buu Nguyen")]
 [assembly: AssemblyProduct("Fasterflect")]
-[assembly: AssemblyCopyright("Copyright ©  2009")]
+[assembly: AssemblyCopyright("Copyright © Buu Nguyen 2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]

@@ -28,50 +28,31 @@ namespace Fasterflect.Emitter
     /// </summary>
     internal class CallInfo
     {
-        private static readonly Type[] EmptyTypeArray = new Type[0];
+        public Type TargetType { get; private set; }
+        public MemberTypes MemberTypes { get; set; }
+        public Type[] ParamTypes { get; private set; }
+        public string Name { get; private set; }
+        public bool IsStatic { get; private set; }
 
         public CallInfo(Type targetType, MemberTypes memberTypes, string name)
-            : this(targetType, memberTypes, name, EmptyTypeArray)
+            : this(targetType, memberTypes, name, Constants.EmptyTypeArray)
         {
         }
 
         public CallInfo(Type targetType, MemberTypes memberTypes, string name, Type[] paramTypes)
+            : this(targetType, memberTypes, name, paramTypes, false)
+        {
+        }
+
+        public CallInfo(Type targetType, MemberTypes memberTypes, string name, Type[] paramTypes, bool isStatic)
         {
             TargetType = targetType;
             MemberTypes = memberTypes;
             Name = name;
-            ParamTypes = paramTypes.Length == 0 ? EmptyTypeArray : paramTypes;
+            ParamTypes = paramTypes.Length == 0 ? Constants.EmptyTypeArray : paramTypes;
+            IsStatic = isStatic;
         }
 
-        public Type TargetType { get; private set; }
-        public MemberTypes MemberTypes { get; set; }
-        public Type[] ParamTypes { get; private set; }
-        public bool HasNoParam { get { return ParamTypes == EmptyTypeArray; } }
-        public string Name { get; private set; }
-        public bool IsStatic { get; set; }
-        public object Target { get; set; }
-        public object[] Parameters { get; set; }
-
-        public bool IsTargetTypeStruct
-        {
-            get { return TargetType.IsValueType; }
-        }
-
-        /// <summary>
-        /// Returns the actual type that is to be used for the CIL invocation.
-        /// If there's an inner struct, the inner struct type is returned.
-        /// </summary>
-        public Type ActualTargetType 
-        { 
-            get
-            {
-                if (ShouldHandleInnerStruct && Target is ValueTypeHolder)
-                {
-                    return ((ValueTypeHolder)Target).Value.GetType();
-                }
-                return TargetType;
-            }
-        }
 
         /// <summary>
         /// The CIL should handle inner struct only when the target type is 
@@ -83,10 +64,18 @@ namespace Fasterflect.Emitter
         {
             get
             {
-                return ((TargetType == typeof(ValueTypeHolder) && Target != null) || 
-                        TargetType.IsValueType) && 
-                       !IsStatic;
+                return IsTargetTypeStruct && !IsStatic;
             }
+        }
+
+        public bool IsTargetTypeStruct
+        {
+            get { return TargetType.IsValueType; }
+        }
+
+        public bool HasNoParam
+        {
+            get { return ParamTypes == Constants.EmptyTypeArray; }
         }
 
         public bool HasRefParam

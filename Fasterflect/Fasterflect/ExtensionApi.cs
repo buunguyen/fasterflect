@@ -330,7 +330,8 @@ namespace Fasterflect
         /// <returns>The type whose static method is to be invoked.</returns>
         public static Type Invoke(this Type targetType, string methodName, params object[] parameters)
         {
-            return Invoke(targetType, methodName, parameters.GetTypeArray(), parameters);
+            Reflector.Invoke(targetType, methodName, parameters);
+            return targetType;
         }
 
         /// <summary>
@@ -377,7 +378,8 @@ namespace Fasterflect
         /// <returns>The object whose method is to be invoked.</returns>
         public static object Invoke(this object target, string methodName, params object[] parameters)
         {
-            return Invoke(target, methodName, parameters.GetTypeArray(), parameters);
+            Reflector.Invoke(target, methodName, parameters);
+            return target;
         }
 
         /// <summary>
@@ -436,7 +438,7 @@ namespace Fasterflect
         /// <returns>The return value of the static method.</returns>
         public static TReturn Invoke<TReturn>(this Type targetType, string methodName, params object[] parameters)
         {
-            return Invoke<TReturn>(targetType, methodName, parameters.GetTypeArray(), parameters);
+            return Reflector.Invoke<TReturn>(targetType, methodName, parameters);
         }
 
         /// <summary>
@@ -468,7 +470,7 @@ namespace Fasterflect
         /// <returns>The return value of the method.</returns>
         public static TReturn Invoke<TReturn>(this object target, string methodName, params object[] parameters)
         {
-            return Invoke<TReturn>(target, methodName, parameters.GetTypeArray(), parameters);
+            return Reflector.Invoke<TReturn>(target, methodName, parameters);
         }
 
         /// <summary>
@@ -535,6 +537,53 @@ namespace Fasterflect
         }
         #endregion
 
+        #region Array
+        /// <summary>
+        /// Sets <paramref name="parameter"/> to <paramref name="index"/>'th location of the target array.
+        /// </summary>
+        /// <param name="target">The array whose element is to be set</param>
+        /// <param name="index">The index of the element to be set</param>
+        /// <param name="parameter">The value to set</param>
+        /// <returns>The array itself</returns>
+        public static object SetElement(this object target, int index, object parameter)
+        {
+            Reflector.SetElement(target, index, parameter);
+            return target;
+        }
+
+        /// <summary>
+        /// Retrieves the element at <paramref name="index"/>'th location of the target array.
+        /// </summary>
+        /// <typeparam name="TReturn">The element type of the array</typeparam>
+        /// <param name="target">The target array whose element is to be retrieved</param>
+        /// <param name="index">The index of the element to be retrieved</param>
+        /// <returns>The element at <paramref name="index"/>'th location of the target array</returns>
+        public static TReturn GetElement<TReturn>(this object target, int index)
+        {
+            return Reflector.GetElement<TReturn>(target, index);
+        }
+
+        /// <summary>
+        /// Creates a delegate which can set element of the array type <paramref name="targetType"/>.
+        /// </summary>
+        /// <param name="targetType">The array type</param>
+        /// <returns>The delegate which can set element of the array type <paramref name="targetType"/></returns>
+        public static ArrayElementSetter DelegateForSetElement(this Type targetType)
+        {
+            return Reflector.DelegateForSetElement(targetType);
+        }
+
+        /// <summary>
+        /// Creates a delegate which can retrieve element of the array type <paramref name="targetType"/>.
+        /// </summary>
+        /// <param name="targetType">The array type</param>
+        /// <returns>The delegate which can retrieve element of the array type <paramref name="targetType"/></returns>
+        public static ArrayElementGetter DelegateForGetElement(this Type targetType)
+        {
+            return Reflector.DelegateForGetElement(targetType);
+        }
+        #endregion
+
         #region Indexer
         /// <summary>
         /// Sets the value of the indexer of object <paramref name="target"/>
@@ -554,7 +603,8 @@ namespace Fasterflect
         /// </example>
         public static object SetIndexer(this object target, params object[] parameters)
         {
-            return SetIndexer(target, parameters.GetTypeArray(), parameters);
+            Reflector.SetIndexer(target, parameters);
+            return target;
         }
 
         /// <summary>
@@ -591,7 +641,7 @@ namespace Fasterflect
         /// <returns>The value returned by the indexer.</returns>
         public static TReturn GetIndexer<TReturn>(this object target, params object[] parameters)
         {
-            return GetIndexer<TReturn>(target, parameters.GetTypeArray(), parameters);
+            return Reflector.GetIndexer<TReturn>(target, parameters);
         }
 
         /// <summary>
@@ -660,7 +710,7 @@ namespace Fasterflect
         /// <returns>An instance of type <paramref name="targetType"/>.</returns>
         public static object Construct(this Type targetType, params object[] parameters)
         {
-            return Construct(targetType, parameters.GetTypeArray(), parameters);
+            return Reflector.Construct(targetType, parameters);
         }
 
         /// <summary>

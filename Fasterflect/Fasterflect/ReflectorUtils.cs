@@ -26,22 +26,22 @@ namespace Fasterflect
 {
     internal static class ReflectorUtils
     {
-        #region Fields
-        public static readonly Type[] ArrayOfObjectType = new[] { typeof(object) };
-        public static readonly object[] EmptyObjectArray = new object[0];
-        public const string IndexerSetterName = "set_Item";
-        public const string IndexerGetterName = "get_Item";
-        #endregion
-
-        #region Reflection
         public static List<PropertyInfo> GetProperties(this object sample)
         {
             return sample.GetType().GetProperties().ToList();
         }
 
+        public static Type GetTypeAdjusted(this object obj)
+        {
+            var wrapper = obj as ValueTypeHolder;
+            return wrapper == null 
+                ? obj.GetType() 
+                : wrapper.Value.GetType();
+        }
+
         public static object GetValue(this PropertyInfo prop, object sample)
         {
-            return prop.GetGetMethod().Invoke(sample, EmptyObjectArray);
+            return prop.GetGetMethod().Invoke(sample, Constants.EmptyObjectArray);
         }
 
         public static Type[] GetTypeArray(this object[] objects)
@@ -57,88 +57,5 @@ namespace Fasterflect
             }
             return types;
         }
-        #endregion
-
-        #region CallInfo Construction
-        public static CallInfo CreateStaticSetCallInfo(Type targetType, MemberTypes memberTypes, string fieldOrProperty, object value)
-        {
-            return new CallInfo(targetType, memberTypes, fieldOrProperty, ArrayOfObjectType)
-                        {
-                            IsStatic = true, 
-                            Parameters = new[] { value }
-                        };
-        }
-
-        public static CallInfo CreateStaticGetCallInfo(Type targetType, MemberTypes memberTypes,
-            string fieldOrPropertyName)
-        {
-            return new CallInfo(targetType, memberTypes, fieldOrPropertyName)
-                        {
-                           IsStatic = true
-                        };
-        }
-
-        public static CallInfo CreateSetCallInfo(Type targetType, object target, MemberTypes memberTypes, string fieldOrProperty, object value)
-        {
-            return new CallInfo(targetType, memberTypes, fieldOrProperty, ArrayOfObjectType)
-                        {
-                            Target = target,
-                            Parameters = new[] { value }
-                        };
-        }
-
-        public static CallInfo CreateGetCallInfo(Type targetType, object target, MemberTypes memberTypes, string fieldOrPropertyName)
-        {
-            return new CallInfo(targetType, memberTypes, fieldOrPropertyName)
-                        {
-                           Target = target
-                        };
-        }
-
-        public static CallInfo GetConstructorCallInfo(Type targetType, Type[] paramTypes,
-            object[] parameters)
-        {
-            return new CallInfo(targetType, MemberTypes.Constructor, targetType.Name, paramTypes)
-                        {
-                            Parameters = parameters
-                        };
-        }
-
-        public static CallInfo CreateIndexerSetCallInfo(Type targetType, object target, Type[] paramTypes, object[] parameters)
-        {
-            return new CallInfo(targetType, MemberTypes.Method, IndexerSetterName, paramTypes)
-            {
-                Parameters = parameters,
-                Target = target
-            };
-        }
-
-        public static CallInfo CreateIndexerGetCallInfo(Type targetType, object target, Type[] paramTypes, object[] parameters)
-        {
-            return new CallInfo(targetType, MemberTypes.Method, IndexerGetterName, paramTypes)
-            {
-                Parameters = parameters,
-                Target = target
-            };
-        }
-
-        public static CallInfo CreateStaticMethodCallInfo(Type targetType, string methodName, Type[] paramTypes, object[] parameters)
-        {
-            return new CallInfo(targetType, MemberTypes.Method, methodName, paramTypes)
-            {
-                IsStatic = true,
-                Parameters = parameters
-            };
-        }
-
-        public static CallInfo CreateMethodCallInfo(Type targetType, object target, string methodName, Type[] paramTypes, object[] parameters)
-        {
-            return new CallInfo(targetType, MemberTypes.Method, methodName, paramTypes)
-            {
-                Parameters = parameters,
-                Target = target
-            };
-        }
-        #endregion
     }
 }

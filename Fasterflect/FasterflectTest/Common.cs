@@ -33,6 +33,10 @@ namespace FasterflectTest
         }
     }
 
+    internal struct PersonStruct
+    {
+    }
+
     internal class Person
     {
         private int id;

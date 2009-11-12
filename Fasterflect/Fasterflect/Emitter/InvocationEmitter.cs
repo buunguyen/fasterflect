@@ -23,7 +23,7 @@ namespace Fasterflect.Emitter
 {
     internal abstract class InvocationEmitter : BaseEmitter
     {
-        protected InvocationEmitter(CallInfo callInfo, DelegateCache cache) : base(callInfo, cache)
+        protected InvocationEmitter(DelegateCache cache) : base(cache)
         {
         }
 
@@ -90,7 +90,7 @@ namespace Fasterflect.Emitter
 
         protected void ReturnValue(ILGenerator generator, Type returnType)
         {
-            if (returnType == VoidType)
+            if (returnType == Constants.VoidType)
             {
                 generator.Emit(OpCodes.Ldnull);
             }
