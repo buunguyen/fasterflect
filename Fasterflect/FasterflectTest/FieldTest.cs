@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -25,109 +26,133 @@ namespace FasterflectTest
     [TestClass]
     public class FieldTest
     {
-        private class Person
+        private enum Color
+        {
+            Red, Green, Blue
+        }
+
+        private class PersonClass
         {
             private static int counter;
             private int age;
-            protected string name;
-            public Person peer;
+            public PersonClass peer;
             internal Color[] favoriteColors;
         }
 
-        private Reflector reflector;
-        private object target;
-
-        [TestInitialize()]
-        public void TestInitialize()
+        private struct PersonStruct
         {
-            reflector = Reflector.Create();
-            target = new Person();
+            private static int counter;
+            private int age;
+            public PersonClass peer; // can't use PersonStruct here (infinite initialization)
+            internal Color[] favoriteColors;
+        }
+
+
+        private static readonly List<Type> TypeList = new List<Type>
+                {
+                    typeof(PersonClass), 
+                    typeof(PersonStruct)
+                };
+
+        [TestMethod]
+        public void Test_set_get_static_fields()
+        {
+            TypeList.ForEach(type =>
+                                 {
+                                     type.SetField("counter", 1);
+                                     Assert.AreEqual(1, type.GetField<int>("counter"));
+                                 });
         }
 
         [TestMethod]
-        public void test_set_and_get_static_fields()
+        public void Test_set_and_get_fields()
         {
-            reflector.SetField(typeof(Person), "counter", 1);
-            Assert.AreEqual(1, reflector.GetField<int>(typeof(Person), "counter"));
-
-            reflector.SetFields(typeof(Person), new { counter = 2 });
-            Assert.AreEqual(2, reflector.GetField<int>(typeof(Person), "counter"));
+            TypeList.ForEach(type =>
+            {
+                var target = type.Construct().CreateHolderIfValueType();
+                var peer = new PersonClass();
+                var favColors = new[] { Color.Blue, Color.Red };
+                target.SetField("age", 10)
+                      .SetField("peer", peer)
+                      .SetField("favoriteColors", favColors);
+                Assert.AreEqual(10, target.GetField<int>("age"));
+                Assert.AreSame(peer, target.GetField<PersonClass>("peer"));
+                Assert.AreSame(favColors, target.GetField<Color[]>("favoriteColors"));
+            });
         }
 
         [TestMethod]
-        public void test_set_and_get_fields()
+        public void Test_set_and_get_static_fields_via_sample()
         {
-            var peer = new Person();
-            var favColors = new[] {Color.Blue, Color.Red};
-            reflector.SetField(target, "age", 10)
-                .SetField(target, "name", "John")
-                .SetField(target, "peer", peer)
-                .SetField(target, "favoriteColors", favColors);
-            Assert.AreEqual(10, reflector.GetField<int>(target, "age"));
-            Assert.AreEqual("John", reflector.GetField<string>(target, "name"));
-            Assert.AreSame(peer, reflector.GetField<Person>(target, "peer"));
-            Assert.AreSame(favColors, reflector.GetField<Color[]>(target, "favoriteColors"));
+            TypeList.ForEach(type =>
+            {
+                type.SetFields(new { counter = 2 });
+                Assert.AreEqual(2, type.GetField<int>("counter"));
+            });
         }
 
         [TestMethod]
-        public void test_set_and_get_fields_via_sample()
+        public void Test_set_and_get_fields_via_sample()
         {
-            var peer = new Person();
-            var favColors = new[] { Color.Blue, Color.Red };
-            reflector.SetFields(target, new {age = 10, name = "John", peer, favoriteColors = favColors});
-            Assert.AreEqual(10, reflector.GetField<int>(target, "age"));
-            Assert.AreEqual("John", reflector.GetField<string>(target, "name"));
-            Assert.AreSame(peer, reflector.GetField<Person>(target, "peer"));
-            Assert.AreSame(favColors, reflector.GetField<Color[]>(target, "favoriteColors"));
+            TypeList.ForEach(type =>
+            {
+                var target = type.Construct().CreateHolderIfValueType();
+                var peer = new PersonClass();
+                var favColors = new[] { Color.Blue, Color.Red };
+                target.SetFields(new {age = 10, peer, favoriteColors = favColors});
+                Assert.AreEqual(10, target.GetField<int>("age"));
+                Assert.AreSame(peer, target.GetField<PersonClass>("peer"));
+                Assert.AreSame(favColors, target.GetField<Color[]>("favoriteColors"));
+            });
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingFieldException))]
-        public void test_set_not_existent_field()
+        public void Test_set_not_existent_field()
         {
-            reflector.SetField(target, "not_exist", 1);
+            TypeList.ForEach(type => type.Construct().SetField("not_exist", 1));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingFieldException))]
-        public void test_set_not_existent_static_field()
+        public void Test_set_not_existent_static_field()
         {
-            reflector.SetField(typeof(Person), "not_exist", 1);
+            TypeList.ForEach(type => type.SetField("not_exist", 1));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingFieldException))]
-        public void test_get_not_existent_field()
+        public void Test_get_not_existent_field()
         {
-            reflector.GetField<int>(target, "not_exist");
+            TypeList.ForEach(type => type.Construct().CreateHolderIfValueType().GetField<int>("not_exist"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingFieldException))]
-        public void test_get_not_existent_static_field()
+        public void Test_get_not_existent_static_field()
         {
-            reflector.GetField<int>(target, "not_exist");
+            TypeList.ForEach(type => type.GetField<int>("not_exist"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidCastException))]
-        public void test_set_invalid_value_type()
+        public void Test_set_invalid_value_type()
         {
-            reflector.SetField(target, "name", 1);
+            TypeList.ForEach(type => type.Construct().CreateHolderIfValueType().SetField("peer", 1));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidCastException))]
-        public void test_get_invalid_type()
+        public void Test_get_invalid_type()
         {
-            reflector.GetField<string>(target, "age");
+            TypeList.ForEach(type => type.Construct().CreateHolderIfValueType().GetField<string>("age"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(NullReferenceException))]
-        public void test_set_null_to_value_type()
+        public void Test_set_null_to_value_type()
         {
-            reflector.SetField(target, "age", null);
+            TypeList.ForEach(type => type.Construct().SetField("age", null));
         }
     }
 }

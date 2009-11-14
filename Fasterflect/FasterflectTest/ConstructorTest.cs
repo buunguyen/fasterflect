@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -25,27 +26,28 @@ namespace FasterflectTest
     [TestClass]
     public class ConstructorTest
     {
-        private class Person
+        private class PersonClass
         {
             public int Age;
             public int? Id;
             public string Name;
             public object Data;
-            public Person Peer;
-            public Person[] Peers;
+            public PersonClass Peer;
+            public PersonClass[] Peers;
 
-            private Person() { }
-            internal Person(out int i, out string s) {
+            private PersonClass() { }
+            internal PersonClass(out int i, out string s)
+            {
                 i = 1;
                 s = "changed";
             }
-            internal Person(int age) { Age = age; }
-            internal Person(int? id) { Id = id; }
-            protected Person(string name) { Name = name; }
-            protected Person(object data) { Data = data; }
-            public Person(Person peer) { Peer = peer; }
-            public Person(Person[] peers) { Peers = peers; }
-            internal Person(int age, int? id, string name, Person peer, Person[] peers)
+            internal PersonClass(int age) { Age = age; }
+            internal PersonClass(int? id) { Id = id; }
+            protected PersonClass(string name) { Name = name; }
+            protected PersonClass(object data) { Data = data; }
+            public PersonClass(PersonClass peer) { Peer = peer; }
+            public PersonClass(PersonClass[] peers) { Peers = peers; }
+            internal PersonClass(int age, int? id, string name, PersonClass peer, PersonClass[] peers)
             {
                 Age = age;
                 Id = id;
@@ -55,86 +57,129 @@ namespace FasterflectTest
             }
         }
 
-        class Employee : Person
+        private class PersonStruct
         {
-            internal Employee(int age) : base(age){}
+            public int Age;
+            public int? Id;
+            public string Name;
+            public object Data;
+            public PersonClass Peer;
+            public PersonClass[] Peers;
+
+            private PersonStruct() { }
+            internal PersonStruct(out int i, out string s)
+            {
+                i = 1;
+                s = "changed";
+            }
+            internal PersonStruct(int age) { Age = age; }
+            internal PersonStruct(int? id) { Id = id; }
+            protected PersonStruct(string name) { Name = name; }
+            protected PersonStruct(object data) { Data = data; }
+            public PersonStruct(PersonClass peer) { Peer = peer; }
+            public PersonStruct(PersonClass[] peers) { Peers = peers; }
+            internal PersonStruct(int age, int? id, string name, PersonClass peer, PersonClass[] peers)
+            {
+                Age = age;
+                Id = id;
+                Name = name;
+                Peer = peer;
+                Peers = peers;
+            }
         }
 
-        private Reflector reflector;
-
-        [TestInitialize()]
-        public void TestInitialize()
+        class Employee : PersonClass
         {
-            reflector = Reflector.Create();
+            internal Employee(int age) : base(age) { }
+        }
+
+        private static readonly List<Type> TypeList = new List<Type>
+                {
+                    typeof(PersonClass), 
+                    typeof(PersonStruct)
+                };
+
+        [TestMethod]
+        public void Test_use_constructor_with_byref_params()
+        {
+            TypeList.ForEach(type =>
+            {
+                var parameters = new object[] { 0, "original" };
+                var obj = type.Construct(new[] {
+                                                    typeof(int).MakeByRefType(),
+                                                    typeof(string).MakeByRefType()
+                                               }, parameters);
+                Assert.IsNotNull(obj);
+                Assert.AreEqual(1, parameters[0]);
+                Assert.AreEqual("changed", parameters[1]);
+            });
         }
 
         [TestMethod]
-        public void test_use_constructor_with_byref_params()
+        public void Test_create_instances()
         {
-            var parameters = new object[] {0, "original"};
-            var obj = reflector.Construct(typeof(Person), new[]
-                                                    {
-                                                        typeof(int).MakeByRefType(),
-                                                        typeof(string).MakeByRefType()
-                                                    }, parameters);
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(1, parameters[0]);
-            Assert.AreEqual("changed", parameters[1]);
+            TypeList.ForEach(type =>
+            {
+                var obj = type.Construct();
+                Assert.IsNotNull(obj);
+
+                obj = type.Construct(new[] { typeof(int) }, 1);
+                Assert.IsNotNull(obj);
+                Assert.AreEqual(1, obj.GetField<int>("Age"));
+
+                obj = type.Construct(new[] { typeof(int?) }, 1);
+                Assert.IsNotNull(obj);
+                Assert.AreEqual(1, obj.GetField<int?>("Id"));
+
+                obj = type.Construct(new[] { typeof(int?) }, new object[]{null});
+                Assert.IsNotNull(obj);
+                Assert.AreEqual(null, obj.GetField<int?>("Id"));
+
+                obj = type.Construct(new[] { typeof(string) }, "Jane");
+                Assert.IsNotNull(obj);
+                Assert.AreEqual("Jane", obj.GetField<string>("Name"));
+
+                obj = type.Construct(new[] { typeof(object) }, type);
+                Assert.IsNotNull(obj);
+                Assert.AreSame(type, obj.GetField<object>("Data"));
+
+                obj = type.Construct(new[] { typeof(object) }, 1.1d);
+                Assert.IsNotNull(obj);
+                Assert.AreEqual(1.1d, obj.GetField<double>("Data"));
+
+                var peer = new PersonClass(1);
+                obj = type.Construct(new[] { typeof(PersonClass) }, peer);
+                Assert.IsNotNull(obj);
+                Assert.AreSame(peer, obj.GetField<PersonClass>("Peer"));
+
+                var peers = new[] { new PersonClass(1), new PersonClass(1) };
+                obj = type.Construct(new[] { typeof(PersonClass).MakeArrayType() },
+                    new object[] { peers });
+                Assert.IsNotNull(obj);
+                Assert.AreSame(peers, obj.GetField<PersonClass[]>("Peers"));
+            });
         }
 
         [TestMethod]
-        public void test_create_instances()
-        {
-            var obj = reflector.Construct(typeof (Person));
-            Assert.IsNotNull(obj);
-
-            obj = reflector.Construct(typeof(Person), new []{typeof(int)}, new object[]{1});
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(1, reflector.GetField<int>(obj, "Age"));
-
-            obj = reflector.Construct(typeof(Person), new[] { typeof(int?) }, new object[] { null });
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(null, reflector.GetField<int?>(obj, "Id"));
-
-            obj = reflector.Construct(typeof(Person), new[] { typeof(string) }, new object[] { "Jane" });
-            Assert.IsNotNull(obj);
-            Assert.AreEqual("Jane", reflector.GetField<string>(obj, "Name"));
-
-            obj = reflector.Construct(typeof(Person), new[] { typeof(object) }, new object[] { reflector });
-            Assert.IsNotNull(obj);
-            Assert.AreSame(reflector, reflector.GetField<object>(obj, "Data"));
-
-            obj = reflector.Construct(typeof(Person), new[] { typeof(object) }, new object[] { 1.1d }); 
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(1.1d, reflector.GetField<double>(obj, "Data"));
-
-            var peer = new Person(1);
-            obj = reflector.Construct(typeof(Person), new[] { typeof(Person) },
-                new object[] { peer });
-            Assert.IsNotNull(obj);
-            Assert.AreSame(peer, reflector.GetField<Person>(obj, "Peer"));
-
-            var peers = new[] {new Person(1), new Person(1)};
-            obj = reflector.Construct(typeof(Person), new[] { typeof(Person).MakeArrayType() },
-                new object[] { peers });
-            Assert.IsNotNull(obj);
-            Assert.AreSame(peers, reflector.GetField<Person[]>(obj, "Peers"));
-        }
-
-        [TestMethod]
-        public void test_invoke_with_co_variant_return_and_param_type()
+        public void Test_invoke_with_co_variant_return_and_param_type()
         {
             var peer = new Employee(1);
-            var obj = reflector.Construct(typeof(Person), new[] { typeof(Employee) },
-                new object[] { peer });
-            Assert.AreSame(peer, reflector.GetField<Employee>(obj, "Peer"));
+            var obj = typeof(PersonClass).Construct(new[] { typeof(Employee) }, peer);
+            Assert.AreSame(peer, obj.GetField<Employee>("Peer"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidCastException))]
-        public void test_pass_invalid_data_type()
+        public void Test_pass_invalid_data_type()
         {
-            reflector.Construct(typeof (Person), new[] {typeof (int)}, new object[] {"string"});
+            TypeList.ForEach(type => type.Construct(new[] { typeof(int) }, "string"));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMemberException))]
+        public void Test_pass_none_existant_constructor()
+        {
+            TypeList.ForEach(type => type.Construct(new[] { typeof(int), typeof(int) }, 1, 2));
         }
     }
 }

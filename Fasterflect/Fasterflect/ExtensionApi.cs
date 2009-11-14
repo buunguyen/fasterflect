@@ -184,7 +184,7 @@ namespace Fasterflect
         /// <param name="sample">An object whose properties will be used to set the static fields of
         /// <paramref name="targetType"/>.</param>
         /// <returns>The type whose static fields are to be set.</returns>
-        public static Type SẹtFields(this Type targetType, object sample)
+        public static Type SetFields(this Type targetType, object sample)
         {
             Reflector.SetFields(targetType, sample);
             return targetType;
@@ -344,7 +344,7 @@ namespace Fasterflect
         /// <param name="paramTypes">The types of the static method's parameters (must be in the right order).</param>
         /// <param name="parameters">The parameters of the static method (must be in the right order).</param>
         /// <returns>The type whose static method is to be invoked.</returns>
-        public static Type Invoke(this Type targetType, string methodName, Type[] paramTypes, object[] parameters)
+        public static Type Invoke(this Type targetType, string methodName, Type[] paramTypes, params object[] parameters)
         {
             Reflector.Invoke(targetType, methodName, paramTypes, parameters);
             return targetType;
@@ -392,7 +392,7 @@ namespace Fasterflect
         /// <param name="paramTypes">The types of the method parameters (must be in the right order).</param>
         /// <param name="parameters">The parameters of the method (must be in the right order).</param>
         /// <returns>The object whose method is to be invoked.</returns>
-        public static object Invoke(this object target, string methodName, Type[] paramTypes, object[] parameters)
+        public static object Invoke(this object target, string methodName, Type[] paramTypes, params object[] parameters)
         {
             Reflector.Invoke(target, methodName, paramTypes, parameters);
             return target;
@@ -451,7 +451,7 @@ namespace Fasterflect
         /// <param name="paramTypes">The types of the static method's parameters (must be in the right order).</param>
         /// <param name="parameters">The parameters of the static method (must be in the right order).</param>
         /// <returns>The return value of the static method.</returns>
-        public static TReturn Invoke<TReturn>(this Type targetType, string methodName, Type[] paramTypes, object[] parameters)
+        public static TReturn Invoke<TReturn>(this Type targetType, string methodName, Type[] paramTypes, params object[] parameters)
         {
             return Reflector.Invoke<TReturn>(targetType, methodName, paramTypes, parameters);
         }
@@ -483,7 +483,7 @@ namespace Fasterflect
         /// <param name="paramTypes">The types of the method parameters (must be in the right order).</param>
         /// <param name="parameters">The parameters of the method (must be in the right order).</param>
         /// <returns>The return value of the method.</returns>
-        public static TReturn Invoke<TReturn>(this object target, string methodName, Type[] paramTypes, object[] parameters)
+        public static TReturn Invoke<TReturn>(this object target, string methodName, Type[] paramTypes, params object[] parameters)
         {
             return Reflector.Invoke<TReturn>(target, methodName, paramTypes, parameters);
         }
@@ -507,7 +507,7 @@ namespace Fasterflect
         /// <param name="paramTypes">The types of the static method's parameters (must be in the right order).</param>
         /// <returns>A delegate which can invoke the specified static method.</returns>
         public static StaticMethodInvoker DelegateForStaticInvoke(this Type targetType, string methodName,
-            Type[] paramTypes)
+            params Type[] paramTypes)
         {
             return Reflector.DelegateForStaticInvoke(targetType, methodName, paramTypes);
         }
@@ -531,7 +531,7 @@ namespace Fasterflect
         /// <param name="paramTypes">The types of the method parameters (must be in the right order).</param>
         /// <returns>A delegate which can invoke the specified method.</returns>
         public static MethodInvoker DelegateForInvoke(this Type targetType, string methodName,
-            Type[] paramTypes)
+            params Type[] paramTypes)
         {
             return Reflector.DelegateForInvoke(targetType, methodName, paramTypes);
         }
@@ -623,7 +623,7 @@ namespace Fasterflect
         /// target.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
         /// </code>
         /// </example>
-        public static object SetIndexer(this object target, Type[] paramTypes, object[] parameters)
+        public static object SetIndexer(this object target, Type[] paramTypes, params object[] parameters)
         {
             Reflector.SetIndexer(target, paramTypes, parameters);
             return target;
@@ -652,7 +652,7 @@ namespace Fasterflect
         /// <param name="paramTypes">The types of the indexer parameters (must be in the right order).</param>
         /// <param name="parameters">The list of the indexer parameters.</param>
         /// <returns>The value returned by the indexer.</returns>
-        public static TReturn GetIndexer<TReturn>(this object target, Type[] paramTypes, object[] parameters)
+        public static TReturn GetIndexer<TReturn>(this object target, Type[] paramTypes, params object[] parameters)
         {
             return Reflector.GetIndexer<TReturn>(target, paramTypes, parameters);
         }
@@ -671,7 +671,7 @@ namespace Fasterflect
         /// MethodInvoker invoker = type.DelegateForSetIndexer(new Type[]{typeof(int), typeof(string)});
         /// </code>
         /// </example>
-        public static MethodInvoker DelegateForSetIndexer(this Type targetType, Type[] paramTypes)
+        public static MethodInvoker DelegateForSetIndexer(this Type targetType, params Type[] paramTypes)
         {
             return Reflector.DelegateForSetIndexer(targetType, paramTypes);
         }
@@ -682,7 +682,7 @@ namespace Fasterflect
         /// <param name="targetType">The type which the indexer belongs to.</param>
         /// <param name="paramTypes">The types of the indexer parameters (must be in the right order).</param>
         /// <returns>The delegate which can get the value of an indexer.</returns>
-        public static MethodInvoker DelegateForGetIndexer(this Type targetType, Type[] paramTypes)
+        public static MethodInvoker DelegateForGetIndexer(this Type targetType, params Type[] paramTypes)
         {
             return Reflector.DelegateForGetIndexer(targetType, paramTypes);
         }
@@ -720,7 +720,7 @@ namespace Fasterflect
         /// <param name="paramTypes">The types of the constructor parameters (must be in the right order).</param>
         /// <param name="parameters">The parameters of the constructor (must be in the right order).</param>
         /// <returns>An instance of type <paramref name="targetType"/>.</returns>
-        public static object Construct(this Type targetType, Type[] paramTypes, object[] parameters)
+        public static object Construct(this Type targetType, Type[] paramTypes, params object[] parameters)
         {
             return Reflector.Construct(targetType, paramTypes, parameters);
         }
@@ -741,7 +741,7 @@ namespace Fasterflect
         /// <param name="targetType">The type which has the constructor to be invoked.</param>
         /// <param name="paramTypes">The types of the constructor parameters (must be in the right order).</param>
         /// <returns>The delegate which can invoke the constructor of type <paramref name="targetType"/>.</returns>
-        public static ConstructorInvoker DelegateForConstruct(this Type targetType, Type[] paramTypes)
+        public static ConstructorInvoker DelegateForConstruct(this Type targetType, params Type[] paramTypes)
         {
             return Reflector.DelegateForConstruct(targetType, paramTypes);
         }

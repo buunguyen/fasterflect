@@ -26,6 +26,46 @@ namespace FasterflectTest
     [TestClass]
     public class DelegateCacheTest
     {
+        internal class Person
+        {
+            private int id;
+            private static int miles;
+            private static int Miles
+            {
+                get { return miles; }
+                set { miles = value; }
+            }
+            protected object this[string s]
+            {
+                get { return null; }
+                set { }
+            }
+            public int Id { get; set; }
+            public int Age { private get; set; }
+            internal Person() { }
+            internal Person(int id) { this.id = id; }
+            private int GetId() { return id; }
+            private void SetId(int id) { this.id = id; }
+            private static void SetMiles(int m) { miles = m; }
+            private static int GetMiles() { return miles; }
+            private static int GetMiles(int offset) { return offset + miles; }
+            private object GetItself(object data) { return data; }
+            private void Run() { }
+            private void Run(float speed) { }
+            private static void Generate() { }
+            private static void Generate(Person sample) { }
+        }
+
+        internal class Utils
+        {
+            private static void Swap(ref int i, ref int j)
+            {
+                int tmp = i;
+                i = j;
+                j = tmp;
+            }
+        }
+
         private Reflector reflector;
         private object target;
         private Type targetType;
@@ -41,7 +81,7 @@ namespace FasterflectTest
             delegateMap = reflector.GetField<IDictionary>(cache, "map");
         }
 
-        private void execute_cache_test(params Action[] actions)
+        private void Execute_cache_test(params Action[] actions)
         {
             int delCount = delegateMap.Count;
             foreach (var action in actions)
@@ -53,9 +93,9 @@ namespace FasterflectTest
         }
 
         [TestMethod]
-        public void test_delegate_is_property_cached_for_fields()
+        public void Test_delegate_is_property_cached_for_fields()
         {
-            execute_cache_test(
+            Execute_cache_test(
                 () => reflector.SetField(target, "id", 1),
                 () => reflector.GetField<int>(target, "id"),
                 () => reflector.SetField(targetType, "miles", 1),
@@ -63,9 +103,9 @@ namespace FasterflectTest
         }
 
         [TestMethod]
-        public void test_delegate_is_property_cached_for_properties()
+        public void Test_delegate_is_property_cached_for_properties()
         {
-            execute_cache_test(
+            Execute_cache_test(
                 () => reflector.SetProperty(target, "Age", 1),
                 () => reflector.GetProperty<int>(target, "Age"),
                 () => reflector.SetProperty(targetType, "Miles", 1),
@@ -73,17 +113,25 @@ namespace FasterflectTest
         }
 
         [TestMethod]
-        public void test_delegate_is_property_cached_for_constructors()
+        public void Test_delegate_is_property_cached_for_array_element()
         {
-            execute_cache_test(
+            Execute_cache_test(
+                () => reflector.SetElement(targetType.MakeArrayType().Construct(10), 1, target),
+                () => reflector.GetElement<object>(targetType.MakeArrayType().Construct(10), 1));
+        }
+
+        [TestMethod]
+        public void Test_delegate_is_property_cached_for_constructors()
+        {
+            Execute_cache_test(
                 () => reflector.Construct(targetType),
                 () => reflector.Construct(targetType, new[] { typeof(int) }, new object[] { 1 }));
         }
 
         [TestMethod]
-        public void test_delegate_is_property_cached_for_methods()
+        public void Test_delegate_is_property_cached_for_methods()
         {
-            execute_cache_test(
+            Execute_cache_test(
                 () => reflector.Invoke(targetType, "Generate"),
                 () => reflector.Invoke<int>(targetType, "GetMiles"),
                 () => reflector.Invoke(target, "SetId", new[] { typeof(int) }, new object[] { 1 }),
@@ -91,15 +139,15 @@ namespace FasterflectTest
         }
 
         [TestMethod]
-        public void test_delegate_is_property_cached_for_indexers()
+        public void Test_delegate_is_property_cached_for_indexers()
         {
-            execute_cache_test(
+            Execute_cache_test(
                 () => reflector.SetIndexer(target, new[] { typeof(string), typeof(object) }, new object[] { "a", null }),
                 () => reflector.GetIndexer<string>(target, new[] { typeof(string) }, new object[] { "a"}));
         }
 
         [TestMethod]
-        public void test_delegate_is_property_cached_for_method_with_byref_params()
+        public void Test_delegate_is_property_cached_for_method_with_byref_params()
         {
             var action = reflector.DelegateForStaticInvoke(typeof (Utils), "Swap",
                                               new[]{typeof(int).MakeByRefType(),
@@ -111,10 +159,12 @@ namespace FasterflectTest
         }
 
         [TestMethod]
-        public void test_delegate_retrieval_methods_return_correct_delegate_type()
+        public void Test_delegate_retrieval_methods_return_correct_delegate_type()
         {
             var funcs = new Func<Delegate>[]
                               {
+                                  () => targetType.MakeArrayType().DelegateForGetElement(),
+                                  () => targetType.MakeArrayType().DelegateForSetElement(),
                                   () => targetType.DelegateForConstruct(),
                                   () => targetType.DelegateForConstruct(new[] { typeof(int) }),
                                   () => targetType.DelegateForStaticInvoke("SetMiles", new[] { typeof(int) }),
@@ -140,6 +190,8 @@ namespace FasterflectTest
                               };
             var types = new[]
                               {
+                                  typeof(ArrayElementGetter),
+                                  typeof(ArrayElementSetter),
                                   typeof(ConstructorInvoker),
                                   typeof(ConstructorInvoker),
                                   typeof(StaticMethodInvoker),

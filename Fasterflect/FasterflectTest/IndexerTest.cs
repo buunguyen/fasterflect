@@ -16,6 +16,8 @@
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
 #endregion
 
+using System;
+using System.Collections.Generic;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,13 +26,16 @@ namespace FasterflectTest
     [TestClass]
     public class IndexerTest
     {
-        private class Region {}
-        private class Country : Region
+        private class CountryClass 
         {
-            private string[] cities = new string[100];
-            private Region this[Region region]
+            private string[] cities ;
+            public CountryClass(int capacity)
             {
-                get { return region;}
+                cities = new string[capacity];
+            }
+            private CountryClass this[CountryClass country]
+            {
+                get { return country; }
                 set {}
             }
             private string this[int pos]
@@ -57,33 +62,63 @@ namespace FasterflectTest
             }
         }
 
-        private Reflector reflector;
-        private object target;
-
-        [TestInitialize()]
-        public void TestInitialize()
+        private struct CountryStruct
         {
-            reflector = Reflector.Create();
-            target = new Country();
+            private string[] cities ;
+            public CountryStruct(int capacity)
+            {
+                cities = new string[capacity];
+            }
+
+            private CountryStruct this[CountryStruct country]
+            {
+                get { return country; }
+                set { }
+            }
+            private string this[int pos]
+            {
+                get
+                {
+                    return cities[pos];
+                }
+                set
+                {
+                    cities[pos] = value;
+                }
+            }
+            private string this[int part1, int part2]
+            {
+                get
+                {
+                    return cities[part1 + part2];
+                }
+                set
+                {
+                    cities[part1 + part2] = value;
+                }
+            }
         }
+
+        private static readonly List<Type> TypeList = new List<Type>
+                {
+                    typeof(CountryStruct), 
+                    typeof(CountryStruct)
+                };
 
         [TestMethod()]
-        public void test_indexer()
+        public void Test_indexer()
         {
-            reflector.SetIndexer(target, new[] { typeof(int), typeof(string) }, new object[] { 10, "John" });
-            Assert.AreEqual("John", reflector.GetIndexer<string>(target, new[] { typeof(int) }, new object[] { 10 }));
-
-            reflector.SetIndexer(target, new[] { typeof(int), typeof(int), typeof(string) }, new object[] { 1, 2, "Jane" });
-            Assert.AreEqual("Jane", reflector.GetIndexer<string>(target, new[] { typeof(int), typeof(int) }, new object[] { 1, 2 }));
-        }
-
-        [TestMethod]
-        public void test_invoke_with_co_variant_return_and_param_type()
-        {
-            var country = new Country();
-            var result = reflector.GetIndexer<Country>(target,
-                new[] { typeof(Country) }, new object[] { country });
-            Assert.AreSame(country, result);
+            TypeList.ForEach(type =>
+             {
+                 var target = type.Construct(100).CreateHolderIfValueType();
+                 target.SetIndexer(10, "John");
+                 Assert.AreEqual("John", target.GetIndexer<string>(10));
+                 target.SetIndexer(new[] { typeof(int), typeof(int), typeof(string) }, 1, 2, "Jane");
+                 Assert.AreEqual("Jane", target.GetIndexer<string>(new[] { typeof(int), typeof(int) }, 1, 2));
+                 var other = type.Construct(1);
+                 var result = target.GetIndexer<object>(other);
+                 Assert.AreEqual(other, result);
+             });
         }
     }
 }

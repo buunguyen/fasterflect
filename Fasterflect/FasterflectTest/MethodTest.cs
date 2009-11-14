@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,7 +27,7 @@ namespace FasterflectTest
     [TestClass]
     public class MethodTest
     {
-        private class Person
+        private class PersonClass
         {
             private static int nextId;
             private static int milesTraveled;
@@ -61,16 +62,54 @@ namespace FasterflectTest
                 return milesTraveled;
             }
 
-            private Person AddPeer(Person person)
+            private PersonClass AddPeer(PersonClass person)
             {
                 return person;
             }
+
+            private void DoNothing() {}
+            private int JustGet() { return 1; }
         }
 
-        private class Employee : Person
+        private struct PersonStruct
         {
-            
+            private static int nextId;
+            private static int milesTraveled;
+            private static int GetNextId()
+            {
+                return ++nextId;
+            }
+            private static int GetNextId(int offset)
+            {
+                return ++nextId + offset;
+            }
+            private static void SetStartingId(int id)
+            {
+                nextId = id;
+            }
+            private void Walk(int miles)
+            {
+                milesTraveled += miles;
+            }
+            private int GetMilesTraveled()
+            {
+                return milesTraveled;
+            }
+            private int GetMilesTraveled(int increase)
+            {
+                milesTraveled += increase;
+                return milesTraveled;
+            }
+            private static int IncreaseMiles(int miles)
+            {
+                milesTraveled += miles;
+                return milesTraveled;
+            }
+            private void DoNothing() { }
+            private int JustGet() { return 1; }
         }
+
+        private class Employee : PersonClass { }
 
         class Utils
         {
@@ -88,42 +127,40 @@ namespace FasterflectTest
             }
         }
 
-        private Reflector reflector;
-        private object target;
-
-        [TestInitialize()]
-        public void TestInitialize()
-        {
-            reflector = Reflector.Create();
-            target = new Person();
-        }
+        private static readonly List<Type> TypeList = new List<Type>
+                {
+                    typeof(PersonClass), 
+                    typeof(PersonStruct)
+                };
 
         [TestMethod]
-        public void test_invoke_with_co_variant_return_and_param_type()
+        public void Test_invoke_with_co_variant_return_and_param_type()
         {
+            var type = typeof (PersonClass);
+            var target = type.Construct();
             var employee = new Employee();
-            var result = reflector.Invoke<Employee>(target, "AddPeer",
+            var result = target.Invoke<Employee>("AddPeer",
                 new[] { typeof(Employee) }, new object[] { employee });
             Assert.AreSame(employee, result);
         }
 
         [TestMethod]
-        public void test_invoke_method_with_ref_params()
+        public void Test_invoke_method_with_ref_params()
         {
-            var parameters = new object[] { 1, 1, 3, "original"};
-            var result = reflector.Invoke<int>(typeof(Utils), "Update", 
+            var parameters = new object[] { 1, 1, 3, "original" };
+            var result = typeof(Utils).Invoke<int>("Update",
                 new[] { typeof(int), typeof(int).MakeByRefType(), 
-                    typeof(int), typeof(string).MakeByRefType() }, parameters);
+                typeof(int), typeof(string).MakeByRefType() }, parameters);
             Assert.AreEqual(4, result);
             Assert.AreEqual(2, parameters[1]);
             Assert.AreEqual("changed", parameters[3]);
         }
 
         [TestMethod]
-        public void test_invoke_method_with_ref_params_without_returning()
+        public void Test_invoke_method_with_ref_params_without_returning()
         {
             var parameters = new object[] { 1, 1, 3, "original" };
-            reflector.Invoke(typeof(Utils), "Update",
+            typeof(Utils).Invoke("Update",
                 new[] { typeof(int), typeof(int).MakeByRefType(), 
                     typeof(int), typeof(string).MakeByRefType() }, parameters);
             Assert.AreEqual(2, parameters[1]);
@@ -131,10 +168,10 @@ namespace FasterflectTest
         }
 
         [TestMethod]
-        public void test_invoke_no_ret_method_with_ref_params()
+        public void Test_invoke_no_ret_method_with_ref_params()
         {
             var parameters = new object[] { 1, "original", 2 };
-            reflector.Invoke(typeof(Utils), "Update",
+            typeof(Utils).Invoke("Update",
                 new[] { typeof(int).MakeByRefType(), 
                         typeof(string).MakeByRefType(),
                         typeof(int)}, parameters);
@@ -143,67 +180,113 @@ namespace FasterflectTest
         }
 
         [TestMethod]
-        public void test_invoke_static_methods()
+        public void Test_invoke_static_methods()
         {
-            reflector.Invoke(typeof(Person), "SetStartingId", new[] { typeof(int) }, new object[] { 10 });
-            var nextId = reflector.Invoke<int>(typeof(Person), "GetNextId"); 
-            Assert.AreEqual(11, nextId);
+            TypeList.ForEach(type =>
+                                 {
+                                     type.Invoke("SetStartingId", 10);
+                                     var nextId = type.Invoke<int>("GetNextId");
+                                     Assert.AreEqual(11, nextId);
+                                 });
         }
 
         [TestMethod]
-        public void test_invoke_static_methods_with_args()
+        public void Test_invoke_methods_without_specifying_return_type()
         {
-            reflector.Invoke(typeof(Person), "SetStartingId", new[] { typeof(int) }, new object[] { 10 });
-            var nextId = reflector.Invoke<int>(typeof(Person), "GetNextId", new[] { typeof(int) }, new object[] { 5 });
-            Assert.AreEqual(16, nextId);
-        }
-
-        [TestMethod]
-        public void test_invoke_ret_static_methods()
-        {
-            reflector.SetField(typeof (Person), "milesTraveled", 0);
-            reflector.Invoke(typeof(Person), "IncreaseMiles", new[] { typeof(int) }, new object[] { 5 })
-                     .Invoke(typeof(Person), "IncreaseMiles", new[] { typeof(int) }, new object[] { 10 })
-                     .Invoke(typeof(Person), "IncreaseMiles", new[] { typeof(int) }, new object[] { 20 });
-            Assert.AreEqual(35, reflector.GetField<int>(typeof(Person), "milesTraveled"));
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(MissingMethodException))]
-        public void test_invoke_non_existent_static_method()
-        {
-            reflector.Invoke(typeof(Person), "NotExist");
-        }
-
-        [TestMethod]
-        public void test_invoke_instance_methods()
-        {
-            reflector.SetField(typeof(Person), "milesTraveled", 0);
-            int[] miles = {1, 10, 20, 100};
-            foreach (var mile in miles)
+            TypeList.ForEach(type =>
             {
-                reflector.Invoke(target, "Walk", new[] { typeof(int) }, new object[] { mile });
-            }
-            var totalMiles = reflector.Invoke<int>(target, "GetMilesTraveled");
-            Assert.AreEqual(miles.Sum(), totalMiles);
+                type.Invoke("SetStartingId", 10);
+                var result = type.Invoke("GetNextId");
+                Assert.AreSame(type, result);
+            });
         }
 
         [TestMethod]
-        public void test_invoke_ret_instance_methods()
+        public void Test_invoke_static_methods_with_args()
         {
-            reflector.SetField(typeof(Person), "milesTraveled", 0);
-            reflector.Invoke(target, "GetMilesTraveled", new[] { typeof(int) }, new object[] { 5 })
-                     .Invoke(target, "GetMilesTraveled", new[] { typeof(int) }, new object[] { 10 })
-                     .Invoke(target, "GetMilesTraveled", new[] { typeof(int) }, new object[] { 20 });
-            var totalMiles = reflector.GetField<int>(typeof(Person), "milesTraveled"); ;
-            Assert.AreEqual(35, totalMiles);
+            TypeList.ForEach(type =>
+                                 {
+                                     type.Invoke("SetStartingId", 10);
+                                     var nextId = type.Invoke<int>("GetNextId", 5);
+                                     Assert.AreEqual(16, nextId);
+                                 });
+        }
+
+        [TestMethod]
+        public void Test_invoke_ret_static_methods()
+        {
+            TypeList.ForEach(type =>
+                                 {
+                                     type.SetField("milesTraveled", 0);
+                                     type.Invoke("IncreaseMiles", 5)
+                                         .Invoke("IncreaseMiles", 10)
+                                         .Invoke("IncreaseMiles", 20);
+                                     Assert.AreEqual(35, type.GetField<int>("milesTraveled"));
+                                 });
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingMethodException))]
-        public void test_invoke_non_existent_instance_method()
+        public void Test_invoke_non_existent_static_method()
         {
-            reflector.Invoke(target, "NotExist");
+            TypeList.ForEach(type => type.Invoke("NotExist"));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMethodException))]
+        public void Test_invoke_non_existent_instance_method()
+        {
+            TypeList.ForEach(type =>
+            {
+                var target = type.Construct().CreateHolderIfValueType();
+                target.Invoke("NotExist");
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMethodException))]
+        public void Test_invoke_non_existent_instance_method_with_return_type()
+        {
+            TypeList.ForEach(type =>
+            {
+                var target = type.Construct().CreateHolderIfValueType();
+                target.Invoke<int>("NotExist");
+            });
+        }
+
+        [TestMethod]
+        public void Test_invoke_instance_methods()
+        {
+            TypeList.ForEach(type =>
+                                 {
+                                     type.SetField("milesTraveled", 0);
+                                     var target = type.Construct().CreateHolderIfValueType();
+                                     target.Invoke("DoNothing");
+                                     Assert.AreEqual(1, target.Invoke<int>("JustGet"));
+
+                                     int[] miles = {1, 10, 20, 100};
+                                     foreach (var mile in miles)
+                                     {
+                                         target.Invoke("Walk", mile);
+                                     }
+                                     var totalMiles = target.Invoke<int>("GetMilesTraveled", 5);
+                                     Assert.AreEqual(miles.Sum() + 5, totalMiles);
+                                 });
+        }
+
+        [TestMethod]
+        public void Test_invoke_ret_instance_methods()
+        {
+            TypeList.ForEach(type =>
+                                 {
+                                     type.SetField("milesTraveled", 0);
+                                     var target = type.Construct().CreateHolderIfValueType();
+                                     target.Invoke("GetMilesTraveled", new[] { typeof(int) }, 5)
+                                           .Invoke("GetMilesTraveled", new[] {typeof (int)}, 10)
+                                           .Invoke("GetMilesTraveled", new[] {typeof (int)}, 20);
+                                     var totalMiles = type.GetField<int>("milesTraveled");
+                                     Assert.AreEqual(35, totalMiles);
+                                 });
         }
     }
 }
