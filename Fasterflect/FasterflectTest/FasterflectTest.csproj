@@ -43,14 +43,11 @@
     <Compile Include="ArrayTest.cs" />
     <Compile Include="ConstructorTest.cs" />
     <Compile Include="DelegateCacheTest.cs" />
-    <Compile Include="ExtensionApiTest.cs" />
     <Compile Include="FieldTest.cs" />
     <Compile Include="IndexerTest.cs" />
     <Compile Include="MethodTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyTest.cs" />
-    <Compile Include="StructTest.cs" />
-    <Compile Include="Common.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fasterflect\Fasterflect.csproj">

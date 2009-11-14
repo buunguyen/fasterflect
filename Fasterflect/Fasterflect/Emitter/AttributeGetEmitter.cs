@@ -29,7 +29,7 @@ namespace Fasterflect.Emitter
             : base(cache)
         {
             callInfo = new CallInfo(targetType, memberTypes, fieldOrPropertyName, 
-                Constants.EmptyTypeArray, isStatic);
+                Type.EmptyTypes, isStatic);
         }
 
         protected override Delegate CreateDelegate()

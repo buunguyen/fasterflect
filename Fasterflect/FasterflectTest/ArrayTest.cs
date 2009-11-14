@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -10,41 +8,63 @@ namespace FasterflectTest
     [TestClass]
     public class ArrayTest
     {
-        [TestMethod]
-        public void test_construct_array()
-        {
-            var obj = typeof(PersonStruct[]).Construct(10);
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(10, obj.GetProperty<int>("Length"));
+        class AClass { }
+        class AStruct { }
 
-            obj = typeof(int[]).Construct(0);
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(0, obj.GetProperty<object>("Length"));
+        private static readonly List<Type> TypeList = new List<Type>
+                {
+                    typeof(AClass[]), 
+                    typeof(AStruct[]), 
+                    typeof(int[])
+                };
+
+        [TestMethod]
+        public void Test_construct_arrays()
+        {
+            TypeList.ForEach(type =>
+                             {
+                                 var obj = type.Construct(10);
+                                 Assert.IsNotNull(obj);
+                                 Assert.AreEqual(10, obj.GetProperty<int>("Length"));
+                             });
         }
 
         [TestMethod]
-        public void test_get_set()
+        public void Test_construct_arrays_via_delegate()
         {
-            var obj = typeof(PersonStruct[]).Construct(10);
-            var p = new PersonStruct();
-            obj.SetElement(1, p);
-            Assert.AreEqual(p, obj.GetElement<object>(1));
-
-            obj = typeof(int[]).Construct(10);
-            obj.SetElement(1, 2);
-            Assert.AreEqual(2, obj.GetElement<int>(1));
+            TypeList.ForEach(type =>
+                            {
+                                var ctorFunc = type.DelegateForConstruct(typeof(int));
+                                var obj = ctorFunc(20);
+                                Assert.IsNotNull(obj);
+                                Assert.AreEqual(20, obj.GetProperty<int>("Length"));
+                            });
         }
 
-        public void test_get_set_with_cached_delegate()
+        [TestMethod]
+        public void Test_get_set_elements()
         {
-            var type = typeof(PersonStruct[]);
-            var setFunc = type.DelegateForSetElement();
-            var getFunc = type.DelegateForGetElement();
-            var instance = type.Construct(10);
+            TypeList.ForEach(type =>
+                                 {
+                                     var array = type.Construct(10);
+                                     var instance = type.GetElementType().Construct();
+                                     array.SetElement(1, instance);
+                                     Assert.AreEqual(instance, array.GetElement<object>(1));
+                                 });
+        }
 
-            var person = type.GetElementType().Construct();
-            setFunc(instance, 9, person);
-            Assert.AreEqual(person, getFunc(instance, 9));
+        [TestMethod]
+        public void Test_get_set_elements_via_delegate()
+        {
+            TypeList.ForEach(type =>
+            {
+                var setFunc = type.DelegateForSetElement();
+                var getFunc = type.DelegateForGetElement();
+                var array = type.Construct(10);
+                var instance = type.GetElementType().Construct();
+                setFunc(array, 9, instance);
+                Assert.AreEqual(instance, getFunc(array, 9));
+            });
         }
     }
 }

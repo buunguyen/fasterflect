@@ -87,18 +87,5 @@ namespace Fasterflect.Emitter
                 }
             }
         }
-
-        protected void ReturnValue(ILGenerator generator, Type returnType)
-        {
-            if (returnType == Constants.VoidType)
-            {
-                generator.Emit(OpCodes.Ldnull);
-            }
-            else
-            {
-                BoxIfValueType(generator, returnType);
-            }
-            generator.Emit(OpCodes.Ret);
-        }
     }
 }

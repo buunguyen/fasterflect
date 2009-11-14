@@ -34,11 +34,6 @@ namespace Fasterflect.Emitter
         public string Name { get; private set; }
         public bool IsStatic { get; private set; }
 
-        public CallInfo(Type targetType, MemberTypes memberTypes, string name)
-            : this(targetType, memberTypes, name, Constants.EmptyTypeArray)
-        {
-        }
-
         public CallInfo(Type targetType, MemberTypes memberTypes, string name, Type[] paramTypes)
             : this(targetType, memberTypes, name, paramTypes, false)
         {
@@ -49,7 +44,7 @@ namespace Fasterflect.Emitter
             TargetType = targetType;
             MemberTypes = memberTypes;
             Name = name;
-            ParamTypes = paramTypes.Length == 0 ? Constants.EmptyTypeArray : paramTypes;
+            ParamTypes = paramTypes.Length == 0 ? Type.EmptyTypes : paramTypes;
             IsStatic = isStatic;
         }
 
@@ -75,7 +70,7 @@ namespace Fasterflect.Emitter
 
         public bool HasNoParam
         {
-            get { return ParamTypes == Constants.EmptyTypeArray; }
+            get { return ParamTypes == Type.EmptyTypes; }
         }
 
         public bool HasRefParam

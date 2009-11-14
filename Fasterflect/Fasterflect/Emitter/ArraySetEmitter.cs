@@ -32,7 +32,7 @@ namespace Fasterflect.Emitter
 
         protected override Delegate CreateDelegate()
         {
-            var method = CreateDynamicMethod("[]=", callInfo.TargetType, null,
+            var method = CreateDynamicMethod(Constants.ArraySetterName, callInfo.TargetType, null,
                 new[] { Constants.ObjectType, Constants.IntType, Constants.ObjectType });
             ILGenerator generator = method.GetILGenerator();
             var elementType = callInfo.TargetType.GetElementType();
@@ -41,9 +41,7 @@ namespace Fasterflect.Emitter
             generator.Emit(OpCodes.Castclass, callInfo.TargetType); // (T)arg0
             generator.Emit(OpCodes.Ldarg_1); // arg1;
             generator.Emit(OpCodes.Ldarg_2); // arg2;
-
             UnboxOrCast(generator, elementType);
-
             if (elementType.IsValueType)
             {
                 generator.Emit(OpCodes.Stelem, elementType);
@@ -52,7 +50,6 @@ namespace Fasterflect.Emitter
             {
                 generator.Emit(OpCodes.Stelem_Ref);    
             }
-
             generator.Emit(OpCodes.Ret);
             return method.CreateDelegate(typeof (ArrayElementSetter));
         }

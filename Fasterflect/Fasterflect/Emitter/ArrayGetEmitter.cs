@@ -40,7 +40,6 @@ namespace Fasterflect.Emitter
             generator.Emit(OpCodes.Ldarg_0); // arg0;
             generator.Emit(OpCodes.Castclass, callInfo.TargetType); // (T)arg0
             generator.Emit(OpCodes.Ldarg_1); // arg1;
-
             if (elementType.IsValueType)
             {
                 generator.Emit(OpCodes.Ldelem, elementType);

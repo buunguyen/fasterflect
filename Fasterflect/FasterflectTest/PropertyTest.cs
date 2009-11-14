@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -25,7 +26,7 @@ namespace FasterflectTest
     [TestClass]
     public class PropertyTest
     {
-        private class Person
+        private class PersonClass
         {
             private static int counter;
             public static int Counter { 
@@ -41,105 +42,136 @@ namespace FasterflectTest
             public int Age { private get; set; }
             public string Name { get; private set; }
             public bool IsGeek { set { } }
-            public Person Peer { get { return null; } }
+            public bool LikeMusic { get { return true; } }
+            public PersonClass Peer { get; set; }
         }
 
-        private Reflector reflector;
-        private object target;
-
-        [TestInitialize()]
-        public void TestInitialize()
+        private struct PersonStruct
         {
-            reflector = Reflector.Create();
-            target = new Person();
+            private static int counter;
+            public static int Counter
+            {
+                private get
+                {
+                    return counter;
+                }
+                set
+                {
+                    counter = value;
+                }
+            }
+            public int Age { private get; set; }
+            public string Name { get; private set; }
+            public bool IsGeek { set { } }
+        }
+
+        private static readonly List<Type> TypeList = new List<Type>
+                {
+                    typeof(PersonClass), 
+                    typeof(PersonStruct)
+                };
+
+        [TestMethod]
+        public void Test_set_and_get_static_properties()
+        {
+            TypeList.ForEach(type =>
+                                 {
+                                     type.SetProperty("Counter", 1);
+                                     Assert.AreEqual(1, type.GetProperty<int>("Counter"));
+
+                                     type.SetProperties(new { Counter = 2 });
+                                     Assert.AreEqual(2, type.GetProperty<int>("Counter"));
+                                 });
         }
 
         [TestMethod]
-        public void test_set_and_get_static_properties()
+        public void Test_set_and_get_properties()
         {
-            reflector.SetProperty(typeof(Person), "Counter", 1);
-            Assert.AreEqual(1, reflector.GetProperty<int>(typeof(Person), "Counter"));
-
-            reflector.SetProperties(typeof(Person), new { Counter = 2 });
-            Assert.AreEqual(2, reflector.GetProperty<int>(typeof(Person), "Counter"));
+            TypeList.ForEach(type =>
+                                {
+                                    var target = type.Construct().CreateHolderIfValueType();
+                                    target.SetProperty("Age", 10);
+                                    Assert.AreEqual(10, target.GetProperty<int>("Age"));
+                                    target.SetProperty("IsGeek", true);
+                                });
         }
 
         [TestMethod]
-        public void test_set_and_get_properties()
+        public void Test_set_and_get_properties_via_sample()
         {
-            reflector.SetProperty(target, "Age", 10);
-            reflector.SetProperty(target, "IsGeek", true);
-            Assert.AreEqual(10, reflector.GetProperty<int>(target, "Age"));
-        }
-
-        [TestMethod]
-        public void test_set_and_get_properties_via_sample()
-        {
-            reflector.SetProperties(target, new {Age = 10, Name = "John" });
-            Assert.AreEqual(10, reflector.GetProperty<int>(target, "Age"));
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(MissingMemberException))]
-        public void test_use_non_existent_setter()
-        {
-            reflector.SetProperty(target, "Peer", new Person());
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(MissingMemberException))]
-        public void test_use_non_existent_getter()
-        {
-            reflector.GetProperty<bool>(target, "IsGeek");
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(MissingMemberException))]
-        public void test_set_non_existent_property()
-        {
-            reflector.SetProperty(target, "NotExist", true);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(MissingMemberException))]
-        public void test_set_non_existent_static_property()
-        {
-            reflector.SetProperty(typeof(Person), "NotExist", true);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(MissingMemberException))]
-        public void test_get_non_existent_property()
-        {
-            reflector.GetProperty<int>(target, "NotExist");
+            TypeList.ForEach(type =>
+                                {
+                                    var target = type.Construct().CreateHolderIfValueType();
+                                    target.SetProperties(new { Age = 10, Name = "John" });
+                                    Assert.AreEqual(10, target.GetProperty<int>("Age"));
+                                });
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingMemberException))]
-        public void test_get_non_existent_static_property()
+        public void Test_use_non_existent_setter()
         {
-            reflector.GetProperty<int>(typeof(Person), "NotExist");
+            TypeList.ForEach(type =>
+            {
+                var target = type.Construct();
+                target.SetProperty("LikeMusic", target);
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMemberException))]
+        public void Test_use_non_existent_getter()
+        {
+            TypeList.ForEach(type => type.Construct().CreateHolderIfValueType().GetProperty<bool>("IsGeek"));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMemberException))]
+        public void Test_set_non_existent_property()
+        {
+            TypeList.ForEach(type => type.Construct().CreateHolderIfValueType().SetProperty("NotExist", true));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMemberException))]
+        public void Test_set_non_existent_static_property()
+        {
+            TypeList.ForEach(type => type.SetProperty("NotExist", true));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMemberException))]
+        public void Test_get_non_existent_property()
+        {
+            TypeList.ForEach(type => type.GetProperty<int>("NotExist"));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMemberException))]
+        public void Test_get_non_existent_static_property()
+        {
+            TypeList.ForEach(type => type.GetProperty<int>("NotExist"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidCastException))]
-        public void test_set_invalid_value_type()
+        public void Test_set_invalid_value_type()
         {
-            reflector.SetProperty(target, "Name", 1);
+            TypeList.ForEach(type => type.Construct().CreateHolderIfValueType().SetProperty("Name", 1));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidCastException))]
-        public void test_get_invalid_type()
+        public void Test_get_invalid_type()
         {
-            reflector.GetProperty<string>(target, "Age");
+            TypeList.ForEach(type => type.Construct().CreateHolderIfValueType().GetProperty<string>("Age"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(NullReferenceException))]
-        public void test_set_null_to_value_type()
+        public void Test_set_null_to_value_type()
         {
-            reflector.SetProperty(target, "Age", null);
+            TypeList.ForEach(type => type.Construct().CreateHolderIfValueType().SetProperty("Age", null));
         }
     }
 }

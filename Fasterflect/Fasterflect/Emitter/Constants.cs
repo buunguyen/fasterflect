@@ -31,7 +31,6 @@ namespace Fasterflect.Emitter
         public static readonly Type StructType = typeof(ValueTypeHolder);
         public static readonly Type VoidType = typeof(void);
         public static readonly Type[] ArrayOfObjectType = new[] { typeof(object) };
-        public static readonly Type[] EmptyTypeArray = new Type[0];
         public static readonly object[] EmptyObjectArray = new object[0];
     }
 }

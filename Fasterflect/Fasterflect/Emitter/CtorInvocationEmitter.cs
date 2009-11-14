@@ -73,7 +73,8 @@ namespace Fasterflect.Emitter
                     GenerateNewObjInvocation(generator, ctorInfo); // new T();
                 }
             }
-            ReturnValue(generator, callInfo.TargetType); // return (box)<stack>;
+            BoxIfValueType(generator, callInfo.TargetType); // return (box)<stack>;
+            generator.Emit(OpCodes.Ret);
             return method.CreateDelegate(typeof(ConstructorInvoker));
         }
 
