@@ -56,6 +56,13 @@ namespace Fasterflect
             return new Reflector();
         }
 
+        public object CreateHolderIfValueType(object obj)
+        {
+            return obj.GetType().IsValueType
+                ? new ValueTypeHolder(obj)
+                : obj;
+        }
+
         #region Batch Setters/Getters
         public Reflector SetProperties(Type targetType, object sample)
         {

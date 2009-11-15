@@ -37,8 +37,7 @@ namespace FasterflectSample
                                      {
                                          ExecuteNormalApi(type);
                                          ExecuteCacheApi(type);
-                                     }
-                );
+                                     });
         }
 
         private static void ExecuteNormalApi(Type type)
@@ -129,6 +128,21 @@ namespace FasterflectSample
 
             // Double-check the current value of the milesTravelled field
             AssertTrue(6 == obj.GetField<int>("milesTraveled"));
+
+            // Construct an array of 10 elements for current type
+            var arr = type.MakeArrayType().Construct(10);
+
+            // Get & set element of array
+            obj = type.Construct();
+            arr.SetElement(4, obj).SetElement(9, obj);
+            AssertTrue(obj.Equals(arr.GetElement<object>(4)));
+            AssertTrue(obj.Equals(arr.GetElement<object>(9)));
+            
+            // Remember, struct array doesn't have null element
+            if (!isStruct)
+            {
+                AssertTrue(null == arr.GetElement<object>(0));
+            }
         }
 
         private static void ExecuteCacheApi(Type type)
