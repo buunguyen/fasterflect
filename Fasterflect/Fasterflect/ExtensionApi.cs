@@ -45,9 +45,7 @@ namespace Fasterflect
         /// is a value type, or <paramref name="obj"/> itself if it's a reference type.</returns>
         public static object CreateHolderIfValueType(this object obj)
         {
-            return obj.GetType().IsValueType 
-                ? new ValueTypeHolder(obj) 
-                : obj;
+            return Reflector.CreateHolderIfValueType(obj);
         }
 
         /// <summary>
