@@ -32,7 +32,7 @@ namespace Fasterflect
     /// memory of the cached methods).
     /// </summary>
     /// <seealso cref="ExtensionApi"/>
-    public class Reflector
+    public class Reflector : IDisposable
     {
         /// <summary>
         /// Used to cache all generated delegates in the declaring  <see cref="Reflector"/> instance.
@@ -391,7 +391,7 @@ namespace Fasterflect
         }
         #endregion
 
-        #region Construction
+        #region Constructors
         public object Construct(Type targetType)
         {
             return Construct(targetType, Type.EmptyTypes, Constants.EmptyObjectArray);
@@ -418,5 +418,10 @@ namespace Fasterflect
                 new CtorInvocationEmitter(cache, targetType, paramTypes).GetDelegate();
         }
         #endregion
+
+        public void Dispose()
+        {
+            cache.Dispose();
+        }
     }
 }

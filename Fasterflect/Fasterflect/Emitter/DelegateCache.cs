@@ -22,7 +22,7 @@ using System.Threading;
 
 namespace Fasterflect.Emitter
 {
-    internal class DelegateCache
+    internal class DelegateCache : IDisposable
     {
         private readonly Dictionary<CallInfo, Delegate> map = new Dictionary<CallInfo, Delegate>();
         private readonly ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim();
@@ -70,6 +70,11 @@ namespace Fasterflect.Emitter
                 rwLock.ExitWriteLock();
             }
             return action;
+        }
+
+        public void Dispose()
+        {
+            rwLock.Dispose();
         }
     }
 }
