@@ -19,44 +19,36 @@
 namespace Fasterflect
 {
     /// <summary>
-    /// A delegate to retrieve the value of a static field or property of a type
+    /// A delegate to retrieve the value of a static field or property of a type.
     /// </summary>
     public delegate object StaticAttributeGetter();
 
     /// <summary>
     /// A delegate to retrieve the value of an instance field or property of an object.
     /// </summary>
-    /// <param name="target">The object whose field's or property's value is to be retrieved</param>
+    /// <param name="target">The object whose field's or property's value is to be retrieved.</param>
     /// <returns>The value of the instance field or property.</returns>
     public delegate object AttributeGetter(object target);
 
     /// <summary>
     /// A delegate to set the value of a static field or property of a type.
     /// </summary>
-    /// <param name="value">The value to be set to the field or property</param>
+    /// <param name="value">The value to be set to the field or property.</param>
     public delegate void StaticAttributeSetter(object value);
 
     /// <summary>
     /// A delegate to set the value of an instance field or property of an object.
     /// </summary>
     /// <param name="target">The object whose field's or property's value is to be set.</param>
-    /// <param name="value">The value to be set to the field or property</param>
+    /// <param name="value">The value to be set to the field or property.</param>
     public delegate void AttributeSetter(object target, object value);
-
-    /// <summary>
-    /// A delegate to invoke a static method of a type.
-    /// </summary>
-    /// <param name="parameters">The properly-ordered parameter list of the method.</param>
-    /// <returns>The return value of the method.  Null is returned if the method has no
-    /// return type.</returns>
-    public delegate object StaticMethodInvoker(params object[] parameters);
 
     /// <summary>
     /// A delegate to set an element of an array.
     /// </summary>
-    /// <param name="array">The array whose element is to be set</param>
-    /// <param name="index">The index of the element to be set</param>
-    /// <param name="value">The value to set to the element</param>
+    /// <param name="array">The array whose element is to be set.</param>
+    /// <param name="index">The index of the element to be set.</param>
+    /// <param name="value">The value to set to the element.</param>
     public delegate void ArrayElementSetter(object array, int index, object value);
 
     /// <summary>
@@ -67,6 +59,13 @@ namespace Fasterflect
     /// <returns>The element at <paramref name="index"/></returns>
     public delegate object ArrayElementGetter(object array, int index);
 
+    /// <summary>
+    /// A delegate to invoke a static method of a type.
+    /// </summary>
+    /// <param name="parameters">The properly-ordered parameter list of the method.</param>
+    /// <returns>The return value of the method.  Null is returned if the method has no
+    /// return type.</returns>
+    public delegate object StaticMethodInvoker(params object[] parameters);
 
     /// <summary>
     /// A delegate to invoke an instance method or indexer of an object.
@@ -82,7 +81,7 @@ namespace Fasterflect
     /// <summary>
     /// A delegate to invoke the constructor of a type.
     /// </summary>
-    /// <param name="parameters">The properly-ordered parameter list of the constructor</param>
+    /// <param name="parameters">The properly-ordered parameter list of the constructor.</param>
     /// <returns>An instance of type whose constructor is invoked.</returns>
     public delegate object ConstructorInvoker(params object[] parameters);
 }

@@ -20,7 +20,7 @@ namespace FasterflectSample
 {
     struct PersonStruct
     {
-       private int id;
+        private int id;
         private int milesTraveled;
         public int Id
         {

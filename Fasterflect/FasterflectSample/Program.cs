@@ -53,7 +53,8 @@ namespace FasterflectSample
             // Double-check if the constructor is invoked successfully or not
             AssertTrue(null != obj);
 
-            // struct doesn't have no-arg constructor, thus instanceCount won't be increased
+            // struct's no-arg constructor cannot be overriden, thus the following checking
+            // is not applicable to struct type
             if (!isStruct)
             {
                 // Now, Person.InstanceCount should be 1
@@ -61,7 +62,7 @@ namespace FasterflectSample
 
                 // What if we don't know the type of InstanceCount?  
                 // Just specify object as the type parameter
-                AssertTrue(1 == (int) type.GetField<object>("InstanceCount"));
+                AssertTrue(type.GetField<object>("InstanceCount") != null);
             }
 
             // We can bypass the constructor to change the value of Person.InstanceCount
@@ -83,24 +84,33 @@ namespace FasterflectSample
                                 .Invoke("GetInstanceCount")
                                 .Invoke<int>("GetInstanceCount"));
 
-            // Invoke method receiving ref/out params
-            var parameters = new object[] { 1, 2 };
-            type.Invoke("Swap", new[] { typeof(int).MakeByRefType(), typeof(int).MakeByRefType() }, 
-                parameters);
-            AssertTrue(2 == (int)parameters[0]);
-            AssertTrue(1 == (int)parameters[1]);
+            // Invoke method receiving ref/out params, we need to put arguments in an array
+            var arguments = new object[] { 1, 2 };
+            type.Invoke("Swap", 
+                // Parameter types must be set to the appropriate ref type
+                new[] { typeof(int).MakeByRefType(), typeof(int).MakeByRefType() },
+                arguments);
+            AssertTrue(2 == (int)arguments[0]);
+            AssertTrue(1 == (int)arguments[1]);
 
-            // Now, invoke the 2-arg constructor
-            obj = type.Construct(1, "Doe").CreateHolderIfValueType();
+            // Now, invoke the 2-arg constructor.  We don't even have to specify parameter types
+            // if we know that the arguments are not null (Fasterflect will internally retrieve type info).
+            obj = type.Construct(1, "Doe");
+
+            // Due to struct type's pass-by-value nature, in order for struct to be used 
+            // properly with Fasterflect, you need to convert it into a holder (wrapper) first.  
+            // The call below does nothing if obj is reference type so when unsure, just call it.
+            obj = obj.CreateHolderIfValueType();
 
             // id and name should have been set properly
             AssertTrue(1 == obj.GetField<int>("id"));
             AssertTrue("Doe" == obj.GetProperty<string>("Name"));
 
-            // Let's use the indexer to retrieve the character at index 1st
+            // Let's use the indexer to retrieve the character at index 1
             AssertTrue('o' == obj.GetIndexer<char>(1));
 
-            // If there's null param, must explicitly specify the param type array
+            // If there's null argument, or when we're unsure whether there's a null argument
+            // we must explicitly specify the param type array
             obj = type.Construct(new[] { typeof(int), typeof(string) }, new object[] { 1, null })
                 .CreateHolderIfValueType();
 
@@ -119,7 +129,10 @@ namespace FasterflectSample
             AssertTrue("Buu" == obj.GetProperty<string>("Name"));
              
             // How about modifying both properties at the same time using an anonymous sample
-            obj.SetProperties(new {Id = 4, Name = "Nguyen"});
+            obj.SetProperties(new {
+                                      Id = 4, 
+                                      Name = "Nguyen"
+                                  });
             AssertTrue(4 == obj.GetProperty<int>("Id"));
             AssertTrue("Nguyen" == obj.GetProperty<string>("Name"));
 
@@ -135,10 +148,20 @@ namespace FasterflectSample
             // Get & set element of array
             obj = type.Construct();
             arr.SetElement(4, obj).SetElement(9, obj);
-            AssertTrue(obj.Equals(arr.GetElement<object>(4)));
-            AssertTrue(obj.Equals(arr.GetElement<object>(9)));
-            
-            // Remember, struct array doesn't have null element
+
+            if (isStruct) // struct, won't have same reference
+            {
+                AssertTrue(obj.Equals(arr.GetElement<object>(4)));
+                AssertTrue(obj.Equals(arr.GetElement<object>(9)));
+            }
+            else 
+            {
+                AssertTrue(obj == arr.GetElement<object>(4));
+                AssertTrue(obj == arr.GetElement<object>(9));
+            }
+
+            // Remember, struct array doesn't have null element 
+            // (instead always initialized to default struct)
             if (!isStruct)
             {
                 AssertTrue(null == arr.GetElement<object>(0));
