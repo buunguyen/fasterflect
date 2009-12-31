@@ -46,11 +46,6 @@ namespace FasterflectBenchmark
             internal string GetName(string prefix) { return prefix + " " + name; }
         }
 
-        struct Animal
-        {
-            internal int id;
-        }
-
         private static readonly int[] Iterations = new[] { 20000, 2000000 };
         private static readonly object[] NoArgArray = new object[0];
         private static readonly object[] ArgArray = new object[]{10};
@@ -68,7 +63,6 @@ namespace FasterflectBenchmark
             RunMethodInvocationBenchmark();
             RunStaticMethodInvocationBenchmark();
             RunIndexerBenchmark();
-            RunStructFieldBenchmark();
         }
 
         private static void RunConstructorBenchmark()
@@ -102,45 +96,19 @@ namespace FasterflectBenchmark
                                   {"Init getter", () => {getter = TargetType.DelegateForGetField("name");}}
                               };
 
+            dynamic tmp = TargetPerson;
             var actionMap = new Dictionary<string, Action>
                               {
                                   {"Direct set", () => { TargetPerson.name = "John"; }},
                                   {"Direct get", () => { var name = TargetPerson.name; }},
+                                  {"'dynamic' set", () => { tmp.name = "John"; }},
+                                  {"'dynamic' get", () => { var name = tmp.name; }},
                                   {"Reflection set", () => fieldInfo.SetValue(TargetPerson, "John")},
                                   {"Reflection get", () => fieldInfo.GetValue(TargetPerson)},
                                   {"Fasterflect set", () => TargetPerson.SetField("name", "John")},
                                   {"Fasterflect get", () => TargetPerson.GetField<string>("name")},
                                   {"Fasterflect cached set", () => setter(TargetPerson, "John")},
                                   {"Fasterflect cached get", () => getter(TargetPerson)},
-                              };
-            Execute("Field Benchmark", initMap, actionMap);
-        }
-
-        private static void RunStructFieldBenchmark()
-        {
-            var targetType = typeof (Animal);
-            var targetAnimal = new Animal();
-            var wrapper = targetAnimal.CreateHolderIfValueType();
-            FieldInfo fieldInfo = null;
-            AttributeSetter setter = null;
-            AttributeGetter getter = null;
-            var initMap = new Dictionary<string, Action>
-                              {
-                                  {"Init info", () => { fieldInfo = targetType.GetField("id", BindingFlags.NonPublic | BindingFlags.Instance); }},
-                                  {"Init setter", () => { setter = targetType.DelegateForSetField("id"); }},
-                                  {"Init getter", () => { getter = targetType.DelegateForGetField("id");}}
-                              };
-
-            var actionMap = new Dictionary<string, Action>
-                              {
-                                  {"Direct set", () => { targetAnimal.id = 10; }},
-                                  {"Direct get", () => { var id = targetAnimal.id; }},
-                                  {"Reflection set", () => fieldInfo.SetValue(targetAnimal, 10)},
-                                  {"Reflection get", () => fieldInfo.GetValue(targetAnimal)},
-                                  {"Fasterflect set", () => wrapper.SetField("id", 10)},
-                                  {"Fasterflect get", () => wrapper.GetField<int>("id")},
-                                  {"Fasterflect cached set", () => setter(wrapper, 10)},
-                                  {"Fasterflect cached get", () => getter(wrapper)},
                               };
             Execute("Field Benchmark", initMap, actionMap);
         }
@@ -182,11 +150,13 @@ namespace FasterflectBenchmark
                                   {"Init setter", () => { setter = TargetType.DelegateForSetProperty("Age"); }},
                                   {"Init getter", () => { getter = TargetType.DelegateForGetProperty("Age"); }}
                               };
-      
+            dynamic tmp = TargetPerson;
             var actionMap = new Dictionary<string, Action>
                               {
                                   {"Direct set", () => { TargetPerson.Age = 10; }},
                                   {"Direct get", () => { var age = TargetPerson.Age; }},
+                                  {"'dynamic' set", () => { tmp.Age = 10; }},
+                                  {"'dynamic' get", () => { var age = tmp.Age; }},
                                   {"Reflection set", () => propInfo.SetValue(TargetPerson, 10, null)},
                                   {"Reflection get", () => propInfo.GetValue(TargetPerson, null)},
                                   {"Fasterflect set", () => TargetPerson.SetProperty("Age", 10)},
@@ -239,10 +209,13 @@ namespace FasterflectBenchmark
                                   {"Init getter", () => { getter = TargetType.DelegateForGetIndexer(new[] { typeof(int), typeof(int) }); }}
                               };
 
+            dynamic tmp = TargetPerson;
             var actionMap = new Dictionary<string, Action>
                               {
                                   {"Direct set", () => { TargetPerson[1, 2] = null; }},
-                                  {"Direct get", () => { var tmp = TargetPerson[1, 2]; }},
+                                  {"Direct get", () => { var t = TargetPerson[1, 2]; }},
+                                  {"'dynamic' set", () => { tmp[1, 2] = null; }},
+                                  {"'dynamic' get", () => { var t = tmp[1, 2]; }},
                                   {"Reflection set", () => setterInfo.Invoke(TargetPerson, new object[]{1, 2, null})},
                                   {"Reflection get", () => getterInfo.Invoke(TargetPerson, new object[]{1, 2 })},
                                   {"Fasterflect set", () => TargetPerson.SetIndexer(new[] { typeof(int), typeof(int), typeof(object) }, new object[]{1, 2, null})},
@@ -269,10 +242,13 @@ namespace FasterflectBenchmark
                                   {"Init arg invoker", () => { argInvoker = TargetType.DelegateForInvoke("Walk", new[] { typeof(int) }); }}
                               };
 
+            dynamic tmp = TargetPerson;
             var actionMap = new Dictionary<string, Action>
                               {
                                   {"Direct invoke", () => TargetPerson.Walk()},
                                   {"Direct invoke (arg)", () => TargetPerson.Walk(10)},
+                                  {"'dynamic' invoke", () => { tmp.Walk(); }},
+                                  {"'dynamic' invoke (arg)", () => { tmp.Walk(10); }},
                                   {"Reflection invoke", () => noArgMethodInfo.Invoke(TargetPerson, NoArgArray)},
                                   {"Reflection invoke (arg)", () => argMethodInfo.Invoke(TargetPerson, ArgArray)},
                                   {"Fasterflect invoke", () => TargetPerson.Invoke("Walk")},
