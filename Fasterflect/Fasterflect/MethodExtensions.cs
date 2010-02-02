@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
 
@@ -277,6 +278,10 @@ namespace Fasterflect
 		#endregion
 
 		#region Method Lookup
+		public static IEnumerable<MethodInfo> Methods( this Type type )
+		{
+			return type.Methods(Reflector.AllCriteria, null);
+		}
 
 		public static IList<MethodInfo> Methods(this Type type, BindingFlags bindingFlags)
 		{
@@ -285,17 +290,10 @@ namespace Fasterflect
 
 		public static IList<MethodInfo> Methods(this Type type, BindingFlags bindingFlags, string methodName)
 		{
-			IList<MethodInfo> result = new List<MethodInfo>();
-			foreach (MemberInfo memberInfo in type.FindMembers(MemberTypes.Method, bindingFlags, null, null))
-			{
-				if (methodName == null || memberInfo.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase))
-				{
-					result.Add(memberInfo as MethodInfo);
-				}
-			}
-			return result;
+			return (from memberInfo in type.FindMembers(MemberTypes.Method, bindingFlags, null, null)
+			        where methodName == null || memberInfo.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase)
+			        select memberInfo as MethodInfo).ToList();
 		}
-
 		#endregion
 
 		#region Method Parameter Lookup

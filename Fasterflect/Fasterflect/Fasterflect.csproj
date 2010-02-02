@@ -104,7 +104,6 @@
     <Compile Include="Emitter\MemberSetEmitter.cs" />
     <Compile Include="ObjectConstruction\ConstructorMap.cs" />
     <Compile Include="ObjectConstruction\MapFactory.cs" />
-    <Compile Include="QueryExtensions.cs" />
     <Compile Include="ObjectConstruction\MapCache.cs" />
     <Compile Include="ObjectConstruction\SourceInfo.cs" />
     <Compile Include="ObjectConstruction\MethodMap.cs" />
