@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Fasterflect
@@ -170,8 +171,70 @@ namespace Fasterflect
 
 		#endregion
 
-		#region Field Lookup
+		#region FieldInfo Access
+		/// <summary>
+		/// Gets the value of the instance field <paramref name="info"/> from the <paramref name="target"/>.
+		/// </summary>
+		/// <param name="info">The field to read.</param>
+		/// <param name="target">The object whose field should be read.</param>
+		/// <returns>The value of the specified field.</returns>
+		public static object GetValue( this FieldInfo info, object target )
+		{
+			return target.GetField<object>( info.Name );
+		}
 
+		/// <summary>
+		/// Sets the value of the instance field <paramref name="info"/> on the <paramref name="target"/>.
+		/// </summary>
+		/// <param name="info">The field to write.</param>
+		/// <param name="target">The object on which to set the field value.</param>
+		/// <param name="value">The value to assign to the specified field.</param>
+		public static void SetValue( this FieldInfo info, object target, object value )
+		{
+			target.SetField( info.Name, value );
+		}
+		#endregion
+
+		#region Field Lookup
+		/// <summary>
+		/// Find a specific named field on the given type.
+		/// </summary>
+		/// <param name="type">The type to reflect on</param>
+		/// <param name="name">The name of the member to find</param>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found</returns>
+		public static FieldInfo Field<T>( this Type type, string name )
+		{
+			FieldInfo info = type.GetField( name, Reflector.AllCriteria );
+			return info != null && info.FieldType == typeof( T ) ? info : null;
+		}
+
+		/// <summary>
+		/// Find a specific named field on the given type.
+		/// </summary>
+		/// <param name="type">The type to reflect on</param>
+		/// <param name="name">The name of the member to find</param>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found</returns>
+		public static FieldInfo Field( this Type type, string name )
+		{
+			return type.GetField( name, Reflector.AllCriteria );
+		}
+
+		public static FieldInfo[] Fields( this Type type )
+		{
+			return type.GetFields( Reflector.InstanceCriteria ) ?? new FieldInfo[ 0 ];
+		}
+
+		public static FieldInfo[] FieldsIncludingBaseTypes( this Type type )
+		{
+			var fields = new List<FieldInfo>( type.Fields() );
+			Type baseType = type.BaseType;
+			while( baseType != typeof( object ) )
+			{
+				fields.AddRange( baseType.Fields() );
+				baseType = baseType.BaseType;
+			}
+			return fields.ToArray();
+		}
 		#endregion
 	}
 }

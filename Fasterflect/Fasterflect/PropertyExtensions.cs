@@ -30,7 +30,6 @@ namespace Fasterflect
 	public static class PropertyExtensions
 	{
 		#region Property Access
-
 		/// <summary>
 		/// Sets the static property <paramref name="propertyName"/> of type <paramref name="targetType"/>
 		/// with the specified <paramref name="value" />.
@@ -125,6 +124,30 @@ namespace Fasterflect
 			return targetType.DelegateForGetFieldOrProperty(MemberTypes.Property, propertyName);
 		}
 
+		#endregion
+
+		#region PropertyInfo Access
+		/// <summary>
+		/// Gets the value of the instance property <paramref name="info"/> from the <paramref name="target"/>.
+		/// </summary>
+		/// <param name="info">The property to read.</param>
+		/// <param name="target">The object whose property should be read.</param>
+		/// <returns>The value of the specified property.</returns>
+		public static object GetValue( this PropertyInfo info, object target )
+		{
+			return target.GetProperty<object>( info.Name );
+		}
+
+		/// <summary>
+		/// Sets the value of the instance property <paramref name="info"/> on the <paramref name="target"/>.
+		/// </summary>
+		/// <param name="info">The property to write.</param>
+		/// <param name="target">The object on which to set the property value.</param>
+		/// <param name="value">The value to assign to the specified property.</param>
+		public static void SetValue( this PropertyInfo info, object target, object value )
+		{
+			target.SetProperty(info.Name, value);
+		}
 		#endregion
 
 		#region Batch Setters
@@ -272,7 +295,33 @@ namespace Fasterflect
 		#endregion
 
 		#region Property Lookup
+		/// <summary>
+		/// Find a specific named property on the given type.
+		/// </summary>
+		/// <param name="type">The type to reflect on</param>
+		/// <param name="name">The name of the member to find</param>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found</returns>
+		public static PropertyInfo Property<T>( this Type type, string name )
+		{
+			PropertyInfo info = type.GetProperty( name, Reflector.AllCriteria );
+			return info != null && info.PropertyType == typeof( T ) ? info : null;
+		}
 
+		/// <summary>
+		/// Find a specific named property on the given type.
+		/// </summary>
+		/// <param name="type">The type to reflect on</param>
+		/// <param name="name">The name of the member to find</param>
+		/// <returns>A single PropertyInfo instance of the first found match or null if no match was found</returns>
+		public static PropertyInfo Property( this Type type, string name )
+		{
+			return type.GetProperty( name, Reflector.AllCriteria );
+		}
+
+		public static PropertyInfo[] Properties( this Type type )
+		{
+			return type.GetProperties() ?? new PropertyInfo[ 0 ];
+		}
 		#endregion
 	}
 }
