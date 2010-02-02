@@ -1,0 +1,450 @@
+#region License
+
+// Copyright 2010 Morten Mertner, Buu Nguyen (http://www.buunguyen.net/blog)
+// 
+// Licensed under the Apache License, Version 2.0 (the "License"); 
+// you may not use this file except in compliance with the License. 
+// You may obtain a copy of the License at 
+// 
+// http://www.apache.org/licenses/LICENSE-2.0 
+// 
+// Unless required by applicable law or agreed to in writing, software 
+// distributed under the License is distributed on an "AS IS" BASIS, 
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+// See the License for the specific language governing permissions and 
+// limitations under the License.
+// 
+// The latest version of this file can be found at http://fasterflect.codeplex.com/
+
+#endregion
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+
+namespace Fasterflect.ObjectConstruction
+{
+	/// <summary>
+	/// This class wraps a single invokable method call. It contains information on the method to call as well as 
+	/// the parameters to use in the method call.
+	/// This intermediary class is used by the ObjectConstructionExtensions class to select the best match to call
+	/// from a given set of available methods/constructors (and a set of parameter names and types).
+	/// </summary>
+	internal class MethodMap
+	{
+		private readonly bool allowUnusedParameters;
+		protected long cost;
+		protected bool isPerfectMatch;
+		protected bool isValid;
+		protected MemberInfo[] members;
+		protected MethodBase method;
+		protected BitArray methodParameterUsageMask; // marks method parameters for which a source was found
+		protected string[] paramNames;
+		protected Type[] paramTypes;
+		protected BitArray parameterDefaultValueMask; // marks fields where default values will be used
+		protected IDictionary<string, object> parameterDefaultValues;
+		protected int parameterHashCode;
+		// protected BitArray parameterInjectionValueMask; // marks fields where injected values will be used
+		// protected BitArray parameterNullValueMask; // marks fields where null values will be used
+		protected int[] parameterOrderMap;
+		protected int[] parameterOrderMapReverse;
+		protected BitArray parameterReflectionMask; // marks parameters set using reflection
+		protected BitArray parameterTypeConvertMask; // marks columns that may need type conversion
+		protected BitArray parameterUnusedMask; // marks unused fields (columns with no target)
+		protected long parameterUsageCount; // number of parameters used in constructor call
+		protected BitArray parameterUsageMask; // marks parameters used in method call
+		protected IList<ParameterInfo> parameters;
+		// method call information
+		protected int requiredFoundCount;
+		protected int requiredParameterCount;
+		protected Type type;
+		// match indicators
+
+		public MethodMap(MethodBase method, string[] paramNames, Type[] paramTypes, bool allowUnusedParameters)
+		{
+			type = method.DeclaringType;
+			this.method = method;
+			this.paramNames = paramNames;
+			this.paramTypes = paramTypes;
+			parameterHashCode = GetParameterHash(paramNames, paramTypes);
+			requiredParameterCount = method.Parameters().Count;
+			this.allowUnusedParameters = allowUnusedParameters;
+			parameters = method.Parameters();
+			InitializeBitArrays(Math.Max(parameters.Count, paramNames.Length));
+			InitializeMethodMap();
+		}
+
+		private void InitializeBitArrays(int length)
+		{
+			methodParameterUsageMask = new BitArray(parameters.Count);
+			parameterUsageMask = new BitArray(length);
+			parameterUnusedMask = new BitArray(length);
+			parameterTypeConvertMask = new BitArray(length);
+			parameterReflectionMask = new BitArray(length);
+			parameterDefaultValueMask = new BitArray(length);
+		}
+
+		#region Parameter List Identification
+
+		internal static int GetParameterHash(string[] names, Type[] types)
+		{
+			int hash = 0;
+			for (int i = 0; i < names.Length; i++)
+			{
+				hash ^= names[i].GetHashCode() ^ types[i].GetHashCode();
+			}
+			return hash;
+		}
+
+		#endregion
+
+		#region Map Initialization
+
+		private void InitializeMethodMap()
+		{
+			//int normalCount = 0; // number of fields filled with regular parameter values
+			int defaultCount = 0; // number of fields filled using default values
+			int nullCount = 0; // number of fields filled using null
+			int injectionCount = 0; // number of fields filled using external values (dependency injection aka IoC)
+			parameterOrderMap = new int[paramNames.Length];
+			for (int i = 0; i < paramNames.Length; i++)
+				parameterOrderMap[i] = -1;
+			parameterUsageCount = 0;
+			members = new MemberInfo[paramNames.Length];
+			// use a counter to determine whether we have a column for every parameter
+			int noColumnForParameter = parameters.Count;
+			// keep a reverse index for later when we check for default values
+			parameterOrderMapReverse = new int[noColumnForParameter];
+			// explicitly mark unused entries as we may have more parameters than columns
+			for (int i = 0; i < noColumnForParameter; i++)
+				parameterOrderMapReverse[i] = -1;
+			bool isPerfectColumnOrder = true;
+			// process columns
+			for (int invokeParamIndex = 0; invokeParamIndex < paramNames.Length; invokeParamIndex++)
+			{
+				string paramName = paramNames[invokeParamIndex];
+				Type paramType = paramTypes[invokeParamIndex];
+				bool foundParam = false;
+				int methodParameterIndex = 0;
+				for (int methodParamIndex = 0; methodParamIndex < parameters.Count; methodParamIndex++)
+				{
+					if (methodParameterUsageMask[methodParamIndex]) // ignore input if we already have an appropriate source
+						continue;
+					methodParameterIndex = methodParamIndex; // preserve loop variable outside loop
+					ParameterInfo parameter = parameters[methodParamIndex];
+					if (parameter.Name.Equals(paramName, StringComparison.OrdinalIgnoreCase))
+						// permit casing differences to allow for matching lower-case parameters to upper-case properties
+					{
+						bool convert = false; // TODO we should also allow other types that can be converted
+						if (parameter.ParameterType == paramType || convert)
+						{
+							foundParam = true;
+							methodParameterUsageMask[methodParamIndex] = true;
+							noColumnForParameter--;
+							parameterUsageCount++;
+							parameterUsageMask[invokeParamIndex] = true;
+							parameterOrderMap[invokeParamIndex] = methodParamIndex;
+							parameterOrderMapReverse[methodParamIndex] = invokeParamIndex;
+							isPerfectColumnOrder &= invokeParamIndex == methodParamIndex;
+							// type conversion required for nullable columns mapping to not-nullable system type
+							// or when the supplied value type is different from member/parameter type
+							if (convert)
+							{
+								parameterTypeConvertMask[invokeParamIndex] = true;
+								cost += 1;
+							}
+							break;
+						}
+					}
+				}
+				// method can only be invoked if we have the required number of parameters
+				// parameters are checked from left to right (so any required number wont be enough)
+				if (foundParam && methodParameterIndex < requiredParameterCount)
+				{
+					requiredFoundCount++;
+				}
+				if (! foundParam)
+				{
+					// check if we can use reflection to set some members
+					MemberInfo member = type.Member(paramName);
+					Type memberType = member != null ? member.Type() : null;
+					bool convert = false; // TODO we should also allow other types that can be converted
+					bool useMember = memberType != null && member.CanWrite() && (memberType == paramType || convert);
+					if (method.IsConstructor && useMember)
+					{
+						members[invokeParamIndex] = member;
+						// column not included in method call but member field or property is present
+						parameterReflectionMask[invokeParamIndex] = true;
+						cost += 10;
+						// type conversion required for nullable columns mapping to not-nullable system type
+						// or when result set type is different from member/parameter type
+						if (convert)
+						{
+							parameterTypeConvertMask[invokeParamIndex] = true;
+							cost += 1;
+						}
+					}
+					else
+					{
+						// unused column - not in constructor or as member field
+						parameterUnusedMask[invokeParamIndex] = true;
+					}
+				}
+			}
+			// check whether method has unused parameters
+			if (noColumnForParameter > 0)
+			{
+				for (int methodParamIndex = 0; methodParamIndex < parameters.Count; methodParamIndex++)
+				{
+					int invokeIndex = parameterOrderMapReverse[methodParamIndex];
+					bool hasValue = invokeIndex != -1;
+					if (hasValue)
+					{
+						hasValue = parameterUsageMask[invokeIndex];
+					}
+					// only try to supply default values for parameters that do not already have a value
+					if (! hasValue)
+					{
+						ParameterInfo parameter = parameters[methodParamIndex];
+						bool hasDefaultValue = parameter.HasDefaultValue();
+						// default value can be a null value, but not for required parameters
+						bool isDefaultAllowed = methodParamIndex >= requiredParameterCount || hasDefaultValue;
+						if (isDefaultAllowed)
+						{
+							// prefer any explicitly defined default parameter value for the parameter
+							if (hasDefaultValue)
+							{
+								SaveDefaultValue(parameter.Name, parameter.DefaultValue);
+								parameterDefaultValueMask[methodParamIndex] = true;
+								defaultCount++;
+								noColumnForParameter--;
+							}
+							else if (HasExternalDefaultValue(parameter)) // external values (dependency injection)
+							{
+								SaveDefaultValue(parameter.Name, GetExternalDefaultValue(parameter));
+								parameterDefaultValueMask[methodParamIndex] = true;
+								injectionCount++;
+								noColumnForParameter--;
+							}
+							else // see if we can use null as the default value
+							{
+								if (parameter.ParameterType != null && parameter.IsNullable())
+								{
+									SaveDefaultValue(parameter.Name, null);
+									parameterDefaultValueMask[methodParamIndex] = true;
+									nullCount++;
+									noColumnForParameter--;
+								}
+							}
+						}
+					}
+				}
+			}
+			// score 100 if parameter and column count differ
+			cost += parameterUsageCount == parameters.Count ? 0 : 100;
+			// score 300 if column order does not match parameter order
+			cost += isPerfectColumnOrder ? 0 : 300;
+			// score 600 if type conversion for any column is required
+			cost += AllUnset(parameterTypeConvertMask) ? 0 : 600;
+			// score additinal points if we need to use any kind of default value
+			cost += defaultCount*1000 + injectionCount*1000 + nullCount*1000;
+			// determine whether we have a perfect match (can use direct constructor invocation)
+			isPerfectMatch = isPerfectColumnOrder && parameterUsageCount == parameters.Count;
+			isPerfectMatch &= parameterUsageCount == paramNames.Length;
+			isPerfectMatch &= AllUnset(parameterUnusedMask) && AllUnset(parameterTypeConvertMask);
+			isPerfectMatch &= cost == 0;
+			// isValid tells whether this CM can be used with the given columns
+			isValid = requiredFoundCount == requiredParameterCount && parameterUsageCount >= requiredParameterCount;
+			isValid &= allowUnusedParameters || parameterUsageCount == paramNames.Length;
+			isValid &= noColumnForParameter == 0;
+			isValid &= AllSet(methodParameterUsageMask);
+			// this last specifies that we must use all of the supplied parameters to construct the object
+			// isValid &= parameterUnusedMask == 0;
+
+			/*
+			// we must have a value for every method parameter
+			bool isValid = parameterInfos.Length == normalCount + defaultCount + nullCount;
+			// we must use all configured values in the config file
+			isValid &= parameters.Count == normalCount;
+			if( ! isValid )
+				return null;
+			// method can be called using supplied parameters.. 
+			int matchIndicator = normalCount << 16 - defaultCount << 8 - nullCount;
+			return new MethodInvokable( this, matchIndicator, invokeParameters );
+			*/
+		}
+
+		private void SaveDefaultValue(string parameterName, object parameterValue)
+		{
+			// perform late initialization of the dictionary for default values
+			if (parameterDefaultValues == null)
+				parameterDefaultValues = new Dictionary<string, object>();
+			parameterDefaultValues[parameterName] = parameterValue;
+		}
+
+		#endregion
+
+		#region Dependency Injection Helpers
+
+		private bool HasExternalDefaultValue(ParameterInfo parameter)
+		{
+			// TODO plug in code for DI or DI framework here
+			return false;
+		}
+
+		private object GetExternalDefaultValue(ParameterInfo parameter)
+		{
+			return null;
+		}
+
+		#endregion
+
+		#region Parameter Preparation
+
+		/// <summary>
+		/// Perform parameter reordering, null handling and type conversion in preparation
+		/// of executing the method call.
+		/// </summary>
+		/// <param name="row">The callers row of data.</param>
+		/// <returns>The parameter array to use in the actual invocation.</returns>
+		protected object[] PrepareParameters(object[] row)
+		{
+			var methodParams = new object[parameters.Count];
+			int firstPotentialDefaultValueIndex = 0;
+			for (int i = 0; i < row.Length; i++)
+			{
+				// only include columns in constructor
+				if (parameterUsageMask[i])
+				{
+					// only convert column if type is assignment incompatible with constructor argument
+					if (parameterTypeConvertMask[i])
+					{
+						//MetaValue mv = parameterValues[ i ];
+						//ParameterInfo mp = parameters[ parameterOrderMap[ i ] ];
+						// TODO clean up code - type conversion or not?
+						methodParams[parameterOrderMap[i]] = row[i];
+					}
+					else
+					{
+						methodParams[parameterOrderMap[i]] = row[i];
+					}
+					// advance counter of sequential fields used to save some time in the loop below
+					if (i == 1 + firstPotentialDefaultValueIndex)
+						firstPotentialDefaultValueIndex++;
+				}
+			}
+			for (int i = firstPotentialDefaultValueIndex; i < methodParams.Length; i++)
+			{
+				if (parameterDefaultValueMask[i])
+				{
+					methodParams[i] = parameterDefaultValues[parameters[i].Name];
+				}
+			}
+			return methodParams;
+		}
+
+		#endregion
+
+		#region Method Invocation
+
+		public virtual object Invoke(object[] row)
+		{
+			throw new NotImplementedException("Implemented in subclasses.");
+		}
+
+		public virtual object Invoke(object target, object[] row)
+		{
+			//CreateInvoker();
+			object[] methodParameters = isPerfectMatch ? row : PrepareParameters(row);
+			//return invoker.Invoke( methodParameters );
+			return method.Invoke(target, methodParameters);
+		}
+
+		internal Type[] GetParamTypes()
+		{
+			var paramTypes = new Type[parameters.Count];
+			for (int i = 0; i < parameters.Count; i++)
+			{
+				ParameterInfo pi = parameters[i];
+				paramTypes[i] = pi.ParameterType;
+			}
+			return paramTypes;
+		}
+
+		#endregion
+
+		#region BitArray Helpers
+
+		/// <summary>
+		/// Test whether at least one bit is set in the array. Replaces the old "long != 0" check.
+		/// </summary>
+		protected bool AnySet(BitArray bits)
+		{
+			return ! AllUnset(bits);
+		}
+
+		/// <summary>
+		/// Test whether no bits are set in the array. Replaces the old "long == 0" check.
+		/// </summary>
+		protected bool AllUnset(BitArray bits)
+		{
+			foreach (bool bit in bits)
+			{
+				if (bit)
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// Test whether no bits are set in the array. Replaces the old "long == 0" check.
+		/// </summary>
+		protected bool AllSet(BitArray bits)
+		{
+			foreach (bool bit in bits)
+			{
+				if (! bit)
+					return false;
+			}
+			return true;
+		}
+
+		#endregion
+
+		#region Properties
+
+		public IDictionary<string, object> ParameterDefaultValues
+		{
+			get { return parameterDefaultValues; }
+			set { parameterDefaultValues = value; }
+		}
+
+		public int ParameterCount
+		{
+			get { return parameters.Count; }
+		}
+
+		public int RequiredParameterCount
+		{
+			get { return requiredParameterCount; }
+		}
+
+		public virtual long Cost
+		{
+			get { return cost; }
+		}
+
+		public bool IsValid
+		{
+			get { return isValid; }
+		}
+
+		public bool IsPerfectMatch
+		{
+			get { return isPerfectMatch; }
+		}
+
+		#endregion
+	}
+}

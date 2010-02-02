@@ -22,17 +22,26 @@ using System;
 
 namespace Fasterflect.Emitter
 {
-	internal static class Constants
+	/// <summary>
+	/// A wrapper for value type.  Must be used in order for Fasterflect to 
+	/// work with value type such as struct.
+	/// </summary>
+	internal class ValueTypeHolder
 	{
-		public const string IndexerSetterName = "set_Item";
-		public const string IndexerGetterName = "get_Item";
-		public const string ArraySetterName = "[]=";
-		public const string ArrayGetterName = "=[]";
-		public static readonly Type ObjectType = typeof (object);
-		public static readonly Type IntType = typeof (int);
-		public static readonly Type StructType = typeof (ValueTypeHolder);
-		public static readonly Type VoidType = typeof (void);
-		public static readonly Type[] ArrayOfObjectType = new[] {typeof (object)};
-		public static readonly object[] EmptyObjectArray = new object[0];
+		/// <summary>
+		/// Creates a wrapper for <paramref name="value"/> value type.  The wrapper
+		/// can then be used with Fasterflect.
+		/// </summary>
+		/// <param name="value">The value type to be wrapped.  
+		/// Must be a derivative of <code>ValueType</code>.</param>
+		public ValueTypeHolder(object value)
+		{
+			Value = (ValueType) value;
+		}
+
+		/// <summary>
+		/// The actual struct wrapped by this instance.
+		/// </summary>
+		public ValueType Value { get; set; }
 	}
 }

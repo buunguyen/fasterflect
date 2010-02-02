@@ -1,4 +1,5 @@
 ﻿#region License
+
 // Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,6 +15,7 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
+
 #endregion
 
 using System;
@@ -21,71 +23,67 @@ using System.Reflection.Emit;
 
 namespace Fasterflect.Emitter
 {
-    internal abstract class InvocationEmitter : BaseEmitter
-    {
-        protected InvocationEmitter(DelegateCache cache) : base(cache)
-        {
-        }
+	internal abstract class InvocationEmitter : BaseEmitter
+	{
+		protected int CreateLocalsForByRefParams(ILGenerator generator, int paramArrayIndex)
+		{
+			int numberOfByRefParams = 0;
+			for (int i = 0; i < callInfo.ParamTypes.Length; i++)
+			{
+				Type paramType = callInfo.ParamTypes[i];
+				if (paramType.IsByRef)
+				{
+					Type type = paramType.GetElementType();
+					generator.DeclareLocal(type);
+					generator.Emit(OpCodes.Ldarg, paramArrayIndex);
+					generator.Emit(OpCodes.Ldc_I4, i);
+					generator.Emit(OpCodes.Ldelem_Ref);
+					UnboxOrCast(generator, type);
+					generator.Emit(OpCodes.Stloc, numberOfByRefParams++);
+				}
+			}
+			return numberOfByRefParams;
+		}
 
-        protected int CreateLocalsForByRefParams(ILGenerator generator, int paramArrayIndex)
-        {
-            int numberOfByRefParams = 0;
-            for (int i = 0; i < callInfo.ParamTypes.Length; i++)
-            {
-                var paramType = callInfo.ParamTypes[i];
-                if (paramType.IsByRef)
-                {
-                    var type = paramType.GetElementType();
-                    generator.DeclareLocal(type);
-                    generator.Emit(OpCodes.Ldarg, paramArrayIndex);
-                    generator.Emit(OpCodes.Ldc_I4, i);
-                    generator.Emit(OpCodes.Ldelem_Ref);
-                    UnboxOrCast(generator, type);
-                    generator.Emit(OpCodes.Stloc, numberOfByRefParams++);
-                }
-            }
-            return numberOfByRefParams;
-        }
+		protected void AssignByRefParamsToArray(ILGenerator generator, int paramArrayIndex)
+		{
+			int currentByRefParam = 0;
+			for (int i = 0; i < callInfo.ParamTypes.Length; i++)
+			{
+				Type paramType = callInfo.ParamTypes[i];
+				if (paramType.IsByRef)
+				{
+					generator.Emit(OpCodes.Ldarg, paramArrayIndex);
+					generator.Emit(OpCodes.Ldc_I4, i);
+					generator.Emit(OpCodes.Ldloc, currentByRefParam++);
+					Type type = paramType.GetElementType();
+					if (type.IsValueType)
+					{
+						generator.Emit(OpCodes.Box, type);
+					}
+					generator.Emit(OpCodes.Stelem_Ref);
+				}
+			}
+		}
 
-        protected void AssignByRefParamsToArray(ILGenerator generator, int paramArrayIndex)
-        {
-            int currentByRefParam = 0;
-            for (int i = 0; i < callInfo.ParamTypes.Length; i++)
-            {
-                var paramType = callInfo.ParamTypes[i];
-                if (paramType.IsByRef)
-                {
-                    generator.Emit(OpCodes.Ldarg, paramArrayIndex);
-                    generator.Emit(OpCodes.Ldc_I4, i);
-                    generator.Emit(OpCodes.Ldloc, currentByRefParam++);
-                    var type = paramType.GetElementType();
-                    if (type.IsValueType)
-                    {
-                        generator.Emit(OpCodes.Box, type);
-                    }
-                    generator.Emit(OpCodes.Stelem_Ref);
-                }
-            }
-        }
-
-        protected void PushParamsOrLocalsToStack(ILGenerator generator, int paramArrayIndex)
-        {
-            int currentByRefParam = 0;
-            for (int i = 0; i < callInfo.ParamTypes.Length; i++)
-            {
-                var paramType = callInfo.ParamTypes[i];
-                if (paramType.IsByRef)
-                {
-                    generator.Emit(OpCodes.Ldloca_S, currentByRefParam++);
-                }
-                else
-                {
-                    generator.Emit(OpCodes.Ldarg, paramArrayIndex);
-                    generator.Emit(OpCodes.Ldc_I4, i);
-                    generator.Emit(OpCodes.Ldelem_Ref);
-                    UnboxOrCast(generator, paramType);
-                }
-            }
-        }
-    }
+		protected void PushParamsOrLocalsToStack(ILGenerator generator, int paramArrayIndex)
+		{
+			int currentByRefParam = 0;
+			for (int i = 0; i < callInfo.ParamTypes.Length; i++)
+			{
+				Type paramType = callInfo.ParamTypes[i];
+				if (paramType.IsByRef)
+				{
+					generator.Emit(OpCodes.Ldloca_S, currentByRefParam++);
+				}
+				else
+				{
+					generator.Emit(OpCodes.Ldarg, paramArrayIndex);
+					generator.Emit(OpCodes.Ldc_I4, i);
+					generator.Emit(OpCodes.Ldelem_Ref);
+					UnboxOrCast(generator, paramType);
+				}
+			}
+		}
+	}
 }

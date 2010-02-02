@@ -1,4 +1,5 @@
 ﻿#region License
+
 // Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,6 +15,7 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
+
 #endregion
 
 using System;
@@ -22,66 +24,65 @@ using System.Reflection.Emit;
 
 namespace Fasterflect.Emitter
 {
-    internal class CtorInvocationEmitter : InvocationEmitter
-    {
-        public CtorInvocationEmitter(DelegateCache cache, Type targetType, Type[] paramTypes)
-            : base(cache)
-        {
-            callInfo = new CallInfo(targetType, MemberTypes.Constructor, targetType.Name, paramTypes);
-        }
+	internal class CtorInvocationEmitter : InvocationEmitter
+	{
+		public CtorInvocationEmitter(Type targetType, Type[] paramTypes)
+		{
+			callInfo = new CallInfo(targetType, MemberTypes.Constructor, targetType.Name, paramTypes);
+		}
 
-        protected override Delegate CreateDelegate()
-        {
-            var method = CreateDynamicMethod("ctor",
-                callInfo.TargetType, Constants.ObjectType, new[] { Constants.ObjectType });
-            ILGenerator generator = method.GetILGenerator();
+		protected override Delegate CreateDelegate()
+		{
+			DynamicMethod method = CreateDynamicMethod("ctor",
+			                                           callInfo.TargetType, Constants.ObjectType, new[] {Constants.ObjectType});
+			ILGenerator generator = method.GetILGenerator();
 
-            if (callInfo.IsTargetTypeStruct && callInfo.HasNoParam)
-            {
-                generator.DeclareLocal(callInfo.TargetType); // loc_0: T tmp;
-                generator.Emit(OpCodes.Ldloca_S, 0); // &tmp;
-                generator.Emit(OpCodes.Initobj, callInfo.TargetType); // init_obj(&tmp);
-                generator.Emit(OpCodes.Ldloc, 0); // tmp;;
-            }
-            else if (callInfo.TargetType.IsArray)
-            {
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldc_I4_0);
-                generator.Emit(OpCodes.Ldelem_Ref);
-                generator.Emit(OpCodes.Unbox_Any, typeof(int));
-                generator.Emit(OpCodes.Newarr, callInfo.TargetType.GetElementType());
-            }
-            else
-            {
-                ConstructorInfo ctorInfo = callInfo.TargetType.GetConstructor(
-                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                                null, CallingConventions.HasThis, callInfo.ParamTypes, null);
-                if (ctorInfo == null)
-                    throw new MissingMemberException("Constructor does not exist");
+			if (callInfo.IsTargetTypeStruct && callInfo.HasNoParam)
+			{
+				generator.DeclareLocal(callInfo.TargetType); // loc_0: T tmp;
+				generator.Emit(OpCodes.Ldloca_S, 0); // &tmp;
+				generator.Emit(OpCodes.Initobj, callInfo.TargetType); // init_obj(&tmp);
+				generator.Emit(OpCodes.Ldloc, 0); // tmp;;
+			}
+			else if (callInfo.TargetType.IsArray)
+			{
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldc_I4_0);
+				generator.Emit(OpCodes.Ldelem_Ref);
+				generator.Emit(OpCodes.Unbox_Any, typeof (int));
+				generator.Emit(OpCodes.Newarr, callInfo.TargetType.GetElementType());
+			}
+			else
+			{
+				ConstructorInfo ctorInfo = callInfo.TargetType.GetConstructor(
+					BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+					null, CallingConventions.HasThis, callInfo.ParamTypes, null);
+				if (ctorInfo == null)
+					throw new MissingMemberException("Constructor does not exist");
 
-                if (callInfo.HasRefParam)
-                {
-                    int byRefParamsCount = CreateLocalsForByRefParams(generator, 0);
-                    generator.DeclareLocal(callInfo.TargetType); // T tmp;
-                    GenerateNewObjInvocation(generator, ctorInfo); // new T();
-                    generator.Emit(OpCodes.Stloc, byRefParamsCount); // tmp = <stack>;
-                    AssignByRefParamsToArray(generator, 0); // 
-                    generator.Emit(OpCodes.Ldloc, byRefParamsCount); // tmp;
-                }
-                else
-                {
-                    GenerateNewObjInvocation(generator, ctorInfo); // new T();
-                }
-            }
-            BoxIfValueType(generator, callInfo.TargetType); // return (box)<stack>;
-            generator.Emit(OpCodes.Ret);
-            return method.CreateDelegate(typeof(ConstructorInvoker));
-        }
+				if (callInfo.HasRefParam)
+				{
+					int byRefParamsCount = CreateLocalsForByRefParams(generator, 0);
+					generator.DeclareLocal(callInfo.TargetType); // T tmp;
+					GenerateNewObjInvocation(generator, ctorInfo); // new T();
+					generator.Emit(OpCodes.Stloc, byRefParamsCount); // tmp = <stack>;
+					AssignByRefParamsToArray(generator, 0); // 
+					generator.Emit(OpCodes.Ldloc, byRefParamsCount); // tmp;
+				}
+				else
+				{
+					GenerateNewObjInvocation(generator, ctorInfo); // new T();
+				}
+			}
+			BoxIfValueType(generator, callInfo.TargetType); // return (box)<stack>;
+			generator.Emit(OpCodes.Ret);
+			return method.CreateDelegate(typeof (ConstructorInvoker));
+		}
 
-        private void GenerateNewObjInvocation(ILGenerator generator, ConstructorInfo ctorInfo)
-        {
-            PushParamsOrLocalsToStack(generator, 0);
-            generator.Emit(OpCodes.Newobj, ctorInfo);
-        }
-    }
+		private void GenerateNewObjInvocation(ILGenerator generator, ConstructorInfo ctorInfo)
+		{
+			PushParamsOrLocalsToStack(generator, 0);
+			generator.Emit(OpCodes.Newobj, ctorInfo);
+		}
+	}
 }

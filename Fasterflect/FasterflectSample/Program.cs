@@ -48,7 +48,7 @@ namespace FasterflectSample
             AssertTrue(type.GetField<int>("InstanceCount") == 0);
             
             // Invokes the no-arg constructor
-            object obj = type.Construct();
+            object obj = type.CreateInstance();
 
             // Double-check if the constructor is invoked successfully or not
             AssertTrue(null != obj);
@@ -95,7 +95,7 @@ namespace FasterflectSample
 
             // Now, invoke the 2-arg constructor.  We don't even have to specify parameter types
             // if we know that the arguments are not null (Fasterflect will internally retrieve type info).
-            obj = type.Construct(1, "Doe");
+            obj = type.CreateInstance(1, "Doe");
 
             // Due to struct type's pass-by-value nature, in order for struct to be used 
             // properly with Fasterflect, you need to convert it into a holder (wrapper) first.  
@@ -111,7 +111,7 @@ namespace FasterflectSample
 
             // If there's null argument, or when we're unsure whether there's a null argument
             // we must explicitly specify the param type array
-            obj = type.Construct(new[] { typeof(int), typeof(string) }, new object[] { 1, null })
+            obj = type.CreateInstance(new[] { typeof(int), typeof(string) }, new object[] { 1, null })
                 .CreateHolderIfValueType();
 
             // id and name should have been set properly
@@ -143,10 +143,10 @@ namespace FasterflectSample
             AssertTrue(6 == obj.GetField<int>("milesTraveled"));
 
             // Construct an array of 10 elements for current type
-            var arr = type.MakeArrayType().Construct(10);
+            var arr = type.MakeArrayType().CreateInstance(10);
 
             // Get & set element of array
-            obj = type.Construct();
+            obj = type.CreateInstance();
             arr.SetElement(4, obj).SetElement(9, obj);
 
             if (isStruct) // struct, won't have same reference
@@ -177,7 +177,7 @@ namespace FasterflectSample
 
             // Now cache the 2-arg constructor of Person and playaround with the delegate returned
             int currentInstanceCount = (int)count();
-            ConstructorInvoker ctor = type.DelegateForConstruct(new[] { typeof(int), typeof(string) });
+            ConstructorInvoker ctor = type.DelegateForCreateInstance(new[] { typeof(int), typeof(string) });
             range.ForEach(i =>
             {
                 object obj = ctor(i, "_" + i).CreateHolderIfValueType();
@@ -192,12 +192,12 @@ namespace FasterflectSample
             AttributeGetter nameGetter = type.DelegateForGetProperty("Name");
 
             object person = ctor(1, "Buu").CreateHolderIfValueType();
-            AssertTrue("Buu" == nameGetter(person));
+            AssertTrue("Buu" == (string)nameGetter(person));
             nameSetter(person, "Doe");
-            AssertTrue("Doe" == nameGetter(person));
+            AssertTrue("Doe" == (string)nameGetter(person));
 
             // Another example
-            person = type.Construct().CreateHolderIfValueType();
+            person = type.CreateInstance().CreateHolderIfValueType();
             MethodInvoker walk = type.DelegateForInvoke("Walk", new[] { typeof(int) });
             range.ForEach(i => walk(person, i));
             AssertTrue(range.Sum() == person.GetField<int>("milesTraveled"));

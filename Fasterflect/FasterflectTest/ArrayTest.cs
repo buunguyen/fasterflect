@@ -23,7 +23,7 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
                              {
-                                 var obj = type.Construct(10);
+                                 var obj = type.CreateInstance(10);
                                  Assert.IsNotNull(obj);
                                  Assert.AreEqual(10, obj.GetProperty<int>("Length"));
                              });
@@ -34,7 +34,7 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
                             {
-                                var ctorFunc = type.DelegateForConstruct(typeof(int));
+                                var ctorFunc = type.DelegateForCreateInstance(typeof(int));
                                 var obj = ctorFunc(20);
                                 Assert.IsNotNull(obj);
                                 Assert.AreEqual(20, obj.GetProperty<int>("Length"));
@@ -46,8 +46,8 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
                                  {
-                                     var array = type.Construct(10);
-                                     var instance = type.GetElementType().Construct();
+                                     var array = type.CreateInstance(10);
+                                     var instance = type.GetElementType().CreateInstance();
                                      array.SetElement(1, instance);
                                      Assert.AreEqual(instance, array.GetElement<object>(1));
                                  });
@@ -60,8 +60,8 @@ namespace FasterflectTest
             {
                 var setFunc = type.DelegateForSetElement();
                 var getFunc = type.DelegateForGetElement();
-                var array = type.Construct(10);
-                var instance = type.GetElementType().Construct();
+                var array = type.CreateInstance(10);
+                var instance = type.GetElementType().CreateInstance();
                 setFunc(array, 9, instance);
                 Assert.AreEqual(instance, getFunc(array, 9));
             });

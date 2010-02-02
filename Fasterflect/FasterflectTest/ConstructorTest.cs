@@ -105,7 +105,7 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
             {
                 var parameters = new object[] { 0, "original" };
-                var obj = type.Construct(new[] {
+                var obj = type.CreateInstance(new[] {
                                                     typeof(int).MakeByRefType(),
                                                     typeof(string).MakeByRefType()
                                                }, parameters);
@@ -120,40 +120,40 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
             {
-                var obj = type.Construct();
+                var obj = type.CreateInstance();
                 Assert.IsNotNull(obj);
 
-                obj = type.Construct(new[] { typeof(int) }, 1);
+                obj = type.CreateInstance(new[] { typeof(int) }, 1);
                 Assert.IsNotNull(obj);
                 Assert.AreEqual(1, obj.GetField<int>("Age"));
 
-                obj = type.Construct(new[] { typeof(int?) }, 1);
+                obj = type.CreateInstance(new[] { typeof(int?) }, 1);
                 Assert.IsNotNull(obj);
                 Assert.AreEqual(1, obj.GetField<int?>("Id"));
 
-                obj = type.Construct(new[] { typeof(int?) }, new object[]{null});
+                obj = type.CreateInstance(new[] { typeof(int?) }, new object[]{null});
                 Assert.IsNotNull(obj);
                 Assert.AreEqual(null, obj.GetField<int?>("Id"));
 
-                obj = type.Construct(new[] { typeof(string) }, "Jane");
+                obj = type.CreateInstance(new[] { typeof(string) }, "Jane");
                 Assert.IsNotNull(obj);
                 Assert.AreEqual("Jane", obj.GetField<string>("Name"));
 
-                obj = type.Construct(new[] { typeof(object) }, type);
+                obj = type.CreateInstance(new[] { typeof(object) }, type);
                 Assert.IsNotNull(obj);
                 Assert.AreSame(type, obj.GetField<object>("Data"));
 
-                obj = type.Construct(new[] { typeof(object) }, 1.1d);
+                obj = type.CreateInstance(new[] { typeof(object) }, 1.1d);
                 Assert.IsNotNull(obj);
                 Assert.AreEqual(1.1d, obj.GetField<double>("Data"));
 
                 var peer = new PersonClass(1);
-                obj = type.Construct(new[] { typeof(PersonClass) }, peer);
+                obj = type.CreateInstance(new[] { typeof(PersonClass) }, peer);
                 Assert.IsNotNull(obj);
                 Assert.AreSame(peer, obj.GetField<PersonClass>("Peer"));
 
                 var peers = new[] { new PersonClass(1), new PersonClass(1) };
-                obj = type.Construct(new[] { typeof(PersonClass).MakeArrayType() },
+                obj = type.CreateInstance(new[] { typeof(PersonClass).MakeArrayType() },
                     new object[] { peers });
                 Assert.IsNotNull(obj);
                 Assert.AreSame(peers, obj.GetField<PersonClass[]>("Peers"));
@@ -164,7 +164,7 @@ namespace FasterflectTest
         public void Test_invoke_with_co_variant_return_and_param_type()
         {
             var peer = new Employee(1);
-            var obj = typeof(PersonClass).Construct(new[] { typeof(Employee) }, peer);
+            var obj = typeof(PersonClass).CreateInstance(new[] { typeof(Employee) }, peer);
             Assert.AreSame(peer, obj.GetField<Employee>("Peer"));
         }
 
@@ -172,14 +172,14 @@ namespace FasterflectTest
         [ExpectedException(typeof(InvalidCastException))]
         public void Test_pass_invalid_data_type()
         {
-            TypeList.ForEach(type => type.Construct(new[] { typeof(int) }, "string"));
+            TypeList.ForEach(type => type.CreateInstance(new[] { typeof(int) }, "string"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingMemberException))]
         public void Test_pass_none_existant_constructor()
         {
-            TypeList.ForEach(type => type.Construct(new[] { typeof(int), typeof(int) }, 1, 2));
+            TypeList.ForEach(type => type.CreateInstance(new[] { typeof(int), typeof(int) }, 1, 2));
         }
     }
 }

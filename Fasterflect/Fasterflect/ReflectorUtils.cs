@@ -1,4 +1,5 @@
 ﻿#region License
+
 // Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,6 +15,7 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
+
 #endregion
 
 using System;
@@ -24,38 +26,38 @@ using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
-    internal static class ReflectorUtils
-    {
-        public static List<PropertyInfo> GetProperties(this object sample)
-        {
-            return sample.GetType().GetProperties().ToList();
-        }
+	internal static class ReflectorUtils
+	{
+		public static List<PropertyInfo> GetProperties(this object sample)
+		{
+			return sample.GetType().GetProperties().ToList();
+		}
 
-        public static Type GetTypeAdjusted(this object obj)
-        {
-            var wrapper = obj as ValueTypeHolder;
-            return wrapper == null 
-                ? obj.GetType() 
-                : wrapper.Value.GetType();
-        }
+		public static Type GetTypeAdjusted(this object obj)
+		{
+			var wrapper = obj as ValueTypeHolder;
+			return wrapper == null
+			       	? obj.GetType()
+			       	: wrapper.Value.GetType();
+		}
 
-        public static object GetValue(this PropertyInfo prop, object sample)
-        {
-            return prop.GetGetMethod().Invoke(sample, Constants.EmptyObjectArray);
-        }
+		//public static object GetValue(this PropertyInfo prop, object sample)
+		//{
+		//    return prop.GetGetMethod().Invoke(sample, Constants.EmptyObjectArray);
+		//}
 
-        public static Type[] GetTypeArray(this object[] objects)
-        {
-            /*
+		public static Type[] GetTypeArray(this object[] objects)
+		{
+			/*
              * Readable code with a LINQ query, but it's pretty slow
              * return objects.Select(o => o.GetType()).ToArray();
              */
-            var types = new Type[objects.Length];
-            for (int i = 0; i < types.Length; i++)
-            {
-                types[i] = objects[i].GetType();
-            }
-            return types;
-        }
-    }
+			var types = new Type[objects.Length];
+			for (int i = 0; i < types.Length; i++)
+			{
+				types[i] = objects[i].GetType();
+			}
+			return types;
+		}
+	}
 }
