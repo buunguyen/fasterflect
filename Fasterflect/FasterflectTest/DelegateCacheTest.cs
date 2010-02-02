@@ -19,14 +19,17 @@
 using System;
 using System.Collections;
 using Fasterflect;
+using Fasterflect.Caching;
+using Fasterflect.Emitter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest
 {
     [TestClass]
     public class DelegateCacheTest
-    {
-        internal class Person
+	{
+		#region Sample Types
+		internal class Person
         {
             private int id;
             private static int miles;
@@ -64,21 +67,19 @@ namespace FasterflectTest
                 i = j;
                 j = tmp;
             }
-        }
+		}
+		#endregion
 
-        private Reflector reflector;
-        private object target;
+		private object target;
         private Type targetType;
         private IDictionary delegateMap;
 
-        [TestInitialize()]
+        [TestInitialize]
         public void TestInitialize()
         {
             target = new Person();
             targetType = typeof(Person);
-            reflector = Reflector.Create();
-            var cache = reflector.GetField<object>(reflector, "cache");
-            delegateMap = reflector.GetField<IDictionary>(cache, "map");
+            delegateMap = typeof(DelegateCache).GetField<CacheStore<CallInfo,Delegate>>("cache").GetField<IDictionary>("entries");
         }
 
         private void Execute_cache_test(params Action[] actions)
@@ -93,63 +94,64 @@ namespace FasterflectTest
         }
 
         [TestMethod]
-        public void Test_delegate_is_property_cached_for_fields()
+        public void Test_delegate_is_properly_cached_for_fields()
         {
             Execute_cache_test(
-                () => reflector.SetField(target, "id", 1),
-                () => reflector.GetField<int>(target, "id"),
-                () => reflector.SetField(targetType, "miles", 1),
-                () => reflector.GetField<int>(targetType, "miles"));
+                () => target.SetField("id", 1),
+                () => target.GetField<int>("id"),
+                () => targetType.SetField("miles", 1),
+                () => targetType.GetField<int>("miles"));
         }
 
         [TestMethod]
-        public void Test_delegate_is_property_cached_for_properties()
+        public void Test_delegate_is_properly_cached_for_properties()
         {
             Execute_cache_test(
-                () => reflector.SetProperty(target, "Age", 1),
-                () => reflector.GetProperty<int>(target, "Age"),
-                () => reflector.SetProperty(targetType, "Miles", 1),
-                () => reflector.GetProperty<int>(targetType, "Miles"));
+                () => target.SetProperty("Age", 1),
+                () => target.GetProperty<int>("Age"),
+                () => targetType.SetProperty("Miles", 1),
+                () => targetType.GetProperty<int>("Miles"));
         }
 
         [TestMethod]
-        public void Test_delegate_is_property_cached_for_array_element()
+        public void Test_delegate_is_properly_cached_for_array_element()
         {
+			object array = targetType.MakeArrayType().CreateInstance( 10 );
             Execute_cache_test(
-                () => reflector.SetElement(targetType.MakeArrayType().Construct(10), 1, target),
-                () => reflector.GetElement<object>(targetType.MakeArrayType().Construct(10), 1));
+                () => array.SetElement( 1, target ),
+                () => array.GetElement<object>( 1 ) );
         }
 
         [TestMethod]
-        public void Test_delegate_is_property_cached_for_constructors()
+        public void Test_delegate_is_properly_cached_for_constructors()
         {
             Execute_cache_test(
-                () => reflector.Construct(targetType),
-                () => reflector.Construct(targetType, new[] { typeof(int) }, new object[] { 1 }));
+                () => targetType.CreateInstance(),
+                () => targetType.CreateInstance(new[] { typeof(int) }, new object[] { 1 }));
         }
 
         [TestMethod]
-        public void Test_delegate_is_property_cached_for_methods()
+        public void Test_delegate_is_properly_cached_for_methods()
         {
             Execute_cache_test(
-                () => reflector.Invoke(targetType, "Generate"),
-                () => reflector.Invoke<int>(targetType, "GetMiles"),
-                () => reflector.Invoke(target, "SetId", new[] { typeof(int) }, new object[] { 1 }),
-                () => reflector.Invoke<int>(target, "GetId"));
+                () => targetType.Invoke("Generate"),
+                () => targetType.Invoke<int>("GetMiles"),
+                () => target.Invoke("SetId", new[] { typeof(int) }, new object[] { 1 }),
+                () => target.Invoke<int>("GetId"));
         }
 
         [TestMethod]
-        public void Test_delegate_is_property_cached_for_indexers()
+        public void Test_delegate_is_properly_cached_for_indexers()
         {
             Execute_cache_test(
-                () => reflector.SetIndexer(target, new[] { typeof(string), typeof(object) }, new object[] { "a", null }),
-                () => reflector.GetIndexer<string>(target, new[] { typeof(string) }, new object[] { "a"}));
+                () => target.SetIndexer(new[] { typeof(string), typeof(object) }, new object[] { "a", null }),
+                () => target.GetIndexer<string>(new[] { typeof(string) }, new object[] { "a"}));
         }
 
         [TestMethod]
-        public void Test_delegate_is_property_cached_for_method_with_byref_params()
+        public void Test_delegate_is_properly_cached_for_method_with_byref_params()
         {
-            var action = reflector.DelegateForStaticInvoke(typeof (Utils), "Swap",
+            var action = typeof(Utils).DelegateForStaticInvoke("Swap",
                                               new[]{typeof(int).MakeByRefType(),
                                                     typeof(int).MakeByRefType()});
             var parameters = new object[] {1, 2};
@@ -165,8 +167,8 @@ namespace FasterflectTest
                               {
                                   () => targetType.MakeArrayType().DelegateForGetElement(),
                                   () => targetType.MakeArrayType().DelegateForSetElement(),
-                                  () => targetType.DelegateForConstruct(),
-                                  () => targetType.DelegateForConstruct(new[] { typeof(int) }),
+                                  () => targetType.DelegateForCreateInstance(),
+                                  () => targetType.DelegateForCreateInstance(new[] { typeof(int) }),
                                   () => targetType.DelegateForStaticInvoke("SetMiles", new[] { typeof(int) }),
                                   () => targetType.DelegateForStaticInvoke("GetMiles"),
                                   () => targetType.DelegateForStaticInvoke("GetMiles", new[] { typeof(int) }),

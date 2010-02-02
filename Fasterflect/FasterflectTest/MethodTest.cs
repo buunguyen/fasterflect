@@ -137,7 +137,7 @@ namespace FasterflectTest
         public void Test_invoke_with_co_variant_return_and_param_type()
         {
             var type = typeof (PersonClass);
-            var target = type.Construct();
+            var target = type.CreateInstance();
             var employee = new Employee();
             var result = target.Invoke<Employee>("AddPeer",
                 new[] { typeof(Employee) }, new object[] { employee });
@@ -238,7 +238,7 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
             {
-                var target = type.Construct().CreateHolderIfValueType();
+                var target = type.CreateInstance().CreateHolderIfValueType();
                 target.Invoke("NotExist");
             });
         }
@@ -249,7 +249,7 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
             {
-                var target = type.Construct().CreateHolderIfValueType();
+                var target = type.CreateInstance().CreateHolderIfValueType();
                 target.Invoke<int>("NotExist");
             });
         }
@@ -260,7 +260,7 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
                                  {
                                      type.SetField("milesTraveled", 0);
-                                     var target = type.Construct().CreateHolderIfValueType();
+                                     var target = type.CreateInstance().CreateHolderIfValueType();
                                      target.Invoke("DoNothing");
                                      Assert.AreEqual(1, target.Invoke<int>("JustGet"));
 
@@ -280,7 +280,7 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
                                  {
                                      type.SetField("milesTraveled", 0);
-                                     var target = type.Construct().CreateHolderIfValueType();
+                                     var target = type.CreateInstance().CreateHolderIfValueType();
                                      target.Invoke("GetMilesTraveled", new[] { typeof(int) }, 5)
                                            .Invoke("GetMilesTraveled", new[] {typeof (int)}, 10)
                                            .Invoke("GetMilesTraveled", new[] {typeof (int)}, 20);

@@ -1,4 +1,5 @@
 ﻿#region License
+
 // Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,23 +15,24 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
+
 #endregion
 
 using System;
 
 namespace Fasterflect.Emitter
 {
-    internal static class Constants
-    {
-        public const string IndexerSetterName = "set_Item";
-        public const string IndexerGetterName = "get_Item";
-        public const string ArraySetterName = "[]=";
-        public const string ArrayGetterName = "=[]";
-        public static readonly Type ObjectType = typeof(object);
-        public static readonly Type IntType = typeof(int);
-        public static readonly Type StructType = typeof(ValueTypeHolder);
-        public static readonly Type VoidType = typeof(void);
-        public static readonly Type[] ArrayOfObjectType = new[] { typeof(object) };
-        public static readonly object[] EmptyObjectArray = new object[0];
-    }
+	internal static class Constants
+	{
+		public const string IndexerSetterName = "set_Item";
+		public const string IndexerGetterName = "get_Item";
+		public const string ArraySetterName = "[]=";
+		public const string ArrayGetterName = "=[]";
+		public static readonly Type ObjectType = typeof (object);
+		public static readonly Type IntType = typeof (int);
+		public static readonly Type StructType = typeof (ValueTypeHolder);
+		public static readonly Type VoidType = typeof (void);
+		public static readonly Type[] ArrayOfObjectType = new[] {typeof (object)};
+		public static readonly object[] EmptyObjectArray = new object[0];
+	}
 }

@@ -1,4 +1,5 @@
 ﻿#region License
+
 // Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,6 +15,7 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
+
 #endregion
 
 using System;
@@ -22,37 +24,36 @@ using System.Reflection.Emit;
 
 namespace Fasterflect.Emitter
 {
-    internal class ArraySetEmitter : BaseEmitter
-    {
-        public ArraySetEmitter(DelegateCache cache, Type targetType) : base(cache)
-        {
-            callInfo = new CallInfo(targetType, MemberTypes.Method, Constants.ArraySetterName,
-                                new[] {typeof (int), targetType.GetElementType()});
-        }
+	internal class ArraySetEmitter : BaseEmitter
+	{
+		public ArraySetEmitter(Type targetType)
+		{
+			callInfo = new CallInfo(targetType, MemberTypes.Method, Constants.ArraySetterName,
+			                        new[] {typeof (int), targetType.GetElementType()});
+		}
 
-        protected override Delegate CreateDelegate()
-        {
-            var method = CreateDynamicMethod(Constants.ArraySetterName, callInfo.TargetType, null,
-                new[] { Constants.ObjectType, Constants.IntType, Constants.ObjectType });
-            ILGenerator generator = method.GetILGenerator();
-            var elementType = callInfo.TargetType.GetElementType();
+		protected override Delegate CreateDelegate()
+		{
+			DynamicMethod method = CreateDynamicMethod(Constants.ArraySetterName, callInfo.TargetType, null,
+			                                           new[] {Constants.ObjectType, Constants.IntType, Constants.ObjectType});
+			ILGenerator generator = method.GetILGenerator();
+			Type elementType = callInfo.TargetType.GetElementType();
 
-            generator.Emit(OpCodes.Ldarg_0); // arg0;
-            generator.Emit(OpCodes.Castclass, callInfo.TargetType); // (T)arg0
-            generator.Emit(OpCodes.Ldarg_1); // arg1;
-            generator.Emit(OpCodes.Ldarg_2); // arg2;
-            UnboxOrCast(generator, elementType);
-            if (elementType.IsValueType)
-            {
-                generator.Emit(OpCodes.Stelem, elementType);
-            }
-            else
-            {
-                generator.Emit(OpCodes.Stelem_Ref);    
-            }
-            generator.Emit(OpCodes.Ret);
-            return method.CreateDelegate(typeof (ArrayElementSetter));
-        }
-
-    }
+			generator.Emit(OpCodes.Ldarg_0); // arg0;
+			generator.Emit(OpCodes.Castclass, callInfo.TargetType); // (T)arg0
+			generator.Emit(OpCodes.Ldarg_1); // arg1;
+			generator.Emit(OpCodes.Ldarg_2); // arg2;
+			UnboxOrCast(generator, elementType);
+			if (elementType.IsValueType)
+			{
+				generator.Emit(OpCodes.Stelem, elementType);
+			}
+			else
+			{
+				generator.Emit(OpCodes.Stelem_Ref);
+			}
+			generator.Emit(OpCodes.Ret);
+			return method.CreateDelegate(typeof (ArrayElementSetter));
+		}
+	}
 }
