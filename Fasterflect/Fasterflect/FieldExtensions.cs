@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Fasterflect
@@ -30,9 +31,7 @@ namespace Fasterflect
 	public static class FieldExtensions
 	{
 		#region Field Access
-
 		#region Single Setters
-
 		/// <summary>
 		/// Sets the static field <paramref name="fieldName"/> of type <paramref name="targetType"/>
 		/// with the specified <paramref name="value" />.
@@ -65,7 +64,7 @@ namespace Fasterflect
 		/// <param name="targetType">The type which the static field belongs to.</param>
 		/// <param name="fieldName">The name of the static field to be set.</param>
 		/// <returns>A delegate which can set the value of the specified static field.</returns>
-		public static StaticAttributeSetter DelegateForSetStaticField(this Type targetType, string fieldName)
+		public static StaticMemberSetter DelegateForSetStaticField(this Type targetType, string fieldName)
 		{
 			return targetType.DelegateForSetStaticFieldOrProperty(MemberTypes.Field, fieldName);
 		}
@@ -76,15 +75,13 @@ namespace Fasterflect
 		/// <param name="targetType">The type which the field belongs to.</param>
 		/// <param name="fieldName">The name of the field to be set.</param>
 		/// <returns>A delegate which can set the value of the specified field.</returns>
-		public static AttributeSetter DelegateForSetField(this Type targetType, string fieldName)
+		public static MemberSetter DelegateForSetField(this Type targetType, string fieldName)
 		{
 			return targetType.DelegateForSetFieldOrProperty(MemberTypes.Field, fieldName);
 		}
-
 		#endregion
 
 		#region Single Getters
-
 		/// <summary>
 		/// Gets the value of the static field <paramref name="fieldName"/> of type 
 		/// <paramref name="targetType"/>.
@@ -115,7 +112,7 @@ namespace Fasterflect
 		/// <param name="targetType">The type which the static field belongs to.</param>
 		/// <param name="fieldName">The name of the static field to be retrieved.</param>
 		/// <returns>A delegate which can get the value of the specified static field.</returns>
-		public static StaticAttributeGetter DelegateForGetStaticField(this Type targetType, string fieldName)
+		public static StaticMemberGetter DelegateForGetStaticField(this Type targetType, string fieldName)
 		{
 			return targetType.DelegateForGetStaticFieldOrProperty(MemberTypes.Field, fieldName);
 		}
@@ -126,15 +123,13 @@ namespace Fasterflect
 		/// <param name="targetType">The type which the field belongs to.</param>
 		/// <param name="fieldName">The name of the field to be retrieved.</param>
 		/// <returns>A delegate which can get the value of the specified field.</returns>
-		public static AttributeGetter DelegateForGetField(this Type targetType, string fieldName)
+		public static MemberGetter DelegateForGetField(this Type targetType, string fieldName)
 		{
 			return targetType.DelegateForGetFieldOrProperty(MemberTypes.Field, fieldName);
 		}
-
 		#endregion
 
 		#region Batch Setters
-
 		/// <summary>
 		/// Sets the static fields of <paramref name="targetType"/> based on
 		/// the properties available in <paramref name="sample"/>. 
@@ -145,9 +140,7 @@ namespace Fasterflect
 		/// <returns>The type whose static fields are to be set.</returns>
 		public static Type SetFields(this Type targetType, object sample)
 		{
-			sample.GetProperties().ForEach(prop =>
-			                               SetField(targetType, prop.Name, prop.GetValue(sample))
-				);
+			sample.Properties().ForEach( prop => SetField( targetType, prop.Name, prop.GetValue( sample ) ) );
 			return targetType;
 		}
 
@@ -161,14 +154,10 @@ namespace Fasterflect
 		/// <returns>The object whose fields are to be set.</returns>
 		public static object SetFields(this object target, object sample)
 		{
-			sample.GetProperties().ForEach(prop =>
-			                               SetField(target, prop.Name, prop.GetValue(sample))
-				);
+			sample.Properties().ForEach(prop => SetField(target, prop.Name, prop.GetValue(sample)));
 			return target;
 		}
-
 		#endregion
-
 		#endregion
 
 		#region FieldInfo Access
@@ -197,7 +186,7 @@ namespace Fasterflect
 
 		#region Field Lookup
 		/// <summary>
-		/// Find a specific named field on the given type.
+		/// Find a specific named field on the given <paramref name="type"/>.
 		/// </summary>
 		/// <param name="type">The type to reflect on</param>
 		/// <param name="name">The name of the member to find</param>
@@ -209,7 +198,7 @@ namespace Fasterflect
 		}
 
 		/// <summary>
-		/// Find a specific named field on the given type.
+		/// Find a specific named field on the given <paramref name="type"/>.
 		/// </summary>
 		/// <param name="type">The type to reflect on</param>
 		/// <param name="name">The name of the member to find</param>
@@ -219,12 +208,22 @@ namespace Fasterflect
 			return type.GetField( name, Reflector.AllCriteria );
 		}
 
-		public static FieldInfo[] Fields( this Type type )
+		/// <summary>
+		/// Find all instance fields on the given <paramref name="type"/>.
+		/// </summary>
+		/// <returns>A list of all instance fields on the type.</returns>
+		public static List<FieldInfo> Fields( this Type type )
 		{
-			return type.GetFields( Reflector.InstanceCriteria ) ?? new FieldInfo[ 0 ];
+			return type.GetFields( Reflector.InstanceCriteria ).ToList();
 		}
 
-		public static FieldInfo[] FieldsIncludingBaseTypes( this Type type )
+		/// <summary>
+		/// Find all instance fields on the given <paramref name="type"/>, including fields from
+		/// all base types.
+		/// </summary>
+		/// <param name="type">The type to reflect on.</param>
+		/// <returns>A list of all instance fields on the type.</returns>
+		public static List<FieldInfo> FieldsIncludingBaseTypes( this Type type )
 		{
 			var fields = new List<FieldInfo>( type.Fields() );
 			Type baseType = type.BaseType;
@@ -233,7 +232,7 @@ namespace Fasterflect
 				fields.AddRange( baseType.Fields() );
 				baseType = baseType.BaseType;
 			}
-			return fields.ToArray();
+			return fields;
 		}
 		#endregion
 	}

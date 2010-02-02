@@ -29,7 +29,7 @@ namespace Fasterflect.ObjectConstruction
 		private bool[] paramKinds;
 		private string[] paramNames;
 		private Type[] paramTypes;
-		private AttributeGetter[] paramValueReaders;
+		private MemberGetter[] paramValueReaders;
 		private Type type;
 
 		public SourceInfo(Type type)
@@ -67,7 +67,7 @@ namespace Fasterflect.ObjectConstruction
 			get { return paramKinds; }
 		}
 
-		public AttributeGetter[] ParamValueReaders
+		public MemberGetter[] ParamValueReaders
 		{
 			get
 			{
@@ -76,10 +76,10 @@ namespace Fasterflect.ObjectConstruction
 			}
 		}
 
-		public AttributeGetter GetReader(string memberName)
+		public MemberGetter GetReader(string memberName)
 		{
 			int index = Array.IndexOf(paramNames, memberName);
-			AttributeGetter reader = paramValueReaders[index];
+			MemberGetter reader = paramValueReaders[index];
 			if (reader == null)
 			{
 				reader = paramKinds[index] ? type.DelegateForGetField(memberName) : type.DelegateForGetProperty(memberName);
@@ -105,7 +105,7 @@ namespace Fasterflect.ObjectConstruction
 		{
 			if (paramValueReaders == null)
 			{
-				paramValueReaders = new AttributeGetter[paramNames.Length];
+				paramValueReaders = new MemberGetter[paramNames.Length];
 				for (int i = 0; i < paramNames.Length; i++)
 				{
 					string name = paramNames[i];

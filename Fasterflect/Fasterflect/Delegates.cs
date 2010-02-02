@@ -23,27 +23,27 @@ namespace Fasterflect
 	/// <summary>
 	/// A delegate to retrieve the value of a static field or property of a type.
 	/// </summary>
-	public delegate object StaticAttributeGetter();
+	public delegate object StaticMemberGetter();
 
 	/// <summary>
 	/// A delegate to retrieve the value of an instance field or property of an object.
 	/// </summary>
 	/// <param name="target">The object whose field's or property's value is to be retrieved.</param>
 	/// <returns>The value of the instance field or property.</returns>
-	public delegate object AttributeGetter(object target);
+	public delegate object MemberGetter(object target);
 
 	/// <summary>
 	/// A delegate to set the value of a static field or property of a type.
 	/// </summary>
 	/// <param name="value">The value to be set to the field or property.</param>
-	public delegate void StaticAttributeSetter(object value);
+	public delegate void StaticMemberSetter(object value);
 
 	/// <summary>
 	/// A delegate to set the value of an instance field or property of an object.
 	/// </summary>
 	/// <param name="target">The object whose field's or property's value is to be set.</param>
 	/// <param name="value">The value to be set to the field or property.</param>
-	public delegate void AttributeSetter(object target, object value);
+	public delegate void MemberSetter(object target, object value);
 
 	/// <summary>
 	/// A delegate to set an element of an array.

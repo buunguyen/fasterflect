@@ -23,15 +23,8 @@ using System.Reflection;
 namespace Fasterflect
 {
 	/// <summary>
-	/// An low-level API for Fasterflect.  The extension method-based
-	/// wrapper API, declared in <see cref="ExtensionApi"/>, should be used as the default API.  
-	/// 
-	/// You should only consider this API only if you need fine-grain control 
-	/// of <see cref="Reflector"/> instances and their cache (e.g. use an instance 
-	/// for a certain period and then have it garbaged collected to release
-	/// memory of the cached methods).
+	/// This class provides access to commonly used BindingFlags combinations.
 	/// </summary>
-	/// <seealso cref="ExtensionApi"/>
 	public static class Reflector
 	{
 		#region BindingFlags

@@ -89,8 +89,8 @@ namespace Fasterflect.Emitter
 			generator.Emit(OpCodes.Ret);
 
 			return callInfo.IsStatic
-			       	? method.CreateDelegate(typeof (StaticAttributeGetter))
-			       	: method.CreateDelegate(typeof (AttributeGetter));
+			       	? method.CreateDelegate(typeof (StaticMemberGetter))
+			       	: method.CreateDelegate(typeof (MemberGetter));
 		}
 	}
 }

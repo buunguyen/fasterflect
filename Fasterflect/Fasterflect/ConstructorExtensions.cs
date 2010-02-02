@@ -33,7 +33,6 @@ namespace Fasterflect
 	public static class ConstructorExtensions
 	{
 		#region Constructor Invocation (CreateInstance)
-
 		/// <summary>
 		/// Invokes the no-arg constructor on type <paramref name="targetType"/>.
 		/// </summary>
@@ -90,16 +89,17 @@ namespace Fasterflect
 		{
 			return (ConstructorInvoker) new CtorInvocationEmitter(targetType, paramTypes).GetDelegate();
 		}
-
 		#endregion
 
 		#region Constructor Invocation (TryCreateInstance)
-
-		public static object TryCreateInstance(this Type type)
-		{
-			return type.CreateInstance();
-		}
-
+		/// <summary>
+		/// Creates an instance of the given <paramref name="type"/> using the public properties of the 
+		/// supplied <paramref name="source"/> object as input.
+		/// This method will try to determine the least-cost route to constructing the instance, which
+		/// implies mapping as many properties as possible to constructor parameters. Remaining properties
+		/// on the source are mapped to properties on the created instance or ignored if none matches.
+		/// </summary>
+		/// <returns>An instance of type <paramref name="type"/>.</returns>
 		public static object TryCreateInstance(this Type type, object source)
 		{
 			Type sourceType = source.GetType();
@@ -109,17 +109,38 @@ namespace Fasterflect
 				sourceInfo = new SourceInfo(sourceType);
 				MapFactory.AddSourceInfo(sourceType, sourceInfo);
 			}
-			return type.TryCreateInstance(sourceInfo, source);
+			MethodMap map = type.PrepareInvoke( sourceInfo.ParamNames, sourceInfo.ParamTypes );
+			return map.Invoke( sourceInfo.GetParameterValues( source ) );
 		}
 
-		public static object TryCreateInstance(this Type type, IDictionary<string, object> parameters)
+		/// <summary>
+		/// Creates an instance of the given <paramref name="type"/> using the values in the supplied
+		/// <paramref name="parameters"/> dictionary as input.
+		/// This method will try to determine the least-cost route to constructing the instance, which
+		/// implies mapping as many values as possible to constructor parameters. Remaining values
+		/// are mapped to properties on the created instance or ignored if none matches.
+		/// </summary>
+		/// <returns>An instance of type <paramref name="type"/>.</returns>
+		public static object TryCreateInstance( this Type type, IDictionary<string, object> parameters )
 		{
 			string[] names = parameters.Keys.ToArray();
 			object[] values = parameters.Values.ToArray();
 			return type.TryCreateInstance(names, values);
 		}
 
-		public static object TryCreateInstance(this Type type, string[] parameterNames, object[] parameterValues)
+		/// <summary>
+		/// Creates an instance of the given <paramref name="type"/> using the supplied parameter information as input.
+		/// Parameter types are inferred from the supplied <paramref name="parameterValues"/> and as such these
+		/// should not be null.
+		/// This method will try to determine the least-cost route to constructing the instance, which
+		/// implies mapping as many properties as possible to constructor parameters. Remaining properties
+		/// on the source are mapped to properties on the created instance or ignored if none matches.
+		/// </summary>
+		/// <param name="type">The type of which an instance should be created.</param>
+		/// <param name="parameterNames">The names of the supplied parameters.</param>
+		/// <param name="parameterValues">The values of the supplied parameters.</param>
+		/// <returns>An instance of type <paramref name="type"/>.</returns>
+		public static object TryCreateInstance( this Type type, string[] parameterNames, object[] parameterValues )
 		{
 			var parameterTypes = new Type[parameterValues.Length];
 			for (int i = 0; i < parameterNames.Length; i++)
@@ -130,23 +151,26 @@ namespace Fasterflect
 			return type.TryCreateInstance(parameterNames, parameterTypes, parameterValues);
 		}
 
-		internal static object TryCreateInstance(this Type type, SourceInfo sourceInfo, object source)
-		{
-			MethodMap map = type.PrepareInvoke(sourceInfo.ParamNames, sourceInfo.ParamTypes);
-			return map.Invoke(sourceInfo.GetParameterValues(source));
-		}
-
-		public static object TryCreateInstance(this Type type, string[] parameterNames, Type[] parameterTypes,
+		/// <summary>
+		/// Creates an instance of the given <paramref name="type"/> using the supplied parameter information as input.
+		/// This method will try to determine the least-cost route to constructing the instance, which
+		/// implies mapping as many properties as possible to constructor parameters. Remaining properties
+		/// on the source are mapped to properties on the created instance or ignored if none matches.
+		/// </summary>
+		/// <param name="type">The type of which an instance should be created.</param>
+		/// <param name="parameterNames">The names of the supplied parameters.</param>
+		/// <param name="parameterTypes">The types of the supplied parameters.</param>
+		/// <param name="parameterValues">The values of the supplied parameters.</param>
+		/// <returns>An instance of type <paramref name="type"/>.</returns>
+		public static object TryCreateInstance( this Type type, string[] parameterNames, Type[] parameterTypes,
 		                                       object[] parameterValues)
 		{
 			MethodMap map = type.PrepareInvoke(parameterNames, parameterTypes);
 			return map.Invoke(parameterValues);
 		}
-
 		#endregion
 
 		#region Constructor Lookup
-
 		/// <summary>
 		/// Find all available (non-abstract) constructors for the specified type.
 		/// </summary>
@@ -174,7 +198,6 @@ namespace Fasterflect
 		{
 			return type.GetConstructor(Reflector.InstanceCriteria, null, parameterTypes, null);
 		}
-
 		#endregion
 	}
 }

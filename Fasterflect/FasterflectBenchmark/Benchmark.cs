@@ -141,8 +141,8 @@ namespace FasterflectBenchmark
 		private static void RunFieldBenchmark()
 		{
 			FieldInfo fieldInfo = null;
-			AttributeSetter setter = null;
-			AttributeGetter getter = null;
+			MemberSetter setter = null;
+			MemberGetter getter = null;
 			var initMap = new Dictionary<string, Action>
 			              	{
 			              		{"Init info", () => { fieldInfo = TargetType.GetField("name", BindingFlags.NonPublic | BindingFlags.Instance); }},
@@ -170,8 +170,8 @@ namespace FasterflectBenchmark
 		private static void RunStaticFieldBenchmark()
 		{
 			FieldInfo fieldInfo = null;
-			StaticAttributeSetter setter = null;
-			StaticAttributeGetter getter = null;
+			StaticMemberSetter setter = null;
+			StaticMemberGetter getter = null;
 			var initMap = new Dictionary<string, Action>
 			              	{
 			              		{"Init info", () => { fieldInfo = TargetType.GetField("counter", BindingFlags.NonPublic | BindingFlags.Static); }},
@@ -196,8 +196,8 @@ namespace FasterflectBenchmark
 		private static void RunPropertyBenchmark()
 		{
 			PropertyInfo propInfo = null;
-			AttributeSetter setter = null;
-			AttributeGetter getter = null;
+			MemberSetter setter = null;
+			MemberGetter getter = null;
 			var initMap = new Dictionary<string, Action>
 			              	{
 			              		{"Init info", () => { propInfo = TargetType.GetProperty("Age", BindingFlags.NonPublic | BindingFlags.Instance); }},
@@ -224,8 +224,8 @@ namespace FasterflectBenchmark
 		private static void RunStaticPropertyBenchmark()
 		{
 			PropertyInfo propInfo = null;
-			StaticAttributeSetter setter = null;
-			StaticAttributeGetter getter = null;
+			StaticMemberSetter setter = null;
+			StaticMemberGetter getter = null;
 
 			var initMap = new Dictionary<string, Action>
 			              	{

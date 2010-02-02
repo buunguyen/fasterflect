@@ -34,11 +34,21 @@ namespace Fasterflect
 	{
 		#region Member Access
 		#region Instance Getters
+		/// <summary>
+		/// Gets the value of the instance field or property identified by <paramref name="info"/> on
+		/// the <paramref name="target"/> object.
+		/// </summary>
+		/// <returns>The value of the given member.</returns>
 		public static object GetValue( this MemberInfo info, object target )
 		{
 			return target.GetFieldOrProperty<object>( info.MemberType, info.Name );
 		}
 
+		/// <summary>
+		/// Gets the value of the instance field or property identified by <paramref name="memberTypes"/>
+		/// and <paramref name="fieldOrPropertyName"/> on the <paramref name="target"/> object.
+		/// </summary>
+		/// <returns>The value of the given member.</returns>
 		public static TReturn GetFieldOrProperty<TReturn>(this object target, MemberTypes memberTypes,
 		                                                  string fieldOrPropertyName)
 		{
@@ -46,68 +56,105 @@ namespace Fasterflect
 				DelegateForGetFieldOrProperty(target.GetTypeAdjusted(), memberTypes, fieldOrPropertyName)(target);
 		}
 
-		public static AttributeGetter DelegateForGetFieldOrProperty(this Type targetType, MemberTypes memberTypes,
+		/// <summary>
+		/// Gets a delegate for getting the value of the instance field or property identified 
+		/// by <paramref name="memberTypes"/> and <paramref name="fieldOrPropertyName"/> on the 
+		/// <paramref name="targetType"/>.
+		/// </summary>
+		/// <returns>A delegate for getting the value of the field or property.</returns>
+		public static MemberGetter DelegateForGetFieldOrProperty(this Type targetType, MemberTypes memberTypes,
 		                                                            string fieldOrPropertyName)
 		{
-			return (AttributeGetter)
+			return (MemberGetter)
 				new MemberGetEmitter(targetType, memberTypes, fieldOrPropertyName, false).GetDelegate();
 		}
 		#endregion
 
 		#region Instance Setters
+		/// <summary>
+		/// Sets the <paramref name="value"/> of the instance field or property identified by <paramref name="info"/> on
+		/// the <paramref name="target"/> object.
+		/// </summary>
 		public static void SetValue( this MemberInfo info, object target, object value )
 		{
 			target.SetFieldOrProperty( info.MemberType, info.Name, value );
 		}
 
+		/// <summary>
+		/// Sets the <paramref name="value"/> of the instance field or property identified by <paramref name="memberTypes"/>
+		/// and <paramref name="fieldOrPropertyName"/> on the <paramref name="target"/> object.
+		/// </summary>
 		public static object SetFieldOrProperty( this object target, MemberTypes memberTypes,
-		                                        string fieldOrProperty, object value)
+		                                        string fieldOrPropertyName, object value)
 		{
-			DelegateForSetFieldOrProperty(target.GetTypeAdjusted(), memberTypes, fieldOrProperty)(target, value);
+			DelegateForSetFieldOrProperty(target.GetTypeAdjusted(), memberTypes, fieldOrPropertyName)(target, value);
 			return target;
 		}
 
-		public static AttributeSetter DelegateForSetFieldOrProperty(this Type targetType, MemberTypes memberTypes,
-		                                                            string fieldOrProperty)
+		/// <summary>
+		/// Gets a delegate for setting the value of the instance field or property identified 
+		/// by <paramref name="memberTypes"/> and <paramref name="fieldOrPropertyName"/> on the 
+		/// <paramref name="targetType"/>.
+		/// </summary>
+		/// <returns>A delegate for setting the value of the field or property.</returns>
+		public static MemberSetter DelegateForSetFieldOrProperty( this Type targetType, MemberTypes memberTypes,
+		                                                            string fieldOrPropertyName)
 		{
-			return (AttributeSetter) new MemberSetEmitter(targetType, memberTypes, fieldOrProperty, false).GetDelegate();
+			return (MemberSetter) new MemberSetEmitter(targetType, memberTypes, fieldOrPropertyName, false).GetDelegate();
 		}
 		#endregion
 
 		#region Static Getters
-
-		public static TReturn GetFieldOrProperty<TReturn>(this Type targetType, MemberTypes memberTypes,
+		/// <summary>
+		/// Gets the value of the static field or property identified by <paramref name="memberTypes"/>
+		/// and <paramref name="fieldOrPropertyName"/> on the <paramref name="targetType"/>.
+		/// </summary>
+		/// <returns>The value of the given member.</returns>
+		public static TReturn GetFieldOrProperty<TReturn>( this Type targetType, MemberTypes memberTypes,
 		                                                  string fieldOrPropertyName)
 		{
 			return (TReturn) DelegateForGetStaticFieldOrProperty(targetType, memberTypes, fieldOrPropertyName)();
 		}
 
-		public static StaticAttributeGetter DelegateForGetStaticFieldOrProperty(this Type targetType, MemberTypes memberTypes,
+		/// <summary>
+		/// Gets a delegate for getting the value of the static field or property identified 
+		/// by <paramref name="memberTypes"/> and <paramref name="fieldOrPropertyName"/> on the 
+		/// <paramref name="targetType"/>.
+		/// </summary>
+		/// <returns>A delegate for getting the value of the field or property.</returns>
+		public static StaticMemberGetter DelegateForGetStaticFieldOrProperty( this Type targetType, MemberTypes memberTypes,
 		                                                                        string fieldOrPropertyName)
 		{
 			return
-				(StaticAttributeGetter) new MemberGetEmitter(targetType, memberTypes, fieldOrPropertyName, true).GetDelegate();
+				(StaticMemberGetter) new MemberGetEmitter(targetType, memberTypes, fieldOrPropertyName, true).GetDelegate();
 		}
-
 		#endregion
 
 		#region Static Setters
-
-		public static Type SetFieldOrProperty(this Type targetType, MemberTypes memberTypes,
-		                                      string fieldOrProperty, object value)
+		/// <summary>
+		/// Sets the <paramref name="value"/> of the static field or property identified by <paramref name="memberTypes"/>
+		/// and <paramref name="fieldOrPropertyName"/> on the <paramref name="targetType"/>.
+		/// </summary>
+		public static Type SetFieldOrProperty( this Type targetType, MemberTypes memberTypes,
+		                                      string fieldOrPropertyName, object value)
 		{
-			DelegateForSetStaticFieldOrProperty(targetType, memberTypes, fieldOrProperty)(value);
+			DelegateForSetStaticFieldOrProperty(targetType, memberTypes, fieldOrPropertyName)(value);
 			return targetType;
 		}
 
-		public static StaticAttributeSetter DelegateForSetStaticFieldOrProperty(this Type targetType,
+		/// <summary>
+		/// Gets a delegate for setting the value of the static field or property identified 
+		/// by <paramref name="memberTypes"/> and <paramref name="fieldOrPropertyName"/> on the 
+		/// <paramref name="targetType"/>.
+		/// </summary>
+		/// <returns>A delegate for setting the value of the field or property.</returns>
+		public static StaticMemberSetter DelegateForSetStaticFieldOrProperty( this Type targetType,
 		                                                                        MemberTypes memberTypes,
-		                                                                        string fieldOrProperty)
+		                                                                        string fieldOrPropertyName)
 		{
-			return (StaticAttributeSetter)
-			       new MemberSetEmitter(targetType, memberTypes, fieldOrProperty, true).GetDelegate();
+			return (StaticMemberSetter)
+			       new MemberSetEmitter(targetType, memberTypes, fieldOrPropertyName, true).GetDelegate();
 		}
-
 		#endregion
 		#endregion
 
@@ -174,6 +221,10 @@ namespace Fasterflect
 		#endregion
 
 		#region MemberInfo Helpers
+		/// <summary>
+		/// Get the system type of the field or property identified by the <paramref name="member"/>.
+		/// </summary>
+		/// <returns>The system type of the member.</returns>
 		public static Type Type( this MemberInfo member )
 		{
 			var field = member as FieldInfo;
@@ -185,12 +236,22 @@ namespace Fasterflect
 			throw new NotSupportedException( "Can only determine the type for fields and properties." );
 		}
 
+		/// <summary>
+		/// Find out whether a value can be read from the field or property identified by
+		/// the <paramref name="member"/>.
+		/// </summary>
+		/// <returns>True for fields and readable properties, false otherwise.</returns>
 		public static bool CanRead( this MemberInfo member )
 		{
 			var property = member as PropertyInfo;
 			return property == null || property.CanRead;
 		}
 
+		/// <summary>
+		/// Find out whether a value can be assigned to the field or property identified by
+		/// the <paramref name="member"/>.
+		/// </summary>
+		/// <returns>True for fields and writable properties, false otherwise.</returns>
 		public static bool CanWrite( this MemberInfo member )
 		{
 			var property = member as PropertyInfo;
