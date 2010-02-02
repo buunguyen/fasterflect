@@ -19,6 +19,8 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
 
@@ -86,7 +88,7 @@ namespace Fasterflect
 		/// <param name="targetType">The type which the static property belongs to.</param>
 		/// <param name="propertyName">The name of the static property to be set.</param>
 		/// <returns>A delegate which can set the value of the specified static property.</returns>
-		public static StaticAttributeSetter DelegateForSetStaticProperty(this Type targetType, string propertyName)
+		public static StaticMemberSetter DelegateForSetStaticProperty(this Type targetType, string propertyName)
 		{
 			return targetType.DelegateForSetStaticFieldOrProperty(MemberTypes.Property, propertyName);
 		}
@@ -97,7 +99,7 @@ namespace Fasterflect
 		/// <param name="targetType">The type which the property belongs to.</param>
 		/// <param name="propertyName">The name of the property to be set.</param>
 		/// <returns>A delegate which can set the value of the specified property.</returns>
-		public static AttributeSetter DelegateForSetProperty(this Type targetType, string propertyName)
+		public static MemberSetter DelegateForSetProperty(this Type targetType, string propertyName)
 		{
 			return targetType.DelegateForSetFieldOrProperty(MemberTypes.Property, propertyName);
 		}
@@ -108,7 +110,7 @@ namespace Fasterflect
 		/// <param name="targetType">The type which the static property belongs to.</param>
 		/// <param name="propertyName">The name of the static property to be retrieved.</param>
 		/// <returns>A delegate which can get the value of the specified static property.</returns>
-		public static StaticAttributeGetter DelegateForGetStaticProperty(this Type targetType, string propertyName)
+		public static StaticMemberGetter DelegateForGetStaticProperty(this Type targetType, string propertyName)
 		{
 			return targetType.DelegateForGetStaticFieldOrProperty(MemberTypes.Property, propertyName);
 		}
@@ -119,7 +121,7 @@ namespace Fasterflect
 		/// <param name="targetType">The type which the property belongs to.</param>
 		/// <param name="propertyName">The name of the property to be retrieved.</param>
 		/// <returns>A delegate which can get the value of the specified property.</returns>
-		public static AttributeGetter DelegateForGetProperty(this Type targetType, string propertyName)
+		public static MemberGetter DelegateForGetProperty(this Type targetType, string propertyName)
 		{
 			return targetType.DelegateForGetFieldOrProperty(MemberTypes.Property, propertyName);
 		}
@@ -151,7 +153,6 @@ namespace Fasterflect
 		#endregion
 
 		#region Batch Setters
-
 		/// <summary>
 		/// Sets the static properties of <paramref name="targetType"/> based on
 		/// the properties available in <paramref name="sample"/>. 
@@ -162,9 +163,7 @@ namespace Fasterflect
 		/// <returns>The type whose static properties are to be set.</returns>
 		public static Type SetProperties(this Type targetType, object sample)
 		{
-			sample.GetProperties().ForEach(prop =>
-			                               SetProperty(targetType, prop.Name, prop.GetValue(sample))
-				);
+			sample.Properties().ForEach(prop => SetProperty(targetType, prop.Name, prop.GetValue(sample)));
 			return targetType;
 		}
 
@@ -178,16 +177,12 @@ namespace Fasterflect
 		/// <returns>The object whose properties are to be set.</returns>
 		public static object SetProperties(this object target, object sample)
 		{
-			sample.GetProperties().ForEach(prop =>
-			                               SetProperty(target, prop.Name, prop.GetValue(sample))
-				);
+			sample.Properties().ForEach(prop => SetProperty(target, prop.Name, prop.GetValue(sample)));
 			return target;
 		}
-
 		#endregion
 
 		#region Indexers
-
 		/// <summary>
 		/// Sets the value of the indexer of object <paramref name="target"/>
 		/// </summary>
@@ -291,7 +286,6 @@ namespace Fasterflect
 			return (MethodInvoker) new MethodInvocationEmitter(
 			                       	Constants.IndexerGetterName, targetType, paramTypes, false).GetDelegate();
 		}
-
 		#endregion
 
 		#region Property Lookup
@@ -318,9 +312,22 @@ namespace Fasterflect
 			return type.GetProperty( name, Reflector.AllCriteria );
 		}
 
-		public static PropertyInfo[] Properties( this Type type )
+		/// <summary>
+		/// Find all public properties on the given <paramref name="target"/> object.
+		/// </summary>
+		/// <returns>A list of all public properties on the type.</returns>
+		public static List<PropertyInfo> Properties( this object target )
 		{
-			return type.GetProperties() ?? new PropertyInfo[ 0 ];
+			return target.GetType().Properties();
+		}
+
+		/// <summary>
+		/// Find all public properties on the given <paramref name="type"/>.
+		/// </summary>
+		/// <returns>A list of all public properties on the type.</returns>
+		public static List<PropertyInfo> Properties( this Type type )
+		{
+			return type.GetProperties().ToList();
 		}
 		#endregion
 	}

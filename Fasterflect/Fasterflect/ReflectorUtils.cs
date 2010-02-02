@@ -19,20 +19,12 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
 	internal static class ReflectorUtils
 	{
-		public static List<PropertyInfo> GetProperties(this object sample)
-		{
-			return sample.GetType().GetProperties().ToList();
-		}
-
 		public static Type GetTypeAdjusted(this object obj)
 		{
 			var wrapper = obj as ValueTypeHolder;
@@ -40,11 +32,6 @@ namespace Fasterflect
 			       	? obj.GetType()
 			       	: wrapper.Value.GetType();
 		}
-
-		//public static object GetValue(this PropertyInfo prop, object sample)
-		//{
-		//    return prop.GetGetMethod().Invoke(sample, Constants.EmptyObjectArray);
-		//}
 
 		public static Type[] GetTypeArray(this object[] objects)
 		{

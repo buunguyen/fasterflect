@@ -33,9 +33,7 @@ namespace Fasterflect
 	public static class MethodExtensions
 	{
 		#region Method Invocation
-
 		#region Static Method Invocation
-
 		/// <summary>
 		/// Invokes the static method specified by <paramref name="methodName"/> of type
 		/// <paramref name="targetType"/>.  Use this overload when the static method has no return type or 
@@ -151,11 +149,9 @@ namespace Fasterflect
 		{
 			return (StaticMethodInvoker) new MethodInvocationEmitter(methodName, targetType, paramTypes, true).GetDelegate();
 		}
-
 		#endregion
 
 		#region Instance Method Invocation
-
 		/// <summary>
 		/// Invokes the method specified by <paramref name="methodName"/> of object
 		/// <paramref name="target"/>.  Use this overload when the method has no return type or 
@@ -272,23 +268,34 @@ namespace Fasterflect
 		{
 			return (MethodInvoker) new MethodInvocationEmitter(methodName, targetType, paramTypes, false).GetDelegate();
 		}
-
 		#endregion
-
 		#endregion
 
 		#region Method Lookup
-		public static IEnumerable<MethodInfo> Methods( this Type type )
+		/// <summary>
+		/// Gets all public and non-public, instance and static methods on the given <paramref name="type"/>.
+		/// </summary>
+		/// <returns>A list of all methods.</returns>
+		public static IList<MethodInfo> Methods( this Type type )
 		{
 			return type.Methods(Reflector.AllCriteria, null);
 		}
 
-		public static IList<MethodInfo> Methods(this Type type, BindingFlags bindingFlags)
+		/// <summary>
+		/// Gets all methods on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>.
+		/// </summary>
+		/// <returns>A list of all matching methods.</returns>
+		public static IList<MethodInfo> Methods( this Type type, BindingFlags bindingFlags )
 		{
 			return type.Methods(bindingFlags, null);
 		}
 
-		public static IList<MethodInfo> Methods(this Type type, BindingFlags bindingFlags, string methodName)
+		/// <summary>
+		/// Gets all methods on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>
+		/// and with the given <paramref name="methodName"/>.
+		/// </summary>
+		/// <returns>A list of all matching methods.</returns>
+		public static IList<MethodInfo> Methods( this Type type, BindingFlags bindingFlags, string methodName )
 		{
 			return (from memberInfo in type.FindMembers(MemberTypes.Method, bindingFlags, null, null)
 			        where methodName == null || memberInfo.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase)
@@ -297,17 +304,30 @@ namespace Fasterflect
 		#endregion
 
 		#region Method Parameter Lookup
-
+		/// <summary>
+		/// Gets all parameters for the given <paramref name="method"/>.
+		/// </summary>
+		/// <returns>The list of parameters for the method.</returns>
 		public static IList<ParameterInfo> Parameters(this MethodBase method)
 		{
 			return method.GetParameters();
 		}
 
+		/// <summary>
+		/// Determines whether null can be assigned to the given <paramref name="parameter"/>.
+		/// </summary>
+		/// <returns>True if null can be assigned, false otherwise.</returns>
 		public static bool IsNullable(this ParameterInfo parameter)
 		{
 			return ! parameter.ParameterType.IsValueType || parameter.ParameterType.IsSubclassOf(typeof (Nullable));
 		}
 
+		/// <summary>
+		/// Determines whether the given <paramref name="parameter"/> has the given <paramref name="name"/>.
+		/// The comparison uses OrdinalIgnoreCase and allows for a leading underscore in the parameter name
+		/// to be ignored (this is useful when mapping data using reserved words to method parameters). 
+		/// </summary>
+		/// <returns>True if the name considered identical, false otherwise.</returns>
 		public static bool HasName(this ParameterInfo parameter, string name)
 		{
 			bool result = parameter.Name.Equals(name, StringComparison.OrdinalIgnoreCase);
@@ -316,19 +336,30 @@ namespace Fasterflect
 			return result;
 		}
 
-		public static bool HasDefaultValue(this ParameterInfo parameter)
+		/// <summary>
+		/// Determines whether the given <paramref name="parameter"/> has an associated default value as
+		/// supplied by an <see href="DefaultValueAttribute"/>. This method does not read the value of
+		/// the attribute. It also does not support C# 4.0 default parameter specifications.
+		/// </summary>
+		/// <returns>True if the attribute was detected, false otherwise.</returns>
+		public static bool HasDefaultValue( this ParameterInfo parameter )
 		{
 			var defaultValue = parameter.Attribute<DefaultValueAttribute>();
 			return defaultValue != null;
 		}
 
-		public static object DefaultValue(this ParameterInfo parameter)
+		/// <summary>
+		/// Gets the default value associated with the given <paramref name="parameter"/>. The value is
+		/// obtained from the <see href="DefaultValueAttribute"/> if present on the parameter. This method 
+		/// does not support C# 4.0 default parameter specifications.
+		/// </summary>
+		/// <returns>True if the attribute was detected, false otherwise.</returns>
+		public static object DefaultValue( this ParameterInfo parameter )
 		{
 			var defaultValue = parameter.Attribute<DefaultValueAttribute>();
 			// TODO we should do type conversion here since attributes cannot hold all types
 			return defaultValue != null ? defaultValue.Value : null;
 		}
-
 		#endregion
 	}
 }

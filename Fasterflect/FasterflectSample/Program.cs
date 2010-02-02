@@ -173,7 +173,7 @@ namespace FasterflectSample
             var range = Enumerable.Range(0, 10).ToList();
 
             // Let's cache the getter for InstanceCount
-            StaticAttributeGetter count = type.DelegateForGetStaticField("InstanceCount");
+            StaticMemberGetter count = type.DelegateForGetStaticField("InstanceCount");
 
             // Now cache the 2-arg constructor of Person and playaround with the delegate returned
             int currentInstanceCount = (int)count();
@@ -188,8 +188,8 @@ namespace FasterflectSample
 
             // Whatever thing we can do with the normal API, we can do with the cache API.
             // For example:
-            AttributeSetter nameSetter = type.DelegateForSetProperty("Name");
-            AttributeGetter nameGetter = type.DelegateForGetProperty("Name");
+            MemberSetter nameSetter = type.DelegateForSetProperty("Name");
+            MemberGetter nameGetter = type.DelegateForGetProperty("Name");
 
             object person = ctor(1, "Buu").CreateHolderIfValueType();
             AssertTrue("Buu" == (string)nameGetter(person));

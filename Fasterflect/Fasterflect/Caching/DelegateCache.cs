@@ -36,6 +36,8 @@ namespace Fasterflect.Caching
 		/// 
 		/// This method assures that one and only one delegate can be created for 
 		/// any particular instance of <paramref name="callInfo"/>.
+		/// 
+		/// Created delegates are cached temporarily using a <see href="WeakReference"/>.
 		/// </summary>
 		public static Delegate GetDelegate(CallInfo callInfo, Func<Delegate> createDelegateAction)
 		{
@@ -50,6 +52,10 @@ namespace Fasterflect.Caching
 		/// 
 		/// This method assures that one and only one delegate can be created for 
 		/// any particular instance of <paramref name="callInfo"/>.
+		/// 
+		/// Created delegates are cached temporarily using a <see href="WeakReference"/> by 
+		/// default. This can be overridden by specifying an alternative option for
+		/// <param name="strategy"/>.
 		/// </summary>
 		public static Delegate GetDelegate(CallInfo callInfo, Func<Delegate> createDelegateAction, CacheStrategy strategy)
 		{
