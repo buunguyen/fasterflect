@@ -37,7 +37,10 @@ namespace Fasterflect
 		/// <summary>
 		/// Gets the value of the instance field or property identified by <paramref name="memberTypes"/>
 		/// and <paramref name="fieldOrPropertyName"/> on the <paramref name="target"/> object.
-		/// </summary>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the field or property.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <returns>The value of the given member.</returns>
 		public static TReturn GetFieldOrProperty<TReturn>(this object target, MemberTypes memberTypes,
 		                                                  string fieldOrPropertyName)
@@ -89,7 +92,10 @@ namespace Fasterflect
 		/// <summary>
 		/// Gets the value of the static field or property identified by <paramref name="memberTypes"/>
 		/// and <paramref name="fieldOrPropertyName"/> on the <paramref name="targetType"/>.
-		/// </summary>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the field or property.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <returns>The value of the given member.</returns>
 		public static TReturn GetFieldOrProperty<TReturn>( this Type targetType, MemberTypes memberTypes,
 		                                                  string fieldOrPropertyName)
@@ -142,7 +148,10 @@ namespace Fasterflect
 		#region MemberInfo Access
 		/// <summary>
 		/// Gets the value of the instance field or property identified by <paramref name="info"/> on
-		/// the <paramref name="target"/> object.
+        /// the <paramref name="target"/> object.
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the field or property.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// </summary>
 		/// <returns>The value of the given member.</returns>
 		public static TReturn GetValue<TReturn>( this MemberInfo info, object target )
@@ -169,7 +178,7 @@ namespace Fasterflect
 		/// <returns>A list of MemberInfo objects with information on the member.</returns>
 		public static IList<MemberInfo> FieldsAndProperties( this Type type )
 		{
-			return type.Members( MemberTypes.Field | MemberTypes.Property, ReflectorUtils.AllCriteria );
+			return type.Members( MemberTypes.Field | MemberTypes.Property, Flags.AllCriteria );
 		}
 
 		/// <summary>
@@ -204,7 +213,7 @@ namespace Fasterflect
 		/// <returns>A single MemberInfo instance of the first found match or null if no match was found</returns>
 		public static MemberInfo Member( this Type type, string name )
 		{
-			MemberInfo[] mis = type.GetMember( name, ReflectorUtils.AllCriteria );
+            MemberInfo[] mis = type.GetMember(name, Flags.AllCriteria);
 			return mis != null && mis.Length > 0 ? mis[ 0 ] : null;
 		}
 
