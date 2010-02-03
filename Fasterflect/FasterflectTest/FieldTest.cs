@@ -95,6 +95,17 @@ namespace FasterflectTest
         }
 
         [TestMethod]
+        public void Test_set_and_get_static_fields_via_sample_with_filter()
+        {
+            TypeList.ForEach(type =>
+            {
+                var currentValue = type.GetField<int>( "counter" );
+                type.SetFields(new { counter = (currentValue + 1) }, "non_exist");
+                Assert.AreEqual(currentValue, type.GetField<int>("counter"));
+            });
+        }
+
+        [TestMethod]
         public void Test_set_and_get_fields_via_sample()
         {
             TypeList.ForEach(type =>
@@ -106,6 +117,21 @@ namespace FasterflectTest
                 Assert.AreEqual(10, target.GetField<int>("age"));
                 Assert.AreSame(peer, target.GetField<PersonClass>("peer"));
                 Assert.AreSame(favColors, target.GetField<Color[]>("favoriteColors"));
+            });
+        }
+
+        [TestMethod]
+        public void Test_set_and_get_fields_via_sample_with_filter()
+        {
+            TypeList.ForEach(type =>
+            {
+                var target = type.CreateInstance().CreateHolderIfValueType();
+                var peer = new PersonClass();
+                var favColors = new[] { Color.Blue, Color.Red };
+                target.SetFields(new { age = 10, peer, favoriteColors = favColors }, "age");
+                Assert.AreEqual(10, target.GetField<int>("age"));
+                Assert.AreSame(null, target.GetField<PersonClass>("peer"));
+                Assert.AreSame(null, target.GetField<Color[]>("favoriteColors"));
             });
         }
 
