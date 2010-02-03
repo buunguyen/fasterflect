@@ -78,10 +78,28 @@ namespace FasterflectTest
                                  {
                                      type.SetProperty("Counter", 1);
                                      Assert.AreEqual(1, type.GetProperty<int>("Counter"));
-
-                                     type.SetProperties(new { Counter = 2 });
-                                     Assert.AreEqual(2, type.GetProperty<int>("Counter"));
                                  });
+        }
+
+        [TestMethod]
+        public void Test_set_and_get_static_properties_via_sample()
+        {
+            TypeList.ForEach(type =>
+            {
+                type.SetProperties(new { Counter = 5 });
+                Assert.AreEqual(5, type.GetProperty<int>("Counter"));
+            });
+        }
+
+        [TestMethod]
+        public void Test_set_and_get_static_properties_via_sample_with_filter()
+        {
+            TypeList.ForEach(type =>
+            {
+                var currentValue = type.GetProperty<int>( "Counter" );
+                type.SetProperties(new { Counter = (currentValue + 1) }, "not_exist");
+                Assert.AreEqual(currentValue, type.GetProperty<int>("Counter"));
+            });
         }
 
         [TestMethod]
@@ -104,7 +122,20 @@ namespace FasterflectTest
                                     var target = type.CreateInstance().CreateHolderIfValueType();
                                     target.SetProperties(new { Age = 10, Name = "John" });
                                     Assert.AreEqual(10, target.GetProperty<int>("Age"));
+                                    Assert.AreEqual("John", target.GetProperty<string>("Name"));
                                 });
+        }
+
+        [TestMethod]
+        public void Test_set_and_get_properties_via_sample_with_filter()
+        {
+            TypeList.ForEach(type =>
+            {
+                var target = type.CreateInstance().CreateHolderIfValueType();
+                target.SetProperties(new { Age = 10, Name = "John" }, "Age");
+                Assert.AreEqual(10, target.GetProperty<int>("Age"));
+                Assert.AreSame(null, target.GetProperty<string>("Name"));
+            });
         }
 
         [TestMethod]

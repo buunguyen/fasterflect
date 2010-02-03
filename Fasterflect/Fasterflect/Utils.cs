@@ -19,20 +19,32 @@
 #endregion
 
 using System;
+using Fasterflect.Emitter;
 
-namespace Fasterflect.Emitter
+namespace Fasterflect
 {
-	internal static class Constants
+	internal static class Utils
 	{
-		public const string IndexerSetterName = "set_Item";
-		public const string IndexerGetterName = "get_Item";
-		public const string ArraySetterName = "[]=";
-		public const string ArrayGetterName = "=[]";
-		public static readonly Type ObjectType = typeof (object);
-		public static readonly Type IntType = typeof (int);
-		public static readonly Type StructType = typeof (ValueTypeHolder);
-		public static readonly Type VoidType = typeof (void);
-		public static readonly Type[] ArrayOfObjectType = new[] {typeof (object)};
-		public static readonly object[] EmptyObjectArray = new object[0];
+		public static Type GetTypeAdjusted( this object obj )
+		{
+			var wrapper = obj as ValueTypeHolder;
+			return wrapper == null
+			       	? obj.GetType()
+			       	: wrapper.Value.GetType();
+		}
+
+		public static Type[] GetTypeArray(this object[] objects)
+		{
+			/*
+             * Readable code with a LINQ query, but it's pretty slow
+             * return objects.Select(o => o.GetType()).ToArray();
+             */
+			var types = new Type[objects.Length];
+			for (int i = 0; i < types.Length; i++)
+			{
+				types[i] = objects[i].GetType();
+			}
+			return types;
+		}
 	}
 }

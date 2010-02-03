@@ -138,31 +138,65 @@ namespace Fasterflect
 		#region Batch Setters
 		/// <summary>
 		/// Sets the static fields of <paramref name="targetType"/> based on
-		/// the properties available in <paramref name="sample"/>. 
+        /// the public properties available in <paramref name="sample"/>. 
 		/// </summary>
 		/// <param name="targetType">The type whose static fields are to be set.</param>
-		/// <param name="sample">An object whose properties will be used to set the static fields of
-		/// <paramref name="targetType"/>.</param>
+        /// <param name="sample">An object whose public properties will be used to set the 
+		/// static fields of <paramref name="targetType"/>.</param>
 		/// <returns>The type whose static fields are to be set.</returns>
 		public static Type SetFields(this Type targetType, object sample)
 		{
-            sample.GetType().Properties().ForEach(prop => targetType.SetField(prop.Name, prop.GetValue<object>(sample)));
-			return targetType;
+		    return targetType.SetFields( sample, null );
 		}
 
-		/// <summary>
+        /// <summary>
+        /// Sets the static fields of <paramref name="targetType"/> based on
+        /// the public properties available in <paramref name="sample"/> filtered by 
+        /// <paramref name="propertiesToInclude"/>. 
+        /// </summary>
+        /// <param name="targetType">The type whose static fields are to be set.</param>
+        /// <param name="sample">An object whose public properties will be used to set the 
+        /// static fields of <paramref name="targetType"/>.</param>
+        /// <param name="propertiesToInclude">A comma delimited list of names of properties to be retrieved.  If
+        /// this is <c>null</c>, all public properties are used.</param>
+        /// <returns>The type whose static fields are to be set.</returns>
+        public static Type SetFields(this Type targetType, object sample, string propertiesToInclude)
+        {
+            var properties = sample.GetType().Properties( propertiesToInclude );
+            properties.ForEach(prop => targetType.SetField(prop.Name, prop.GetValue<object>(sample)));
+            return targetType;
+        }
+
+	    /// <summary>
 		/// Sets the fields of <paramref name="target"/> based on
-		/// the properties available in <paramref name="sample"/>. 
+        /// the public properties available in <paramref name="sample"/>. 
 		/// </summary>
 		/// <param name="target">The object whose fields are to be set.</param>
-		/// <param name="sample">An object whose fields will be used to set the properties of
+        /// <param name="sample">An object whose public properties will be used to set the fields of
 		/// <paramref name="target"/>.</param>
 		/// <returns>The object whose fields are to be set.</returns>
 		public static object SetFields(this object target, object sample)
 		{
-            sample.GetType().Properties().ForEach(prop => target.SetField(prop.Name, prop.GetValue<object>(sample)));
-			return target;
+	        return target.SetFields( sample, null );
 		}
+
+        /// <summary>
+        /// Sets the fields of <paramref name="target"/> based on
+        /// the public properties available in <paramref name="sample"/> filtered by 
+        /// <paramref name="propertiesToInclude"/>. 
+        /// </summary>
+        /// <param name="target">The object whose fields are to be set.</param>
+        /// <param name="sample">An object whose public properties will be used to set the fields of
+        /// <paramref name="target"/>.</param>
+        /// <param name="propertiesToInclude">A comma delimited list of names of properties to be retrieved.  If
+        /// this is <c>null</c>, all public properties are used.</param>
+        /// <returns>The object whose fields are to be set.</returns>
+        public static object SetFields(this object target, object sample, string propertiesToInclude)
+        {
+            var properties = sample.GetType().Properties(propertiesToInclude);
+            properties.ForEach(prop => target.SetField(prop.Name, prop.GetValue<object>(sample)));
+            return target;
+        }
 		#endregion
 		#endregion
 

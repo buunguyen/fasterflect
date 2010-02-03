@@ -164,31 +164,63 @@ namespace Fasterflect
 		#region Batch Setters
 		/// <summary>
 		/// Sets the static properties of <paramref name="targetType"/> based on
-		/// the properties available in <paramref name="sample"/>. 
+		/// the public properties available in <paramref name="sample"/>. 
 		/// </summary>
 		/// <param name="targetType">The type whose static properties are to be set.</param>
-		/// <param name="sample">An object whose properties will be used to set the static properties of
+        /// <param name="sample">An object whose public properties will be used to set the static properties of
 		/// <paramref name="targetType"/>.</param>
 		/// <returns>The type whose static properties are to be set.</returns>
 		public static Type SetProperties(this Type targetType, object sample)
 		{
-			sample.GetType().Properties().ForEach( prop => SetProperty( targetType, prop.Name, prop.GetValue<object>( sample ) ) );
-			return targetType;
+		    return targetType.SetProperties( sample, null );
 		}
+
+        /// <summary>
+        /// Sets the static properties of <paramref name="targetType"/> based on
+        /// the public properties available in <paramref name="sample"/>, filtered by <paramref name="propertiesToInclude"/>. 
+        /// </summary>
+        /// <param name="targetType">The type whose static properties are to be set.</param>
+        /// <param name="sample">An object whose public properties will be used to set the static properties of
+        /// <paramref name="targetType"/>.</param>
+        /// <param name="propertiesToInclude">A comma delimited list of names of properties to be retrieved.  If
+        /// this is <c>null</c>, all public properties are used.</param>
+        /// <returns>The type whose static properties are to be set.</returns>
+        public static Type SetProperties(this Type targetType, object sample, string propertiesToInclude)
+        {
+            var properties = sample.GetType().Properties(propertiesToInclude);
+            properties.ForEach(prop => targetType.SetProperty(prop.Name, prop.GetValue<object>(sample)));
+            return targetType;
+        }
 
 		/// <summary>
 		/// Sets the properties of <paramref name="target"/> based on
-		/// the properties available in <paramref name="sample"/>. 
+        /// the public properties available in <paramref name="sample"/>. 
 		/// </summary>
 		/// <param name="target">The object whose properties are to be set.</param>
-		/// <param name="sample">An object whose properties will be used to set the properties of
+        /// <param name="sample">An object whose public properties will be used to set the properties of
 		/// <paramref name="target"/>.</param>
 		/// <returns>The object whose properties are to be set.</returns>
 		public static object SetProperties(this object target, object sample)
 		{
-            sample.GetType().Properties().ForEach(prop => SetProperty(target, prop.Name, prop.GetValue<object>(sample)));
-			return target;
+		    return target.SetProperties( sample, null );
 		}
+
+        /// <summary>
+        /// Sets the properties of <paramref name="target"/> based on
+        /// the public properties available in <paramref name="sample"/>, filtered by <paramref name="propertiesToInclude"/>. 
+        /// </summary>
+        /// <param name="target">The object whose properties are to be set.</param>
+        /// <param name="sample">An object whose public properties will be used to set the properties of
+        /// <paramref name="target"/>.</param>
+        /// <param name="propertiesToInclude">A comma delimited list of names of properties to be retrieved.  If
+        /// this is <c>null</c>, all public properties are used.</param>
+        /// <returns>The object whose properties are to be set.</returns>
+        public static object SetProperties(this object target, object sample, string propertiesToInclude)
+        {
+            var properties = sample.GetType().Properties(propertiesToInclude);
+            properties.ForEach(prop => target.SetProperty(prop.Name, prop.GetValue<object>(sample)));
+            return target;
+        }
 		#endregion
 
 		#region Indexers
@@ -303,7 +335,7 @@ namespace Fasterflect
 
 		#region Property Lookup
 		/// <summary>
-		/// Find a specific named property on the given type.
+        /// Retrieves a specific named property on the given type.
 		/// </summary>
 		/// <param name="type">The type to reflect on</param>
         /// <param name="name">The name of the member to find</param>
@@ -316,7 +348,7 @@ namespace Fasterflect
 		}
 
 		/// <summary>
-		/// Find a specific named property on the given type.
+        /// Retrieves a specific named property on the given type.
 		/// </summary>
 		/// <param name="type">The type to reflect on</param>
 		/// <param name="name">The name of the member to find</param>
@@ -327,13 +359,30 @@ namespace Fasterflect
 		}
 
 		/// <summary>
-		/// Find all public properties on the given <paramref name="type"/>.
+        /// Retrieves all public properties on the given <paramref name="type"/>.
 		/// </summary>
 		/// <returns>A list of all public properties on the type.</returns>
 		public static List<PropertyInfo> Properties( this Type type )
 		{
-            return type.GetProperties().ToList();
+            return type.Properties(null);
 		}
+
+        /// <summary>
+        /// Retrieves all public properties on the given <paramref name="type"/>, filted by 
+        /// <param name="propertiesToInclude"/>
+        /// </summary>
+        /// <param name="type">The type whose public properties are to be retrieved.</param>
+        /// <param name="propertiesToInclude">A comma delimited list of names of properties to be retrieved.  If
+        /// this is <c>null</c>, all public properties are returned.</param>
+        /// <returns>A list of all public properties on the type filted by <param name="propertiesToInclude"/>.</returns>
+        public static List<PropertyInfo> Properties(this Type type, string propertiesToInclude)
+        {
+            var properties = type.GetProperties().ToList();
+            if (propertiesToInclude == null)
+                return properties;
+            var propertyNames = propertiesToInclude.Split(',');
+            return properties.Where(prop => propertyNames.Contains(prop.Name)).ToList();
+        }
 		#endregion
 	}
 }
