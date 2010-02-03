@@ -85,7 +85,10 @@ namespace Fasterflect
 		/// <summary>
 		/// Gets the value of the static field <paramref name="fieldName"/> of type 
 		/// <paramref name="targetType"/>.
-		/// </summary>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the field.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="targetType">The type whose static field is to be retrieved.</param>
 		/// <param name="fieldName">The name of the static field whose value is to be retrieved.</param>
 		/// <returns>The value of the static field.</returns>
@@ -97,9 +100,12 @@ namespace Fasterflect
 		/// <summary>
 		/// Retrieves the value of the field <paramref name="fieldName"/> of object
 		/// <paramref name="target"/>.
-		/// </summary>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the field.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="target">The object whose field is to be retrieved.</param>
-		/// <param name="fieldName">The name of the field whose value is to be retrieved.</param>
+        /// <param name="fieldName">The name of the field whose value is to be retrieved.</param>
 		/// <returns>The value of the field.</returns>
 		public static TReturn GetField<TReturn>(this object target, string fieldName)
 		{
@@ -140,7 +146,7 @@ namespace Fasterflect
 		/// <returns>The type whose static fields are to be set.</returns>
 		public static Type SetFields(this Type targetType, object sample)
 		{
-			sample.Properties().ForEach( prop => SetField( targetType, prop.Name, prop.GetValue<object>( sample ) ) );
+            sample.GetType().Properties().ForEach(prop => targetType.SetField(prop.Name, prop.GetValue<object>(sample)));
 			return targetType;
 		}
 
@@ -154,7 +160,7 @@ namespace Fasterflect
 		/// <returns>The object whose fields are to be set.</returns>
 		public static object SetFields(this object target, object sample)
 		{
-			sample.Properties().ForEach( prop => SetField( target, prop.Name, prop.GetValue<object>( sample ) ) );
+            sample.GetType().Properties().ForEach(prop => target.SetField(prop.Name, prop.GetValue<object>(sample)));
 			return target;
 		}
 		#endregion
@@ -163,9 +169,12 @@ namespace Fasterflect
 		#region FieldInfo Access
 		/// <summary>
 		/// Gets the value of the instance field <paramref name="info"/> from the <paramref name="target"/>.
-		/// </summary>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the field.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="info">The field to read.</param>
-		/// <param name="target">The object whose field should be read.</param>
+        /// <param name="target">The object whose field should be read.</param>
 		/// <returns>The value of the specified field.</returns>
 		public static TReturn GetValue<TReturn>( this FieldInfo info, object target )
 		{
@@ -186,14 +195,16 @@ namespace Fasterflect
 
 		#region Field Lookup
 		/// <summary>
-		/// Find a specific named field on the given <paramref name="type"/>.
+        /// Find a specific named field whose type is <typeparamref name="T"/>
+        /// on the given <paramref name="type"/>. 
 		/// </summary>
 		/// <param name="type">The type to reflect on</param>
 		/// <param name="name">The name of the member to find</param>
+		/// <typeparam name="T">The type of the specified field</typeparam>
 		/// <returns>A single FieldInfo instance of the first found match or null if no match was found</returns>
 		public static FieldInfo Field<T>( this Type type, string name )
 		{
-			FieldInfo info = type.GetField( name, ReflectorUtils.AllCriteria );
+            FieldInfo info = type.GetField(name, Flags.AllCriteria);
 			return info != null && info.FieldType == typeof( T ) ? info : null;
 		}
 
@@ -205,16 +216,16 @@ namespace Fasterflect
 		/// <returns>A single FieldInfo instance of the first found match or null if no match was found</returns>
 		public static FieldInfo Field( this Type type, string name )
 		{
-			return type.GetField( name, ReflectorUtils.AllCriteria );
+            return type.GetField(name, Flags.AllCriteria);
 		}
 
 		/// <summary>
-		/// Find all instance fields on the given <paramref name="type"/>.
+        /// Find all public instance fields on the given <paramref name="type"/>.
 		/// </summary>
-		/// <returns>A list of all instance fields on the type.</returns>
+		/// <returns>A list of all public instance fields on the type.</returns>
 		public static List<FieldInfo> Fields( this Type type )
 		{
-			return type.GetFields( ReflectorUtils.InstanceCriteria ).ToList();
+            return type.GetFields(Flags.InstanceCriteria).ToList();
 		}
 
 		/// <summary>

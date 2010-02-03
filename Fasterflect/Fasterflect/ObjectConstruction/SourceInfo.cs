@@ -118,7 +118,7 @@ namespace Fasterflect.ObjectConstruction
 
 		internal void ExtractParameterInfo(Type type)
 		{
-			IList<MemberInfo> members = type.Members(MemberTypes.Field | MemberTypes.Property, ReflectorUtils.InstanceCriteria);
+            IList<MemberInfo> members = type.Members(MemberTypes.Field | MemberTypes.Property, Flags.InstanceCriteria);
 			var names = new List<string>(members.Count);
 			var types = new List<Type>(members.Count);
 			var kinds = new List<bool>(members.Count);

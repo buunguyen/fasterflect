@@ -178,7 +178,7 @@ namespace Fasterflect
 		/// <returns>An enumeration of available constructors</returns>
 		public static IList<ConstructorInfo> Constructors(this Type type)
 		{
-			return type.GetConstructors(ReflectorUtils.InstanceCriteria).Where(ci => ! ci.IsAbstract).ToList();
+            return type.GetConstructors(Flags.InstanceCriteria).Where(ci => !ci.IsAbstract).ToList();
 		}
 
 		/// <summary>
@@ -189,7 +189,7 @@ namespace Fasterflect
 		/// <returns>The matching constructor or null if no match was found</returns>
 		public static ConstructorInfo Constructor(this Type type, params Type[] parameterTypes)
 		{
-			return type.GetConstructor(ReflectorUtils.InstanceCriteria, null, parameterTypes, null);
+            return type.GetConstructor(Flags.InstanceCriteria, null, parameterTypes, null);
 		}
 		#endregion
 	}

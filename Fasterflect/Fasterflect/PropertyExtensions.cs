@@ -61,9 +61,12 @@ namespace Fasterflect
 		/// <summary>
 		/// Gets the value of the static property <paramref name="propertyName"/> of type 
 		/// <paramref name="targetType"/>.
-		/// </summary>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the property.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="targetType">The type whose static property is to be retrieved.</param>
-		/// <param name="propertyName">The name of the static property whose value is to be retrieved.</param>
+        /// <param name="propertyName">The name of the static property whose value is to be retrieved.</param>
 		/// <returns>The value of the static property.</returns>
 		public static TReturn GetProperty<TReturn>(this Type targetType, string propertyName)
 		{
@@ -73,9 +76,12 @@ namespace Fasterflect
 		/// <summary>
 		/// Retrieves the value of the property <paramref name="propertyName"/> of object
 		/// <paramref name="target"/>.
-		/// </summary>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the property.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="target">The object whose property is to be retrieved.</param>
-		/// <param name="propertyName">The name of the property whose value is to be retrieved.</param>
+        /// <param name="propertyName">The name of the property whose value is to be retrieved.</param>
 		/// <returns>The value of the property.</returns>
 		public static TReturn GetProperty<TReturn>(this object target, string propertyName)
 		{
@@ -131,9 +137,12 @@ namespace Fasterflect
 		#region PropertyInfo Access
 		/// <summary>
 		/// Gets the value of the instance property <paramref name="info"/> from the <paramref name="target"/>.
-		/// </summary>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the property.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="info">The property to read.</param>
-		/// <param name="target">The object whose property should be read.</param>
+        /// <param name="target">The object whose property should be read.</param>
 		/// <returns>The value of the specified property.</returns>
 		public static TReturn GetValue<TReturn>( this PropertyInfo info, object target )
 		{
@@ -163,7 +172,7 @@ namespace Fasterflect
 		/// <returns>The type whose static properties are to be set.</returns>
 		public static Type SetProperties(this Type targetType, object sample)
 		{
-			sample.Properties().ForEach( prop => SetProperty( targetType, prop.Name, prop.GetValue<object>( sample ) ) );
+			sample.GetType().Properties().ForEach( prop => SetProperty( targetType, prop.Name, prop.GetValue<object>( sample ) ) );
 			return targetType;
 		}
 
@@ -177,7 +186,7 @@ namespace Fasterflect
 		/// <returns>The object whose properties are to be set.</returns>
 		public static object SetProperties(this object target, object sample)
 		{
-			sample.Properties().ForEach( prop => SetProperty( target, prop.Name, prop.GetValue<object>( sample ) ) );
+            sample.GetType().Properties().ForEach(prop => SetProperty(target, prop.Name, prop.GetValue<object>(sample)));
 			return target;
 		}
 		#endregion
@@ -229,8 +238,10 @@ namespace Fasterflect
 
 		/// <summary>
 		/// Gets the value of the indexer of object <paramref name="target"/>
-		/// </summary>
-		/// <typeparam name="TReturn">The type of the indexer.</typeparam>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the indexer.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="target">The object whose indexer is to be retrieved.</param>
 		/// <param name="parameters">The list of the indexer parameters.
 		/// The parameter types are determined from these parameters, therefore no parameter can be <code>null</code>.
@@ -244,8 +255,10 @@ namespace Fasterflect
 
 		/// <summary>
 		/// Gets the value of the indexer of object <paramref name="target"/>
-		/// </summary>
-		/// <typeparam name="TReturn">The type of the indexer.</typeparam>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the indexer.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="target">The object whose indexer is to be retrieved.</param>
 		/// <param name="paramTypes">The types of the indexer parameters (must be in the right order).</param>
 		/// <param name="parameters">The list of the indexer parameters.</param>
@@ -293,11 +306,12 @@ namespace Fasterflect
 		/// Find a specific named property on the given type.
 		/// </summary>
 		/// <param name="type">The type to reflect on</param>
-		/// <param name="name">The name of the member to find</param>
+        /// <param name="name">The name of the member to find</param>
+        /// <typeparam name="T">The type of the specified property</typeparam>
 		/// <returns>A single FieldInfo instance of the first found match or null if no match was found</returns>
 		public static PropertyInfo Property<T>( this Type type, string name )
 		{
-			PropertyInfo info = type.GetProperty( name, ReflectorUtils.AllCriteria );
+            PropertyInfo info = type.GetProperty(name, Flags.AllCriteria);
 			return info != null && info.PropertyType == typeof( T ) ? info : null;
 		}
 
@@ -309,16 +323,7 @@ namespace Fasterflect
 		/// <returns>A single PropertyInfo instance of the first found match or null if no match was found</returns>
 		public static PropertyInfo Property( this Type type, string name )
 		{
-			return type.GetProperty( name, ReflectorUtils.AllCriteria );
-		}
-
-		/// <summary>
-		/// Find all public properties on the given <paramref name="target"/> object.
-		/// </summary>
-		/// <returns>A list of all public properties on the type.</returns>
-		public static List<PropertyInfo> Properties( this object target )
-		{
-			return target.GetType().Properties();
+            return type.GetProperty(name, Flags.AllCriteria);
 		}
 
 		/// <summary>
@@ -327,7 +332,7 @@ namespace Fasterflect
 		/// <returns>A list of all public properties on the type.</returns>
 		public static List<PropertyInfo> Properties( this Type type )
 		{
-			return type.GetProperties().ToList();
+            return type.GetProperties().ToList();
 		}
 		#endregion
 	}

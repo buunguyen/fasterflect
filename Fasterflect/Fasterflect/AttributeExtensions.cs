@@ -180,7 +180,7 @@ namespace Fasterflect
 		/// <returns>An enumeration of all matching members.</returns>
 		public static IEnumerable<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes ) where T : Attribute
 		{
-			return type.MembersWith(memberTypes, ReflectorUtils.AllCriteria, typeof (T));
+            return type.MembersWith(memberTypes, Flags.AllCriteria, typeof(T));
 		}
 
 		/// <summary>
@@ -194,7 +194,7 @@ namespace Fasterflect
 		public static IEnumerable<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes,
 		                                                     BindingFlags bindingFlags)
 		{
-			return type.MembersWith(memberTypes, ReflectorUtils.AllCriteria, typeof (T));
+            return type.MembersWith(memberTypes, Flags.AllCriteria, typeof(T));
 		}
 
 		/// <summary>
@@ -209,7 +209,7 @@ namespace Fasterflect
 		public static IEnumerable<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes,
 		                                                  params Type[] attributeTypes)
 		{
-			return type.MembersWith(memberTypes, ReflectorUtils.AllCriteria, attributeTypes);
+            return type.MembersWith(memberTypes, Flags.AllCriteria, attributeTypes);
 		}
 
 		/// <summary>

@@ -83,8 +83,10 @@ namespace Fasterflect
 		/// <summary>
 		/// Invokes the static method specified by <paramref name="methodName"/> of type <paramref name="targetType"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>.
-		/// </summary>
-		/// <typeparam name="TReturn">The return type of the static method.</typeparam>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="targetType">The type whose static method is to be invoked.</param>
 		/// <param name="methodName">The name of the static method to be invoked.</param>
 		/// <returns>The return value of the static method.</returns>
@@ -96,8 +98,10 @@ namespace Fasterflect
 		/// <summary>
 		/// Invokes the static method specified by <paramref name="methodName"/> of type <paramref name="targetType"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>
-		/// </summary>
-		/// <typeparam name="TReturn">The return type of the static method.</typeparam>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="targetType">The type whose static method is to be invoked.</param>
 		/// <param name="methodName">The name of the static method to be invoked.</param>
 		/// <param name="parameters">The parameters of the static method (must be in the right order).
@@ -113,8 +117,10 @@ namespace Fasterflect
 		/// <summary>
 		/// Invokes the static method specified by <paramref name="methodName"/> of type <paramref name="targetType"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>
-		/// </summary>
-		/// <typeparam name="TReturn">The return type of the static method.</typeparam>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="targetType">The type whose static method is to be invoked.</param>
 		/// <param name="methodName">The name of the static method to be invoked.</param>
 		/// <param name="paramTypes">The types of the static method's parameters (must be in the right order).</param>
@@ -202,8 +208,10 @@ namespace Fasterflect
 		/// <summary>
 		/// Invokes the method specified by <paramref name="methodName"/> of object <paramref name="target"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>.
-		/// </summary>
-		/// <typeparam name="TReturn">The return type of the method.</typeparam>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="target">The object whose method is to be invoked.</param>
 		/// <param name="methodName">The name of the method to be invoked.</param>
 		/// <returns>The return value of the method.</returns>
@@ -215,8 +223,10 @@ namespace Fasterflect
 		/// <summary>
 		/// Invokes the method specified by <paramref name="methodName"/> of object <paramref name="target"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>
-		/// </summary>
-		/// <typeparam name="TReturn">The return type of the method.</typeparam>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="target">The object whose method is to be invoked.</param>
 		/// <param name="methodName">The name of the method to be invoked.</param>
 		/// <param name="parameters">The parameters of the method (must be in the right order).
@@ -233,8 +243,10 @@ namespace Fasterflect
 		/// <summary>
 		/// Invokes the method specified by <paramref name="methodName"/> of object <paramref name="target"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>
-		/// </summary>
-		/// <typeparam name="TReturn">The return type of the method.</typeparam>
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="target">The object whose method is to be invoked.</param>
 		/// <param name="methodName">The name of the method to be invoked.</param>
 		/// <param name="paramTypes">The types of the method parameters (must be in the right order).</param>
@@ -278,7 +290,7 @@ namespace Fasterflect
 		/// <returns>A list of all methods.</returns>
 		public static IList<MethodInfo> Methods( this Type type )
 		{
-			return type.Methods(ReflectorUtils.AllCriteria, null);
+            return type.Methods(Flags.AllCriteria, null);
 		}
 
 		/// <summary>

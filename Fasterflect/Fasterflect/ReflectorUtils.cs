@@ -19,36 +19,12 @@
 #endregion
 
 using System;
-using System.Reflection;
 using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
 	internal static class ReflectorUtils
 	{
-		#region BindingFlags
-		/// <summary>
-		/// Search criteria encompassing all public and non-public members.
-		/// </summary>
-		public static readonly BindingFlags DefaultCriteria = BindingFlags.Public | BindingFlags.NonPublic;
-
-		/// <summary>
-		/// Search criteria encompassing all public and non-public instance members.
-		/// </summary>
-		public static readonly BindingFlags InstanceCriteria = DefaultCriteria | BindingFlags.Instance;
-
-		/// <summary>
-		/// Search criteria encompassing all public and non-public static members, including those of parent classes.
-		/// </summary>
-		public static readonly BindingFlags StaticCriteria = DefaultCriteria | BindingFlags.Static |
-															 BindingFlags.FlattenHierarchy;
-
-		/// <summary>
-		/// Search criteria encompassing all members, including those of parent classes.
-		/// </summary>
-		public static readonly BindingFlags AllCriteria = InstanceCriteria | StaticCriteria;
-		#endregion
-
 		public static Type GetTypeAdjusted( this object obj )
 		{
 			var wrapper = obj as ValueTypeHolder;

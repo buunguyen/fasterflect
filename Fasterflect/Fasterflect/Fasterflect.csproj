@@ -85,6 +85,7 @@
     <Compile Include="ConstructorExtensions.cs" />
     <Compile Include="AttributeExtensions.cs" />
     <Compile Include="ArrayExtensions.cs" />
+    <Compile Include="Flags.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="MemberExtensions.cs" />
     <Compile Include="PropertyExtensions.cs" />

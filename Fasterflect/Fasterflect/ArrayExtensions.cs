@@ -46,9 +46,11 @@ namespace Fasterflect
 		/// <summary>
 		/// Retrieves the element at <paramref name="index"/>'th location of the target array.
 		/// </summary>
-		/// <typeparam name="TReturn">The element type of the array</typeparam>
 		/// <param name="target">The target array whose element is to be retrieved</param>
-		/// <param name="index">The index of the element to be retrieved</param>
+        /// <param name="index">The index of the element to be retrieved</param>
+        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+        /// between this type and the actual type of the array.  Fasterflect simply inserts an explicit cast 
+        /// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <returns>The element at <paramref name="index"/>'th location of the target array</returns>
 		public static TReturn GetElement<TReturn>(this object target, int index)
 		{
