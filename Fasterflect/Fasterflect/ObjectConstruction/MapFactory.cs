@@ -32,7 +32,6 @@ namespace Fasterflect.ObjectConstruction
 		private static readonly MapCache cache = new MapCache();
 
 		#region Map Construction
-
 		public static MethodMap PrepareInvoke(this Type type, string[] paramNames, Type[] paramTypes)
 		{
 			int hash = MethodMap.GetParameterHash(paramNames, paramTypes);
@@ -44,11 +43,9 @@ namespace Fasterflect.ObjectConstruction
 			}
 			return map;
 		}
-
 		#endregion
 
 		#region Map Construction Helpers
-
 		private static MethodMap DetermineBestConstructorMatch(Type type, string[] paramNames, Type[] paramTypes)
 		{
 			MethodMap bestMap = null;
@@ -69,6 +66,7 @@ namespace Fasterflect.ObjectConstruction
 			}
 			if (bestMap != null)
 			{
+				bestMap.InitializeInvoker();
 				// TODO warn user that code has non-optimal performance
 				//if( best.Cost > 0 )
 				//	Check.LogInfo( "Best available constructor for type {0} is non-optimal (cost {1}).", typeMap.Type, best.Cost );
@@ -89,7 +87,6 @@ namespace Fasterflect.ObjectConstruction
 				return new ConstructorMap(method as ConstructorInfo, paramNames, paramTypes, allowUnusedParameters);
 			return new MethodMap(method, paramNames, paramTypes, allowUnusedParameters);
 		}
-
 		#endregion
 
 		#region SourceInfo Lookups

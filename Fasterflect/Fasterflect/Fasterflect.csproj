@@ -108,7 +108,6 @@
     <Compile Include="ObjectConstruction\SourceInfo.cs" />
     <Compile Include="ObjectConstruction\MethodMap.cs" />
     <Compile Include="ReflectorUtils.cs" />
-    <Compile Include="Reflector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Emitter\ValueTypeHolder.cs" />
   </ItemGroup>

@@ -29,18 +29,17 @@ namespace Fasterflect.ObjectConstruction
 		/// This field is used to cache information on objects used as parameters for object construction, which
 		/// improves performance for subsequent instantiations of the same type using a compatible source type.
 		/// </summary>
-		private static readonly Dictionary<Type, SourceInfo> sources = new Dictionary<Type, SourceInfo>();
+		private readonly Dictionary<Type, SourceInfo> sources = new Dictionary<Type, SourceInfo>();
 
 		/// <summary>
 		/// This field contains a dictionary mapping from a particular constructor to all known parameter sets,
 		/// each with an associated MethodMap responsible for creating instances of the type using the given
 		/// constructor and parameter set.
 		/// </summary>
-		private static readonly Dictionary<Type, Dictionary<int, MethodMap>> maps =
+		private readonly Dictionary<Type, Dictionary<int, MethodMap>> maps =
 			new Dictionary<Type, Dictionary<int, MethodMap>>();
 
 		#region Map Cache Methods
-
 		public MethodMap GetMap(Type type, int parameterHashCode)
 		{
 			lock (mapLock)
@@ -70,11 +69,9 @@ namespace Fasterflect.ObjectConstruction
 				}
 			}
 		}
-
 		#endregion
 
 		#region SourceInfo Cache Methods
-
 		public SourceInfo GetSourceInfo(Type type)
 		{
 			lock (sourceLock)
@@ -91,7 +88,6 @@ namespace Fasterflect.ObjectConstruction
 				sources[type] = sourceInfo;
 			}
 		}
-
 		#endregion
 
 		private readonly object mapLock = new object();
