@@ -80,8 +80,8 @@ namespace FasterflectTest
         }
 
 		[TestMethod]
-        public void TestDeepCloneNestedObject()
-        {
+		public void TestDeepCloneWithSelfReference()
+		{
 			DateTime birthday = new DateTime( 1973, 1, 27 );
 			Employee employee = new Employee( 42, birthday, "Arthur Dent", "AD" );
 			employee.Manager = employee;
@@ -91,16 +91,38 @@ namespace FasterflectTest
 			Assert.AreNotSame( employee.Manager, clone.Manager );
 			Verify( employee.Manager, clone.Manager );
 			Assert.AreEqual( employee.Manager.Initials, clone.Manager.Initials );
-        }
+		}
 
-    	private static void Verify( Person person, Person clone )
-        {
+		[TestMethod]
+		public void TestDeepCloneWithCyclicObjectGraph()
+		{
+			DateTime birthday = new DateTime( 1973, 1, 27 );
+			Employee manager = new Employee( 1, birthday, "Ford Prefect", "FP" );
+			manager.Manager = manager;
+			Employee employee = new Employee( 2, birthday, "Arthur Dent", "AD", manager );
+			
+			Employee clone = employee.DeepClone();
+			Verify( employee, clone );
+			Verify( employee.Manager, clone.Manager );
+			Verify( employee.Manager.Manager, clone.Manager.Manager );
+			Assert.AreNotSame( employee, employee.Manager );
+			Assert.AreSame( employee.Manager, employee.Manager.Manager );
+		}
+
+		private static void Verify( Person person, Person clone )
+		{
 			Assert.IsNotNull( clone );
 			Assert.AreNotSame( person, clone );
 			Assert.AreEqual( person.Id, clone.Id );
 			Assert.AreEqual( person.Birthday, clone.Birthday );
 			Assert.AreEqual( person.Name, clone.Name );
 			Assert.AreEqual( person.LastModified, clone.LastModified );
-        }
-    }
+		}
+		private static void Verify( Employee employee, Employee clone )
+		{
+			Verify( employee as Person, clone as Person );
+			Assert.AreEqual( employee.Initials, clone.Initials );
+			Assert.AreNotSame( employee.Manager, clone.Manager );
+		}
+	}
 }

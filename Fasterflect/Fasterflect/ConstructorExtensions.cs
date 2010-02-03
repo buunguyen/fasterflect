@@ -176,16 +176,9 @@ namespace Fasterflect
 		/// </summary>
 		/// <param name="type">The type to reflect on</param>
 		/// <returns>An enumeration of available constructors</returns>
-		public static IEnumerable<ConstructorInfo> Constructors(this Type type)
+		public static IList<ConstructorInfo> Constructors(this Type type)
 		{
-			foreach (ConstructorInfo constructorInfo in type.GetConstructors(Reflector.InstanceCriteria))
-			{
-				// exclude abstract constructors (weird concept anyway, not sure we need this check)
-				if (! constructorInfo.IsAbstract)
-				{
-					yield return constructorInfo;
-				}
-			}
+			return type.GetConstructors(ReflectorUtils.InstanceCriteria).Where(ci => ! ci.IsAbstract).ToList();
 		}
 
 		/// <summary>
@@ -196,7 +189,7 @@ namespace Fasterflect
 		/// <returns>The matching constructor or null if no match was found</returns>
 		public static ConstructorInfo Constructor(this Type type, params Type[] parameterTypes)
 		{
-			return type.GetConstructor(Reflector.InstanceCriteria, null, parameterTypes, null);
+			return type.GetConstructor(ReflectorUtils.InstanceCriteria, null, parameterTypes, null);
 		}
 		#endregion
 	}

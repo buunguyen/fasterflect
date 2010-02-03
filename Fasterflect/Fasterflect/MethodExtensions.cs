@@ -278,7 +278,7 @@ namespace Fasterflect
 		/// <returns>A list of all methods.</returns>
 		public static IList<MethodInfo> Methods( this Type type )
 		{
-			return type.Methods(Reflector.AllCriteria, null);
+			return type.Methods(ReflectorUtils.AllCriteria, null);
 		}
 
 		/// <summary>

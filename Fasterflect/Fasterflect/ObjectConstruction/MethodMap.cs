@@ -86,7 +86,6 @@ namespace Fasterflect.ObjectConstruction
 		}
 
 		#region Parameter List Identification
-
 		internal static int GetParameterHash(string[] names, Type[] types)
 		{
 			int hash = 0;
@@ -96,11 +95,9 @@ namespace Fasterflect.ObjectConstruction
 			}
 			return hash;
 		}
-
 		#endregion
 
 		#region Map Initialization
-
 		private void InitializeMethodMap()
 		{
 			//int normalCount = 0; // number of fields filled with regular parameter values
@@ -282,11 +279,9 @@ namespace Fasterflect.ObjectConstruction
 				parameterDefaultValues = new Dictionary<string, object>();
 			parameterDefaultValues[parameterName] = parameterValue;
 		}
-
 		#endregion
 
 		#region Dependency Injection Helpers
-
 		private bool HasExternalDefaultValue(ParameterInfo parameter)
 		{
 			// TODO plug in code for DI or DI framework here
@@ -297,11 +292,9 @@ namespace Fasterflect.ObjectConstruction
 		{
 			return null;
 		}
-
 		#endregion
 
 		#region Parameter Preparation
-
 		/// <summary>
 		/// Perform parameter reordering, null handling and type conversion in preparation
 		/// of executing the method call.
@@ -343,11 +336,9 @@ namespace Fasterflect.ObjectConstruction
 			}
 			return methodParams;
 		}
-
 		#endregion
 
 		#region Method Invocation
-
 		public virtual object Invoke(object[] row)
 		{
 			throw new NotImplementedException("Implemented in subclasses.");
@@ -371,7 +362,6 @@ namespace Fasterflect.ObjectConstruction
 			}
 			return paramTypes;
 		}
-
 		#endregion
 
 		#region BitArray Helpers
@@ -446,5 +436,10 @@ namespace Fasterflect.ObjectConstruction
 		}
 
 		#endregion
+
+		internal virtual void InitializeInvoker()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

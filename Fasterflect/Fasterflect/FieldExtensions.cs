@@ -89,9 +89,9 @@ namespace Fasterflect
 		/// <param name="targetType">The type whose static field is to be retrieved.</param>
 		/// <param name="fieldName">The name of the static field whose value is to be retrieved.</param>
 		/// <returns>The value of the static field.</returns>
-		public static TReturn GetField<TReturn>(this Type targetType, string fieldName)
+		public static TReturn GetField<TReturn>( this Type targetType, string fieldName )
 		{
-			return targetType.GetFieldOrProperty<TReturn>(MemberTypes.Field, fieldName);
+			return targetType.GetFieldOrProperty<TReturn>( MemberTypes.Field, fieldName );
 		}
 
 		/// <summary>
@@ -140,7 +140,7 @@ namespace Fasterflect
 		/// <returns>The type whose static fields are to be set.</returns>
 		public static Type SetFields(this Type targetType, object sample)
 		{
-			sample.Properties().ForEach( prop => SetField( targetType, prop.Name, prop.GetValue( sample ) ) );
+			sample.Properties().ForEach( prop => SetField( targetType, prop.Name, prop.GetValue<object>( sample ) ) );
 			return targetType;
 		}
 
@@ -154,7 +154,7 @@ namespace Fasterflect
 		/// <returns>The object whose fields are to be set.</returns>
 		public static object SetFields(this object target, object sample)
 		{
-			sample.Properties().ForEach(prop => SetField(target, prop.Name, prop.GetValue(sample)));
+			sample.Properties().ForEach( prop => SetField( target, prop.Name, prop.GetValue<object>( sample ) ) );
 			return target;
 		}
 		#endregion
@@ -167,9 +167,9 @@ namespace Fasterflect
 		/// <param name="info">The field to read.</param>
 		/// <param name="target">The object whose field should be read.</param>
 		/// <returns>The value of the specified field.</returns>
-		public static object GetValue( this FieldInfo info, object target )
+		public static TReturn GetValue<TReturn>( this FieldInfo info, object target )
 		{
-			return target.GetField<object>( info.Name );
+			return target.GetField<TReturn>( info.Name );
 		}
 
 		/// <summary>
@@ -193,7 +193,7 @@ namespace Fasterflect
 		/// <returns>A single FieldInfo instance of the first found match or null if no match was found</returns>
 		public static FieldInfo Field<T>( this Type type, string name )
 		{
-			FieldInfo info = type.GetField( name, Reflector.AllCriteria );
+			FieldInfo info = type.GetField( name, ReflectorUtils.AllCriteria );
 			return info != null && info.FieldType == typeof( T ) ? info : null;
 		}
 
@@ -205,7 +205,7 @@ namespace Fasterflect
 		/// <returns>A single FieldInfo instance of the first found match or null if no match was found</returns>
 		public static FieldInfo Field( this Type type, string name )
 		{
-			return type.GetField( name, Reflector.AllCriteria );
+			return type.GetField( name, ReflectorUtils.AllCriteria );
 		}
 
 		/// <summary>
@@ -214,7 +214,7 @@ namespace Fasterflect
 		/// <returns>A list of all instance fields on the type.</returns>
 		public static List<FieldInfo> Fields( this Type type )
 		{
-			return type.GetFields( Reflector.InstanceCriteria ).ToList();
+			return type.GetFields( ReflectorUtils.InstanceCriteria ).ToList();
 		}
 
 		/// <summary>
@@ -227,7 +227,7 @@ namespace Fasterflect
 		{
 			var fields = new List<FieldInfo>( type.Fields() );
 			Type baseType = type.BaseType;
-			while( baseType != typeof( object ) )
+			while( baseType != null && baseType != typeof(object) )
 			{
 				fields.AddRange( baseType.Fields() );
 				baseType = baseType.BaseType;

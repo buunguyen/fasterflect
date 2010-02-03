@@ -33,7 +33,6 @@ namespace Fasterflect.ObjectConstruction
 		}
 
 		#region UpdateMembers Private Helper Method
-
 		private void UpdateMembers(object target, object[] row)
 		{
 			for (int i = 0; i < row.Length; i++)
@@ -48,20 +47,20 @@ namespace Fasterflect.ObjectConstruction
 				}
 			}
 		}
-
 		#endregion
 
 		public override object Invoke(object[] row)
 		{
-			if (invoker == null)
-			{
-				invoker = type.DelegateForCreateInstance(GetParamTypes());
-			}
 			object[] methodParameters = isPerfectMatch ? row : PrepareParameters(row);
 			object result = invoker.Invoke(methodParameters);
 			if (!isPerfectMatch && AnySet(parameterReflectionMask))
 				UpdateMembers(result, row);
 			return result;
+		}
+
+		internal override void InitializeInvoker()
+		{
+			invoker = type.DelegateForCreateInstance( GetParamTypes() );
 		}
 	}
 }

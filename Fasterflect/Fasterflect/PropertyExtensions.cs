@@ -135,9 +135,9 @@ namespace Fasterflect
 		/// <param name="info">The property to read.</param>
 		/// <param name="target">The object whose property should be read.</param>
 		/// <returns>The value of the specified property.</returns>
-		public static object GetValue( this PropertyInfo info, object target )
+		public static TReturn GetValue<TReturn>( this PropertyInfo info, object target )
 		{
-			return target.GetProperty<object>( info.Name );
+			return target.GetProperty<TReturn>( info.Name );
 		}
 
 		/// <summary>
@@ -163,7 +163,7 @@ namespace Fasterflect
 		/// <returns>The type whose static properties are to be set.</returns>
 		public static Type SetProperties(this Type targetType, object sample)
 		{
-			sample.Properties().ForEach(prop => SetProperty(targetType, prop.Name, prop.GetValue(sample)));
+			sample.Properties().ForEach( prop => SetProperty( targetType, prop.Name, prop.GetValue<object>( sample ) ) );
 			return targetType;
 		}
 
@@ -177,7 +177,7 @@ namespace Fasterflect
 		/// <returns>The object whose properties are to be set.</returns>
 		public static object SetProperties(this object target, object sample)
 		{
-			sample.Properties().ForEach(prop => SetProperty(target, prop.Name, prop.GetValue(sample)));
+			sample.Properties().ForEach( prop => SetProperty( target, prop.Name, prop.GetValue<object>( sample ) ) );
 			return target;
 		}
 		#endregion
@@ -297,7 +297,7 @@ namespace Fasterflect
 		/// <returns>A single FieldInfo instance of the first found match or null if no match was found</returns>
 		public static PropertyInfo Property<T>( this Type type, string name )
 		{
-			PropertyInfo info = type.GetProperty( name, Reflector.AllCriteria );
+			PropertyInfo info = type.GetProperty( name, ReflectorUtils.AllCriteria );
 			return info != null && info.PropertyType == typeof( T ) ? info : null;
 		}
 
@@ -309,7 +309,7 @@ namespace Fasterflect
 		/// <returns>A single PropertyInfo instance of the first found match or null if no match was found</returns>
 		public static PropertyInfo Property( this Type type, string name )
 		{
-			return type.GetProperty( name, Reflector.AllCriteria );
+			return type.GetProperty( name, ReflectorUtils.AllCriteria );
 		}
 
 		/// <summary>

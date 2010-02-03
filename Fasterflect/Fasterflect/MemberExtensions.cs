@@ -35,16 +35,6 @@ namespace Fasterflect
 		#region Member Access
 		#region Instance Getters
 		/// <summary>
-		/// Gets the value of the instance field or property identified by <paramref name="info"/> on
-		/// the <paramref name="target"/> object.
-		/// </summary>
-		/// <returns>The value of the given member.</returns>
-		public static object GetValue( this MemberInfo info, object target )
-		{
-			return target.GetFieldOrProperty<object>( info.MemberType, info.Name );
-		}
-
-		/// <summary>
 		/// Gets the value of the instance field or property identified by <paramref name="memberTypes"/>
 		/// and <paramref name="fieldOrPropertyName"/> on the <paramref name="target"/> object.
 		/// </summary>
@@ -71,15 +61,6 @@ namespace Fasterflect
 		#endregion
 
 		#region Instance Setters
-		/// <summary>
-		/// Sets the <paramref name="value"/> of the instance field or property identified by <paramref name="info"/> on
-		/// the <paramref name="target"/> object.
-		/// </summary>
-		public static void SetValue( this MemberInfo info, object target, object value )
-		{
-			target.SetFieldOrProperty( info.MemberType, info.Name, value );
-		}
-
 		/// <summary>
 		/// Sets the <paramref name="value"/> of the instance field or property identified by <paramref name="memberTypes"/>
 		/// and <paramref name="fieldOrPropertyName"/> on the <paramref name="target"/> object.
@@ -158,6 +139,27 @@ namespace Fasterflect
 		#endregion
 		#endregion
 
+		#region MemberInfo Access
+		/// <summary>
+		/// Gets the value of the instance field or property identified by <paramref name="info"/> on
+		/// the <paramref name="target"/> object.
+		/// </summary>
+		/// <returns>The value of the given member.</returns>
+		public static TReturn GetValue<TReturn>( this MemberInfo info, object target )
+		{
+			return target.GetFieldOrProperty<TReturn>( info.MemberType, info.Name );
+		}
+
+		/// <summary>
+		/// Sets the <paramref name="value"/> of the instance field or property identified by <paramref name="info"/> on
+		/// the <paramref name="target"/> object.
+		/// </summary>
+		public static void SetValue( this MemberInfo info, object target, object value )
+		{
+			target.SetFieldOrProperty( info.MemberType, info.Name, value );
+		}
+		#endregion
+
 		#region Member Lookup
 		/// <summary>
 		/// Find and return a list of fields and properties for the specified type. This method returns
@@ -167,7 +169,7 @@ namespace Fasterflect
 		/// <returns>A list of MemberInfo objects with information on the member.</returns>
 		public static IList<MemberInfo> FieldsAndProperties( this Type type )
 		{
-			return type.Members( MemberTypes.Field | MemberTypes.Property, Reflector.AllCriteria );
+			return type.Members( MemberTypes.Field | MemberTypes.Property, ReflectorUtils.AllCriteria );
 		}
 
 		/// <summary>
@@ -202,7 +204,7 @@ namespace Fasterflect
 		/// <returns>A single MemberInfo instance of the first found match or null if no match was found</returns>
 		public static MemberInfo Member( this Type type, string name )
 		{
-			MemberInfo[] mis = type.GetMember( name, Reflector.AllCriteria );
+			MemberInfo[] mis = type.GetMember( name, ReflectorUtils.AllCriteria );
 			return mis != null && mis.Length > 0 ? mis[ 0 ] : null;
 		}
 

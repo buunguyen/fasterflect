@@ -51,7 +51,7 @@ namespace Fasterflect.Caching
 					synchronizer.Dispose();
 				}
 				currentLockStrategy = strategy;
-				synchronizer = strategy == LockStrategy.Monitor ? new MonitorLock() as ILock : new ReaderWriterLock() as ILock;
+				synchronizer = strategy == LockStrategy.Monitor ? new MonitorLock() : new ReaderWriterLock() as ILock;
 			}
 		}
 		#endregion
@@ -63,8 +63,8 @@ namespace Fasterflect.Caching
 		}
 		public IEnumerator<CacheEntry<TKey,TValue>> GetEnumerator()
 		{
-			var list = synchronizer.Read<IList<CacheEntry<TKey,TValue>>>( () => entries.Values.ToList() );
-			return list.Where(entry => ! entry.IsCollected).GetEnumerator();
+			var list = synchronizer.Read<IList<CacheEntry<TKey,TValue>>>( () => entries.Values.Where( e => ! e.IsCollected ).ToList() );
+			return list.GetEnumerator();
 		}
 		#endregion
 
@@ -136,16 +136,14 @@ namespace Fasterflect.Caching
 
 		#region Get Methods
 		/// <summary>
-		/// Retrieves an entry from the cache using the given key. If the entry exists but has
-		/// been collected then this method will also remove the item from the cache by temporarily
-		/// upgrading the supplied lock to a writer lock.
+		/// Retrieves an entry from the cache using the given key.
 		/// </summary>
 		/// <param name="key">The cache key of the item to retrieve.</param>
 		/// <returns>The retrieved cache item or null if not found.</returns>
 		public TValue Get( TKey key )
 		{
 			return synchronizer.Read( () => { CacheEntry<TKey,TValue> entry;
-											  return entries.TryGetValue(key,out entry) && !entry.IsCollected ? entry.Value : null; } );
+											  return entries.TryGetValue(key,out entry) ? entry.Value : null; } );
 		}
 
 		private CacheEntry<TKey,TValue> GetEntry( TKey key )
