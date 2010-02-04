@@ -59,7 +59,7 @@ namespace Fasterflect.Caching
 				{
 					strongReference = value;
 				}
-				else if( weakReference != null && weakReference.IsAlive )
+				else
 				{
 					weakReference.Target = value;
 				}

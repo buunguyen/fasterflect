@@ -36,37 +36,25 @@ namespace Fasterflect.ObjectConstruction
 		/// each with an associated MethodMap responsible for creating instances of the type using the given
 		/// constructor and parameter set.
 		/// </summary>
-		private readonly Dictionary<Type, Dictionary<int, MethodMap>> maps =
-			new Dictionary<Type, Dictionary<int, MethodMap>>();
+		private readonly Dictionary<long, MethodMap> maps = new Dictionary<long, MethodMap>();
 
 		#region Map Cache Methods
 		public MethodMap GetMap(Type type, int parameterHashCode)
 		{
 			lock (mapLock)
 			{
-				Dictionary<int, MethodMap> parameterMaps;
-				if (maps.TryGetValue(type, out parameterMaps))
-				{
-					MethodMap map;
-					return parameterMaps.TryGetValue(parameterHashCode, out map) ? map : null;
-				}
+				long key = ((long) type.GetHashCode()) << 32 + parameterHashCode;
+				MethodMap map;
+				return maps.TryGetValue(key, out map) ? map : null;
 			}
-			return null;
 		}
 
 		public void AddMap(Type type, int parameterHashCode, MethodMap map)
 		{
 			lock (mapLock)
 			{
-				Dictionary<int, MethodMap> parameterMaps;
-				if (maps.TryGetValue(type, out parameterMaps))
-				{
-					parameterMaps[parameterHashCode] = map;
-				}
-				else
-				{
-					maps[type] = new Dictionary<int, MethodMap> {{parameterHashCode, map}};
-				}
+				long key = ((long) type.GetHashCode()) << 32 + parameterHashCode;
+				maps[ key ] = map;
 			}
 		}
 		#endregion

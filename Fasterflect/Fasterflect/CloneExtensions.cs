@@ -47,7 +47,7 @@ namespace Fasterflect
 
 		private static T DeepClone<T>( this T source, Dictionary<object, object> map ) where T : class, new()
 		{
-			Type type = source.GetType(); //typeof( T );
+			Type type = source.GetType();
 			IList<FieldInfo> fields = type.FieldsIncludingBaseTypes();
 			var clone = type.CreateInstance() as T;
 			map = map ?? new Dictionary<object, object>();
@@ -62,7 +62,9 @@ namespace Fasterflect
 
 		private static object GetValue( FieldInfo field, object source, Dictionary<object, object> map )
 		{
-			object result = field.GetValue(source);
+			object result = field.GetValue( source );
+			// fails if field is not declated on source:
+			//object result = source.GetField<object>( field.Name );
 			object clone;
 			if( map.TryGetValue(result, out clone) )
 			{
