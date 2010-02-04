@@ -39,7 +39,7 @@ namespace Fasterflect.Caching
             }
 		}
 
-		public T Read<T>(Func<T> action)
+		public TResult Read<TResult>( Func<TResult> action )
 		{
 			synchronizer.EnterReadLock();
             try 
@@ -50,6 +50,19 @@ namespace Fasterflect.Caching
             {
                 synchronizer.ExitReadLock();
             }
+		}
+
+		public TResult Read<TResult>( MethodInvoker invoker, params object[] parameters )
+		{
+			synchronizer.EnterReadLock();
+			try
+			{
+				return (TResult) invoker( parameters );
+			}
+			finally
+			{
+				synchronizer.ExitReadLock();
+			}
 		}
 
 		public void Write(Action action)
@@ -65,7 +78,7 @@ namespace Fasterflect.Caching
             }
 		}
 
-		public T Write<T>(Func<T> action)
+		public TResult Write<TResult>( Func<TResult> action )
 		{
 			synchronizer.EnterWriteLock();
             try 

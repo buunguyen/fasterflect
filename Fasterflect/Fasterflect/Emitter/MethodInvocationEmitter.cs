@@ -31,7 +31,7 @@ namespace Fasterflect.Emitter
 			callInfo = new CallInfo(targetType, MemberTypes.Method, name, paramTypes, isStatic);
 		}
 
-		protected override Delegate CreateDelegate()
+		protected internal override Delegate CreateDelegate()
 		{
 			MethodInfo methodInfo = GetMethodInfo();
 			DynamicMethod method = CreateDynamicMethod();

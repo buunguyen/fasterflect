@@ -32,7 +32,7 @@ namespace Fasterflect.Emitter
 			                        Constants.ArrayGetterName, new[] {typeof (int)});
 		}
 
-		protected override Delegate CreateDelegate()
+		protected internal override Delegate CreateDelegate()
 		{
 			DynamicMethod method = CreateDynamicMethod(Constants.ArrayGetterName, callInfo.TargetType,
 			                                           Constants.ObjectType, new[] {Constants.ObjectType, Constants.IntType});

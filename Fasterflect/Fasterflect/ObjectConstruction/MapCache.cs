@@ -20,9 +20,11 @@
 
 using System;
 using System.Collections.Generic;
+using Fasterflect.Caching;
 
 namespace Fasterflect.ObjectConstruction
 {
+	#region MapCache without CacheStore
 	internal class MapCache
 	{
 		/// <summary>
@@ -30,6 +32,7 @@ namespace Fasterflect.ObjectConstruction
 		/// improves performance for subsequent instantiations of the same type using a compatible source type.
 		/// </summary>
 		private readonly Dictionary<Type, SourceInfo> sources = new Dictionary<Type, SourceInfo>();
+		private readonly object sourceLock = new object();
 
 		/// <summary>
 		/// This field contains a dictionary mapping from a particular constructor to all known parameter sets,
@@ -37,6 +40,7 @@ namespace Fasterflect.ObjectConstruction
 		/// constructor and parameter set.
 		/// </summary>
 		private readonly Dictionary<long, MethodMap> maps = new Dictionary<long, MethodMap>();
+		private readonly object mapLock = new object();
 
 		#region Map Cache Methods
 		public MethodMap GetMap(Type type, int parameterHashCode)
@@ -77,8 +81,50 @@ namespace Fasterflect.ObjectConstruction
 			}
 		}
 		#endregion
-
-		private readonly object mapLock = new object();
-		private readonly object sourceLock = new object();
 	}
+	#endregion
+
+	#region MapCache with CacheStore
+	internal class MapCacheSlow
+	{
+		/// <summary>
+		/// This field is used to cache information on objects used as parameters for object construction, which
+		/// improves performance for subsequent instantiations of the same type using a compatible source type.
+		/// </summary>
+		private readonly CacheStore<Type, SourceInfo> sources = new CacheStore<Type, SourceInfo>( LockStrategy.Monitor );
+
+		/// <summary>
+		/// This field contains a dictionary mapping from a particular constructor to all known parameter sets,
+		/// each with an associated MethodMap responsible for creating instances of the type using the given
+		/// constructor and parameter set.
+		/// </summary>
+		private readonly CacheStore<long, MethodMap> maps = new CacheStore<long, MethodMap>( LockStrategy.Monitor );
+
+		#region Map Cache Methods
+		public MethodMap GetMap( Type type, int parameterHashCode )
+		{
+			long key = ((long) type.GetHashCode()) << 32 + parameterHashCode;
+			return maps.Get( key );
+		}
+
+		public void AddMap( Type type, int parameterHashCode, MethodMap map )
+		{
+			long key = ((long) type.GetHashCode()) << 32 + parameterHashCode;
+			maps.Insert( key, map );
+		}
+		#endregion
+
+		#region SourceInfo Cache Methods
+		public SourceInfo GetSourceInfo( Type type )
+		{
+			return sources.Get( type );
+		}
+
+		public void AddSourceInfo( Type type, SourceInfo sourceInfo )
+		{
+			sources.Insert( type, sourceInfo );
+		}
+		#endregion
+	}
+	#endregion
 }

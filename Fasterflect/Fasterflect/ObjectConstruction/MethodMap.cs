@@ -311,29 +311,23 @@ namespace Fasterflect.ObjectConstruction
 				if (parameterUsageMask[i])
 				{
 					// only convert column if type is assignment incompatible with constructor argument
-					if (parameterTypeConvertMask[i])
-					{
-						//MetaValue mv = parameterValues[ i ];
-						//ParameterInfo mp = parameters[ parameterOrderMap[ i ] ];
-						// TODO clean up code - type conversion or not?
-						methodParams[parameterOrderMap[i]] = row[i];
-					}
-					else
-					{
-						methodParams[parameterOrderMap[i]] = row[i];
-					}
+					int index = parameterOrderMap[ i ];
+					methodParams[ index ] = parameterTypeConvertMask[ i ]
+					                        	? TypeConverter.Get( parameters[ index ].ParameterType, row[ i ] )
+					                        	: row[ i ];
 					// advance counter of sequential fields used to save some time in the loop below
 					if (i == 1 + firstPotentialDefaultValueIndex)
 						firstPotentialDefaultValueIndex++;
 				}
 			}
-			for (int i = firstPotentialDefaultValueIndex; i < methodParams.Length; i++)
-			{
-				if (parameterDefaultValueMask[i])
-				{
-					methodParams[i] = parameterDefaultValues[parameters[i].Name];
-				}
-			}
+			// TODO decide whether to support injecting default values
+			//for (int i = firstPotentialDefaultValueIndex; i < methodParams.Length; i++)
+			//{
+			//    if (parameterDefaultValueMask[i])
+			//    {
+			//        methodParams[i] = parameterDefaultValues[parameters[i].Name];
+			//    }
+			//}
 			return methodParams;
 		}
 		#endregion

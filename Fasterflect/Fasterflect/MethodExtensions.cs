@@ -285,12 +285,22 @@ namespace Fasterflect
 
 		#region Method Lookup
 		/// <summary>
+		/// Gets the public or non-public, instance or static method with the given <paramref name="name"/> on the
+		///  given <paramref name="type"/>.
+		/// </summary>
+		/// <returns>The specified method or null if no method was found.</returns>
+		public static MethodInfo Method( this Type type, string name )
+		{
+			return type.GetMethod( name, Flags.AllCriteria );
+		}
+
+		/// <summary>
 		/// Gets all public and non-public, instance and static methods on the given <paramref name="type"/>.
 		/// </summary>
 		/// <returns>A list of all methods.</returns>
 		public static IList<MethodInfo> Methods( this Type type )
 		{
-            return type.Methods(Flags.AllCriteria, null);
+			return type.Methods( Flags.AllCriteria, null );
 		}
 
 		/// <summary>

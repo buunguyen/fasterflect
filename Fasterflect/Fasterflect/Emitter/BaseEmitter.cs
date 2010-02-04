@@ -39,7 +39,7 @@ namespace Fasterflect.Emitter
 			return DelegateCache.GetDelegate(callInfo, CreateDelegate);
 		}
 
-		protected abstract Delegate CreateDelegate();
+		protected internal abstract Delegate CreateDelegate();
 
 		protected static DynamicMethod CreateDynamicMethod(string name, Type targetType, Type returnType, Type[] paramTypes)
 		{
