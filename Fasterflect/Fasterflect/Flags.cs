@@ -2,9 +2,11 @@
 
 namespace Fasterflect
 {
-    internal static class Flags
+	/// <summary>
+	/// This class provides access to common <see cref="BindingFlags"/> combinations.
+	/// </summary>
+    public static class Flags
     {
-        #region BindingFlags
         /// <summary>
         /// Search criteria encompassing all public and non-public members.
         /// </summary>
@@ -25,6 +27,5 @@ namespace Fasterflect
         /// Search criteria encompassing all members, including those of parent classes.
         /// </summary>
         public static readonly BindingFlags AllCriteria = InstanceCriteria | StaticCriteria;
-        #endregion
     }
 }

@@ -75,8 +75,9 @@ namespace FasterflectTest
 		}
 		#endregion
 
+		#region TryCreateInstance Tests
 		[TestMethod]
-        public void TestCreateInstanceWithMatchingEmptyArgumentShouldInvokeConstructor1()
+		public void TestTryCreateInstanceWithMatchingEmptyArgumentShouldInvokeConstructor1()
         {
         	Type type = typeof(Person);
         	Person person = type.TryCreateInstance( new { } ) as Person;
@@ -88,7 +89,7 @@ namespace FasterflectTest
         }
 
 		[TestMethod]
-        public void TestCreateInstanceWithMatchingSingleArgumentShouldInvokeConstructor2()
+		public void TestTryCreateInstanceWithMatchingSingleArgumentShouldInvokeConstructor2()
         {
         	Type type = typeof(Person);
         	Person person = type.TryCreateInstance( new { Id = 42 } ) as Person;
@@ -96,7 +97,7 @@ namespace FasterflectTest
         }
 
 		[TestMethod]
-        public void TestCreateInstanceWithMatchingDoubleArgumentShouldInvokeConstructor3()
+		public void TestTryCreateInstanceWithMatchingDoubleArgumentShouldInvokeConstructor3()
         {
         	Type type = typeof(Person);
 			DateTime birthday = new DateTime( 1973, 1, 27 );
@@ -105,7 +106,7 @@ namespace FasterflectTest
         }
 
 		[TestMethod]
-        public void TestCreateInstanceWithMatchingCompleteArgumentShouldInvokeConstructor4()
+		public void TestTryCreateInstanceWithMatchingCompleteArgumentShouldInvokeConstructor4()
         {
         	Type type = typeof(Person);
 			DateTime birthday = new DateTime( 1973, 1, 27 );
@@ -114,7 +115,7 @@ namespace FasterflectTest
         }
 
 		[TestMethod]
-        public void TestCreateInstanceWithPartialMatchShouldInvokeConstructor1AndSetProperty()
+		public void TestTryCreateInstanceWithPartialMatchShouldInvokeConstructor1AndSetProperty()
         {
         	Type type = typeof(Person);
 			DateTime birthday = new DateTime( 1973, 1, 27 );
@@ -125,7 +126,7 @@ namespace FasterflectTest
         }
 
 		[TestMethod]
-        public void TestCreateInstanceWithPartialMatchShouldInvokeConstructor4AndIgnoreExtraArgs()
+		public void TestTryCreateInstanceWithPartialMatchShouldInvokeConstructor4AndIgnoreExtraArgs()
 		{
 			Type type = typeof(Person);
 			DateTime birthday = new DateTime( 1973, 1, 27 );
@@ -149,7 +150,7 @@ namespace FasterflectTest
         }
 
         [TestMethod]
-        public void TestCreateInstanceWithInvalidArgumentTypeShouldUseConstructor1()
+		public void TestTryCreateInstanceWithInvalidArgumentTypeShouldUseConstructor1()
         {
         	Type type = typeof(Person);
         	Person person = type.TryCreateInstance( new { Id = "Incompatible Argument Type" } ) as Person;
@@ -159,10 +160,11 @@ namespace FasterflectTest
 
         [TestMethod]
         [ExpectedException(typeof(MissingMethodException))]
-        public void TestCreateInstanceWithUnmatchingArgumentShouldThrow()
+        public void TestTryCreateInstanceWithUnmatchingArgumentShouldThrow()
         {
         	Type type = typeof(Employee);
         	type.TryCreateInstance( new { Id = 42 } );
         }
-    }
+		#endregion
+	}
 }

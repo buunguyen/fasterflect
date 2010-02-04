@@ -18,6 +18,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -25,8 +27,9 @@ namespace FasterflectTest
 {
     [TestClass]
     public class ConstructorTest
-    {
-        private class PersonClass
+	{
+		#region Sample Classes
+		private class PersonClass
         {
             public int Age;
             public int? Id;
@@ -98,8 +101,10 @@ namespace FasterflectTest
                     typeof(PersonClass), 
                     typeof(PersonStruct)
                 };
+		#endregion
 
-        [TestMethod]
+		#region CreateInstance Tests
+		[TestMethod]
         public void Test_use_constructor_with_byref_params()
         {
             TypeList.ForEach(type =>
@@ -181,5 +186,26 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type => type.CreateInstance(new[] { typeof(int), typeof(int) }, 1, 2));
         }
+		#endregion
+
+		#region Constructor Lookup Tests
+		[TestMethod]
+		public void TestConstructorLookupOnPersonClassShouldFindNine()
+		{
+			Type type = typeof(PersonClass);
+			IList<ConstructorInfo> constructors = type.Constructors().ToList();
+			Assert.IsNotNull( constructors );
+			Assert.AreEqual( 9, constructors.Count );
+		}
+
+		[TestMethod]
+		public void TestConstructorLookupOnEmployeeShouldFindOne()
+		{
+			Type type = typeof(Employee);
+			IList<ConstructorInfo> constructors = type.Constructors().ToList();
+			Assert.IsNotNull( constructors );
+			Assert.AreEqual( 1, constructors.Count );
+		}
+		#endregion
     }
 }
