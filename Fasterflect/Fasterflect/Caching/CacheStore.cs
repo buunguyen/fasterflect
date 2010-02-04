@@ -20,19 +20,29 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Fasterflect.Emitter;
 
 namespace Fasterflect.Caching
 {
+	internal delegate void ReadWithKey<in TKey>( TKey key );
+	internal delegate void Read();
+	internal delegate TValue FindSingle<in TKey, out TValue>( TKey key );
+
 	internal sealed class CacheStore<TKey,TValue> : IEnumerable<CacheEntry<TKey,TValue>> where TValue : class
 	{
 		private readonly Dictionary<TKey,CacheEntry<TKey,TValue>> entries = new Dictionary<TKey,CacheEntry<TKey,TValue>>();
 		private LockStrategy currentLockStrategy;
 		private ILock synchronizer;
+		//private MethodInvoker getValue;
 
 		#region Constructors
 		public CacheStore( LockStrategy lockStrategy )
 		{
 			InitializeLock( lockStrategy );
+			//var paramTypes = new[] { typeof(TKey), typeof(TValue).MakeByRefType() };
+			//MethodInfo mi = entries.GetType().GetMethod( "TryGetValue", Flags.InstanceCriteria, null, paramTypes, null );
+			//getValue = (MethodInvoker) new MethodInvocationEmitter( "TryGetValue", entries.GetType(), paramTypes, false ).CreateDelegate();
 		}
 
 		/// <summary>
@@ -142,8 +152,9 @@ namespace Fasterflect.Caching
 		/// <returns>The retrieved cache item or null if not found.</returns>
 		public TValue Get( TKey key )
 		{
+			//return synchronizer.Read<TValue>( getValue, key );
 			return synchronizer.Read( () => { CacheEntry<TKey,TValue> entry;
-											  return entries.TryGetValue(key,out entry) ? entry.Value : null; } );
+			                                  return entries.TryGetValue(key,out entry) ? entry.Value : null; } );
 		}
 
 		private CacheEntry<TKey,TValue> GetEntry( TKey key )

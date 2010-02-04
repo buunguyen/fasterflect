@@ -81,7 +81,7 @@ namespace FasterflectBenchmark
 		}
 		#endregion
 
-		private static readonly int[] Iterations = new[] {20000, 2000000};
+		private static readonly int[] Iterations = new[] { 20000, 2000000};
 		private static readonly object[] NoArgArray = new object[0];
 		private static readonly object[] ArgArray = new object[] {10};
 		private static readonly Type TargetType = typeof (Person);
@@ -110,8 +110,8 @@ namespace FasterflectBenchmark
 			var initMap = new Dictionary<string, Action> {};
 			var actionMap = new Dictionary<string, Action>
 			                	{
-			                		{"CreateInstance [empty]", () => typeof (Person).TryCreateInstance(new {})},
-			                		{"CreateInstance [n+t+v]", () => typeof (Person).TryCreateInstance(names, types, values)},
+									{"CreateInstance [empty]", () => typeof (Person).TryCreateInstance(new {})},
+									{"CreateInstance [n+t+v]", () => typeof (Person).TryCreateInstance(names, types, values)},
 			                		{"CreateInstance [object]", () => typeof (Person).TryCreateInstance(new {Age = 42, Name = "Arthur Dent"})},
 			                	};
 			Execute("TryCreateInstance Benchmark", initMap, actionMap);

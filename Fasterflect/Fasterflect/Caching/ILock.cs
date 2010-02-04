@@ -24,10 +24,12 @@ namespace Fasterflect.Caching
 	{
 		void Read(Action action);
 
-		T Read<T>(Func<T> action);
-		
-		void Write(Action action);
-	
-		T Write<T>(Func<T> action);
+		TResult Read<TResult>( Func<TResult> action );
+
+		TResult Read<TResult>( MethodInvoker invoker, params object[] parameters );
+
+		void Write( Action action );
+
+		TResult Write<TResult>( Func<TResult> action );
 	}
 }

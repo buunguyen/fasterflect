@@ -31,7 +31,7 @@ namespace Fasterflect.Emitter
 			callInfo = new CallInfo(targetType, MemberTypes.Constructor, targetType.Name, paramTypes);
 		}
 
-		protected override Delegate CreateDelegate()
+		protected internal override Delegate CreateDelegate()
 		{
 			DynamicMethod method = CreateDynamicMethod("ctor",
 			                                           callInfo.TargetType, Constants.ObjectType, new[] {Constants.ObjectType});
