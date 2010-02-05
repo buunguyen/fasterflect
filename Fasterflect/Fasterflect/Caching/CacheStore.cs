@@ -25,10 +25,6 @@ using Fasterflect.Emitter;
 
 namespace Fasterflect.Caching
 {
-	internal delegate void ReadWithKey<in TKey>( TKey key );
-	internal delegate void Read();
-	internal delegate TValue FindSingle<in TKey, out TValue>( TKey key );
-
 	internal sealed class CacheStore<TKey,TValue> : IEnumerable<CacheEntry<TKey,TValue>> where TValue : class
 	{
 		private readonly Dictionary<TKey,CacheEntry<TKey,TValue>> entries = new Dictionary<TKey,CacheEntry<TKey,TValue>>();
@@ -40,9 +36,14 @@ namespace Fasterflect.Caching
 		public CacheStore( LockStrategy lockStrategy )
 		{
 			InitializeLock( lockStrategy );
-            var paramTypes = new[] { typeof(TKey), typeof(CacheEntry<TKey, TValue>).MakeByRefType() };
-            MethodInfo mi = entries.GetType().GetMethod("TryGetValue", Flags.InstanceCriteria, null, paramTypes, null);
-            getValue = (MethodInvoker)new MethodInvocationEmitter("TryGetValue", entries.GetType(), paramTypes, false).CreateDelegate();
+			InitializeDelegates();
+		}
+
+		private void InitializeDelegates()
+		{
+			var paramTypes = new[] { typeof(TKey), typeof(CacheEntry<TKey, TValue>).MakeByRefType() };
+			MethodInfo mi = entries.GetType().GetMethod("TryGetValue", Flags.InstanceCriteria, null, paramTypes, null);
+			getValue = (MethodInvoker)new MethodInvocationEmitter("TryGetValue", entries.GetType(), paramTypes, false).CreateDelegate();
 		}
 
 		/// <summary>
@@ -152,14 +153,14 @@ namespace Fasterflect.Caching
 		/// <returns>The retrieved cache item or null if not found.</returns>
 		public TValue Get( TKey key )
         {
-            var parameters = new object[] { key, null };
-            var exist = synchronizer.Read<bool>(getValue, entries, parameters);
-		    return exist ? ((CacheEntry<TKey, TValue>)parameters[ 1 ]).Value : null;
-            //return synchronizer.Read(() =>
-            //{
-            //    CacheEntry<TKey, TValue> entry;
-            //    return entries.TryGetValue(key, out entry) ? entry.Value : null;
-            //});
+			var parameters = new object[] { key, null };
+			var exist = synchronizer.Read<bool>( getValue, entries, parameters );
+			return exist ? ((CacheEntry<TKey, TValue>) parameters[ 1 ]).Value : null;
+			//return synchronizer.Read( () =>
+			//{
+			//    CacheEntry<TKey, TValue> entry;
+			//    return entries.TryGetValue( key, out entry ) ? entry.Value : null;
+			//} );
 		}
 
 		private CacheEntry<TKey,TValue> GetEntry( TKey key )
