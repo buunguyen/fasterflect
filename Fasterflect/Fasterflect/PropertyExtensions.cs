@@ -362,7 +362,7 @@ namespace Fasterflect
         /// Retrieves all public properties on the given <paramref name="type"/>.
 		/// </summary>
 		/// <returns>A list of all public properties on the type.</returns>
-		public static List<PropertyInfo> Properties( this Type type )
+		public static IList<PropertyInfo> Properties( this Type type )
 		{
             return type.Properties(null);
 		}
@@ -375,7 +375,7 @@ namespace Fasterflect
         /// <param name="propertiesToInclude">A comma delimited list of names of properties to be retrieved.  If
         /// this is <c>null</c>, all public properties are returned.</param>
         /// <returns>A list of all public properties on the type filted by <paramref name="propertiesToInclude"/>.</returns>
-        public static List<PropertyInfo> Properties(this Type type, string propertiesToInclude)
+        public static IList<PropertyInfo> Properties(this Type type, string propertiesToInclude)
         {
             var properties = type.GetProperties().ToList();
             if (propertiesToInclude == null)

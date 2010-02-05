@@ -29,7 +29,6 @@ namespace Fasterflect
 	public static class ArrayExtensions
 	{
 		#region Array Access
-
 		/// <summary>
 		/// Sets <paramref name="parameter"/> to <paramref name="index"/>'th location of the target array.
 		/// </summary>
@@ -76,7 +75,6 @@ namespace Fasterflect
 		{
 			return (ArrayElementGetter) new ArrayGetEmitter(targetType).GetDelegate();
 		}
-
 		#endregion
 	}
 }

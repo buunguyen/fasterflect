@@ -257,7 +257,7 @@ namespace Fasterflect
         /// Find all public instance fields on the given <paramref name="type"/>.
 		/// </summary>
 		/// <returns>A list of all public instance fields on the type.</returns>
-		public static List<FieldInfo> Fields( this Type type )
+		public static IList<FieldInfo> Fields( this Type type )
 		{
             return type.GetFields(Flags.InstanceCriteria).ToList();
 		}
@@ -268,7 +268,7 @@ namespace Fasterflect
 		/// </summary>
 		/// <param name="type">The type to reflect on.</param>
 		/// <returns>A list of all instance fields on the type.</returns>
-		public static List<FieldInfo> FieldsIncludingBaseTypes( this Type type )
+		public static IList<FieldInfo> FieldsIncludingBaseTypes( this Type type )
 		{
 			var fields = new List<FieldInfo>( type.Fields() );
 			Type baseType = type.BaseType;
