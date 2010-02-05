@@ -29,7 +29,7 @@ namespace Fasterflect.ObjectConstruction
 	/// </summary>
 	internal static class MapFactory
 	{
-		private static readonly MapCache cache = new MapCache();
+		private static readonly MapCacheSlow cache = new MapCacheSlow();
 
 		#region Map Construction
 		public static MethodMap PrepareInvoke(this Type type, string[] paramNames, Type[] paramTypes)
