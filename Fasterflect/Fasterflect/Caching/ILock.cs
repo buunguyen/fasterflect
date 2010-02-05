@@ -26,7 +26,7 @@ namespace Fasterflect.Caching
 
 		TResult Read<TResult>( Func<TResult> action );
 
-		TResult Read<TResult>( MethodInvoker invoker, params object[] parameters );
+		TResult Read<TResult>( MethodInvoker invoker, object target, params object[] parameters );
 
 		void Write( Action action );
 

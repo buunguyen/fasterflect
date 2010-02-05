@@ -41,11 +41,11 @@ namespace Fasterflect.Caching
 			}
 		}
 
-		public TResult Read<TResult>( MethodInvoker invoker, params object[] parameters )
+		public TResult Read<TResult>( MethodInvoker invoker, object target, params object[] parameters )
 		{
 			lock( synchronizer )
 			{
-				return (TResult) invoker( parameters );
+				return (TResult) invoker( target, parameters );
 			}
 		}
 

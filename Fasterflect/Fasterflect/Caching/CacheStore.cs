@@ -34,15 +34,15 @@ namespace Fasterflect.Caching
 		private readonly Dictionary<TKey,CacheEntry<TKey,TValue>> entries = new Dictionary<TKey,CacheEntry<TKey,TValue>>();
 		private LockStrategy currentLockStrategy;
 		private ILock synchronizer;
-		//private MethodInvoker getValue;
+		private MethodInvoker getValue;
 
 		#region Constructors
 		public CacheStore( LockStrategy lockStrategy )
 		{
 			InitializeLock( lockStrategy );
-			//var paramTypes = new[] { typeof(TKey), typeof(TValue).MakeByRefType() };
-			//MethodInfo mi = entries.GetType().GetMethod( "TryGetValue", Flags.InstanceCriteria, null, paramTypes, null );
-			//getValue = (MethodInvoker) new MethodInvocationEmitter( "TryGetValue", entries.GetType(), paramTypes, false ).CreateDelegate();
+            var paramTypes = new[] { typeof(TKey), typeof(CacheEntry<TKey, TValue>).MakeByRefType() };
+            MethodInfo mi = entries.GetType().GetMethod("TryGetValue", Flags.InstanceCriteria, null, paramTypes, null);
+            getValue = (MethodInvoker)new MethodInvocationEmitter("TryGetValue", entries.GetType(), paramTypes, false).CreateDelegate();
 		}
 
 		/// <summary>
@@ -151,10 +151,15 @@ namespace Fasterflect.Caching
 		/// <param name="key">The cache key of the item to retrieve.</param>
 		/// <returns>The retrieved cache item or null if not found.</returns>
 		public TValue Get( TKey key )
-		{
-			//return synchronizer.Read<TValue>( getValue, key );
-			return synchronizer.Read( () => { CacheEntry<TKey,TValue> entry;
-			                                  return entries.TryGetValue(key,out entry) ? entry.Value : null; } );
+        {
+            var parameters = new object[] { key, null };
+            var exist = synchronizer.Read<bool>(getValue, entries, parameters);
+		    return exist ? ((CacheEntry<TKey, TValue>)parameters[ 1 ]).Value : null;
+            //return synchronizer.Read(() =>
+            //{
+            //    CacheEntry<TKey, TValue> entry;
+            //    return entries.TryGetValue(key, out entry) ? entry.Value : null;
+            //});
 		}
 
 		private CacheEntry<TKey,TValue> GetEntry( TKey key )
