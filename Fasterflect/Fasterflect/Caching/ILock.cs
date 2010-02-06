@@ -22,14 +22,7 @@ namespace Fasterflect.Caching
 {
 	internal interface ILock : IDisposable
 	{
-		void Read(Action action);
-
-		TResult Read<TResult>( Func<TResult> action );
-
-		TResult Read<TResult>( MethodInvoker invoker, object target, params object[] parameters );
-
-		void Write( Action action );
-
-		TResult Write<TResult>( Func<TResult> action );
+		IDisposable ReaderLock { get; }
+		IDisposable WriterLock { get; }
 	}
 }

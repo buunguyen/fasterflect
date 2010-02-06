@@ -17,52 +17,35 @@
 #endregion
 
 using System;
+using System.Threading;
 
 namespace Fasterflect.Caching
 {
 	internal class MonitorLock : ILock
 	{
+		private sealed class Lock : IDisposable
+		{
+			private readonly object synchronizer;
+			public Lock( object synchronizer )
+			{
+				this.synchronizer = synchronizer;
+				Monitor.Enter( synchronizer );
+			}
+			public void Dispose()
+			{
+				Monitor.Exit( synchronizer );
+			}
+		}
 		private readonly object synchronizer = new object();
 
 		#region ILock
-		public void Read(Action action)
+		public IDisposable ReaderLock
 		{
-			lock( synchronizer )
-			{
-				action();
-			}
+			get { return new Lock( synchronizer ); }
 		}
-
-		public TResult Read<TResult>( Func<TResult> action )
+		public IDisposable WriterLock
 		{
-			lock( synchronizer )
-			{
-				return action();
-			}
-		}
-
-		public TResult Read<TResult>( MethodInvoker invoker, object target, params object[] parameters )
-		{
-			lock( synchronizer )
-			{
-				return (TResult) invoker( target, parameters );
-			}
-		}
-
-		public void Write(Action action)
-		{
-			lock( synchronizer )
-			{
-				action();
-			}
-		}
-
-		public TResult Write<TResult>( Func<TResult> action )
-		{
-			lock( synchronizer )
-			{
-				return action();
-			}
+			get { return new Lock( synchronizer ); }
 		}
 		#endregion
 

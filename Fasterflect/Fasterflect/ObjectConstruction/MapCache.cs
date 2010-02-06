@@ -85,7 +85,7 @@ namespace Fasterflect.ObjectConstruction
 	#endregion
 
 	#region MapCache with CacheStore
-	internal class MapCacheSlow
+	internal class MapCacheWithCacheStore
 	{
 		/// <summary>
 		/// This field is used to cache information on objects used as parameters for object construction, which
@@ -110,7 +110,7 @@ namespace Fasterflect.ObjectConstruction
 		public void AddMap( Type type, int parameterHashCode, MethodMap map )
 		{
 			long key = ((long) type.GetHashCode()) << 32 + parameterHashCode;
-			maps.Insert( key, map );
+			maps.Insert( key, map, CacheStrategy.Temporary );
 		}
 		#endregion
 
@@ -122,7 +122,7 @@ namespace Fasterflect.ObjectConstruction
 
 		public void AddSourceInfo( Type type, SourceInfo sourceInfo )
 		{
-			sources.Insert( type, sourceInfo );
+			sources.Insert( type, sourceInfo, CacheStrategy.Temporary );
 		}
 		#endregion
 	}

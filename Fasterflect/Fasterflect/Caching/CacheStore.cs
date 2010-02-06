@@ -17,65 +17,20 @@
 #endregion
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using Fasterflect.Emitter;
 
 namespace Fasterflect.Caching
 {
-	internal sealed class CacheStore<TKey,TValue> : IEnumerable<CacheEntry<TKey,TValue>> where TValue : class
+	internal sealed class CacheStore<TKey, TValue> : IDisposable where TValue : class
 	{
-		private readonly Dictionary<TKey,CacheEntry<TKey,TValue>> entries = new Dictionary<TKey,CacheEntry<TKey,TValue>>();
-		private LockStrategy currentLockStrategy;
-		private ILock synchronizer;
-		private MethodInvoker getValue;
+		private readonly Dictionary<TKey, CacheEntry<TKey, TValue>> entries = new Dictionary<TKey, CacheEntry<TKey, TValue>>();
+		private readonly ILock synchronizer;
 
 		#region Constructors
-		public CacheStore( LockStrategy lockStrategy )
+		public CacheStore( LockStrategy strategy )
 		{
-			InitializeLock( lockStrategy );
-			InitializeDelegates();
-		}
-
-		private void InitializeDelegates()
-		{
-			var paramTypes = new[] { typeof(TKey), typeof(CacheEntry<TKey, TValue>).MakeByRefType() };
-			MethodInfo mi = entries.GetType().GetMethod("TryGetValue", Flags.InstanceCriteria, null, paramTypes, null);
-			getValue = (MethodInvoker)new MethodInvocationEmitter("TryGetValue", entries.GetType(), paramTypes, false).CreateDelegate();
-		}
-
-		/// <summary>
-		/// This method will create or replace the underlying locking mechanism used. Calling this method is not
-		/// thread safe. Accessing the cache from other threads while this method executes will almost certainly
-		/// cause an exception. 
-		/// </summary>
-		/// <param name="strategy">The locking mechanism to switch to if it is not currently being used.</param>
-		private void InitializeLock( LockStrategy strategy )
-		{
-			bool createLock = synchronizer == null || currentLockStrategy != strategy;
-			if( createLock )
-			{
-				if( synchronizer != null )
-				{
-					synchronizer.Dispose();
-				}
-				currentLockStrategy = strategy;
-				synchronizer = strategy == LockStrategy.Monitor ? new MonitorLock() : new ReaderWriterLock() as ILock;
-			}
-		}
-		#endregion
-
-		#region IEnumerable
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-		public IEnumerator<CacheEntry<TKey,TValue>> GetEnumerator()
-		{
-			var list = synchronizer.Read<IList<CacheEntry<TKey,TValue>>>( () => entries.Values.Where( e => ! e.IsCollected ).ToList() );
-			return list.GetEnumerator();
+			synchronizer = strategy == LockStrategy.Monitor ? new MonitorLock() : new ReaderWriterLock() as ILock;
 		}
 		#endregion
 
@@ -90,15 +45,11 @@ namespace Fasterflect.Caching
 		}
 
 		/// <summary>
-		/// This property returns the underlying locking mechanism used. It is possible to assign a
-		/// new value, which will replace the internal locking mechanism with the specified value. 
-		/// Replacing the lock is not thread safe. Accessing the cache from other threads while this
-		/// property is being set will almost certainly cause an exception.
+		/// This property returns the underlying locking mechanism used.
 		/// </summary>
 		public LockStrategy LockStrategy
 		{
-			get { return currentLockStrategy; }
-			set { InitializeLock( value ); }
+			get { return (synchronizer is MonitorLock) ? LockStrategy.Monitor : LockStrategy.ReaderWriter; }
 		}
 		#endregion
 
@@ -141,7 +92,11 @@ namespace Fasterflect.Caching
 		/// that are collectible and Permanent for objects you wish to keep forever).</param>
 		public void Insert( TKey key, TValue value, CacheStrategy strategy )
 		{
-			synchronizer.Write( () => entries[ key ] = new CacheEntry<TKey,TValue>( key, value, strategy ) );
+			var entry = new CacheEntry<TKey, TValue>( key, value, strategy );
+			using( synchronizer.WriterLock )
+			{
+				entries[ key ] = entry;
+			}
 		}
 		#endregion
 
@@ -153,25 +108,11 @@ namespace Fasterflect.Caching
 		/// <returns>The retrieved cache item or null if not found.</returns>
 		public TValue Get( TKey key )
         {
-			var parameters = new object[] { key, null };
-			var exist = synchronizer.Read<bool>( getValue, entries, parameters );
-			return exist ? ((CacheEntry<TKey, TValue>) parameters[ 1 ]).Value : null;
-			//return synchronizer.Read( () =>
-			//{
-			//    CacheEntry<TKey, TValue> entry;
-			//    return entries.TryGetValue( key, out entry ) ? entry.Value : null;
-			//} );
-		}
-
-		private CacheEntry<TKey,TValue> GetEntry( TKey key )
-		{
-			return synchronizer.Read( () => { CacheEntry<TKey,TValue> entry;
-											  return entries.TryGetValue(key,out entry) ? entry : null; } );
-		}
-
-		private CacheEntry<TKey,TValue> GetByValue( TValue instance )
-		{
-			return synchronizer.Read(() => entries.Values.FirstOrDefault(v => v == instance));
+			CacheEntry<TKey, TValue> entry;
+			using( synchronizer.ReaderLock )
+			{
+				return entries.TryGetValue( key, out entry ) ? entry.Value : null;
+			}
 		}
 		#endregion
 
@@ -183,7 +124,10 @@ namespace Fasterflect.Caching
 		/// <returns>True if an item removed from the cache and false otherwise.</returns>
 		public bool Remove( TKey key )
 		{
-			return synchronizer.Write( () => entries.Remove(key) );
+			using( synchronizer.WriterLock )
+			{
+				return entries.Remove( key );
+			}
 		}
 		#endregion
 
@@ -193,7 +137,10 @@ namespace Fasterflect.Caching
 		/// </summary>
 		public void Clear()
 		{
-			synchronizer.Write( entries.Clear );
+			using( synchronizer.WriterLock )
+			{
+				entries.Clear();
+			}
 		}
 
 		/// <summary>
@@ -202,7 +149,10 @@ namespace Fasterflect.Caching
 		/// <returns>The number of live cache entries still in the cache.</returns>
 		private int ClearCollected()
 		{
-			return synchronizer.Write( () => ClearCollected( entries, entries.Values.ToList().Where(e => e.IsCollected) ) );
+			using( synchronizer.WriterLock )
+			{
+				return ClearCollected( entries, entries.Values.ToList().Where( e => e.IsCollected ) );
+			}
 		}
 		private static int ClearCollected( Dictionary<TKey,CacheEntry<TKey,TValue>> entries, IEnumerable<CacheEntry<TKey,TValue>> collectedEntries )
 		{
@@ -222,6 +172,13 @@ namespace Fasterflect.Caching
 		{
 			int count = ClearCollected();
 			return count > 0 ? String.Format( "Cache contains {0} live objects.", count ) : "Cache is empty.";
+		}
+		#endregion
+
+		#region IDisposable
+		public void Dispose()
+		{
+			synchronizer.Dispose();
 		}
 		#endregion
 	}
