@@ -35,7 +35,7 @@ namespace FasterflectTest
         {
 			public int? Id { get; set; }
 			[DefaultValue(42)]
-			private int dummy;
+			private int status;
 			public DateTime Birthday { get; set; }
             public string Name { get; set; }
             public int Age { get { return DateTime.Now.Year - Birthday.Year + (DateTime.Now.DayOfYear >= Birthday.DayOfYear ? 1 : 0); } }
@@ -66,6 +66,12 @@ namespace FasterflectTest
         		Name = name;
             	ConstructorInstanceUsed = 4;
         	}
+
+			public virtual int Status
+			{
+				get { return status; }
+				protected set { status = value; }
+			}
 		}
 
 		[AttributeUsage(AttributeTargets.All)]
