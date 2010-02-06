@@ -60,7 +60,7 @@ namespace Fasterflect.Caching
 		/// </summary>
 		public static Delegate GetDelegate(CallInfo callInfo, Func<Delegate> createDelegateAction, CacheStrategy strategy)
         {
-            using (synchronizer.WriterLock)
+            using (synchronizer.ReaderLock)
             {
                 Delegate action = cache.Get( callInfo );
                 if( action == null )
