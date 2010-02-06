@@ -25,7 +25,8 @@ namespace Fasterflect.Caching
 {
 	internal static class DelegateCache
 	{
-		private static CacheStore<CallInfo, Delegate> cache = new CacheStore<CallInfo, Delegate>( LockStrategy.Monitor );
+	    private static readonly ILock synchronizer = new ReaderWriterLock();
+		private static volatile CacheStore<CallInfo, Delegate> cache = new CacheStore<CallInfo, Delegate>( LockStrategy.Monitor );
 		
 		#region Delegate Cache Methods
 		/// <summary>
@@ -58,27 +59,37 @@ namespace Fasterflect.Caching
 		/// <param name="strategy"/>.
 		/// </summary>
 		public static Delegate GetDelegate(CallInfo callInfo, Func<Delegate> createDelegateAction, CacheStrategy strategy)
-		{
-			Delegate action = cache.Get(callInfo);
-			if( action == null )
-			{
-				action = createDelegateAction();
-				cache.Insert(callInfo, action, strategy);
-			}
-			return action;
-		}
+        {
+            using (synchronizer.ReaderLock)
+            {
+                Delegate action = cache.Get( callInfo );
+                if( action == null )
+                {
+                    action = createDelegateAction();
+                    cache.Insert(callInfo, action, strategy);
+                }
+                return action;
+            }
+        }
 		#endregion
 		
 		#region Properties
 		public static LockStrategy LockStrategy
 		{
-			get { return cache.LockStrategy; }
+            get
+            {
+                using (synchronizer.ReaderLock)
+                {
+                    return cache.LockStrategy;
+                }
+            }
 			set
 			{
-				// presumably this isn't thread safe so should not really be set once cache is in use
-				var oldCache = cache;
-				cache = new CacheStore<CallInfo, Delegate>( value );
-				oldCache.Dispose();
+                using (synchronizer.WriterLock)
+                {
+                    cache.Dispose();
+                    cache = new CacheStore<CallInfo, Delegate>( value );
+                }
 			}
 		}
 		#endregion
