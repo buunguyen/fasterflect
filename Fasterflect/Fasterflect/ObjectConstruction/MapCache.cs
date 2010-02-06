@@ -24,8 +24,52 @@ using Fasterflect.Caching;
 
 namespace Fasterflect.ObjectConstruction
 {
-	#region MapCache without CacheStore
+	#region MapCache with CacheStore
 	internal class MapCache
+	{
+		/// <summary>
+		/// This field is used to cache information on objects used as parameters for object construction, which
+		/// improves performance for subsequent instantiations of the same type using a compatible source type.
+		/// </summary>
+		private readonly CacheStore<Type, SourceInfo> sources = new CacheStore<Type, SourceInfo>( LockStrategy.Monitor );
+
+		/// <summary>
+		/// This field contains a dictionary mapping from a particular constructor to all known parameter sets,
+		/// each with an associated MethodMap responsible for creating instances of the type using the given
+		/// constructor and parameter set.
+		/// </summary>
+		private readonly CacheStore<long, MethodMap> maps = new CacheStore<long, MethodMap>( LockStrategy.Monitor );
+
+		#region Map Cache Methods
+		public MethodMap GetMap( Type type, int parameterHashCode )
+		{
+			long key = ((long) type.GetHashCode()) << 32 + parameterHashCode;
+			return maps.Get( key );
+		}
+
+		public void AddMap( Type type, int parameterHashCode, MethodMap map )
+		{
+			long key = ((long) type.GetHashCode()) << 32 + parameterHashCode;
+			maps.Insert( key, map, CacheStrategy.Temporary );
+		}
+		#endregion
+
+		#region SourceInfo Cache Methods
+		public SourceInfo GetSourceInfo( Type type )
+		{
+			return sources.Get( type );
+		}
+
+		public void AddSourceInfo( Type type, SourceInfo sourceInfo )
+		{
+			sources.Insert( type, sourceInfo, CacheStrategy.Temporary );
+		}
+		#endregion
+	}
+	#endregion
+
+	#region MapCache without CacheStore
+	internal class MapCacheOriginal
 	{
 		/// <summary>
 		/// This field is used to cache information on objects used as parameters for object construction, which
@@ -79,50 +123,6 @@ namespace Fasterflect.ObjectConstruction
 			{
 				sources[type] = sourceInfo;
 			}
-		}
-		#endregion
-	}
-	#endregion
-
-	#region MapCache with CacheStore
-	internal class MapCacheWithCacheStore
-	{
-		/// <summary>
-		/// This field is used to cache information on objects used as parameters for object construction, which
-		/// improves performance for subsequent instantiations of the same type using a compatible source type.
-		/// </summary>
-		private readonly CacheStore<Type, SourceInfo> sources = new CacheStore<Type, SourceInfo>( LockStrategy.Monitor );
-
-		/// <summary>
-		/// This field contains a dictionary mapping from a particular constructor to all known parameter sets,
-		/// each with an associated MethodMap responsible for creating instances of the type using the given
-		/// constructor and parameter set.
-		/// </summary>
-		private readonly CacheStore<long, MethodMap> maps = new CacheStore<long, MethodMap>( LockStrategy.Monitor );
-
-		#region Map Cache Methods
-		public MethodMap GetMap( Type type, int parameterHashCode )
-		{
-			long key = ((long) type.GetHashCode()) << 32 + parameterHashCode;
-			return maps.Get( key );
-		}
-
-		public void AddMap( Type type, int parameterHashCode, MethodMap map )
-		{
-			long key = ((long) type.GetHashCode()) << 32 + parameterHashCode;
-			maps.Insert( key, map, CacheStrategy.Temporary );
-		}
-		#endregion
-
-		#region SourceInfo Cache Methods
-		public SourceInfo GetSourceInfo( Type type )
-		{
-			return sources.Get( type );
-		}
-
-		public void AddSourceInfo( Type type, SourceInfo sourceInfo )
-		{
-			sources.Insert( type, sourceInfo, CacheStrategy.Temporary );
 		}
 		#endregion
 	}
