@@ -23,73 +23,44 @@ namespace Fasterflect.Caching
 {
 	internal class ReaderWriterLock : ILock
 	{
+		private sealed class ReadLock : IDisposable
+		{
+			private readonly ReaderWriterLockSlim synchronizer;
+			public ReadLock( ReaderWriterLockSlim synchronizer )
+			{
+				this.synchronizer = synchronizer;
+				synchronizer.EnterReadLock();
+			}
+			public void Dispose()
+			{
+                synchronizer.ExitReadLock();
+			}
+		}
+		private sealed class WriteLock : IDisposable
+		{
+			private readonly ReaderWriterLockSlim synchronizer;
+			public WriteLock( ReaderWriterLockSlim synchronizer )
+			{
+				this.synchronizer = synchronizer;
+				synchronizer.EnterWriteLock();
+			}
+			public void Dispose()
+			{
+                synchronizer.ExitWriteLock();
+			}
+		}
 		private readonly ReaderWriterLockSlim synchronizer = new ReaderWriterLockSlim( LockRecursionPolicy.NoRecursion );
 
 		#region ILock
-		public void Read(Action action)
+		public IDisposable ReaderLock
 		{
-			synchronizer.EnterReadLock();
-            try 
-            {
-            	action();
-            }
-            finally
-            {
-                synchronizer.ExitReadLock();
-            }
+			get { return new ReadLock( synchronizer ); }
 		}
 
-		public TResult Read<TResult>( Func<TResult> action )
+		public IDisposable WriterLock
 		{
-			synchronizer.EnterReadLock();
-            try 
-            {
-            	return action();
-            }
-            finally
-            {
-                synchronizer.ExitReadLock();
-            }
-		}
-
-        public TResult Read<TResult>(MethodInvoker invoker, object target, params object[] parameters)
-		{
-			synchronizer.EnterReadLock();
-			try
-			{
-                return (TResult)invoker(target, parameters);
-			}
-			finally
-			{
-				synchronizer.ExitReadLock();
-			}
-		}
-
-		public void Write(Action action)
-		{
-			synchronizer.EnterWriteLock();
-            try 
-            {
-            	action();
-            }
-            finally
-            {
-                synchronizer.ExitWriteLock();
-            }
-		}
-
-		public TResult Write<TResult>( Func<TResult> action )
-		{
-			synchronizer.EnterWriteLock();
-            try 
-            {
-            	return action();
-            }
-            finally
-            {
-                synchronizer.ExitWriteLock();
-            }
-		}
+			get { return new WriteLock( synchronizer ); }
+		}		
 		#endregion
 
 		#region IDisposable

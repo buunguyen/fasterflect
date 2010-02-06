@@ -36,8 +36,8 @@ namespace Fasterflect
 		/// list of attributes can optionally be filtered by suppliying a list of <paramref name="attributeTypes"/>
 		/// to include.
 		/// </summary>
-		/// <returns>An enumeration of the attributes found on the source element.</returns>
-		public static IList<Attribute> Attributes(this ICustomAttributeProvider source, params Type[] attributeTypes)
+		/// <returns>A list of the attributes found on the source element.</returns>
+		public static IList<Attribute> Attributes( this ICustomAttributeProvider source, params Type[] attributeTypes )
 		{
 			return source.GetCustomAttributes(true).Cast<Attribute>().Where( attr => attributeTypes.Length == 0 || 
 			                                                                         attributeTypes.Any( at => { Type type = attr.GetType();
@@ -47,10 +47,34 @@ namespace Fasterflect
 		/// <summary>
 		/// Gets all <see href="Attribute"/>s of type <typeparamref name="T"/> associated with the <paramref name="source"/>.
 		/// </summary>
-		/// <returns>An enumeration of the attributes found on the source element.</returns>
+		/// <returns>A list of the attributes found on the source element.</returns>
 		public static IList<T> Attributes<T>( this ICustomAttributeProvider source ) where T : Attribute
 		{
-			return source.GetCustomAttributes(typeof (T), true).Cast<T>().ToList();
+			return source.GetCustomAttributes( typeof(T), true ).Cast<T>().ToList();
+		}
+
+		/// <summary>
+		/// Gets the <see href="Attribute"/>s associated with the enumeration given in <paramref name="source"/>. 
+		/// </summary>
+		/// <typeparam name="T">The attribute type to search for.</typeparam>
+		/// <param name="source">An enumeration on which to search for attributes of the given type.</param>
+		/// <returns>A list of the attributes found on the supplied source.</returns>
+		public static IList<T> Attributes<T>( this Enum source ) where T : Attribute
+		{
+			Type type = source.GetType();
+			return type.Attributes<T>();
+		}
+
+		/// <summary>
+		/// Gets the <see href="Attribute"/>s associated with the enumeration given in <paramref name="source"/>. 
+		/// The resulting list of attributes can optionally be filtered by suppliying a list of <paramref name="attributeTypes"/>
+		/// to include.
+		/// </summary>
+		/// <returns>A list of the attributes found on the supplied source.</returns>
+		public static IList<Attribute> Attributes( this Enum source, params Type[] attributeTypes )
+		{
+			Type type = source.GetType();
+			return type.Attributes( attributeTypes );
 		}
 		#endregion
 
@@ -70,7 +94,7 @@ namespace Fasterflect
 		/// <returns>The first attribute found on the source element.</returns>
 		public static Attribute Attribute( this ICustomAttributeProvider source, Type attributeType )
 		{
-			return source.Attributes(attributeType).FirstOrDefault();
+			return source.Attributes( attributeType ).FirstOrDefault();
 		}
 
 		/// <summary>
@@ -83,15 +107,16 @@ namespace Fasterflect
 		}
 
 		/// <summary>
-		/// Find a specific attribute type on the given enumeration instance.
+		/// Gets the first <see href="Attribute"/> of type <typeparamref name="T"/> associated with the 
+		/// enumeration value given in the <paramref name="source"/> parameter.
 		/// </summary>
 		/// <typeparam name="T">The attribute type to search for.</typeparam>
 		/// <param name="instance">An enumeration value on which to search for the attribute.</param>
-		/// <returns>An instance of the attribute type specified if it was found on the instance.</returns>
+		/// <returns>The first attribute found on the source.</returns>
 		public static T Attribute<T>(this Enum instance) where T : Attribute
 		{
 			Type type = instance.GetType();
-			MemberInfo info = type.Member(instance.ToString());
+			MemberInfo info = type.Member( instance.ToString() );
 			return info.Attribute<T>();
 		}
 		#endregion
@@ -104,7 +129,7 @@ namespace Fasterflect
 		/// <returns>True if the source element has the associated attribute, false otherwise.</returns>
 		public static bool HasAttribute(this ICustomAttributeProvider source, Type attributeType)
 		{
-			return source.Attribute(attributeType) != null;
+			return source.Attribute( attributeType ) != null;
 		}
 
 		/// <summary>
@@ -114,7 +139,7 @@ namespace Fasterflect
 		/// <returns>True if the source element has the associated attribute, false otherwise.</returns>
 		public static bool HasAttribute<T>( this ICustomAttributeProvider source ) where T : Attribute
 		{
-			return source.HasAttribute(typeof (T));
+			return source.HasAttribute( typeof(T) );
 		}
 
 		/// <summary>
@@ -124,7 +149,7 @@ namespace Fasterflect
 		/// <returns>True if the source element has at least one of the specified attribute types, false otherwise.</returns>
 		public static bool HasAnyAttribute( this ICustomAttributeProvider source, params Type[] attributeTypes )
 		{
-			return source.Attributes(attributeTypes).Count() > 0;
+			return source.Attributes( attributeTypes ).Count() > 0;
 		}
 
 		/// <summary>
@@ -134,9 +159,7 @@ namespace Fasterflect
 		/// <returns>True if the source element has all of the specified attribute types, false otherwise.</returns>
 		public static bool HasAllAttributes( this ICustomAttributeProvider source, params Type[] attributeTypes )
 		{
-			if (attributeTypes.Length == 0)
-				return true;
-			return attributeTypes.All(at => source.HasAttribute(at));
+			return attributeTypes.Length == 0 || attributeTypes.All( at => source.HasAttribute( at ) );
 		}
 		#endregion
 
@@ -175,7 +198,7 @@ namespace Fasterflect
 		/// <returns>An enumeration of all matching members.</returns>
 		public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes ) where T : Attribute
 		{
-            return type.MembersWith(memberTypes, Flags.AllCriteria, typeof(T));
+            return type.MembersWith( memberTypes, Flags.AllCriteria, typeof(T) );
 		}
 
 		/// <summary>
@@ -186,10 +209,9 @@ namespace Fasterflect
 		/// public and non-public, instance and static members in the result.
 		/// </summary>
 		/// <returns>An enumeration of all matching members.</returns>
-		public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes,
-		                                                     BindingFlags bindingFlags)
+		public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes, BindingFlags bindingFlags )
 		{
-            return type.MembersWith(memberTypes, Flags.AllCriteria, typeof(T));
+            return type.MembersWith( memberTypes, bindingFlags, typeof(T) );
 		}
 
 		/// <summary>
@@ -201,10 +223,9 @@ namespace Fasterflect
 		/// public and non-public, instance and static members in the result.
 		/// </summary>
 		/// <returns>An enumeration of all matching members.</returns>
-		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes,
-		                                                  params Type[] attributeTypes)
+		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes, params Type[] attributeTypes )
 		{
-            return type.MembersWith(memberTypes, Flags.AllCriteria, attributeTypes);
+            return type.MembersWith( memberTypes, Flags.AllCriteria, attributeTypes );
 		}
 
 		/// <summary>
@@ -217,12 +238,18 @@ namespace Fasterflect
 		/// </summary>
 		/// <returns>An enumeration of all matching members.</returns>
 		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes, BindingFlags bindingFlags,
-		                                                  params Type[] attributeTypes)
+		                                             params Type[] attributeTypes )
 		{
-			var query = from m in type.Members(memberTypes, bindingFlags)
-			       		where attributeTypes.Length == 0 || m.HasAnyAttribute(attributeTypes)
-			       		select m;
-			return query.ToList();
+			var result = new List<MemberInfo>();
+			while( type != null && type != typeof(object) )
+			{
+				var query = from m in type.Members(memberTypes, bindingFlags)
+				       		where attributeTypes.Length == 0 || m.HasAnyAttribute(attributeTypes)
+				       		select m;
+				result.AddRange( query );
+				type = type.BaseType;
+			}
+			return result;
 		}
 
 		/// <summary>
@@ -235,7 +262,7 @@ namespace Fasterflect
 		/// <returns>An enumeration of all matching members.</returns>
 		public static IList<MemberInfo> FieldsAndPropertiesWith( this Type type, params Type[] attributeTypes )
 		{
-			return type.MembersWith(MemberTypes.Field | MemberTypes.Property, attributeTypes);
+			return type.MembersWith( MemberTypes.Field | MemberTypes.Property, attributeTypes );
 		}
 		#endregion
 
@@ -251,13 +278,13 @@ namespace Fasterflect
 		/// <returns>An dictionary mapping all matching members to their associated attributes.</returns>
 		public static IDictionary<MemberInfo, List<Attribute>> MembersAndAttributes( this Type type, MemberTypes memberTypes,
 		                                                                             BindingFlags bindingFlags,
-		                                                                             params Type[] attributeTypes)
+		                                                                             params Type[] attributeTypes )
 		{
-			var members = from m in type.Members(memberTypes, bindingFlags)
-			              let a = m.Attributes(attributeTypes)
+			var members = from m in type.Members (memberTypes, bindingFlags )
+			              let a = m.Attributes( attributeTypes )
 			              where a.Count() > 0
-			              select new {Member = m, Attributes = a.ToList()};
-			return members.ToDictionary(m => m.Member, m => m.Attributes);
+			              select new { Member = m, Attributes = a.ToList() };
+			return members.ToDictionary( m => m.Member, m => m.Attributes );
 		}
 		#endregion
 	}
