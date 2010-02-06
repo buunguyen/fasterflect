@@ -25,7 +25,7 @@ namespace Fasterflect.Caching
 {
 	internal static class DelegateCache
 	{
-	    private static readonly ILock synchronizer = new MonitorLock();
+	    private static readonly ILock synchronizer = new ReaderWriterLock();
 		private static volatile CacheStore<CallInfo, Delegate> cache = new CacheStore<CallInfo, Delegate>( LockStrategy.Monitor );
 		
 		#region Delegate Cache Methods
