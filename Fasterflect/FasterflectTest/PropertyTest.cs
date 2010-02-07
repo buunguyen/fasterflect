@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using Fasterflect;
+using Fasterflect.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest
@@ -71,6 +72,8 @@ namespace FasterflectTest
                     typeof(PersonStruct)
                 };
 
+        #region Access
+        #region Direct
         [TestMethod]
         public void Test_set_and_get_static_properties()
         {
@@ -79,27 +82,6 @@ namespace FasterflectTest
                                      type.SetProperty("Counter", 1);
                                      Assert.AreEqual(1, type.GetProperty<int>("Counter"));
                                  });
-        }
-
-        [TestMethod]
-        public void Test_set_and_get_static_properties_via_sample()
-        {
-            TypeList.ForEach(type =>
-            {
-                type.SetProperties( new { Counter = 5 } );
-                Assert.AreEqual(5, type.GetProperty<int>("Counter"));
-            });
-        }
-
-        [TestMethod]
-        public void Test_set_and_get_static_properties_via_sample_with_filter()
-        {
-            TypeList.ForEach(type =>
-            {
-                var currentValue = type.GetProperty<int>( "Counter" );
-                type.SetProperties(new { Counter = (currentValue + 1) }, "not_exist");
-                Assert.AreEqual(currentValue, type.GetProperty<int>("Counter"));
-            });
         }
 
         [TestMethod]
@@ -112,6 +94,27 @@ namespace FasterflectTest
                                     Assert.AreEqual(10, target.GetProperty<int>("Age"));
                                     target.SetProperty("IsGeek", true);
                                 });
+        }
+
+        [TestMethod]
+        public void Test_set_and_get_static_properties_via_sample()
+        {
+            TypeList.ForEach(type =>
+            {
+                type.SetProperties(new { Counter = 5 });
+                Assert.AreEqual(5, type.GetProperty<int>("Counter"));
+            });
+        }
+
+        [TestMethod]
+        public void Test_set_and_get_static_properties_via_sample_with_filter()
+        {
+            TypeList.ForEach(type =>
+            {
+                var currentValue = type.GetProperty<int>("Counter");
+                type.SetProperties(new { Counter = (currentValue + 1) }, "not_exist");
+                Assert.AreEqual(currentValue, type.GetProperty<int>("Counter"));
+            });
         }
 
         [TestMethod]
@@ -204,5 +207,36 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().SetProperty("Age", null));
         }
+        #endregion
+
+        #region PropertyInfo
+
+        [TestMethod]
+        public void Test_set_and_get_static_properties_via_property_info()
+        {
+            TypeList.ForEach(type =>
+            {
+                var propInfo = type.Property("Counter", Flags.StaticCriteria);
+                var value = propInfo.Get<int>() + 1;
+                propInfo.Set(value);
+                Assert.AreEqual(value, propInfo.Get<int>());
+            });
+        }
+
+        [TestMethod]
+        public void Test_set_and_get_properties_via_property_info()
+        {
+            TypeList.ForEach(type =>
+            {
+                var target = type.CreateInstance().CreateHolderIfValueType();
+                var age = type.Property("Age");
+                var isGeek = type.Property("IsGeek");
+                age.Set(target, 10);
+                isGeek.Set(target, true);
+                Assert.AreEqual(10, age.Get<int>(target));
+            });
+        }
+        #endregion
+        #endregion
     }
 }
