@@ -20,6 +20,7 @@
 
 using System;
 using Fasterflect.Emitter;
+using Fasterflect.Common;
 
 namespace Fasterflect
 {

@@ -21,6 +21,7 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using Fasterflect.Common;
 
 namespace Fasterflect.Emitter
 {

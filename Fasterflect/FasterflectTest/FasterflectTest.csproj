@@ -79,9 +79,9 @@
     <Compile Include="SampleModel\Attributes\CarnivoreAttribute.cs" />
     <Compile Include="SampleModel\Attributes\CodeAttribute.cs" />
     <Compile Include="SampleModel\Attributes\ZoneAttribute.cs" />
-    <Compile Include="SampleModel\Enumerations\Climate.cs" />
-    <Compile Include="SampleModel\Enumerations\Zone.cs" />
-    <Compile Include="SampleModel\Enumerations\MovementCapabilities.cs" />
+    <Compile Include="SampleModel\Interfaces\Enumerations\Climate.cs" />
+    <Compile Include="SampleModel\Interfaces\Enumerations\Zone.cs" />
+    <Compile Include="SampleModel\Interfaces\Enumerations\MovementCapabilities.cs" />
     <Compile Include="SampleModel\Interfaces\IFood.cs" />
     <Compile Include="SampleModel\Interfaces\IAnimal.cs" />
     <Compile Include="SampleModel\Mammal.cs" />

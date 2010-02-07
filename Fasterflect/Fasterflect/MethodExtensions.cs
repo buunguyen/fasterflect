@@ -22,6 +22,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
+using Fasterflect.Common;
 
 namespace Fasterflect
 {

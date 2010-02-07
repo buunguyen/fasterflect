@@ -21,10 +21,11 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using Fasterflect.Common;
 
 namespace Fasterflect.Emitter
 {
-	internal class MemberSetEmitter : MemberEmitter
+    internal class MemberSetEmitter : BaseEmitter
 	{
 		public MemberSetEmitter(Type targetType, MemberTypes memberTypes, string fieldOrProperty, bool isStatic)
 		{
@@ -34,7 +35,7 @@ namespace Fasterflect.Emitter
 
 		protected internal override Delegate CreateDelegate()
 		{
-			MemberInfo member = GetMember();
+            MemberInfo member = LookupUtils.GetMember(callInfo);
 			DynamicMethod method = callInfo.IsStatic
 			                       	? CreateDynamicMethod("setter", callInfo.TargetType, null, new[] {Constants.ObjectType})
 			                       	: CreateDynamicMethod("setter", callInfo.TargetType, null,
@@ -67,7 +68,7 @@ namespace Fasterflect.Emitter
 			}
 			else
 			{
-				MethodInfo setMethod = GetPropertySetMethod();
+				MethodInfo setMethod = LookupUtils.GetPropertySetMethod(callInfo);
 
 				// ((T)arg0).set_XXX(arg1);
 				generator.Emit((callInfo.IsStatic || callInfo.IsTargetTypeStruct)

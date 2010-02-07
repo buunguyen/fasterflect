@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
+using Fasterflect.Common;
 
 namespace Fasterflect
 {

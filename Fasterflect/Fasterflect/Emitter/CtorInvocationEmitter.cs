@@ -21,6 +21,7 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using Fasterflect.Common;
 
 namespace Fasterflect.Emitter
 {
@@ -54,12 +55,7 @@ namespace Fasterflect.Emitter
 			}
 			else
 			{
-				ConstructorInfo ctorInfo = callInfo.TargetType.GetConstructor(
-					BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-					null, CallingConventions.HasThis, callInfo.ParamTypes, null);
-				if (ctorInfo == null)
-					throw new MissingMemberException("Constructor does not exist");
-
+                ConstructorInfo ctorInfo = LookupUtils.GetConstructor(callInfo);
 				if (callInfo.HasRefParam)
 				{
 					int byRefParamsCount = CreateLocalsForByRefParams(generator, 0);

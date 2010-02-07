@@ -82,11 +82,12 @@
     <Compile Include="Caching\LockStrategy.cs" />
     <Compile Include="Caching\DelegateCache.cs" />
     <Compile Include="CloneExtensions.cs" />
-    <Compile Include="Constants.cs" />
+    <Compile Include="Common\Constants.cs" />
     <Compile Include="ConstructorExtensions.cs" />
     <Compile Include="AttributeExtensions.cs" />
     <Compile Include="ArrayExtensions.cs" />
-    <Compile Include="Flags.cs" />
+    <Compile Include="Emitter\LookupUtils.cs" />
+    <Compile Include="Common\Flags.cs" />
     <Compile Include="ObjectConstruction\TypeConverter.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="MemberExtensions.cs" />
@@ -96,7 +97,6 @@
     <Compile Include="Delegates.cs" />
     <Compile Include="Emitter\ArrayGetEmitter.cs" />
     <Compile Include="Emitter\ArraySetEmitter.cs" />
-    <Compile Include="Emitter\MemberEmitter.cs" />
     <Compile Include="Emitter\BaseEmitter.cs" />
     <Compile Include="Emitter\CallInfo.cs" />
     <Compile Include="Emitter\CtorInvocationEmitter.cs" />
@@ -109,7 +109,7 @@
     <Compile Include="ObjectConstruction\MapCache.cs" />
     <Compile Include="ObjectConstruction\SourceInfo.cs" />
     <Compile Include="ObjectConstruction\MethodMap.cs" />
-    <Compile Include="Utils.cs" />
+    <Compile Include="Common\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Emitter\ValueTypeHolder.cs" />
   </ItemGroup>

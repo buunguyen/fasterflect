@@ -21,6 +21,7 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using Fasterflect.Common;
 
 namespace Fasterflect.Emitter
 {
@@ -33,7 +34,7 @@ namespace Fasterflect.Emitter
 
 		protected internal override Delegate CreateDelegate()
 		{
-			MethodInfo methodInfo = GetMethodInfo();
+			MethodInfo methodInfo = LookupUtils.GetMethod(callInfo);
 			DynamicMethod method = CreateDynamicMethod();
 			ILGenerator generator = method.GetILGenerator();
 
@@ -100,19 +101,6 @@ namespace Fasterflect.Emitter
 			}
 			PushParamsOrLocalsToStack(generator, paramArrayIndex);
 			generator.Emit(callInfo.IsStatic ? OpCodes.Call : OpCodes.Callvirt, methodInfo);
-		}
-
-		protected MethodInfo GetMethodInfo()
-		{
-			MethodInfo methodInfo = callInfo.TargetType.GetMethod(callInfo.Name,
-			                                                      ScopeFlag | BindingFlags.Public | BindingFlags.NonPublic,
-			                                                      null, callInfo.ParamTypes, null);
-			if (methodInfo == null)
-				throw new MissingMethodException(callInfo.IsStatic
-				                                 	?
-				                                 		"Static method "
-				                                 	: "Method " + callInfo.Name + " does not exist");
-			return methodInfo;
 		}
 
 		protected DynamicMethod CreateDynamicMethod()

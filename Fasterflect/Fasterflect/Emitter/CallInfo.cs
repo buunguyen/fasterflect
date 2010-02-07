@@ -25,11 +25,16 @@ using System.Reflection;
 namespace Fasterflect.Emitter
 {
 	/// <summary>
-	/// Stores all necessary information to construct a dynamic method and optionally
-	/// parameters used to invoke that method.
+	/// Stores all necessary information to construct a dynamic method.
 	/// </summary>
 	internal class CallInfo
-	{
+    {
+        public Type TargetType { get; private set; }
+        public MemberTypes MemberTypes { get; set; }
+        public Type[] ParamTypes { get; private set; }
+        public string Name { get; private set; }
+        public bool IsStatic { get; private set; }
+
 		public CallInfo(Type targetType, MemberTypes memberTypes, string name, Type[] paramTypes)
 			: this(targetType, memberTypes, name, paramTypes, false)
 		{
@@ -44,18 +49,11 @@ namespace Fasterflect.Emitter
 			IsStatic = isStatic;
 		}
 
-		public Type TargetType { get; private set; }
-		public MemberTypes MemberTypes { get; set; }
-		public Type[] ParamTypes { get; private set; }
-		public string Name { get; private set; }
-		public bool IsStatic { get; private set; }
-
-
 		/// <summary>
 		/// The CIL should handle inner struct only when the target type is 
 		/// a value type or the wrapper ValueTypeHolder type.  In addition, the call 
 		/// must also be executed in the non-static context since static 
-		/// context doesn't need to handle inner struct case (cos' it has no arg).
+		/// context doesn't need to handle inner struct case.
 		/// </summary>
 		public bool ShouldHandleInnerStruct
 		{
@@ -76,6 +74,11 @@ namespace Fasterflect.Emitter
 		{
 			get { return ParamTypes.Any(t => t.IsByRef); }
 		}
+
+        public BindingFlags ScopeFlag
+        {
+            get { return IsStatic ? BindingFlags.Static : BindingFlags.Instance; }
+        }
 
 		/// <summary>
 		/// Two <c>CallInfo</c> instances are considered equaled if the following properties
@@ -99,10 +102,11 @@ namespace Fasterflect.Emitter
 		public override int GetHashCode()
 		{
 			int hashCode = 7;
-			hashCode = 31*hashCode + TargetType.GetHashCode();
-			hashCode = 31*hashCode + Name.GetHashCode();
+            hashCode = 31 * hashCode + TargetType.GetHashCode();
+            hashCode = 31 * hashCode + MemberTypes.GetHashCode();
+			hashCode = 31 * hashCode + Name.GetHashCode();
 			for (int i = 0; i < ParamTypes.Length; i++)
-				hashCode = 31*hashCode + ParamTypes[i].GetHashCode();
+				hashCode = 31 * hashCode + ParamTypes[i].GetHashCode();
 			return hashCode;
 		}
 	}
