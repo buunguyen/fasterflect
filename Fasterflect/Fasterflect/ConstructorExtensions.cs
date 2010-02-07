@@ -109,8 +109,9 @@ namespace Fasterflect
 				sourceInfo = new SourceInfo(sourceType);
 				MapFactory.AddSourceInfo(sourceType, sourceInfo);
 			}
-			MethodMap map = type.PrepareInvoke( sourceInfo.ParamNames, sourceInfo.ParamTypes );
-			return map.Invoke( sourceInfo.GetParameterValues( source ) );
+			object[] paramValues = sourceInfo.GetParameterValues( source );
+			MethodMap map = type.PrepareInvoke( sourceInfo.ParamNames, sourceInfo.ParamTypes, paramValues );
+			return map.Invoke( paramValues );
 		}
 
 		/// <summary>
@@ -165,7 +166,7 @@ namespace Fasterflect
 		public static object TryCreateInstance( this Type type, string[] parameterNames, Type[] parameterTypes,
 		                                       object[] parameterValues)
 		{
-			MethodMap map = type.PrepareInvoke(parameterNames, parameterTypes);
+			MethodMap map = type.PrepareInvoke(parameterNames, parameterTypes, parameterValues);
 			return map.Invoke(parameterValues);
 		}
 		#endregion

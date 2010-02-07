@@ -86,7 +86,7 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
             {
-                type.SetProperties(new { Counter = 5 });
+                type.SetProperties( new { Counter = 5 } );
                 Assert.AreEqual(5, type.GetProperty<int>("Counter"));
             });
         }

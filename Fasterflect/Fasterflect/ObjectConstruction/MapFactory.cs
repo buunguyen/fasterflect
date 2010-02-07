@@ -1,5 +1,4 @@
 #region License
-
 // Copyright 2010 Morten Mertner, Buu Nguyen (http://www.buunguyen.net/blog)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,7 +14,6 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System;
@@ -30,42 +28,45 @@ namespace Fasterflect.ObjectConstruction
 	internal static class MapFactory
 	{
 		private static readonly MapCache cache = new MapCache();
-		//private static readonly MapCacheOriginal cache = new MapCacheOriginal();
 
 		#region Map Construction
-		public static MethodMap PrepareInvoke(this Type type, string[] paramNames, Type[] paramTypes)
+		public static MethodMap PrepareInvoke( this Type type, string[] paramNames, Type[] paramTypes,
+		                                       object[] sampleParamValues )
 		{
-			int hash = MethodMap.GetParameterHash(paramNames, paramTypes);
-			MethodMap map = cache.GetMap(type, hash);
-			if (map == null)
+			int hash = MethodMap.GetParameterHash( paramNames, paramTypes );
+			MethodMap map = cache.GetMap( type, hash );
+			if( map == null )
 			{
-				map = DetermineBestConstructorMatch(type, paramNames, paramTypes);
-				cache.AddMap(type, hash, map);
+				map = DetermineBestConstructorMatch( type, paramNames, paramTypes, sampleParamValues );
+				cache.AddMap( type, hash, map );
 			}
 			return map;
 		}
 		#endregion
 
 		#region Map Construction Helpers
-		private static MethodMap DetermineBestConstructorMatch(Type type, string[] paramNames, Type[] paramTypes)
+		private static MethodMap DetermineBestConstructorMatch( Type type, string[] paramNames, Type[] paramTypes,
+		                                                        object[] sampleParamValues )
 		{
 			MethodMap bestMap = null;
-			foreach (ConstructorInfo ci in type.Constructors())
+			foreach( ConstructorInfo ci in type.Constructors() )
 			{
-				MethodMap map = CreateMap(ci, paramNames, paramTypes, true);
-				if (map != null && map.IsValid)
+				MethodMap map = CreateMap( ci, paramNames, paramTypes, sampleParamValues, true );
+				if( map != null && map.IsValid )
 				{
 					bool isBetter = bestMap == null;
 					isBetter |= map.IsPerfectMatch;
-					isBetter |= bestMap != null && map.Cost < bestMap.Cost;
+					isBetter |= bestMap != null &&
+					            (map.Cost < bestMap.Cost ||
+					             (map.Cost == bestMap.Cost && map.RequiredParameterCount > bestMap.RequiredParameterCount));
 					isBetter &= map.IsValid;
-					if (isBetter)
+					if( isBetter )
 					{
 						bestMap = map;
 					}
 				}
 			}
-			if (bestMap != null)
+			if( bestMap != null )
 			{
 				bestMap.InitializeInvoker();
 				// TODO warn user that code has non-optimal performance
@@ -78,30 +79,33 @@ namespace Fasterflect.ObjectConstruction
 			//sb.AppendFormat( "No constructor found for type {0} using parameters:{1}",
 			//                 type.Name, Environment.NewLine );
 			//sb.AppendFormat( "{0}{1}", TypeFormatter.Format( parameters, "=", ", ", 3 ), Environment.NewLine );
-			throw new MissingMethodException(type.Name, ".ctor");
+			throw new MissingMethodException( type.Name, ".ctor" );
 		}
 
-		private static MethodMap CreateMap(MethodBase method, string[] paramNames, Type[] paramTypes,
-		                                   bool allowUnusedParameters)
+		private static MethodMap CreateMap( MethodBase method, string[] paramNames, Type[] paramTypes,
+		                                    object[] sampleParamValues, bool allowUnusedParameters )
 		{
-			if (method.IsConstructor)
-				return new ConstructorMap(method as ConstructorInfo, paramNames, paramTypes, allowUnusedParameters);
-			return new MethodMap(method, paramNames, paramTypes, allowUnusedParameters);
+			if( method.IsConstructor )
+			{
+				return new ConstructorMap( method as ConstructorInfo, paramNames, paramTypes, sampleParamValues,
+				                           allowUnusedParameters );
+			}
+			return new MethodMap( method, paramNames, paramTypes, sampleParamValues, allowUnusedParameters );
 		}
 		#endregion
 
 		#region SourceInfo Lookups
-
-		internal static SourceInfo GetSourceInfo(Type sourceType)
+		internal static SourceInfo GetSourceInfo( Type sourceType )
 		{
-			return cache.GetSourceInfo(sourceType);
+			return cache.GetSourceInfo( sourceType );
 		}
 
-		internal static void AddSourceInfo(Type sourceType, SourceInfo sourceInfo)
+		internal static void AddSourceInfo( Type sourceType, SourceInfo sourceInfo )
 		{
-			cache.AddSourceInfo(sourceType, sourceInfo);
+			cache.AddSourceInfo( sourceType, sourceInfo );
 		}
-
 		#endregion
+
+		//private static readonly MapCacheOriginal cache = new MapCacheOriginal();
 	}
 }

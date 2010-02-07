@@ -144,7 +144,7 @@ namespace Fasterflect
         /// <param name="sample">An object whose public properties will be used to set the 
 		/// static fields of <paramref name="targetType"/>.</param>
 		/// <returns>The type whose static fields are to be set.</returns>
-		public static Type SetFields(this Type targetType, object sample)
+		public static Type SetFields( this Type targetType, object sample )
 		{
 		    return targetType.SetFields( sample, null );
 		}
@@ -157,13 +157,13 @@ namespace Fasterflect
         /// <param name="targetType">The type whose static fields are to be set.</param>
         /// <param name="sample">An object whose public properties will be used to set the 
         /// static fields of <paramref name="targetType"/>.</param>
-        /// <param name="propertiesToInclude">A comma delimited list of names of properties to be retrieved.  If
+        /// <param name="propertiesToInclude">A list of names of properties to be retrieved. If
         /// this is <c>null</c>, all public properties are used.</param>
         /// <returns>The type whose static fields are to be set.</returns>
-        public static Type SetFields(this Type targetType, object sample, string propertiesToInclude)
+        public static Type SetFields( this Type targetType, object sample, params string[] propertiesToInclude )
         {
             var properties = sample.GetType().Properties( propertiesToInclude );
-            properties.ForEach(prop => targetType.SetField(prop.Name, prop.GetValue<object>(sample)));
+            properties.ForEach( prop => targetType.SetField( prop.Name, prop.GetValue<object>( sample ) ) );
             return targetType;
         }
 
@@ -175,7 +175,7 @@ namespace Fasterflect
         /// <param name="sample">An object whose public properties will be used to set the fields of
 		/// <paramref name="target"/>.</param>
 		/// <returns>The object whose fields are to be set.</returns>
-		public static object SetFields(this object target, object sample)
+		public static object SetFields( this object target, object sample )
 		{
 	        return target.SetFields( sample, null );
 		}
@@ -191,10 +191,10 @@ namespace Fasterflect
         /// <param name="propertiesToInclude">A comma delimited list of names of properties to be retrieved.  If
         /// this is <c>null</c>, all public properties are used.</param>
         /// <returns>The object whose fields are to be set.</returns>
-        public static object SetFields(this object target, object sample, string propertiesToInclude)
+        public static object SetFields( this object target, object sample, params string[] propertiesToInclude )
         {
-            var properties = sample.GetType().Properties(propertiesToInclude);
-            properties.ForEach(prop => target.SetField(prop.Name, prop.GetValue<object>(sample)));
+            var properties = sample.GetType().Properties( propertiesToInclude );
+            properties.ForEach( prop => target.SetField( prop.Name, prop.GetValue<object>( sample ) ) );
             return target;
         }
 		#endregion
@@ -228,57 +228,169 @@ namespace Fasterflect
 		#endregion
 
 		#region Field Lookup
+		#region Single Field
 		/// <summary>
-        /// Find a specific named field whose type is <typeparamref name="T"/>
-        /// on the given <paramref name="type"/>. 
+        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
+        /// if supplied for the <typeparamref name="T"/> parameter then the fields type must be assignment
+        /// compatible with this type. This method searches for public and non-public instance fields on both 
+        /// the type itself and all parent classes.
+        /// Use the <seealso href="FieldDeclared"/> method if you do not wish to search base types.  
 		/// </summary>
-		/// <param name="type">The type to reflect on</param>
-		/// <param name="name">The name of the member to find</param>
-		/// <typeparam name="T">The type of the specified field</typeparam>
-		/// <returns>A single FieldInfo instance of the first found match or null if no match was found</returns>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
 		public static FieldInfo Field<T>( this Type type, string name )
 		{
-            FieldInfo info = type.GetField(name, Flags.AllCriteria);
-			return info != null && info.FieldType == typeof( T ) ? info : null;
+			return type.Field( name, Flags.InstanceCriteria, typeof(T) );
 		}
 
 		/// <summary>
-		/// Find a specific named field on the given <paramref name="type"/>.
+        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. This method 
+        /// searches for public and non-public instance fields on both the type itself and all parent classes.
+        /// Use the <seealso href="FieldDeclared"/> method if you do not wish to search base types.  
 		/// </summary>
-		/// <param name="type">The type to reflect on</param>
-		/// <param name="name">The name of the member to find</param>
-		/// <returns>A single FieldInfo instance of the first found match or null if no match was found</returns>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
 		public static FieldInfo Field( this Type type, string name )
 		{
-            return type.GetField(name, Flags.AllCriteria);
+			return type.Field( name, Flags.InstanceCriteria, null );
 		}
 
 		/// <summary>
-        /// Find all public instance fields on the given <paramref name="type"/>.
+        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
+        /// if supplied for the <typeparamref name="T"/> parameter then the fields type must be assignment
+        /// compatible with this type. Use the <paramref name="flags"/> parameter to define the scope of the search.
+        /// Use the <seealso href="FieldDeclared"/> method if you do not wish to search base types.  
 		/// </summary>
-		/// <returns>A list of all public instance fields on the type.</returns>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
+		public static FieldInfo Field<T>( this Type type, string name, BindingFlags flags )
+		{
+			return type.Field( name, flags, typeof(T) );
+		}
+
+		/// <summary>
+        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. 
+        /// Use the <paramref name="flags"/> parameter to define the scope of the search.
+        /// Use the <seealso href="FieldDeclared"/> method if you do not wish to search base types.  
+		/// </summary>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
+		public static FieldInfo Field( this Type type, string name, BindingFlags flags )
+		{
+			return type.Field( name, flags, null );
+		}
+
+		/// <summary>
+        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
+        /// if supplied for the <paramref name="fieldType"/> parameter then the fields type must be assignment
+        /// compatible with this type. Use the <paramref name="flags"/> parameter to define the scope of the search.
+        /// Use the <seealso href="FieldDeclared"/> method if you do not wish to search base types.  
+		/// </summary>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
+		public static FieldInfo Field( this Type type, string name, BindingFlags flags, Type fieldType )
+		{
+            FieldInfo info = type.Fields( flags ).FirstOrDefault( f => f.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) );
+			return info != null && (fieldType == null || fieldType.IsAssignableFrom( info.FieldType )) ? info : null;
+		}
+
+		/// <summary>
+        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
+        /// if supplied for the <typeparamref name="T"/> parameter then the fields type must be assignment
+        /// compatible with this type. 
+        /// This method searches for public and non-public instance fields on the specified type only.
+        /// Use the <seealso href="Field"/> method if you wish to include base types in the search.
+		/// </summary>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
+		public static FieldInfo FieldDeclared<T>( this Type type, string name )
+		{
+			return type.FieldDeclared( name, Flags.InstanceCriteria, typeof(T) );
+		}
+
+		/// <summary>
+        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>.
+        /// This method searches for public and non-public instance fields on the specified type only.
+        /// Use the <seealso href="Field"/> method if you wish to include base types in the search.
+		/// </summary>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
+		public static FieldInfo FieldDeclared( this Type type, string name )
+		{
+			return type.FieldDeclared( name, Flags.InstanceCriteria, null );
+		}
+
+		/// <summary>
+        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
+        /// if supplied for the <typeparamref name="T"/> parameter then the fields type must be assignment
+        /// compatible with this type. Use the <paramref name="flags"/> parameter to define the scope of the search.
+        /// Use the <seealso href="Field"/> method if you wish to include base types in the search.
+		/// </summary>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
+		public static FieldInfo FieldDeclared<T>( this Type type, string name, BindingFlags flags )
+		{
+			return type.FieldDeclared( name, flags, typeof(T) );
+		}
+
+		/// <summary>
+        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
+        /// if supplied for the <paramref name="fieldType"/> parameter then the fields type must be assignment
+        /// compatible with this type. Use the <paramref name="flags"/> parameter to define the scope of the search.
+        /// Use the <seealso href="Field"/> method if you wish to include base types in the search.
+		/// </summary>
+		/// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
+		public static FieldInfo FieldDeclared( this Type type, string name, BindingFlags flags, Type fieldType )
+		{
+            FieldInfo info = type.GetField( name, flags );
+			return info != null && (fieldType == null || fieldType.IsAssignableFrom( info.FieldType )) ? info : null;
+		}
+		#endregion
+
+		#region Multiple Fields
+		/// <summary>
+        /// Find all public and non-public instance fields on the given <paramref name="type"/>,
+		/// including fields defined on base types.
+		/// </summary>
+		/// <returns>A list of all instance fields on the type.</returns>
 		public static IList<FieldInfo> Fields( this Type type )
 		{
-            return type.GetFields(Flags.InstanceCriteria).ToList();
+			return type.Fields( Flags.InstanceCriteria );
 		}
 
 		/// <summary>
-		/// Find all instance fields on the given <paramref name="type"/>, including fields from
-		/// all base types.
+        /// Find all fields on the given <paramref name="type"/> that match the specified <paramref name="flags"/>,
+		/// including fields defined on base types.
 		/// </summary>
-		/// <param name="type">The type to reflect on.</param>
-		/// <returns>A list of all instance fields on the type.</returns>
-		public static IList<FieldInfo> FieldsIncludingBaseTypes( this Type type )
+		/// <returns>A list of all matching fields on the type.</returns>
+		public static IList<FieldInfo> Fields( this Type type, BindingFlags flags )
 		{
-			var fields = new List<FieldInfo>( type.Fields() );
+			// as we recurse below, reset flags to only include declared fields (avoid duplicates in result)
+			flags |= BindingFlags.DeclaredOnly;
+			flags -= BindingFlags.FlattenHierarchy;
+			var fields = new List<FieldInfo>( type.FieldsDeclared( flags ) );
 			Type baseType = type.BaseType;
 			while( baseType != null && baseType != typeof(object) )
 			{
-				fields.AddRange( baseType.Fields() );
+				fields.AddRange( baseType.FieldsDeclared( flags ) );
 				baseType = baseType.BaseType;
 			}
 			return fields;
 		}
+
+		/// <summary>
+		/// Find all public and non-public instance fields declared on the given <paramref name="type"/>.
+		/// Use the <seealso href="Fields"/> method if you wish to include base types in the search.
+		/// </summary>
+		/// <returns>A list of all instance fields declared on the type.</returns>
+		public static IList<FieldInfo> FieldsDeclared( this Type type )
+		{
+			return type.FieldsDeclared( Flags.InstanceCriteria );
+		}
+
+		/// <summary>
+		/// Find all fields declared on the given <paramref name="type"/> that match the specified <paramref name="flags"/>.
+		/// Use the <seealso href="Fields"/> method if you wish to include base types in the search.
+		/// </summary>
+		/// <returns>A list of all instance fields declared on the type.</returns>
+		public static IList<FieldInfo> FieldsDeclared( this Type type, BindingFlags flags )
+		{
+			flags |= BindingFlags.DeclaredOnly;
+			return type.GetFields( flags ).ToList();
+		}
+		#endregion
 		#endregion
 	}
 }

@@ -25,8 +25,9 @@ namespace FasterflectTest
 {
     [TestClass]
     public class FieldTest
-    {
-        private enum Color
+	{
+		#region Test Data
+		private enum Color
         {
             Red, Green, Blue
         }
@@ -56,8 +57,10 @@ namespace FasterflectTest
                     typeof(PersonClass), 
                     typeof(PersonStruct)
                 };
+		#endregion
 
-        [TestMethod]
+		#region Field Access
+		[TestMethod]
         public void Test_set_get_static_fields()
         {
             TypeList.ForEach(type =>
@@ -182,6 +185,23 @@ namespace FasterflectTest
         public void Test_set_null_to_value_type()
         {
             TypeList.ForEach(type => type.CreateInstance().SetField("age", null));
-        }
-    }
+		}
+		#endregion
+
+		#region Field Lookup
+		#region Single Field
+		//public static FieldInfo Field<T>( this Type type, string name )
+		//public static FieldInfo Field<T>( this Type type, string name, BindingFlags flags )
+		//public static FieldInfo FieldDeclared<T>( this Type type, string name )
+		//public static FieldInfo FieldDeclared<T>( this Type type, string name, BindingFlags flags )
+		#endregion
+
+		#region Multiple Fields
+		//public static IList<FieldInfo> Fields( this Type type )
+		//public static IList<FieldInfo> Fields( this Type type, BindingFlags flags )
+		//public static IList<FieldInfo> FieldsDeclared( this Type type )
+		//public static IList<FieldInfo> FieldsDeclared( this Type type, BindingFlags flags )
+		#endregion
+		#endregion
+	}
 }
