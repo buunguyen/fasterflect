@@ -221,7 +221,7 @@ namespace Fasterflect
         /// Find all public and non-public instance fields and properties on the given <paramref name="type"/>, 
 		/// including members defined on base types.
 		/// </summary>
-		/// <returns>A list of all matching members on the type.</returns>
+		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
 		public static IList<MemberInfo> FieldsAndProperties( this Type type )
 		{
 			return type.Members( MemberTypes.Field | MemberTypes.Property, Flags.InstanceCriteria );
@@ -231,7 +231,7 @@ namespace Fasterflect
         /// Find all public and non-public instance fields and properties on the given <paramref name="type"/> 
 		/// that match the specified <paramref name="flags"/>, including members defined on base types.
 		/// </summary>
-		/// <returns>A list of all matching members on the type.</returns>
+		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
 		public static IList<MemberInfo> FieldsAndProperties( this Type type, BindingFlags flags )
 		{
 			return type.Members( MemberTypes.Field | MemberTypes.Property, flags );
@@ -243,7 +243,7 @@ namespace Fasterflect
         /// Find all public and non-public instance members of the given <paramref name="memberTypes"/> on 
 		/// the given <paramref name="type"/>, including members defined on base types.
 		/// </summary>
-		/// <returns>A list of all matching members on the type.</returns>
+		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
 		public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes )
 		{
 			return type.Members( memberTypes, Flags.InstanceCriteria );
@@ -253,7 +253,7 @@ namespace Fasterflect
         /// Find all public and non-public instance members on the given <paramref name="type"/> that 
         /// match the specified <paramref name="flags"/>, including members defined on base types.
 		/// </summary>
-		/// <returns>A list of all matching members on the type.</returns>
+		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
 		public static IList<MemberInfo> Members( this Type type, BindingFlags flags )
 		{
 			return type.Members( MemberTypes.All, flags );
@@ -263,7 +263,7 @@ namespace Fasterflect
         /// Find all members of the given <paramref name="memberTypes"/> on the given <paramref name="type"/> that 
         /// match the specified <paramref name="flags"/>, including members defined on base types.
 		/// </summary>
-		/// <returns>A list of all matching members on the type.</returns>
+		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
 		public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes, BindingFlags flags )
 		{
 			// as we recurse below, reset flags to only include declared fields (avoid duplicates in result)
@@ -284,7 +284,7 @@ namespace Fasterflect
 		/// on the given <paramref name="type"/>.
 		/// Use the <see href="Members"/> method if you wish to include base types in the search.
 		/// </summary>
-		/// <returns>A list of all matching members on the type.</returns>
+		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
 		public static IList<MemberInfo> MembersDeclared( this Type type, MemberTypes memberTypes )
 		{
 			return type.MembersDeclared( memberTypes, Flags.InstanceCriteria );
@@ -295,7 +295,7 @@ namespace Fasterflect
 		/// <paramref name="flags"/>.
 		/// Use the <see href="Members"/> method if you wish to include base types in the search.
 		/// </summary>
-		/// <returns>A list of all matching members on the type.</returns>
+		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
 		public static IList<MemberInfo> MembersDeclared( this Type type, BindingFlags flags )
 		{
 			return type.MembersDeclared( MemberTypes.All, flags );
@@ -306,7 +306,7 @@ namespace Fasterflect
 		/// that match the specified <paramref name="flags"/>.
 		/// Use the <see href="Members"/> method if you wish to include base types in the search.
 		/// </summary>
-		/// <returns>A list of all matching members on the type.</returns>
+		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
 		public static IList<MemberInfo> MembersDeclared( this Type type, MemberTypes memberTypes, BindingFlags flags )
 		{
 			return type.FindMembers( memberTypes, flags, null, null );
@@ -338,7 +338,7 @@ namespace Fasterflect
 		public static bool CanRead( this MemberInfo member )
 		{
 			var property = member as PropertyInfo;
-			return property == null || property.CanRead;
+			return member is FieldInfo || (property != null && property.CanRead);
 		}
 
 		/// <summary>
@@ -349,7 +349,7 @@ namespace Fasterflect
 		public static bool CanWrite( this MemberInfo member )
 		{
 			var property = member as PropertyInfo;
-			return property == null || property.CanWrite;
+			return member is FieldInfo || (property != null && property.CanWrite);
 		}
 		#endregion
 	}

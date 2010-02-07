@@ -344,7 +344,7 @@ namespace Fasterflect
         /// Find all public and non-public instance fields on the given <paramref name="type"/>,
 		/// including fields defined on base types.
 		/// </summary>
-		/// <returns>A list of all instance fields on the type.</returns>
+		/// <returns>A list of all instance fields on the type. This value will never be null.</returns>
 		public static IList<FieldInfo> Fields( this Type type )
 		{
 			return type.Fields( Flags.InstanceCriteria );
@@ -354,7 +354,7 @@ namespace Fasterflect
         /// Find all fields on the given <paramref name="type"/> that match the specified <paramref name="flags"/>,
 		/// including fields defined on base types.
 		/// </summary>
-		/// <returns>A list of all matching fields on the type.</returns>
+		/// <returns>A list of all matching fields on the type. This value will never be null.</returns>
 		public static IList<FieldInfo> Fields( this Type type, BindingFlags flags )
 		{
 			// as we recurse below, reset flags to only include declared fields (avoid duplicates in result)
@@ -374,7 +374,7 @@ namespace Fasterflect
 		/// Find all public and non-public instance fields declared on the given <paramref name="type"/>.
 		/// Use the <seealso href="Fields"/> method if you wish to include base types in the search.
 		/// </summary>
-		/// <returns>A list of all instance fields declared on the type.</returns>
+		/// <returns>A list of all instance fields declared on the type. This value will never be null.</returns>
 		public static IList<FieldInfo> FieldsDeclared( this Type type )
 		{
 			return type.FieldsDeclared( Flags.InstanceCriteria );
@@ -384,7 +384,7 @@ namespace Fasterflect
 		/// Find all fields declared on the given <paramref name="type"/> that match the specified <paramref name="flags"/>.
 		/// Use the <seealso href="Fields"/> method if you wish to include base types in the search.
 		/// </summary>
-		/// <returns>A list of all instance fields declared on the type.</returns>
+		/// <returns>A list of all instance fields declared on the type. This value will never be null.</returns>
 		public static IList<FieldInfo> FieldsDeclared( this Type type, BindingFlags flags )
 		{
 			flags |= BindingFlags.DeclaredOnly;

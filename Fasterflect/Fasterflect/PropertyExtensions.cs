@@ -448,7 +448,7 @@ namespace Fasterflect
 		/// Find all public and non-public instance properties on the given <paramref name="type"/>,
 		/// including properties defined on base types.
 		/// </summary>
-		/// <returns>A list of all instance properties on the type.</returns>
+		/// <returns>A list of all instance properties on the type. This value will never be null.</returns>
 		public static IList<PropertyInfo> Properties( this Type type )
 		{
 			return type.Properties( Flags.InstanceCriteria );
@@ -465,7 +465,8 @@ namespace Fasterflect
 		/// <param name="properties">A comma delimited list of names of properties to be retrieved. If
 		/// this is <c>null</c>, all public properties are returned. Names are compared case-insensitively
 		/// using OrdinalIgnoreCase.</param>
-		/// <returns>A list of all public properties on the type filted by <paramref name="properties"/>.</returns>
+		/// <returns>A list of all public properties on the type filted by <paramref name="properties"/>.
+		/// This value will never be null.</returns>
 		public static IList<PropertyInfo> Properties( this Type type, params string[] properties )
 		{
 			IList<PropertyInfo> result = type.Properties( Flags.InstanceCriteria );
@@ -479,7 +480,7 @@ namespace Fasterflect
 		/// Find all properties on the given <paramref name="type"/> that match the specified <paramref name="flags"/>,
 		/// including properties defined on base types.
 		/// </summary>
-		/// <returns>A list of all matching properties on the type.</returns>
+		/// <returns>A list of all matching properties on the type. This value will never be null.</returns>
 		public static IList<PropertyInfo> Properties( this Type type, BindingFlags flags )
 		{
 			// as we recurse below, reset flags to only include declared properties (avoid duplicates in result)
@@ -499,7 +500,7 @@ namespace Fasterflect
 		/// Find all public and non-public instance properties declared on the given <paramref name="type"/>.
 		/// Use the <seealso href="Properties"/> method if you wish to include base types in the search.
 		/// </summary>
-		/// <returns>A list of all instance properties declared on the type.</returns>
+		/// <returns>A list of all instance properties declared on the type. This value will never be null.</returns>
 		public static IList<PropertyInfo> PropertiesDeclared( this Type type )
 		{
 			return type.PropertiesDeclared( Flags.InstanceCriteria );
@@ -509,7 +510,7 @@ namespace Fasterflect
 		/// Find all properties declared on the given <paramref name="type"/> that match the specified <paramref name="flags"/>.
 		/// Use the <seealso href="Properties"/> method if you wish to include base types in the search.
 		/// </summary>
-		/// <returns>A list of all instance properties declared on the type.</returns>
+		/// <returns>A list of all instance properties declared on the type. This value will never be null.</returns>
 		public static IList<PropertyInfo> PropertiesDeclared( this Type type, BindingFlags flags )
 		{
 			flags |= BindingFlags.DeclaredOnly;

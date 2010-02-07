@@ -36,7 +36,7 @@ namespace Fasterflect
 		/// list of attributes can optionally be filtered by suppliying a list of <paramref name="attributeTypes"/>
 		/// to include.
 		/// </summary>
-		/// <returns>A list of the attributes found on the source element.</returns>
+		/// <returns>A list of the attributes found on the source element. This value will never be null.</returns>
 		public static IList<Attribute> Attributes( this ICustomAttributeProvider source, params Type[] attributeTypes )
 		{
 			return source.GetCustomAttributes(true).Cast<Attribute>().Where( attr => attributeTypes.Length == 0 || 
@@ -47,7 +47,7 @@ namespace Fasterflect
 		/// <summary>
 		/// Gets all <see href="Attribute"/>s of type <typeparamref name="T"/> associated with the <paramref name="source"/>.
 		/// </summary>
-		/// <returns>A list of the attributes found on the source element.</returns>
+		/// <returns>A list of the attributes found on the source element. This value will never be null.</returns>
 		public static IList<T> Attributes<T>( this ICustomAttributeProvider source ) where T : Attribute
 		{
 			return source.GetCustomAttributes( typeof(T), true ).Cast<T>().ToList();
@@ -58,7 +58,7 @@ namespace Fasterflect
 		/// </summary>
 		/// <typeparam name="T">The attribute type to search for.</typeparam>
 		/// <param name="source">An enumeration on which to search for attributes of the given type.</param>
-		/// <returns>A list of the attributes found on the supplied source.</returns>
+		/// <returns>A list of the attributes found on the supplied source. This value will never be null.</returns>
 		public static IList<T> Attributes<T>( this Enum source ) where T : Attribute
 		{
 			return source.Attributes( typeof(T) ).Cast<T>().ToList();
@@ -69,7 +69,7 @@ namespace Fasterflect
 		/// The resulting list of attributes can optionally be filtered by suppliying a list of <paramref name="attributeTypes"/>
 		/// to include.
 		/// </summary>
-		/// <returns>A list of the attributes found on the supplied source.</returns>
+		/// <returns>A list of the attributes found on the supplied source. This value will never be null.</returns>
 		public static IList<Attribute> Attributes( this Enum source, params Type[] attributeTypes )
 		{
 			Type type = source.GetType();
@@ -180,7 +180,7 @@ namespace Fasterflect
 		/// Gets all types in the given <paramref name="assembly"/> that are decorated with an
 		/// <see href="Attribute"/> of the given <paramref name="attributeType"/>.
 		/// </summary>
-		/// <returns>An enumeration of all matching types.</returns>
+		/// <returns>A list of all matching types. This value will never be null.</returns>
 		public static IList<Type> TypesWith( this Assembly assembly, Type attributeType )
 		{
 			var query = from t in assembly.GetTypes()
@@ -193,7 +193,7 @@ namespace Fasterflect
 		/// Gets all types in the given <paramref name="assembly"/> that are decorated with an
 		/// <see href="Attribute"/> of the given type <typeparamref name="T"/>.
 		/// </summary>
-		/// <returns>An enumeration of all matching types.</returns>
+		/// <returns>A list of all matching types. This value will never be null.</returns>
 		public static IList<Type> TypesWith<T>( this Assembly assembly ) where T : Attribute
 		{
 			return assembly.TypesWith( typeof(T) );
@@ -206,7 +206,7 @@ namespace Fasterflect
 		/// decorated with an <see href="Attribute"/> of the given type <typeparamref name="T"/>. Only members
 		/// of the given <paramref name="memberTypes"/> will be included in the result.
 		/// </summary>
-		/// <returns>An enumeration of all matching members.</returns>
+		/// <returns>A list of all matching members. This value will never be null.</returns>
 		public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes ) where T : Attribute
 		{
             return type.MembersWith( memberTypes, Flags.InstanceCriteria, typeof(T) );
@@ -219,7 +219,7 @@ namespace Fasterflect
 		/// will be included in the result. This method will include both
 		/// public and non-public, instance and static members in the result.
 		/// </summary>
-		/// <returns>An enumeration of all matching members.</returns>
+		/// <returns>A list of all matching members. This value will never be null.</returns>
 		public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes, BindingFlags flags )
 		{
             return type.MembersWith( memberTypes, flags, typeof(T) );
@@ -232,7 +232,7 @@ namespace Fasterflect
 		/// of <paramref name="attributeTypes"/>, in which case only members decorated with
 		/// at least one of these will be included.
 		/// </summary>
-		/// <returns>An enumeration of all matching members.</returns>
+		/// <returns>A list of all matching members. This value will never be null.</returns>
 		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes, params Type[] attributeTypes )
 		{
             return type.MembersWith( memberTypes, Flags.InstanceCriteria, attributeTypes );
@@ -246,7 +246,7 @@ namespace Fasterflect
 		/// of <paramref name="attributeTypes"/>, in which case only members decorated with
 		/// at least one of these will be included.
 		/// </summary>
-		/// <returns>An enumeration of all matching members.</returns>
+		/// <returns>A list of all matching members. This value will never be null.</returns>
 		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes, BindingFlags flags,
 		                                             params Type[] attributeTypes )
 		{
@@ -263,7 +263,7 @@ namespace Fasterflect
 		/// at least one of these will be included. This method will include both
 		/// public and non-public, instance and static members in the result.
 		/// </summary>
-		/// <returns>An enumeration of all matching members.</returns>
+		/// <returns>A list of all matching members. This value will never be null.</returns>
 		public static IList<MemberInfo> FieldsAndPropertiesWith( this Type type, params Type[] attributeTypes )
 		{
 			return type.MembersWith( MemberTypes.Field | MemberTypes.Property, attributeTypes );
@@ -279,7 +279,8 @@ namespace Fasterflect
 		/// <paramref name="attributeTypes"/>, in which case only members with at least one of these will be
 		/// included in the result.
 		/// </summary>
-		/// <returns>An dictionary mapping all matching members to their associated attributes.</returns>
+		/// <returns>An dictionary mapping all matching members to their associated attributes. This value
+		/// will never be null.</returns>
 		public static IDictionary<MemberInfo, List<Attribute>> MembersAndAttributes( this Type type, MemberTypes memberTypes,
 		                                                                             BindingFlags flags,
 		                                                                             params Type[] attributeTypes )

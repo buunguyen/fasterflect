@@ -1,5 +1,4 @@
 #region License
-
 // Copyright 2010 Morten Mertner, Buu Nguyen (http://www.buunguyen.net/blog)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,7 +14,6 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System;
@@ -42,9 +40,9 @@ namespace Fasterflect
 		/// <param name="targetType">The type whose static method is to be invoked.</param>
 		/// <param name="methodName">The name of the static method to be invoked.</param>
 		/// <returns>The type whose static method is to be invoked.</returns>
-		public static Type Invoke(this Type targetType, string methodName)
+		public static Type Invoke( this Type targetType, string methodName )
 		{
-			return targetType.Invoke(methodName, Type.EmptyTypes, Constants.EmptyObjectArray);
+			return targetType.Invoke( methodName, Type.EmptyTypes, Constants.EmptyObjectArray );
 		}
 
 		/// <summary>
@@ -59,9 +57,9 @@ namespace Fasterflect
 		/// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
 		/// use a different overload of this method.</param>
 		/// <returns>The type whose static method is to be invoked.</returns>
-		public static Type Invoke(this Type targetType, string methodName, params object[] parameters)
+		public static Type Invoke( this Type targetType, string methodName, params object[] parameters )
 		{
-			return targetType.Invoke(methodName, parameters.GetTypeArray(), parameters);
+			return targetType.Invoke( methodName, parameters.GetTypeArray(), parameters );
 		}
 
 		/// <summary>
@@ -74,34 +72,34 @@ namespace Fasterflect
 		/// <param name="paramTypes">The types of the static method's parameters (must be in the right order).</param>
 		/// <param name="parameters">The parameters of the static method (must be in the right order).</param>
 		/// <returns>The type whose static method is to be invoked.</returns>
-		public static Type Invoke(this Type targetType, string methodName, Type[] paramTypes, params object[] parameters)
+		public static Type Invoke( this Type targetType, string methodName, Type[] paramTypes, params object[] parameters )
 		{
-			DelegateForStaticInvoke(targetType, methodName, paramTypes)(parameters);
+			DelegateForStaticInvoke( targetType, methodName, paramTypes )( parameters );
 			return targetType;
 		}
 
 		/// <summary>
 		/// Invokes the static method specified by <paramref name="methodName"/> of type <paramref name="targetType"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>.
-        /// </summary>
-        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
-        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
-        /// behind the scene, no magic in the generated CIL.</typeparam>
+		/// </summary>
+		/// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+		/// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+		/// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="targetType">The type whose static method is to be invoked.</param>
 		/// <param name="methodName">The name of the static method to be invoked.</param>
 		/// <returns>The return value of the static method.</returns>
-		public static TReturn Invoke<TReturn>(this Type targetType, string methodName)
+		public static TReturn Invoke<TReturn>( this Type targetType, string methodName )
 		{
-			return targetType.Invoke<TReturn>(methodName, Type.EmptyTypes, Constants.EmptyObjectArray);
+			return targetType.Invoke<TReturn>( methodName, Type.EmptyTypes, Constants.EmptyObjectArray );
 		}
 
 		/// <summary>
 		/// Invokes the static method specified by <paramref name="methodName"/> of type <paramref name="targetType"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>
-        /// </summary>
-        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
-        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
-        /// behind the scene, no magic in the generated CIL.</typeparam>
+		/// </summary>
+		/// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+		/// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+		/// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="targetType">The type whose static method is to be invoked.</param>
 		/// <param name="methodName">The name of the static method to be invoked.</param>
 		/// <param name="parameters">The parameters of the static method (must be in the right order).
@@ -109,27 +107,27 @@ namespace Fasterflect
 		/// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
 		/// use a different overload of this method.</param>
 		/// <returns>The return value of the static method.</returns>
-		public static TReturn Invoke<TReturn>(this Type targetType, string methodName, params object[] parameters)
+		public static TReturn Invoke<TReturn>( this Type targetType, string methodName, params object[] parameters )
 		{
-			return targetType.Invoke<TReturn>(methodName, parameters.GetTypeArray(), parameters);
+			return targetType.Invoke<TReturn>( methodName, parameters.GetTypeArray(), parameters );
 		}
 
 		/// <summary>
 		/// Invokes the static method specified by <paramref name="methodName"/> of type <paramref name="targetType"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>
-        /// </summary>
-        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
-        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
-        /// behind the scene, no magic in the generated CIL.</typeparam>
+		/// </summary>
+		/// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+		/// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+		/// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="targetType">The type whose static method is to be invoked.</param>
 		/// <param name="methodName">The name of the static method to be invoked.</param>
 		/// <param name="paramTypes">The types of the static method's parameters (must be in the right order).</param>
 		/// <param name="parameters">The parameters of the static method (must be in the right order).</param>
 		/// <returns>The return value of the static method.</returns>
-		public static TReturn Invoke<TReturn>(this Type targetType, string methodName, Type[] paramTypes,
-		                                      params object[] parameters)
+		public static TReturn Invoke<TReturn>( this Type targetType, string methodName, Type[] paramTypes,
+		                                       params object[] parameters )
 		{
-			return (TReturn) DelegateForStaticInvoke(targetType, methodName, paramTypes)(parameters);
+			return (TReturn) DelegateForStaticInvoke( targetType, methodName, paramTypes )( parameters );
 		}
 
 		/// <summary>
@@ -138,9 +136,10 @@ namespace Fasterflect
 		/// <param name="targetType">The type which the static method belongs to.</param>
 		/// <param name="methodName">The name of the static method to be invoked.</param>
 		/// <returns>A delegate which can invoke the specified static method.</returns>
-		public static StaticMethodInvoker DelegateForStaticInvoke(this Type targetType, string methodName)
+		public static StaticMethodInvoker DelegateForStaticInvoke( this Type targetType, string methodName )
 		{
-			return (StaticMethodInvoker) new MethodInvocationEmitter(methodName, targetType, Type.EmptyTypes, true).GetDelegate();
+			return
+				(StaticMethodInvoker) new MethodInvocationEmitter( methodName, targetType, Type.EmptyTypes, true ).GetDelegate();
 		}
 
 		/// <summary>
@@ -150,10 +149,10 @@ namespace Fasterflect
 		/// <param name="methodName">The name of the static method to be invoked.</param>
 		/// <param name="paramTypes">The types of the static method's parameters (must be in the right order).</param>
 		/// <returns>A delegate which can invoke the specified static method.</returns>
-		public static StaticMethodInvoker DelegateForStaticInvoke(this Type targetType, string methodName,
-		                                                          params Type[] paramTypes)
+		public static StaticMethodInvoker DelegateForStaticInvoke( this Type targetType, string methodName,
+		                                                           params Type[] paramTypes )
 		{
-			return (StaticMethodInvoker) new MethodInvocationEmitter(methodName, targetType, paramTypes, true).GetDelegate();
+			return (StaticMethodInvoker) new MethodInvocationEmitter( methodName, targetType, paramTypes, true ).GetDelegate();
 		}
 		#endregion
 
@@ -166,9 +165,9 @@ namespace Fasterflect
 		/// <param name="target">The object whose method is to be invoked.</param>
 		/// <param name="methodName">The name of the method to be invoked.</param>
 		/// <returns>The object whose method is to be invoked.</returns>
-		public static object Invoke(this object target, string methodName)
+		public static object Invoke( this object target, string methodName )
 		{
-			return Invoke(target, methodName, Type.EmptyTypes, Constants.EmptyObjectArray);
+			return Invoke( target, methodName, Type.EmptyTypes, Constants.EmptyObjectArray );
 		}
 
 		/// <summary>
@@ -183,9 +182,9 @@ namespace Fasterflect
 		/// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
 		/// use a different overload of this method.</param>
 		/// <returns>The object whose method is to be invoked.</returns>
-		public static object Invoke(this object target, string methodName, params object[] parameters)
+		public static object Invoke( this object target, string methodName, params object[] parameters )
 		{
-			DelegateForInvoke(target.GetTypeAdjusted(), methodName, parameters.GetTypeArray())(target, parameters);
+			DelegateForInvoke( target.GetTypeAdjusted(), methodName, parameters.GetTypeArray() )( target, parameters );
 			return target;
 		}
 
@@ -199,34 +198,34 @@ namespace Fasterflect
 		/// <param name="paramTypes">The types of the method parameters (must be in the right order).</param>
 		/// <param name="parameters">The parameters of the method (must be in the right order).</param>
 		/// <returns>The object whose method is to be invoked.</returns>
-		public static object Invoke(this object target, string methodName, Type[] paramTypes, params object[] parameters)
+		public static object Invoke( this object target, string methodName, Type[] paramTypes, params object[] parameters )
 		{
-			DelegateForInvoke(target.GetTypeAdjusted(), methodName, paramTypes)(target, parameters);
+			DelegateForInvoke( target.GetTypeAdjusted(), methodName, paramTypes )( target, parameters );
 			return target;
 		}
 
 		/// <summary>
 		/// Invokes the method specified by <paramref name="methodName"/> of object <paramref name="target"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>.
-        /// </summary>
-        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
-        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
-        /// behind the scene, no magic in the generated CIL.</typeparam>
+		/// </summary>
+		/// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+		/// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+		/// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="target">The object whose method is to be invoked.</param>
 		/// <param name="methodName">The name of the method to be invoked.</param>
 		/// <returns>The return value of the method.</returns>
-		public static TReturn Invoke<TReturn>(this object target, string methodName)
+		public static TReturn Invoke<TReturn>( this object target, string methodName )
 		{
-			return Invoke<TReturn>(target, methodName, Type.EmptyTypes, Constants.EmptyObjectArray);
+			return Invoke<TReturn>( target, methodName, Type.EmptyTypes, Constants.EmptyObjectArray );
 		}
 
 		/// <summary>
 		/// Invokes the method specified by <paramref name="methodName"/> of object <paramref name="target"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>
-        /// </summary>
-        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
-        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
-        /// behind the scene, no magic in the generated CIL.</typeparam>
+		/// </summary>
+		/// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+		/// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+		/// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="target">The object whose method is to be invoked.</param>
 		/// <param name="methodName">The name of the method to be invoked.</param>
 		/// <param name="parameters">The parameters of the method (must be in the right order).
@@ -234,28 +233,28 @@ namespace Fasterflect
 		/// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
 		/// use a different overload of this method.</param>
 		/// <returns>The return value of the method.</returns>
-		public static TReturn Invoke<TReturn>(this object target, string methodName, params object[] parameters)
+		public static TReturn Invoke<TReturn>( this object target, string methodName, params object[] parameters )
 		{
 			return
-				(TReturn) DelegateForInvoke(target.GetTypeAdjusted(), methodName, parameters.GetTypeArray())(target, parameters);
+				(TReturn) DelegateForInvoke( target.GetTypeAdjusted(), methodName, parameters.GetTypeArray() )( target, parameters );
 		}
 
 		/// <summary>
 		/// Invokes the method specified by <paramref name="methodName"/> of object <paramref name="target"/>
 		/// and get back the return value, casted to <typeparamref name="TReturn"/>
-        /// </summary>
-        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
-        /// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
-        /// behind the scene, no magic in the generated CIL.</typeparam>
+		/// </summary>
+		/// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
+		/// between this type and the actual return type.  Fasterflect simply inserts an explicit cast 
+		/// behind the scene, no magic in the generated CIL.</typeparam>
 		/// <param name="target">The object whose method is to be invoked.</param>
 		/// <param name="methodName">The name of the method to be invoked.</param>
 		/// <param name="paramTypes">The types of the method parameters (must be in the right order).</param>
 		/// <param name="parameters">The parameters of the method (must be in the right order).</param>
 		/// <returns>The return value of the method.</returns>
-		public static TReturn Invoke<TReturn>(this object target, string methodName, Type[] paramTypes,
-		                                      params object[] parameters)
+		public static TReturn Invoke<TReturn>( this object target, string methodName, Type[] paramTypes,
+		                                       params object[] parameters )
 		{
-			return (TReturn) DelegateForInvoke(target.GetTypeAdjusted(), methodName, paramTypes)(target, parameters);
+			return (TReturn) DelegateForInvoke( target.GetTypeAdjusted(), methodName, paramTypes )( target, parameters );
 		}
 
 		/// <summary>
@@ -264,9 +263,9 @@ namespace Fasterflect
 		/// <param name="targetType">The type which the method belongs to.</param>
 		/// <param name="methodName">The name of the method to be invoked.</param>
 		/// <returns>A delegate which can invoke the specified method.</returns>
-		public static MethodInvoker DelegateForInvoke(this Type targetType, string methodName)
+		public static MethodInvoker DelegateForInvoke( this Type targetType, string methodName )
 		{
-			return DelegateForInvoke(targetType, methodName, Type.EmptyTypes);
+			return DelegateForInvoke( targetType, methodName, Type.EmptyTypes );
 		}
 
 		/// <summary>
@@ -276,61 +275,89 @@ namespace Fasterflect
 		/// <param name="methodName">The name of the method to be invoked.</param>
 		/// <param name="paramTypes">The types of the method parameters (must be in the right order).</param>
 		/// <returns>A delegate which can invoke the specified method.</returns>
-		public static MethodInvoker DelegateForInvoke(this Type targetType, string methodName, params Type[] paramTypes)
+		public static MethodInvoker DelegateForInvoke( this Type targetType, string methodName, params Type[] paramTypes )
 		{
-			return (MethodInvoker) new MethodInvocationEmitter(methodName, targetType, paramTypes, false).GetDelegate();
+			return (MethodInvoker) new MethodInvocationEmitter( methodName, targetType, paramTypes, false ).GetDelegate();
 		}
 		#endregion
 		#endregion
 
 		#region Method Lookup
+		#region Single Method
 		/// <summary>
-		/// Gets the public or non-public, instance or static method with the given <paramref name="name"/> on the
-		///  given <paramref name="type"/>.
+		/// Find the public or non-public instance method with the given <paramref name="name"/> on the
+		/// given <paramref name="type"/>. 
 		/// </summary>
-		/// <returns>The specified method or null if no method was found.</returns>
+		/// <returns>The specified method or null if no method was found. If there are multiple matches
+		/// due to method overloading an exception will be raised.</returns>
 		public static MethodInfo Method( this Type type, string name )
 		{
-			return type.GetMethod( name, Flags.AllCriteria );
+			return type.Method( name, Flags.InstanceCriteria );
 		}
 
 		/// <summary>
-		/// Gets all public and non-public, instance and static methods on the given <paramref name="type"/>.
+		/// Find the method with the given <paramref name="name"/> and matching <paramref name="flags"/>
+		/// on the given <paramref name="type"/>.
 		/// </summary>
-		/// <returns>A list of all methods.</returns>
+		/// <returns>The specified method or null if no method was found. If there are multiple matches
+		/// due to method overloading an exception will be raised.</returns>
+		public static MethodInfo Method( this Type type, string name, BindingFlags flags )
+		{
+			return type.GetMethod( name, flags );
+		}
+		#endregion
+
+		#region Multiple Methods
+		/// <summary>
+		/// Find all public and non-public instance methods on the given <paramref name="type"/>.
+		/// </summary>
+		/// <returns>A list of all matching methods. This value will never be null.</returns>
 		public static IList<MethodInfo> Methods( this Type type )
 		{
-			return type.Methods( Flags.AllCriteria, null );
+			return type.Methods( Flags.InstanceCriteria, null );
 		}
 
 		/// <summary>
-		/// Gets all methods on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>.
+		/// Find all methods on the given <paramref name="type"/> that match the specified <paramref name="flags"/>. 
 		/// </summary>
-		/// <returns>A list of all matching methods.</returns>
-		public static IList<MethodInfo> Methods( this Type type, BindingFlags bindingFlags )
+		/// <returns>A list of all matching methods. This value will never be null.</returns>
+		public static IList<MethodInfo> Methods( this Type type, BindingFlags flags )
 		{
-			return type.Methods(bindingFlags, null);
+			return type.Methods( flags, null );
 		}
 
 		/// <summary>
-		/// Gets all methods on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>
-		/// and with the given <paramref name="methodName"/>.
+		/// Find all public and non-public instance methods on the given <paramref name="type"/> with the
+		/// given <paramref name="name"/>. If <c>null</c> is passed in the <paramref name="name"/>
+		/// parameter then no name filtering will be applied.
 		/// </summary>
-		/// <returns>A list of all matching methods.</returns>
-		public static IList<MethodInfo> Methods( this Type type, BindingFlags bindingFlags, string methodName )
+		/// <returns>A list of all matching methods. This value will never be null.</returns>
+		public static IList<MethodInfo> Methods( this Type type, string name )
 		{
-			return (from memberInfo in type.FindMembers(MemberTypes.Method, bindingFlags, null, null)
-			        where methodName == null || memberInfo.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase)
+			return type.Methods( Flags.InstanceCriteria, name );
+		}
+
+		/// <summary>
+		/// Find all methods on the given <paramref name="type"/> with the given <paramref name="name"/> that 
+		/// match the specified <paramref name="flags"/>. If <c>null</c> is passed in the <paramref name="name"/>
+		/// parameter then no name filtering will be applied.
+		/// </summary>
+		/// <returns>A list of all matching methods. This value will never be null.</returns>
+		public static IList<MethodInfo> Methods( this Type type, BindingFlags flags, string name )
+		{
+			return (from memberInfo in type.FindMembers( MemberTypes.Method, flags, null, null )
+			        where name == null || memberInfo.Name.Equals( name, StringComparison.OrdinalIgnoreCase )
 			        select memberInfo as MethodInfo).ToList();
 		}
+		#endregion
 		#endregion
 
 		#region Method Parameter Lookup
 		/// <summary>
-		/// Gets all parameters for the given <paramref name="method"/>.
+		/// Find all parameters for the given <paramref name="method"/>.
 		/// </summary>
-		/// <returns>The list of parameters for the method.</returns>
-		public static IList<ParameterInfo> Parameters(this MethodBase method)
+		/// <returns>The list of parameters for the method. This value will never be null.</returns>
+		public static IList<ParameterInfo> Parameters( this MethodBase method )
 		{
 			return method.GetParameters();
 		}
@@ -339,23 +366,22 @@ namespace Fasterflect
 		/// Determines whether null can be assigned to the given <paramref name="parameter"/>.
 		/// </summary>
 		/// <returns>True if null can be assigned, false otherwise.</returns>
-		public static bool IsNullable(this ParameterInfo parameter)
+		public static bool IsNullable( this ParameterInfo parameter )
 		{
-			return ! parameter.ParameterType.IsValueType || parameter.ParameterType.IsSubclassOf(typeof (Nullable));
+			return ! parameter.ParameterType.IsValueType || parameter.ParameterType.IsSubclassOf( typeof(Nullable) );
 		}
 
 		/// <summary>
 		/// Determines whether the given <paramref name="parameter"/> has the given <paramref name="name"/>.
-		/// The comparison uses OrdinalIgnoreCase and allows for a leading underscore in the parameter name
-		/// to be ignored (this is useful when mapping data using reserved words to method parameters). 
+		/// The comparison uses OrdinalIgnoreCase and allows for a leading underscore in either name
+		/// to be ignored.
 		/// </summary>
-		/// <returns>True if the name considered identical, false otherwise.</returns>
-		public static bool HasName(this ParameterInfo parameter, string name)
+		/// <returns>True if the name is considered identical, false otherwise.</returns>
+		public static bool HasName( this ParameterInfo parameter, string name )
 		{
-			bool result = parameter.Name.Equals(name, StringComparison.OrdinalIgnoreCase);
-			if (! result && parameter.Name.StartsWith("_"))
-				result = parameter.Name.Substring(1).Equals(name, StringComparison.OrdinalIgnoreCase);
-			return result;
+			string parameterName = parameter.Name.StartsWith( "_" ) ? parameter.Name.Substring( 1 ) : parameter.Name;
+			name = name.StartsWith( "_" ) ? name.Substring( 1 ) : name;
+			return parameterName.Equals( name, StringComparison.OrdinalIgnoreCase );
 		}
 
 		/// <summary>
@@ -375,12 +401,12 @@ namespace Fasterflect
 		/// obtained from the <see href="DefaultValueAttribute"/> if present on the parameter. This method 
 		/// does not support C# 4.0 default parameter specifications.
 		/// </summary>
-		/// <returns>True if the attribute was detected, false otherwise.</returns>
+		/// <returns>The default value if one could be obtained and converted into the type of the parameter,
+		/// and null otherwise.</returns>
 		public static object DefaultValue( this ParameterInfo parameter )
 		{
 			var defaultValue = parameter.Attribute<DefaultValueAttribute>();
-			// TODO we should do type conversion here since attributes cannot hold all types
-			return defaultValue != null ? defaultValue.Value : null;
+			return defaultValue != null ? ObjectConstruction.TypeConverter.Get( parameter.ParameterType, defaultValue.Value ) : null;
 		}
 		#endregion
 	}
