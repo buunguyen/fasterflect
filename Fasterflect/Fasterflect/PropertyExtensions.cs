@@ -132,33 +132,6 @@ namespace Fasterflect
 		}
 		#endregion
 
-		#region PropertyInfo Access
-		/// <summary>
-		/// Gets the value of the instance property <paramref name="info"/> from the <paramref name="target"/>.
-		/// </summary>
-		/// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
-		/// between this type and the actual type of the property.  Fasterflect simply inserts an explicit cast 
-		/// behind the scene, no magic in the generated CIL.</typeparam>
-		/// <param name="info">The property to read.</param>
-		/// <param name="target">The object whose property should be read.</param>
-		/// <returns>The value of the specified property.</returns>
-		public static TReturn GetValue<TReturn>( this PropertyInfo info, object target )
-		{
-			return target.GetProperty<TReturn>( info.Name );
-		}
-
-		/// <summary>
-		/// Sets the value of the instance property <paramref name="info"/> on the <paramref name="target"/>.
-		/// </summary>
-		/// <param name="info">The property to write.</param>
-		/// <param name="target">The object on which to set the property value.</param>
-		/// <param name="value">The value to assign to the specified property.</param>
-		public static void SetValue( this PropertyInfo info, object target, object value )
-		{
-			target.SetProperty( info.Name, value );
-		}
-		#endregion
-
 		#region Batch Setters
 		/// <summary>
 		/// Sets the static properties of <paramref name="targetType"/> based on

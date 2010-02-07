@@ -201,33 +201,6 @@ namespace Fasterflect
 		#endregion
 		#endregion
 
-		#region FieldInfo Access
-		/// <summary>
-		/// Gets the value of the instance field <paramref name="info"/> from the <paramref name="target"/>.
-        /// </summary>
-        /// <typeparam name="TReturn">The return type of this method.  There must be an implicit or explicit conversion 
-        /// between this type and the actual type of the field.  Fasterflect simply inserts an explicit cast 
-        /// behind the scene, no magic in the generated CIL.</typeparam>
-		/// <param name="info">The field to read.</param>
-        /// <param name="target">The object whose field should be read.</param>
-		/// <returns>The value of the specified field.</returns>
-		public static TReturn GetValue<TReturn>( this FieldInfo info, object target )
-		{
-			return target.GetField<TReturn>( info.Name );
-		}
-
-		/// <summary>
-		/// Sets the value of the instance field <paramref name="info"/> on the <paramref name="target"/>.
-		/// </summary>
-		/// <param name="info">The field to write.</param>
-		/// <param name="target">The object on which to set the field value.</param>
-		/// <param name="value">The value to assign to the specified field.</param>
-		public static void SetValue( this FieldInfo info, object target, object value )
-		{
-			target.SetField( info.Name, value );
-		}
-		#endregion
-
 		#region Field Lookup
 		#region Single Field
 		/// <summary>

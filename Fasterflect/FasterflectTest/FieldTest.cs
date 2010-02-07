@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using Fasterflect;
+using Fasterflect.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest
@@ -60,7 +61,8 @@ namespace FasterflectTest
 		#endregion
 
 		#region Field Access
-		[TestMethod]
+        #region Direct
+        [TestMethod]
         public void Test_set_get_static_fields()
         {
             TypeList.ForEach(type =>
@@ -185,12 +187,47 @@ namespace FasterflectTest
         public void Test_set_null_to_value_type()
         {
             TypeList.ForEach(type => type.CreateInstance().SetField("age", null));
-		}
-		#endregion
+        }
+        #endregion
 
-		#region Field Lookup
-		#region Single Field
-		//public static FieldInfo Field<T>( this Type type, string name )
+        #region FieldInfo
+        [TestMethod]
+        public void Test_set_get_static_fields_via_field_info()
+        {
+            TypeList.ForEach(type =>
+            {
+                var fieldInfo = type.Field("counter", Flags.StaticCriteria);
+                var value = fieldInfo.Get<int>() + 1;
+                fieldInfo.Set(value);
+                Assert.AreEqual(value, fieldInfo.Get<int>());
+            });
+        }
+
+        [TestMethod]
+        public void Test_set_and_get_fields_via_field_info()
+        {
+            TypeList.ForEach(type =>
+            {
+                var target = type.CreateInstance().CreateHolderIfValueType();
+                var peer = new PersonClass();
+                var favColors = new[] { Color.Blue, Color.Red };
+                var ageInfo = type.Field("age");
+                var peerInfo = type.Field("peer");
+                var favoriteColorsInfo = type.Field("favoriteColors");
+                ageInfo.Set(target, 10);
+                peerInfo.Set(target, peer);
+                favoriteColorsInfo.Set(target, favColors);
+                Assert.AreEqual(10, ageInfo.Get<int>(target));
+                Assert.AreSame(peer, peerInfo.Get<PersonClass>(target));
+                Assert.AreSame(favColors, favoriteColorsInfo.Get<Color[]>(target));
+            });
+        }
+        #endregion
+        #endregion
+
+        #region Field Lookup
+        #region Single Field
+        //public static FieldInfo Field<T>( this Type type, string name )
 		//public static FieldInfo Field<T>( this Type type, string name, BindingFlags flags )
 		//public static FieldInfo FieldDeclared<T>( this Type type, string name )
 		//public static FieldInfo FieldDeclared<T>( this Type type, string name, BindingFlags flags )
