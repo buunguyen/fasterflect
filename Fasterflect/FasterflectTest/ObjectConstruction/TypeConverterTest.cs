@@ -20,36 +20,30 @@ using System;
 using System.Linq;
 using Fasterflect.ObjectConstruction;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FasterflectTest.SampleModel.Enumerations;
 
 namespace FasterflectTest.ObjectConstruction
 {
 	[TestClass]
 	public class TypeConverterTest
 	{
-		#region Sample Reflection Classes
-		private enum TestEnum
-		{
-			ElementOne = 5,
-		}
-		#endregion
-
 		#region Enum Conversions
 		[TestMethod]
 		public void TestConvertFromEnum()
 		{
-			Assert.AreEqual( 5, TypeConverter.Get( typeof(int), TestEnum.ElementOne ) );
-			Assert.AreEqual( 5f, TypeConverter.Get( typeof(float), TestEnum.ElementOne ) );
-			Assert.AreEqual( 5d, TypeConverter.Get( typeof(double), TestEnum.ElementOne ) );
-			Assert.AreEqual( "ElementOne", TypeConverter.Get( typeof(string), TestEnum.ElementOne ) );
+			Assert.AreEqual( 2, TypeConverter.Get( typeof(int), Climate.Cold ) );
+			Assert.AreEqual( 2f, TypeConverter.Get( typeof(float), Climate.Cold ) );
+			Assert.AreEqual( 2d, TypeConverter.Get( typeof(double), Climate.Cold ) );
+			Assert.AreEqual( "Cold", TypeConverter.Get( typeof(string), Climate.Cold ) );
 		}
 
 		[TestMethod]
 		public void TestConvertToEnum()
 		{
-			Assert.AreEqual( TestEnum.ElementOne, TypeConverter.Get( typeof(TestEnum), 5 ) );
-			Assert.AreEqual( TestEnum.ElementOne, TypeConverter.Get( typeof(TestEnum), "5" ) );
-			Assert.AreEqual( TestEnum.ElementOne, TypeConverter.Get( typeof(TestEnum), "ElementOne" ) );
-			Assert.AreEqual( TestEnum.ElementOne, TypeConverter.Get( typeof(TestEnum), (object) "ElementOne" ) );
+			Assert.AreEqual( Climate.Cold, TypeConverter.Get( typeof(Climate), 2 ) );
+			Assert.AreEqual( Climate.Cold, TypeConverter.Get( typeof(Climate), "2" ) );
+			Assert.AreEqual( Climate.Cold, TypeConverter.Get( typeof(Climate), "Cold" ) );
+			Assert.AreEqual( Climate.Cold, TypeConverter.Get( typeof(Climate), (object) "Cold" ) );
 		}
 		#endregion
 

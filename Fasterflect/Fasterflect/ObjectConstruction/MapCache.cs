@@ -43,13 +43,13 @@ namespace Fasterflect.ObjectConstruction
 		#region Map Cache Methods
 		public MethodMap GetMap( Type type, int parameterHashCode )
 		{
-			long key = ((long) type.GetHashCode()) << 32 + parameterHashCode;
+			long key = (((long) type.GetHashCode()) << 32) + parameterHashCode;
 			return maps.Get( key );
 		}
 
 		public void AddMap( Type type, int parameterHashCode, MethodMap map )
 		{
-			long key = ((long) type.GetHashCode()) << 32 + parameterHashCode;
+			long key = (((long) type.GetHashCode()) << 32) + parameterHashCode;
 			maps.Insert( key, map, CacheStrategy.Temporary );
 		}
 		#endregion

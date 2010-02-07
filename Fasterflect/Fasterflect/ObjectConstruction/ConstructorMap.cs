@@ -27,22 +27,24 @@ namespace Fasterflect.ObjectConstruction
 	{
 		private ConstructorInvoker invoker;
 
-		public ConstructorMap(ConstructorInfo constructor, string[] paramNames, Type[] paramTypes, bool allowUnusedParameters)
-			: base(constructor, paramNames, paramTypes, allowUnusedParameters)
+		public ConstructorMap( ConstructorInfo constructor, string[] paramNames, Type[] paramTypes, 
+			                   object[] sampleParamValues, bool allowUnusedParameters )
+			: base( constructor, paramNames, paramTypes, sampleParamValues, allowUnusedParameters )
 		{
 		}
 
 		#region UpdateMembers Private Helper Method
 		private void UpdateMembers(object target, object[] row)
 		{
-			for (int i = 0; i < row.Length; i++)
+			for( int i = 0; i < row.Length; i++ )
 			{
-				if (parameterReflectionMask[i])
+				if( parameterReflectionMask[ i ] )
 				{
-					MemberInfo member = members[i];
-					if (member != null)
+					MemberInfo member = members[ i ];
+					if( member != null )
 					{
-						member.SetValue(target, row[i]);
+						object value = parameterTypeConvertMask[ i ] ? TypeConverter.Get( member.Type(), row[ i ] ) : row[ i ];
+						member.SetValue( target, value );
 					}
 				}
 			}

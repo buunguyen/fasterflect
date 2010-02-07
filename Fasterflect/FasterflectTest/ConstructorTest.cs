@@ -190,10 +190,38 @@ namespace FasterflectTest
 
 		#region Constructor Lookup Tests
 		[TestMethod]
-		public void TestConstructorLookupOnPersonClassShouldFindNine()
+		public void TestFindAllConstructorsOnPersonClassShouldFindNine()
 		{
-			Type type = typeof(PersonClass);
-			IList<ConstructorInfo> constructors = type.Constructors().ToList();
+			IList<ConstructorInfo> constructors = typeof(PersonClass).Constructors().ToList();
+			Assert.IsNotNull( constructors );
+			Assert.AreEqual( 9, constructors.Count );
+		}
+
+		[TestMethod]
+		public void TestFindSpecificConstructorOnPersonClassShouldReturnNullForNoMatch()
+		{
+			Type[] paramTypes = new[] { typeof(int), typeof(int) };
+			Assert.IsNull( typeof(PersonClass).Constructor( paramTypes ) );
+		}
+
+		[TestMethod]
+		public void TestFindSpecificConstructorOnPersonClassShouldReturnSingleForMatch()
+		{
+			Type[] paramTypes = new[] { typeof(int) };
+			ConstructorInfo constructor = typeof(PersonClass).Constructor( paramTypes );
+			Assert.IsNotNull( constructor );
+			Assert.AreEqual( "age", constructor.GetParameters()[ 0 ].Name );
+			
+			paramTypes = new[] { typeof(int?) };
+			constructor = typeof(PersonClass).Constructor( paramTypes );
+			Assert.IsNotNull( constructor );
+			Assert.AreEqual( "id", constructor.GetParameters()[ 0 ].Name );
+		}
+
+		[TestMethod]
+		public void TestFindSpecificConstructorsOnPersonClass()
+		{
+			IList<ConstructorInfo> constructors = typeof(PersonClass).Constructors().ToList();
 			Assert.IsNotNull( constructors );
 			Assert.AreEqual( 9, constructors.Count );
 		}
@@ -201,8 +229,7 @@ namespace FasterflectTest
 		[TestMethod]
 		public void TestConstructorLookupOnEmployeeShouldFindOne()
 		{
-			Type type = typeof(Employee);
-			IList<ConstructorInfo> constructors = type.Constructors().ToList();
+			IList<ConstructorInfo> constructors = typeof(Employee).Constructors().ToList();
 			Assert.IsNotNull( constructors );
 			Assert.AreEqual( 1, constructors.Count );
 		}

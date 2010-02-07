@@ -23,6 +23,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Fasterflect;
+using FasterflectTest.SampleModel;
+using FasterflectTest.SampleModel.Attributes;
+using FasterflectTest.SampleModel.Enumerations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest
@@ -30,113 +33,25 @@ namespace FasterflectTest
     [TestClass]
     public class AttributeTest
 	{
-		#region Sample Reflection Classes
-		private class Person
-        {
-			public int? Id { get; set; }
-			[DefaultValue(42)]
-			private int status;
-			public DateTime Birthday { get; set; }
-            public string Name { get; set; }
-            public int Age { get { return DateTime.Now.Year - Birthday.Year + (DateTime.Now.DayOfYear >= Birthday.DayOfYear ? 1 : 0); } }
-        	public int ConstructorInstanceUsed { get; private set; }
-
-            public Person()
-            {
-            	ConstructorInstanceUsed = 1;
-            }
-
-        	public Person( int id )
-        	{
-        		Id = id;
-            	ConstructorInstanceUsed = 2;
-        	}
-
-        	public Person( DateTime birthday, string name )
-        	{
-        		Birthday = birthday;
-        		Name = name;
-            	ConstructorInstanceUsed = 3;
-        	}
-
-        	public Person( int id, DateTime birthday, string name )
-        	{
-        		Id = id;
-        		Birthday = birthday;
-        		Name = name;
-            	ConstructorInstanceUsed = 4;
-        	}
-
-			public virtual int Status
-			{
-				get { return status; }
-				protected set { status = value; }
-			}
-		}
-
-		[AttributeUsage(AttributeTargets.All)]
-		private class CodeAttribute : Attribute {
-			public string Code { get; set; }
-
-			public CodeAttribute( string code )
-			{
-				Code = code;
-			}
-		}
-
-		[Code("DPT")]
-		private enum Department
-		{
-			[Code("DEV")]
-			Development, 
-			[Code("MKT")]
-			Marketing, 
-			[Code("SLS")]
-			Sales,
-		}
-
-		[Code("Class"), DebuggerDisplay("ID={Id}")]
-		private class Employee : Person
-		{
-			#pragma warning disable 0169, 0649
-			[Code( "Field" )]
-			private DateTime lastSeen;
-			#pragma warning restore 0169, 0649
-			[Code("Property")]
-			public string Initials { get; private set; }
-			public Department Department { get; private set; }
-
-			[Code("Constructor")]
-			public Employee( int id, string initials ) : base( id )
-			{
-				Initials = initials;
-			}
-			[Code("Constructor")]
-			public Employee( int id, string initials, Department department ) : base( id )
-			{
-				Initials = initials;
-				Department = department;
-			}
-		}
-		#endregion
-
 		#region Enumerations
 		#region Attribute<T>()
 		[TestMethod]
-        public void TestFindSingleAttributeOnEnum()
+        public void TestFindSingleAttributeOnEnum_Generic()
         {
-			CodeAttribute attr = typeof(Department).Attribute<CodeAttribute>();
+			CodeAttribute attr = typeof(Climate).Attribute<CodeAttribute>();
 			Assert.IsNotNull( attr );
-			Assert.AreEqual( "DPT", attr.Code );
+			Assert.AreEqual( "Temperature", attr.Code );
         }
 
 		[TestMethod]
-        public void TestFindSingleAttributeOnEnumField()
+        public void TestFindSingleAttributeOnEnumField_Generic()
         {
-			Department department = Department.Development;
-			CodeAttribute attr = department.Attribute<CodeAttribute>();
+			CodeAttribute attr = Climate.Hot.Attribute<CodeAttribute>();
 			Assert.IsNotNull( attr );
-			Assert.AreEqual( "DEV", attr.Code );
+			Assert.AreEqual( "Hot", attr.Code );
+			attr = Climate.Any.Attribute<CodeAttribute>();
+			Assert.IsNotNull( attr );
+			Assert.AreEqual( "Any", attr.Code );
         }
 		#endregion
 
@@ -144,7 +59,23 @@ namespace FasterflectTest
 		[TestMethod]
         public void TestFindAllAttributesOnEnum()
         {
-			IList<Attribute> attrs = typeof(Department).Attributes();
+			IList<Attribute> attrs = typeof(Climate).Attributes();
+			Assert.IsNotNull( attrs );
+			Assert.AreEqual( 2, attrs.Count );
+        }
+
+		[TestMethod]
+      	public void TestFindSpecificAttributesOnEnum()
+        {
+			IList<Attribute> attrs = typeof(Climate).Attributes( typeof(CodeAttribute) );
+			Assert.IsNotNull( attrs );
+			Assert.AreEqual( 1, attrs.Count );
+        }
+
+		[TestMethod]
+      	public void TestFindSpecificAttributesOnEnum_Generic()
+        {
+			IList<CodeAttribute> attrs = typeof(Climate).Attributes<CodeAttribute>();
 			Assert.IsNotNull( attrs );
 			Assert.AreEqual( 1, attrs.Count );
         }
@@ -152,20 +83,42 @@ namespace FasterflectTest
 		[TestMethod]
         public void TestFindAllAttributesOnEnumField()
         {
-			IList<Attribute> attrs = Department.Development.Attributes();
+			IList<Attribute> attrs = MovementCapabilities.Land.Attributes();
+			Assert.IsNotNull( attrs );
+			Assert.AreEqual( 0, attrs.Count );
+
+			attrs = Climate.Cold.Attributes();
 			Assert.IsNotNull( attrs );
 			Assert.AreEqual( 1, attrs.Count );
+			var codes = attrs.Cast<CodeAttribute>();
+			Assert.IsNotNull( codes.FirstOrDefault( a => a.Code == "Cold" ) );
         }
 
 		[TestMethod]
         public void TestFindSpecificAttributesOnEnumField()
         {
-			IList<Attribute> attrs = Department.Development.Attributes( typeof(CodeAttribute) );
-			Assert.IsNotNull( attrs );
-			Assert.AreEqual( 1, attrs.Count );
-			attrs = Department.Development.Attributes( typeof(ConditionalAttribute) );
+			IList<Attribute> attrs = Climate.Hot.Attributes( typeof(ConditionalAttribute) );
 			Assert.IsNotNull( attrs );
 			Assert.AreEqual( 0, attrs.Count );
+
+			attrs = Climate.Hot.Attributes( typeof(CodeAttribute) );
+			Assert.IsNotNull( attrs );
+			Assert.AreEqual( 1, attrs.Count );
+			var codes = attrs.Cast<CodeAttribute>();
+			Assert.IsNotNull( codes.FirstOrDefault( a => a.Code == "Hot" ) );
+        }
+
+		[TestMethod]
+        public void TestFindSpecificAttributesOnEnumField_Generic()
+        {
+			IList<ConditionalAttribute> empty = Climate.Hot.Attributes<ConditionalAttribute>();
+			Assert.IsNotNull( empty );
+			Assert.AreEqual( 0, empty.Count );
+
+			IList<CodeAttribute> attrs = Climate.Hot.Attributes<CodeAttribute>();
+			Assert.IsNotNull( attrs );
+			Assert.AreEqual( 1, attrs.Count );
+			Assert.IsNotNull( attrs.FirstOrDefault( a => a.Code == "Hot" ) );
         }
 		#endregion
 		#endregion
@@ -173,33 +126,53 @@ namespace FasterflectTest
 		#region Types
 		#region Attribute<T>()
 		[TestMethod]
-        public void TestFindSingleAttributeOnType()
-        {
-			Type type = typeof(Employee);
-			CodeAttribute attr = type.Attribute<CodeAttribute>();
-			Assert.IsNotNull( attr );
-        }
-		#endregion
+        public void TestFindSpecificAttributeOnType()
+		{
+			CodeAttribute code = typeof(Lion).Attribute<CodeAttribute>();
+			Assert.IsNull( code );
+
+			ZoneAttribute zone = typeof(Lion).Attribute<ZoneAttribute>();
+			Assert.IsNotNull( zone );
+			Assert.AreEqual( Zone.Savannah, zone.Zone );
+		}
+    	#endregion
 
 		#region Attributes()
 		[TestMethod]
         public void TestFindAllAttributesOnType()
         {
-			Type type = typeof(Employee);
-			IList<Attribute> attrs = type.Attributes().ToList();
+			IList<Attribute> attrs = typeof(Lion).Attributes();
 			Assert.IsNotNull( attrs );
-			Assert.AreEqual( 2, attrs.Count );
-			Assert.IsTrue( attrs[ 0 ] is CodeAttribute || attrs[ 1 ] is CodeAttribute );
-			Assert.IsTrue( attrs[ 0 ] is DebuggerDisplayAttribute || attrs[ 1 ] is DebuggerDisplayAttribute );
+			Assert.AreEqual( 3, attrs.Count );
+			Assert.IsTrue( attrs[ 0 ] is ZoneAttribute || attrs[ 0 ] is SerializableAttribute || attrs[ 0 ] is DebuggerDisplayAttribute );
+			Assert.IsTrue( attrs[ 1 ] is ZoneAttribute || attrs[ 1 ] is SerializableAttribute || attrs[ 1 ] is DebuggerDisplayAttribute );
+			Assert.IsTrue( attrs[ 2 ] is ZoneAttribute || attrs[ 2 ] is SerializableAttribute || attrs[ 2 ] is DebuggerDisplayAttribute );
         }
 
 		[TestMethod]
-        public void TestFindSpecifiedAttributesOnType()
+        public void TestFindSpecificAttributesOnType()
         {
-			Type type = typeof(Employee);
-			IList<CodeAttribute> attrs = type.Attributes<CodeAttribute>().ToList();
+			IList<Attribute> attrs = typeof(Lion).Attributes( typeof(CodeAttribute) );
+			Assert.IsNotNull( attrs );
+			Assert.AreEqual( 0, attrs.Count );
+
+			attrs = typeof(Lion).Attributes( typeof(ZoneAttribute) );
 			Assert.IsNotNull( attrs );
 			Assert.AreEqual( 1, attrs.Count );
+			Assert.IsNotNull( attrs.Cast<ZoneAttribute>().FirstOrDefault( a => a.Zone == Zone.Savannah ) );
+        }
+
+		[TestMethod]
+        public void TestFindSpecificAttributesOnType_Generic()
+        {
+			IList<CodeAttribute> empty = typeof(Lion).Attributes<CodeAttribute>();
+			Assert.IsNotNull( empty );
+			Assert.AreEqual( 0, empty.Count );
+
+			IList<ZoneAttribute> attrs = typeof(Lion).Attributes<ZoneAttribute>();
+			Assert.IsNotNull( attrs );
+			Assert.AreEqual( 1, attrs.Count );
+			Assert.IsNotNull( attrs.FirstOrDefault( a => a.Zone == Zone.Savannah ) );
         }
 		#endregion
 
@@ -210,7 +183,8 @@ namespace FasterflectTest
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			IList<Type> types = assembly.TypesWith( typeof(CodeAttribute) );
 			Assert.IsNotNull( types );
-			Assert.AreEqual( 2, types.Count );
+			Assert.AreEqual( 1, types.Count );
+			Assert.AreEqual( typeof(Climate), types[ 0 ] );
         }
 
 		[TestMethod]
@@ -219,45 +193,48 @@ namespace FasterflectTest
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			IList<Type> types = assembly.TypesWith<CodeAttribute>();
 			Assert.IsNotNull( types );
-			Assert.AreEqual( 2, types.Count );
+			Assert.AreEqual( 1, types.Count );
+			Assert.AreEqual( typeof(Climate), types[ 0 ] );
         }
 		#endregion
 
 		#region MembersWith()
 		[TestMethod]
-        public void TestFindMembersWith_PrivateField()
+        public void TestFindMembersWith_InstanceFieldShouldIncludeInheritedPrivateField()
         {
-			Type type = typeof(Employee);
-			IList<MemberInfo> members = type.MembersWith( MemberTypes.Field, BindingFlags.NonPublic | BindingFlags.Instance, typeof(CodeAttribute) );
+			Type type = typeof(Lion);
+			IList<MemberInfo> members = type.MembersWith( MemberTypes.Field, Flags.InstanceCriteria, typeof(CodeAttribute) );
+			Assert.IsNotNull( members );
+			Assert.AreEqual( 2, members.Count );
+			Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "id" ) );
+			Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "lastMealTime" ) );
+			
+			members = type.MembersWith( MemberTypes.Field, BindingFlags.NonPublic | BindingFlags.Instance, typeof(DefaultValueAttribute) );
 			Assert.IsNotNull( members );
 			Assert.AreEqual( 1, members.Count );
+			Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "birthDay" ) );
         }
 
 		[TestMethod]
-        public void TestFindMembersWith_InheritedField()
+        public void TestFindMembersWith_InstanceFieldShouldIncludeInheritedPrivateField_Generic()
         {
-			Type type = typeof(Employee);
-			IList<MemberInfo> members = type.MembersWith( MemberTypes.Field, BindingFlags.NonPublic | BindingFlags.Instance, typeof(DefaultValueAttribute) );
+			Type type = typeof(Lion);
+			IList<MemberInfo> members = type.MembersWith<CodeAttribute>( MemberTypes.Field, Flags.InstanceCriteria );
 			Assert.IsNotNull( members );
-			Assert.AreEqual( 1, members.Count );
+			Assert.AreEqual( 2, members.Count );
+			Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "id" ) );
+			Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "lastMealTime" ) );
         }
 
 		[TestMethod]
-        public void TestFindMembersWith_GenericWithMemberTypes()
+        public void TestFindMembersWith_DefaultBindingFlagsShouldBeInstanceCriteria()
         {
-			Type type = typeof(Employee);
-			IList<MemberInfo> members = type.MembersWith<CodeAttribute>( MemberTypes.Field );
+			Type type = typeof(Lion);
+			IList<MemberInfo> members = type.MembersWith( MemberTypes.Field, typeof(CodeAttribute) );
 			Assert.IsNotNull( members );
-			Assert.AreEqual( 1, members.Count );
-        }
-
-		[TestMethod]
-        public void TestFindMembersWith_GenericWithMemberTypesAndBindingFlags()
-        {
-			Type type = typeof(Employee);
-			IList<MemberInfo> members = type.MembersWith<CodeAttribute>( MemberTypes.Field, BindingFlags.NonPublic | BindingFlags.Instance );
-			Assert.IsNotNull( members );
-			Assert.AreEqual( 1, members.Count );
+			Assert.AreEqual( 2, members.Count );
+			Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "id" ) );
+			Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "lastMealTime" ) );
         }
 		#endregion
 
@@ -265,11 +242,15 @@ namespace FasterflectTest
 		[TestMethod]
         public void TestFindMembersAndAttributes()
         {
-			Type type = typeof(Employee);
-			var members = type.MembersAndAttributes( MemberTypes.Field, BindingFlags.NonPublic | BindingFlags.Instance, typeof(CodeAttribute) );
+			var members = typeof(Lion).MembersAndAttributes( MemberTypes.Field, Flags.InstanceCriteria, typeof(CodeAttribute) );
 			Assert.IsNotNull( members );
-			Assert.AreEqual( 1, members.Count );
-			Assert.AreEqual( "lastSeen", members.Keys.First().Name );
+			Assert.AreEqual( 2, members.Count );
+			foreach( var item in members )
+			{
+				Assert.IsTrue( item.Key.Name == "id" || item.Key.Name == "lastMealTime" );
+				Assert.AreEqual( 1, item.Value.Count );
+				Assert.IsTrue( item.Value[ 0 ] is CodeAttribute );
+			}
         }
 		#endregion
 		#endregion
@@ -277,59 +258,100 @@ namespace FasterflectTest
 		#region Members
 		#region Attribute<T>()
 		[TestMethod]
-        public void TestFindSingleAttributeOnMember()
+        public void TestFindSpecificAttributeOnField()
         {
-			Type type = typeof(Employee);
-
-			PropertyInfo info = type.Property( "Department" );
-			Assert.IsNotNull( info );
-			Assert.AreEqual( 0, info.Attributes<CodeAttribute>().Count() );
-
-			FieldInfo field = type.Field<DateTime>( "lastSeen" );
+			// inherited field
+			FieldInfo field = typeof(Lion).Field<DateTime>( "birthDay" );
+			Assert.IsNull( field );
+			field = typeof(Lion).Field<DateTime?>( "birthDay" );
 			Assert.IsNotNull( field );
-			Assert.AreEqual( 1, field.Attributes<CodeAttribute>().Count() );
+			Assert.IsNull( field.Attribute<CodeAttribute>() );
+			Assert.IsNotNull( field.Attribute<DefaultValueAttribute>() );
+			// declared field
+			field = typeof(Lion).Field<DateTime>( "lastMealTime" );
+			Assert.IsNotNull( field );
+			Assert.IsNotNull( field.Attribute<CodeAttribute>() );
+        }
 
-			PropertyInfo property = type.Property<string>( "Initials" );
-			Assert.IsNotNull( property );
-			Assert.AreEqual( 1, property.Attributes<CodeAttribute>().Count() );
+		[TestMethod]
+        public void TestFindSpecificAttributeOnProperty()
+        {
+			// inherited property (without attributes)
+			PropertyInfo info = typeof(Lion).Property( "ID" );
+			Assert.IsNotNull( info );
+			Assert.IsNull( info.Attribute<CodeAttribute>() );
+			// declared property
+			info = typeof(Lion).Property( "Name" );
+			Assert.IsNotNull( info );
+			Assert.IsNotNull( info.Attribute<CodeAttribute>() );
+			Assert.IsNotNull( info.Attribute<DefaultValueAttribute>() );
+			// inherited property
+			info = typeof(Lion).Property( "MovementCapabilities" );
+			Assert.IsNotNull( info );
+			Assert.IsNotNull( info.Attribute<CodeAttribute>() );
         }
 		#endregion
 
 		#region Attributes()
 		[TestMethod]
-        public void TestFindAllAttributesOnMember()
+        public void TestFindAllAttributesOnField()
         {
-			Type type = typeof(Employee);
-
-			PropertyInfo info = type.Property( "Department" );
+			// declared field
+			FieldInfo info = typeof(Lion).Field( "lastMealTime" );
 			Assert.IsNotNull( info );
-			Assert.AreEqual( 0, info.Attributes().Count() );
-
-			FieldInfo field = type.Field<DateTime>( "lastSeen" );
-			Assert.IsNotNull( field );
-			Assert.AreEqual( 1, field.Attributes().Count() );
-
-			PropertyInfo property = type.Property<string>( "Initials" );
-			Assert.IsNotNull( property );
-			Assert.AreEqual( 1, property.Attributes().Count() );
+			Assert.AreEqual( 1, info.Attributes().Count );
+			// inherited field
+			info = typeof(Lion).Field( "id" );
+			Assert.IsNotNull( info );
+			Assert.AreEqual( 1, info.Attributes().Count );
         }
 
 		[TestMethod]
-        public void TestFindSpecifiedAttributesOnMember()
+        public void TestFindSpecificAttributesOnField()
         {
-			Type type = typeof(Employee);
-
-			PropertyInfo info = type.Property( "Department" );
+			// declared field
+			FieldInfo info = typeof(Lion).Field( "lastMealTime" );
 			Assert.IsNotNull( info );
-			Assert.AreEqual( 0, info.Attributes<CodeAttribute>().Count() );
+			Assert.AreEqual( 1, info.Attributes<CodeAttribute>().Count );
+			// inherited field
+			info = typeof(Lion).Field( "id" );
+			Assert.IsNotNull( info );
+			Assert.AreEqual( 1, info.Attributes<CodeAttribute>().Count );
+        }
 
-			FieldInfo field = type.Field<DateTime>( "lastSeen" );
-			Assert.IsNotNull( field );
-			Assert.AreEqual( 1, field.Attributes<CodeAttribute>().Count() );
+		[TestMethod]
+        public void TestFindAllAttributesOnProperty()
+        {
+			// inherited property (without attributes)
+			PropertyInfo info = typeof(Lion).Property( "ID" );
+			Assert.IsNotNull( info );
+			Assert.AreEqual( 0, info.Attributes().Count );
+			// declared property
+			info = typeof(Lion).Property( "Name" );
+			Assert.IsNotNull( info );
+			Assert.AreEqual( 2, info.Attributes().Count );
+			// inherited property
+			info = typeof(Lion).Property( "MovementCapabilities" );
+			Assert.IsNotNull( info );
+			Assert.AreEqual( 1, info.Attributes().Count );
+        }
 
-			PropertyInfo property = type.Property<string>( "Initials" );
-			Assert.IsNotNull( property );
-			Assert.AreEqual( 1, property.Attributes<CodeAttribute>().Count() );
+		[TestMethod]
+        public void TestFindSpecificAttributesOnProperty()
+        {
+			// inherited property (without attributes)
+			PropertyInfo info = typeof(Lion).Property( "ID" );
+			Assert.IsNotNull( info );
+			Assert.AreEqual( 0, info.Attributes<CodeAttribute>().Count );
+			// declared property
+			info = typeof(Lion).Property( "Name" );
+			Assert.IsNotNull( info );
+			Assert.AreEqual( 1, info.Attributes<CodeAttribute>().Count );
+			Assert.AreEqual( 1, info.Attributes<DefaultValueAttribute>().Count );
+			// inherited property
+			info = typeof(Lion).Property( "MovementCapabilities" );
+			Assert.IsNotNull( info );
+			Assert.AreEqual( 1, info.Attributes<CodeAttribute>().Count );
         }
 		#endregion
 		#endregion

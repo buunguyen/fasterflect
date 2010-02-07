@@ -61,8 +61,7 @@ namespace Fasterflect
 		/// <returns>A list of the attributes found on the supplied source.</returns>
 		public static IList<T> Attributes<T>( this Enum source ) where T : Attribute
 		{
-			Type type = source.GetType();
-			return type.Attributes<T>();
+			return source.Attributes( typeof(T) ).Cast<T>().ToList();
 		}
 
 		/// <summary>
@@ -74,7 +73,8 @@ namespace Fasterflect
 		public static IList<Attribute> Attributes( this Enum source, params Type[] attributeTypes )
 		{
 			Type type = source.GetType();
-			return type.Attributes( attributeTypes );
+			MemberInfo info = type.Member( source.ToString(), Flags.StaticCriteria );
+			return info.Attributes( attributeTypes );
 		}
 		#endregion
 
@@ -111,13 +111,25 @@ namespace Fasterflect
 		/// enumeration value given in the <paramref name="source"/> parameter.
 		/// </summary>
 		/// <typeparam name="T">The attribute type to search for.</typeparam>
-		/// <param name="instance">An enumeration value on which to search for the attribute.</param>
+		/// <param name="source">An enumeration value on which to search for the attribute.</param>
 		/// <returns>The first attribute found on the source.</returns>
-		public static T Attribute<T>(this Enum instance) where T : Attribute
+		public static T Attribute<T>( this Enum source ) where T : Attribute
 		{
-			Type type = instance.GetType();
-			MemberInfo info = type.Member( instance.ToString() );
-			return info.Attribute<T>();
+			return source.Attribute( typeof(T) ) as T;
+		}
+
+		/// <summary>
+		/// Gets the first <see href="Attribute"/> of type <paramref name="attributeType"/> associated with the 
+		/// enumeration value given in the <paramref name="source"/> parameter.
+		/// </summary>
+		/// <param name="source">An enumeration value on which to search for the attribute.</param>
+		/// <param name="attributeType">The attribute type to search for.</param>
+		/// <returns>The first attribute found on the source.</returns>
+		public static Attribute Attribute( this Enum source, Type attributeType )
+		{
+			Type type = source.GetType();
+			MemberInfo info = type.MemberDeclared( source.ToString(), Flags.StaticCriteria );
+			return info.Attribute( attributeType );
 		}
 		#endregion
 
@@ -190,66 +202,58 @@ namespace Fasterflect
 
 		#region Members With Lookup
 		/// <summary>
-		/// Gets all members on the given <paramref name="type"/> that are decorated with an
-		/// <see href="Attribute"/> of the given type <typeparamref name="T"/>. Only members
-		/// of the given <paramref name="memberTypes"/> will be included in the result. This method 
-		/// will include both public and non-public, instance and static members in the result.
+		/// Gets all public and non-public instance members on the given <paramref name="type"/> that are 
+		/// decorated with an <see href="Attribute"/> of the given type <typeparamref name="T"/>. Only members
+		/// of the given <paramref name="memberTypes"/> will be included in the result.
 		/// </summary>
 		/// <returns>An enumeration of all matching members.</returns>
 		public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes ) where T : Attribute
 		{
-            return type.MembersWith( memberTypes, Flags.AllCriteria, typeof(T) );
+            return type.MembersWith( memberTypes, Flags.InstanceCriteria, typeof(T) );
 		}
 
 		/// <summary>
 		/// Gets all members on the given <paramref name="type"/> that are decorated with an
 		/// <see href="Attribute"/> of the given type <typeparamref name="T"/>. Only members
-		/// of the given <paramref name="memberTypes"/> and matching <paramref name="bindingFlags"/>
+		/// of the given <paramref name="memberTypes"/> and matching <paramref name="flags"/>
 		/// will be included in the result. This method will include both
 		/// public and non-public, instance and static members in the result.
 		/// </summary>
 		/// <returns>An enumeration of all matching members.</returns>
-		public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes, BindingFlags bindingFlags )
+		public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes, BindingFlags flags )
 		{
-            return type.MembersWith( memberTypes, bindingFlags, typeof(T) );
+            return type.MembersWith( memberTypes, flags, typeof(T) );
 		}
 
 		/// <summary>
-		/// Gets all members on the given <paramref name="type"/>. Only members
+		/// Gets all public and non-public instance members on the given <paramref name="type"/>. Only members
 		/// of the given <paramref name="memberTypes"/> will be included in the result.
 		/// The resulting list of attributes can optionally be filtered by supplying a list
 		/// of <paramref name="attributeTypes"/>, in which case only members decorated with
-		/// at least one of these will be included. This method will include both
-		/// public and non-public, instance and static members in the result.
+		/// at least one of these will be included.
 		/// </summary>
 		/// <returns>An enumeration of all matching members.</returns>
 		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes, params Type[] attributeTypes )
 		{
-            return type.MembersWith( memberTypes, Flags.AllCriteria, attributeTypes );
+            return type.MembersWith( memberTypes, Flags.InstanceCriteria, attributeTypes );
 		}
 
 		/// <summary>
 		/// Gets all members on the given <paramref name="type"/>. Only members of the given 
-		/// <paramref name="memberTypes"/> and matching <paramref name="bindingFlags"/> will be 
+		/// <paramref name="memberTypes"/> and matching <paramref name="flags"/> will be 
 		/// included in the result.
 		/// The resulting list of attributes can optionally be filtered by supplying a list
 		/// of <paramref name="attributeTypes"/>, in which case only members decorated with
 		/// at least one of these will be included.
 		/// </summary>
 		/// <returns>An enumeration of all matching members.</returns>
-		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes, BindingFlags bindingFlags,
+		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes, BindingFlags flags,
 		                                             params Type[] attributeTypes )
 		{
-			var result = new List<MemberInfo>();
-			while( type != null && type != typeof(object) )
-			{
-				var query = from m in type.Members(memberTypes, bindingFlags)
-				       		where attributeTypes.Length == 0 || m.HasAnyAttribute(attributeTypes)
-				       		select m;
-				result.AddRange( query );
-				type = type.BaseType;
-			}
-			return result;
+			var query = from m in type.Members( memberTypes, flags )
+			       		where attributeTypes.Length == 0 || m.HasAnyAttribute( attributeTypes )
+			       		select m;
+			return query.ToList();
 		}
 
 		/// <summary>
@@ -269,7 +273,7 @@ namespace Fasterflect
 		#region Members And Attributes Lookup
 		/// <summary>
 		/// Gets a dictionary with all members on the given <paramref name="type"/> and their associated attributes.
-		/// Only members of the given <paramref name="memberTypes"/> and matching <paramref name="bindingFlags"/> will
+		/// Only members of the given <paramref name="memberTypes"/> and matching <paramref name="flags"/> will
 		/// be included in the result.
 		/// The list of attributes associated with each member can optionally be filtered by supplying a list of
 		/// <paramref name="attributeTypes"/>, in which case only members with at least one of these will be
@@ -277,10 +281,10 @@ namespace Fasterflect
 		/// </summary>
 		/// <returns>An dictionary mapping all matching members to their associated attributes.</returns>
 		public static IDictionary<MemberInfo, List<Attribute>> MembersAndAttributes( this Type type, MemberTypes memberTypes,
-		                                                                             BindingFlags bindingFlags,
+		                                                                             BindingFlags flags,
 		                                                                             params Type[] attributeTypes )
 		{
-			var members = from m in type.Members (memberTypes, bindingFlags )
+			var members = from m in type.Members( memberTypes, flags )
 			              let a = m.Attributes( attributeTypes )
 			              where a.Count() > 0
 			              select new { Member = m, Attributes = a.ToList() };

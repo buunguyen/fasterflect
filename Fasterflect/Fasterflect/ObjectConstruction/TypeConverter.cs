@@ -58,7 +58,7 @@ namespace Fasterflect.ObjectConstruction
 			}
 			catch( FormatException )
 			{
-				return value; // no conversion was possible
+				return null; // no conversion was possible
 			}
 		}
 
@@ -99,7 +99,7 @@ namespace Fasterflect.ObjectConstruction
 			{
 				return ConvertTypes( targetType, sourceType, value );
 			}
-			return value is IConvertible ? Convert.ChangeType( value, targetType ) : value;
+			return value is IConvertible ? Convert.ChangeType( value, targetType ) : null;
 		}
 		#endregion
 
@@ -221,7 +221,7 @@ namespace Fasterflect.ObjectConstruction
 					return g.ToByteArray();
 				}
 			}
-			return sourceObj;
+			return null;
 			// Check.FailPostcondition( typeof(TypeConverter), "Cannot convert type {0} to type {1}.", sourceType, targetType );
 		}
 		#endregion
