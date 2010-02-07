@@ -22,17 +22,13 @@ using System;
 using System.Reflection;
 using System.Reflection.Emit;
 using Fasterflect.Caching;
+using Fasterflect.Common;
 
 namespace Fasterflect.Emitter
 {
 	internal abstract class BaseEmitter
 	{
 		protected CallInfo callInfo;
-
-		protected BindingFlags ScopeFlag
-		{
-			get { return callInfo.IsStatic ? BindingFlags.Static : BindingFlags.Instance; }
-		}
 
 		public Delegate GetDelegate()
 		{

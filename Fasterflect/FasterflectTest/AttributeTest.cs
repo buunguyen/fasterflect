@@ -23,6 +23,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Fasterflect;
+using Fasterflect.Common;
 using FasterflectTest.SampleModel;
 using FasterflectTest.SampleModel.Attributes;
 using FasterflectTest.SampleModel.Enumerations;

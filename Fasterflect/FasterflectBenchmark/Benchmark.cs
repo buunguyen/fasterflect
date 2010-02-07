@@ -90,15 +90,15 @@ namespace FasterflectBenchmark
 
 		public static void Main(string[] args)
 		{
-			RunTryCreateInstanceBenchmark();
-            //RunConstructorBenchmark();
-            //RunFieldBenchmark();
-            //RunStaticFieldBenchmark();
-            //RunPropertyBenchmark();
-            //RunStaticPropertyBenchmark();
-            //RunMethodInvocationBenchmark();
-            //RunStaticMethodInvocationBenchmark();
-            //RunIndexerBenchmark();
+            RunTryCreateInstanceBenchmark();
+            RunConstructorBenchmark();
+            RunFieldBenchmark();
+            RunStaticFieldBenchmark();
+            RunPropertyBenchmark();
+            RunStaticPropertyBenchmark();
+            RunMethodInvocationBenchmark();
+            RunStaticMethodInvocationBenchmark();
+            RunIndexerBenchmark();
 		}
 
 		private static void RunTryCreateInstanceBenchmark()
