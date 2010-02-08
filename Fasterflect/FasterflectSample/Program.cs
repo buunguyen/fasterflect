@@ -98,7 +98,7 @@ namespace FasterflectSample
 
             // id and name should have been set properly
             AssertTrue(1 == (int)obj.GetFieldValue("id"));
-            AssertTrue("Doe" == obj.GetPropertyValue("Name"));
+            AssertTrue("Doe" == obj.GetPropertyValue("Name").ToString());
 
             // Let's use the indexer to retrieve the character at index 1
             AssertTrue('o' == (char)obj.GetIndexer(1));
@@ -120,7 +120,7 @@ namespace FasterflectSample
             // We can chain calls
             obj.SetFieldValue("id", 3).SetPropertyValue("Name", "Buu");
             AssertTrue(3 == (int)obj.GetPropertyValue("Id"));
-            AssertTrue("Buu" == obj.GetPropertyValue("Name"));
+            AssertTrue("Buu" == obj.GetPropertyValue("Name").ToString());
              
             // How about modifying both properties at the same time using an anonymous sample
             obj.SetProperties(new {
@@ -128,7 +128,7 @@ namespace FasterflectSample
                                       Name = "Nguyen"
                                   });
             AssertTrue(4 == (int)obj.GetPropertyValue("Id"));
-            AssertTrue("Nguyen" == obj.GetPropertyValue("Name"));
+            AssertTrue("Nguyen" == obj.GetPropertyValue("Name").ToString());
 
             // Let's have the folk walk 6 miles (and try chaining again)
             obj.Invoke("Walk", 1).Invoke("Walk", 2).Invoke("Walk", 3);
@@ -177,7 +177,7 @@ namespace FasterflectSample
                 object obj = ctor(i, "_" + i).CreateHolderIfValueType();
                 AssertTrue(++currentInstanceCount == (int)count());
                 AssertTrue(i == (int)obj.GetFieldValue("id"));
-                AssertTrue("_" + i == obj.GetPropertyValue("Name"));
+                AssertTrue("_" + i == obj.GetPropertyValue("Name").ToString());
             });
 
             // Whatever thing we can do with the normal API, we can do with the cache API.
