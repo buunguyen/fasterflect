@@ -25,7 +25,7 @@ namespace FasterflectTest
                              {
                                  var obj = type.CreateInstance(10);
                                  Assert.IsNotNull(obj);
-                                 Assert.AreEqual(10, obj.GetProperty<int>("Length"));
+                                 Assert.AreEqual(10, obj.GetPropertyValue("Length"));
                              });
         }
 
@@ -37,7 +37,7 @@ namespace FasterflectTest
                                 var ctorFunc = type.DelegateForCreateInstance(typeof(int));
                                 var obj = ctorFunc(20);
                                 Assert.IsNotNull(obj);
-                                Assert.AreEqual(20, obj.GetProperty<int>("Length"));
+                                Assert.AreEqual(20, obj.GetPropertyValue("Length"));
                             });
         }
 
@@ -49,7 +49,7 @@ namespace FasterflectTest
                                      var array = type.CreateInstance(10);
                                      var instance = type.GetElementType().CreateInstance();
                                      array.SetElement(1, instance);
-                                     Assert.AreEqual(instance, array.GetElement<object>(1));
+                                     Assert.AreEqual(instance, array.GetElement(1));
                                  });
         }
 

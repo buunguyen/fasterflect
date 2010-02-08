@@ -15,7 +15,8 @@
     <StartupObject>
     </StartupObject>
     <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>bnk.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -119,7 +120,6 @@
     <Compile Include="Emitter\ValueTypeHolder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bnk.snk" />
     <Compile Include="Extensions\Core\MethodInfoExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

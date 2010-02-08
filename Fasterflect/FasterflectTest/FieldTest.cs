@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using Fasterflect;
-using Fasterflect.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest

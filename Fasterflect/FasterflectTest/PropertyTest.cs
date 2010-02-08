@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using Fasterflect;
-using Fasterflect.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest
@@ -203,7 +202,6 @@ namespace FasterflectTest
         #endregion
 
         #region PropertyInfo
-
         [TestMethod]
         public void Test_set_and_get_static_properties_via_property_info()
         {
