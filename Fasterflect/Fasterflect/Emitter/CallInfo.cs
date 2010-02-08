@@ -52,7 +52,8 @@ namespace Fasterflect.Emitter
         public Type[] ParamTypes { get; private set; }
         public string Name { get; private set; }
         public bool IsStatic { get; private set; }
-		private int hashCode;
+		private readonly int hashCode;
+
 		private static readonly CallInfoComparer comparer = new CallInfoComparer();
 		
 		public static CallInfoComparer Comparer
@@ -131,6 +132,7 @@ namespace Fasterflect.Emitter
 		{
 			return hashCode;
 		}
+
 		internal int CalculateHashCode()
 		{
 			// simple hash, 60ms
