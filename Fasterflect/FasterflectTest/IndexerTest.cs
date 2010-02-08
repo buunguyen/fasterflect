@@ -112,11 +112,11 @@ namespace FasterflectTest
              {
                  var target = type.CreateInstance(100).CreateHolderIfValueType();
                  target.SetIndexer(10, "John");
-                 Assert.AreEqual("John", target.GetIndexer<string>(10));
+                 Assert.AreEqual("John", target.GetIndexer(10));
                  target.SetIndexer(new[] { typeof(int), typeof(int), typeof(string) }, 1, 2, "Jane");
-                 Assert.AreEqual("Jane", target.GetIndexer<string>(new[] { typeof(int), typeof(int) }, 1, 2));
+                 Assert.AreEqual("Jane", target.GetIndexer(new[] { typeof(int), typeof(int) }, 1, 2));
                  var other = type.CreateInstance(1);
-                 var result = target.GetIndexer<object>(other);
+                 var result = target.GetIndexer(other);
                  Assert.AreEqual(other, result);
              });
         }

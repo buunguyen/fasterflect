@@ -79,8 +79,8 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
                                  {
-                                     type.SetProperty("Counter", 1);
-                                     Assert.AreEqual(1, type.GetProperty<int>("Counter"));
+                                     type.SetPropertyValue("Counter", 1);
+                                     Assert.AreEqual(1, type.GetPropertyValue("Counter"));
                                  });
         }
 
@@ -90,9 +90,9 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
                                 {
                                     var target = type.CreateInstance().CreateHolderIfValueType();
-                                    target.SetProperty("Age", 10);
-                                    Assert.AreEqual(10, target.GetProperty<int>("Age"));
-                                    target.SetProperty("IsGeek", true);
+                                    target.SetPropertyValue("Age", 10);
+                                    Assert.AreEqual(10, target.GetPropertyValue("Age"));
+                                    target.SetPropertyValue("IsGeek", true);
                                 });
         }
 
@@ -102,7 +102,7 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
             {
                 type.SetProperties(new { Counter = 5 });
-                Assert.AreEqual(5, type.GetProperty<int>("Counter"));
+                Assert.AreEqual(5, type.GetPropertyValue("Counter"));
             });
         }
 
@@ -111,9 +111,9 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
             {
-                var currentValue = type.GetProperty<int>("Counter");
+                var currentValue = (int)type.GetPropertyValue("Counter");
                 type.SetProperties(new { Counter = (currentValue + 1) }, "not_exist");
-                Assert.AreEqual(currentValue, type.GetProperty<int>("Counter"));
+                Assert.AreEqual(currentValue, type.GetPropertyValue("Counter"));
             });
         }
 
@@ -124,8 +124,8 @@ namespace FasterflectTest
                                 {
                                     var target = type.CreateInstance().CreateHolderIfValueType();
                                     target.SetProperties(new { Age = 10, Name = "John" });
-                                    Assert.AreEqual(10, target.GetProperty<int>("Age"));
-                                    Assert.AreEqual("John", target.GetProperty<string>("Name"));
+                                    Assert.AreEqual(10, target.GetPropertyValue("Age"));
+                                    Assert.AreEqual("John", target.GetPropertyValue("Name"));
                                 });
         }
 
@@ -136,8 +136,8 @@ namespace FasterflectTest
             {
                 var target = type.CreateInstance().CreateHolderIfValueType();
                 target.SetProperties(new { Age = 10, Name = "John" }, "Age");
-                Assert.AreEqual(10, target.GetProperty<int>("Age"));
-                Assert.AreSame(null, target.GetProperty<string>("Name"));
+                Assert.AreEqual(10, target.GetPropertyValue("Age"));
+                Assert.AreSame(null, target.GetPropertyValue("Name"));
             });
         }
 
@@ -148,7 +148,7 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
             {
                 var target = type.CreateInstance();
-                target.SetProperty("LikeMusic", target);
+                target.SetPropertyValue("LikeMusic", target);
             });
         }
 
@@ -156,56 +156,49 @@ namespace FasterflectTest
         [ExpectedException(typeof(MissingMemberException))]
         public void Test_use_non_existent_getter()
         {
-            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().GetProperty<bool>("IsGeek"));
+            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().GetPropertyValue("IsGeek"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingMemberException))]
         public void Test_set_non_existent_property()
         {
-            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().SetProperty("NotExist", true));
+            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().SetPropertyValue("NotExist", true));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingMemberException))]
         public void Test_set_non_existent_static_property()
         {
-            TypeList.ForEach(type => type.SetProperty("NotExist", true));
+            TypeList.ForEach(type => type.SetPropertyValue("NotExist", true));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingMemberException))]
         public void Test_get_non_existent_property()
         {
-            TypeList.ForEach(type => type.GetProperty<int>("NotExist"));
+            TypeList.ForEach(type => type.GetPropertyValue("NotExist"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingMemberException))]
         public void Test_get_non_existent_static_property()
         {
-            TypeList.ForEach(type => type.GetProperty<int>("NotExist"));
+            TypeList.ForEach(type => type.GetPropertyValue("NotExist"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidCastException))]
         public void Test_set_invalid_value_type()
         {
-            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().SetProperty("Name", 1));
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidCastException))]
-        public void Test_get_invalid_type()
-        {
-            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().GetProperty<string>("Age"));
+            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().SetPropertyValue("Name", 1));
         }
 
         [TestMethod]
         [ExpectedException(typeof(NullReferenceException))]
         public void Test_set_null_to_value_type()
         {
-            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().SetProperty("Age", null));
+            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().SetPropertyValue("Age", null));
         }
         #endregion
 
@@ -217,9 +210,9 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
             {
                 var propInfo = type.Property("Counter", Flags.StaticCriteria);
-                var value = propInfo.Get<int>() + 1;
-                propInfo.Set(value);
-                Assert.AreEqual(value, propInfo.Get<int>());
+                var value = (int)propInfo.GetValue() + 1;
+                propInfo.SetValue(value);
+                Assert.AreEqual(value, propInfo.GetValue());
             });
         }
 
@@ -231,9 +224,9 @@ namespace FasterflectTest
                 var target = type.CreateInstance().CreateHolderIfValueType();
                 var age = type.Property("Age");
                 var isGeek = type.Property("IsGeek");
-                age.Set(target, 10);
-                isGeek.Set(target, true);
-                Assert.AreEqual(10, age.Get<int>(target));
+                age.SetValue(target, 10);
+                isGeek.SetValue(target, true);
+                Assert.AreEqual(10, age.GetValue(target));
             });
         }
         #endregion

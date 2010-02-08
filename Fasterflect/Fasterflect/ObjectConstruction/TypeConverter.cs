@@ -10,7 +10,7 @@ namespace Fasterflect.ObjectConstruction
 	/// </summary>
 	public static class TypeConverter
 	{
-		#region Get methods
+		#region GetValue methods
 		/// <summary>
 		/// Convert the supplied XmlNode into the specified target type. Only the InnerXml portion
 		/// of the XmlNode is used in the conversion, unless the target type is itself an XmlNode.

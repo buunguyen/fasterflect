@@ -67,8 +67,8 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
                                  {
-                                     type.SetField("counter", 1);
-                                     Assert.AreEqual(1, type.GetField<int>("counter"));
+                                     type.SetFieldValue("counter", 1);
+                                     Assert.AreEqual(1, type.GetFieldValue("counter"));
                                  });
         }
 
@@ -80,12 +80,12 @@ namespace FasterflectTest
                 var target = type.CreateInstance().CreateHolderIfValueType();
                 var peer = new PersonClass();
                 var favColors = new[] { Color.Blue, Color.Red };
-                target.SetField("age", 10)
-                      .SetField("peer", peer)
-                      .SetField("favoriteColors", favColors);
-                Assert.AreEqual(10, target.GetField<int>("age"));
-                Assert.AreSame(peer, target.GetField<PersonClass>("peer"));
-                Assert.AreSame(favColors, target.GetField<Color[]>("favoriteColors"));
+                target.SetFieldValue("age", 10)
+                      .SetFieldValue("peer", peer)
+                      .SetFieldValue("favoriteColors", favColors);
+                Assert.AreEqual(10, target.GetFieldValue("age"));
+                Assert.AreSame(peer, target.GetFieldValue("peer"));
+                Assert.AreSame(favColors, target.GetFieldValue("favoriteColors"));
             });
         }
 
@@ -95,7 +95,7 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
             {
                 type.SetFields(new { counter = 2 });
-                Assert.AreEqual(2, type.GetField<int>("counter"));
+                Assert.AreEqual(2, type.GetFieldValue("counter"));
             });
         }
 
@@ -104,9 +104,9 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
             {
-                var currentValue = type.GetField<int>( "counter" );
+                var currentValue = (int)type.GetFieldValue( "counter" );
                 type.SetFields(new { counter = (currentValue + 1) }, "non_exist");
-                Assert.AreEqual(currentValue, type.GetField<int>("counter"));
+                Assert.AreEqual(currentValue, type.GetFieldValue("counter"));
             });
         }
 
@@ -119,9 +119,9 @@ namespace FasterflectTest
                 var peer = new PersonClass();
                 var favColors = new[] { Color.Blue, Color.Red };
                 target.SetFields(new {age = 10, peer, favoriteColors = favColors});
-                Assert.AreEqual(10, target.GetField<int>("age"));
-                Assert.AreSame(peer, target.GetField<PersonClass>("peer"));
-                Assert.AreSame(favColors, target.GetField<Color[]>("favoriteColors"));
+                Assert.AreEqual(10, target.GetFieldValue("age"));
+                Assert.AreSame(peer, target.GetFieldValue("peer"));
+                Assert.AreSame(favColors, target.GetFieldValue("favoriteColors"));
             });
         }
 
@@ -134,9 +134,9 @@ namespace FasterflectTest
                 var peer = new PersonClass();
                 var favColors = new[] { Color.Blue, Color.Red };
                 target.SetFields(new { age = 10, peer, favoriteColors = favColors }, "age");
-                Assert.AreEqual(10, target.GetField<int>("age"));
-                Assert.AreSame(null, target.GetField<PersonClass>("peer"));
-                Assert.AreSame(null, target.GetField<Color[]>("favoriteColors"));
+                Assert.AreEqual(10, target.GetFieldValue("age"));
+                Assert.AreSame(null, target.GetFieldValue("peer"));
+                Assert.AreSame(null, target.GetFieldValue("favoriteColors"));
             });
         }
 
@@ -144,49 +144,42 @@ namespace FasterflectTest
         [ExpectedException(typeof(MissingFieldException))]
         public void Test_set_not_existent_field()
         {
-            TypeList.ForEach(type => type.CreateInstance().SetField("not_exist", 1));
+            TypeList.ForEach(type => type.CreateInstance().SetFieldValue("not_exist", 1));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingFieldException))]
         public void Test_set_not_existent_static_field()
         {
-            TypeList.ForEach(type => type.SetField("not_exist", 1));
+            TypeList.ForEach(type => type.SetFieldValue("not_exist", 1));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingFieldException))]
         public void Test_get_not_existent_field()
         {
-            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().GetField<int>("not_exist"));
+            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().GetFieldValue("not_exist"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MissingFieldException))]
         public void Test_get_not_existent_static_field()
         {
-            TypeList.ForEach(type => type.GetField<int>("not_exist"));
+            TypeList.ForEach(type => type.GetFieldValue("not_exist"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidCastException))]
         public void Test_set_invalid_value_type()
         {
-            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().SetField("peer", 1));
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidCastException))]
-        public void Test_get_invalid_type()
-        {
-            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().GetField<string>("age"));
+            TypeList.ForEach(type => type.CreateInstance().CreateHolderIfValueType().SetFieldValue("peer", 1));
         }
 
         [TestMethod]
         [ExpectedException(typeof(NullReferenceException))]
         public void Test_set_null_to_value_type()
         {
-            TypeList.ForEach(type => type.CreateInstance().SetField("age", null));
+            TypeList.ForEach(type => type.CreateInstance().SetFieldValue("age", null));
         }
         #endregion
 
@@ -197,9 +190,9 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
             {
                 var fieldInfo = type.Field("counter", Flags.StaticCriteria);
-                var value = fieldInfo.Get<int>() + 1;
-                fieldInfo.Set(value);
-                Assert.AreEqual(value, fieldInfo.Get<int>());
+                var value = (int)fieldInfo.GetValue() + 1;
+                fieldInfo.SetValue(value);
+                Assert.AreEqual(value, fieldInfo.GetValue());
             });
         }
 
@@ -214,12 +207,12 @@ namespace FasterflectTest
                 var ageInfo = type.Field("age");
                 var peerInfo = type.Field("peer");
                 var favoriteColorsInfo = type.Field("favoriteColors");
-                ageInfo.Set(target, 10);
-                peerInfo.Set(target, peer);
-                favoriteColorsInfo.Set(target, favColors);
-                Assert.AreEqual(10, ageInfo.Get<int>(target));
-                Assert.AreSame(peer, peerInfo.Get<PersonClass>(target));
-                Assert.AreSame(favColors, favoriteColorsInfo.Get<Color[]>(target));
+                FieldInfoExtensions.SetValue( ageInfo, target, 10);
+                FieldInfoExtensions.SetValue( peerInfo, target, peer);
+                FieldInfoExtensions.SetValue( favoriteColorsInfo, target, favColors);
+                Assert.AreEqual(10, FieldInfoExtensions.GetValue( ageInfo, target));
+                Assert.AreSame(peer, FieldInfoExtensions.GetValue( peerInfo, target));
+                Assert.AreSame(favColors, FieldInfoExtensions.GetValue( favoriteColorsInfo, target));
             });
         }
         #endregion

@@ -135,7 +135,7 @@ namespace Fasterflect.ObjectConstruction
 			MemberGetter reader = paramValueReaders[index];
 			if (reader == null)
 			{
-				reader = paramKinds[index] ? type.DelegateForGetField(memberName) : type.DelegateForGetProperty(memberName);
+				reader = paramKinds[index] ? type.DelegateForGetFieldValue(memberName) : type.DelegateForGetPropertyValue(memberName);
 				paramValueReaders[index] = reader;
 			}
 			return reader;
@@ -149,7 +149,7 @@ namespace Fasterflect.ObjectConstruction
 				for (int i = 0; i < paramNames.Length; i++)
 				{
 					string name = paramNames[i];
-					paramValueReaders[i] = paramKinds[i] ? type.DelegateForGetField(name) : type.DelegateForGetProperty(name);
+					paramValueReaders[i] = paramKinds[i] ? type.DelegateForGetFieldValue(name) : type.DelegateForGetPropertyValue(name);
 				}
 			}
 		}

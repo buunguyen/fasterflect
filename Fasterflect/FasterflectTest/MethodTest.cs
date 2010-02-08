@@ -139,7 +139,7 @@ namespace FasterflectTest
             var type = typeof (PersonClass);
             var target = type.CreateInstance();
             var employee = new Employee();
-            var result = target.Invoke<Employee>("AddPeer",
+            var result = target.Invoke("AddPeer",
                 new[] { typeof(Employee) }, new object[] { employee });
             Assert.AreSame(employee, result);
         }
@@ -148,7 +148,7 @@ namespace FasterflectTest
         public void Test_invoke_method_with_ref_params()
         {
             var parameters = new object[] { 1, 1, 3, "original" };
-            var result = typeof(Utils).Invoke<int>("Update",
+            var result = typeof(Utils).Invoke("Update",
                 new[] { typeof(int), typeof(int).MakeByRefType(), 
                 typeof(int), typeof(string).MakeByRefType() }, parameters);
             Assert.AreEqual(4, result);
@@ -185,20 +185,9 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
                                  {
                                      type.Invoke("SetStartingId", 10);
-                                     var nextId = type.Invoke<int>("GetNextId");
+                                     var nextId = (int)type.Invoke("GetNextId");
                                      Assert.AreEqual(11, nextId);
                                  });
-        }
-
-        [TestMethod]
-        public void Test_invoke_methods_without_specifying_return_type()
-        {
-            TypeList.ForEach(type =>
-            {
-                type.Invoke("SetStartingId", 10);
-                var result = type.Invoke("GetNextId");
-                Assert.AreSame(type, result);
-            });
         }
 
         [TestMethod]
@@ -207,7 +196,7 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
                                  {
                                      type.Invoke("SetStartingId", 10);
-                                     var nextId = type.Invoke<int>("GetNextId", 5);
+                                     var nextId = (int)type.Invoke("GetNextId", 5);
                                      Assert.AreEqual(16, nextId);
                                  });
         }
@@ -217,11 +206,11 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
                                  {
-                                     type.SetField("milesTraveled", 0);
-                                     type.Invoke("IncreaseMiles", 5)
-                                         .Invoke("IncreaseMiles", 10)
-                                         .Invoke("IncreaseMiles", 20);
-                                     Assert.AreEqual(35, type.GetField<int>("milesTraveled"));
+                                     type.SetFieldValue("milesTraveled", 0);
+                                     type.Invoke( "IncreaseMiles", 5 );
+                                     type.Invoke( "IncreaseMiles", 10 );
+                                     type.Invoke( "IncreaseMiles", 20 );
+                                     Assert.AreEqual(35, type.GetFieldValue("milesTraveled"));
                                  });
         }
 
@@ -250,7 +239,7 @@ namespace FasterflectTest
             TypeList.ForEach(type =>
             {
                 var target = type.CreateInstance().CreateHolderIfValueType();
-                target.Invoke<int>("NotExist");
+                target.Invoke("NotExist");
             });
         }
 
@@ -259,17 +248,17 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
                                  {
-                                     type.SetField("milesTraveled", 0);
+                                     type.SetFieldValue("milesTraveled", 0);
                                      var target = type.CreateInstance().CreateHolderIfValueType();
                                      target.Invoke("DoNothing");
-                                     Assert.AreEqual(1, target.Invoke<int>("JustGet"));
+                                     Assert.AreEqual(1, target.Invoke("JustGet"));
 
                                      int[] miles = {1, 10, 20, 100};
                                      foreach (var mile in miles)
                                      {
                                          target.Invoke("Walk", mile);
                                      }
-                                     var totalMiles = target.Invoke<int>("GetMilesTraveled", 5);
+                                     var totalMiles = target.Invoke("GetMilesTraveled", 5);
                                      Assert.AreEqual(miles.Sum() + 5, totalMiles);
                                  });
         }
@@ -279,12 +268,12 @@ namespace FasterflectTest
         {
             TypeList.ForEach(type =>
                                  {
-                                     type.SetField("milesTraveled", 0);
+                                     type.SetFieldValue("milesTraveled", 0);
                                      var target = type.CreateInstance().CreateHolderIfValueType();
-                                     target.Invoke("GetMilesTraveled", new[] { typeof(int) }, 5)
-                                           .Invoke("GetMilesTraveled", new[] {typeof (int)}, 10)
-                                           .Invoke("GetMilesTraveled", new[] {typeof (int)}, 20);
-                                     var totalMiles = type.GetField<int>("milesTraveled");
+                                     target.Invoke( "GetMilesTraveled", new[] { typeof(int) }, 5 );
+                                     target.Invoke( "GetMilesTraveled", new[] { typeof(int) }, 10 );
+                                     target.Invoke( "GetMilesTraveled", new[] { typeof(int) }, 20 );
+                                     var totalMiles = type.GetFieldValue("milesTraveled");
                                      Assert.AreEqual(35, totalMiles);
                                  });
         }

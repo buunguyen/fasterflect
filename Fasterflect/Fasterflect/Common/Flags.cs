@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 
-namespace Fasterflect.Common
+namespace Fasterflect
 {
 	/// <summary>
 	/// This class provides access to common <see cref="BindingFlags"/> combinations.
 	/// </summary>
-    internal static class Flags
+    public static class Flags
     {
         /// <summary>
         /// Search criteria encompassing all public and non-public members.

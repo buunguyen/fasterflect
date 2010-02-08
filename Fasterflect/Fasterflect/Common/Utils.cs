@@ -20,9 +20,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Fasterflect.Emitter;
 
-namespace Fasterflect.Common
+namespace Fasterflect
 {
 	internal static class Utils
 	{
@@ -34,12 +35,22 @@ namespace Fasterflect.Common
 			       	: wrapper.Value.GetType();
 		}
 
+        public static Type[] GetTypeArray(this ParameterInfo[] parameters)
+        {
+            if (parameters.Length == 0)
+                return Type.EmptyTypes;
+            var types = new Type[parameters.Length];
+            for (int i = 0; i < types.Length; i++)
+            {
+                types[i] = parameters[i].ParameterType;
+            }
+            return types;
+        }
+
 		public static Type[] GetTypeArray(this object[] objects)
-		{
-			/*
-             * Readable code with a LINQ query, but it's pretty slow
-             * return objects.Select(o => o.GetType()).ToArray();
-             */
+        {
+            if (objects.Length == 0)
+                return Type.EmptyTypes;
 			var types = new Type[objects.Length];
 			for (int i = 0; i < types.Length; i++)
 			{

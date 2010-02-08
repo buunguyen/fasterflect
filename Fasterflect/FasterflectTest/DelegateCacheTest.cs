@@ -79,8 +79,8 @@ namespace FasterflectTest
         {
             target = new Person();
             targetType = typeof(Person);
-            //delegateMap = typeof(DelegateCache).GetField<CacheStore<CallInfo,Delegate>>("cache").GetField<IDictionary>("entries");
-            delegateMap = typeof(DelegateCache).GetField<Cache<CallInfo,Delegate>>("cache").GetField<IDictionary>("entries");
+            //delegateMap = typeof(DelegateCache).GetFieldValue<CacheStore<CallInfo,Delegate>>("cache").GetFieldValue<IDictionary>("entries");
+            delegateMap = (IDictionary)typeof(DelegateCache).GetFieldValue("cache").GetFieldValue("entries");
         }
 
         private void Execute_cache_test(params Action[] actions)
@@ -98,20 +98,20 @@ namespace FasterflectTest
         public void Test_delegate_is_properly_cached_for_fields()
         {
             Execute_cache_test(
-                () => target.SetField("id", 1),
-                () => target.GetField<int>("id"),
-                () => targetType.SetField("miles", 1),
-                () => targetType.GetField<int>("miles"));
+                () => target.SetFieldValue("id", 1),
+                () => target.GetFieldValue("id"),
+                () => targetType.SetFieldValue("miles", 1),
+                () => targetType.GetFieldValue("miles"));
         }
 
         [TestMethod]
         public void Test_delegate_is_properly_cached_for_properties()
         {
             Execute_cache_test(
-                () => target.SetProperty("Age", 1),
-                () => target.GetProperty<int>("Age"),
-                () => targetType.SetProperty("Miles", 1),
-                () => targetType.GetProperty<int>("Miles"));
+                () => target.SetPropertyValue("Age", 1),
+                () => target.GetPropertyValue("Age"),
+                () => targetType.SetPropertyValue("Miles", 1),
+                () => targetType.GetPropertyValue("Miles"));
         }
 
         [TestMethod]
@@ -120,7 +120,7 @@ namespace FasterflectTest
 			object array = targetType.MakeArrayType().CreateInstance( 10 );
             Execute_cache_test(
                 () => array.SetElement( 1, target ),
-                () => array.GetElement<object>( 1 ) );
+                () => array.GetElement( 1 ) );
         }
 
         [TestMethod]
@@ -136,9 +136,9 @@ namespace FasterflectTest
         {
             Execute_cache_test(
                 () => targetType.Invoke("Generate"),
-                () => targetType.Invoke<int>("GetMiles"),
+                () => targetType.Invoke("GetMiles"),
                 () => target.Invoke("SetId", new[] { typeof(int) }, new object[] { 1 }),
-                () => target.Invoke<int>("GetId"));
+                () => target.Invoke("GetId"));
         }
 
         [TestMethod]
@@ -146,7 +146,7 @@ namespace FasterflectTest
         {
             Execute_cache_test(
                 () => target.SetIndexer(new[] { typeof(string), typeof(object) }, new object[] { "a", null }),
-                () => target.GetIndexer<string>(new[] { typeof(string) }, new object[] { "a"}));
+                () => target.GetIndexer(new[] { typeof(string) }, new object[] { "a"}));
         }
 
         [TestMethod]
@@ -173,18 +173,18 @@ namespace FasterflectTest
                                   () => targetType.DelegateForStaticInvoke("SetMiles", new[] { typeof(int) }),
                                   () => targetType.DelegateForStaticInvoke("GetMiles"),
                                   () => targetType.DelegateForStaticInvoke("GetMiles", new[] { typeof(int) }),
-                                  () => targetType.DelegateForSetStaticField("miles"),
-                                  () => targetType.DelegateForGetStaticField("miles"),
-                                  () => targetType.DelegateForSetStaticProperty("Miles"),
-                                  () => targetType.DelegateForGetStaticProperty("Miles"),
+                                  () => targetType.DelegateForSetStaticFieldValue("miles"),
+                                  () => targetType.DelegateForGetStaticFieldValue("miles"),
+                                  () => targetType.DelegateForSetStaticPropertyValue("Miles"),
+                                  () => targetType.DelegateForGetStaticPropertyValue("Miles"),
                                   () => targetType.DelegateForStaticInvoke("Generate"),
                                   () => targetType.DelegateForStaticInvoke("Generate", new[] { typeof(Person) }),
                                   () => targetType.DelegateForSetIndexer(new[] { typeof(string), typeof(object) }),
                                   () => targetType.DelegateForGetIndexer(new[] { typeof(string) }),
-                                  () => targetType.DelegateForSetField("id"),
-                                  () => targetType.DelegateForGetField("id"),
-                                  () => targetType.DelegateForSetProperty("Id"),
-                                  () => targetType.DelegateForGetProperty("Id"),
+                                  () => targetType.DelegateForSetFieldValue("id"),
+                                  () => targetType.DelegateForGetFieldValue("id"),
+                                  () => targetType.DelegateForSetPropertyValue("Id"),
+                                  () => targetType.DelegateForGetPropertyValue("Id"),
                                   () => targetType.DelegateForInvoke("SetId", new[] { typeof(int) }),
                                   () => targetType.DelegateForInvoke("GetId"),
                                   () => targetType.DelegateForInvoke("GetItself", new[] { typeof(object) }),

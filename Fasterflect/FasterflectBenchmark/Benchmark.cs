@@ -131,8 +131,8 @@ namespace FasterflectBenchmark
 									{"Dictionary TryGetValue", () => { string s; stringDictionary.TryGetValue( key, out s ); } },
 									//{"List Contains", () => stringList.Contains( key ) },
 									//{"List Linq First", () => stringList.First( item => item == key ) },
-									{"CacheStore Monitor Get", () => stringCacheStore.Get( key ) },
-									{"Cache Interlocked Get", () => stringCache.Get( key ) },
+									{"CacheStore Monitor GetValue", () => stringCacheStore.Get( key ) },
+									{"Cache Interlocked GetValue", () => stringCache.Get( key ) },
 									{"GetDelegate", () => DelegateCache.Get( callInfo ) },
 			                	};
 			Execute("Dictionary Benchmark", initMap, actionMap);
@@ -207,8 +207,8 @@ namespace FasterflectBenchmark
 			var initMap = new Dictionary<string, Action>
 			              	{
 								{"Init info", () => { fieldInfo = TargetType.GetField("name", BindingFlags.NonPublic | BindingFlags.Instance); }},
-								{"Init setter", () => { setter = TargetType.DelegateForSetField("name"); }},
-								{"Init getter", () => { getter = TargetType.DelegateForGetField("name"); }}
+								{"Init setter", () => { setter = TargetType.DelegateForSetFieldValue("name"); }},
+								{"Init getter", () => { getter = TargetType.DelegateForGetFieldValue("name"); }}
 			              	};
 
 			dynamic tmp = TargetPerson;
@@ -220,8 +220,8 @@ namespace FasterflectBenchmark
 									{"'dynamic' get", () => { dynamic name = tmp.name; }},
 									{"Reflection set", () => fieldInfo.SetValue(TargetPerson, "John")},
 									{"Reflection get", () => fieldInfo.GetValue(TargetPerson)},
-									{"Fasterflect set", () => TargetPerson.SetField("name", "John")},
-									{"Fasterflect get", () => TargetPerson.GetField<string>("name")},
+									{"Fasterflect set", () => TargetPerson.SetFieldValue("name", "John")},
+									{"Fasterflect get", () => TargetPerson.GetFieldValue("name")},
 									{"Fasterflect cached set", () => setter(TargetPerson, "John")},
 									{"Fasterflect cached get", () => getter(TargetPerson)},
 			                	};
@@ -236,8 +236,8 @@ namespace FasterflectBenchmark
 			var initMap = new Dictionary<string, Action>
 			              	{
 			              		{"Init info", () => { fieldInfo = TargetType.GetField("counter", BindingFlags.NonPublic | BindingFlags.Static); }},
-			              		{"Init setter", () => { setter = TargetType.DelegateForSetStaticField("counter"); }},
-			              		{"Init getter", () => { getter = TargetType.DelegateForGetStaticField("counter"); }}
+			              		{"Init setter", () => { setter = TargetType.DelegateForSetStaticFieldValue("counter"); }},
+			              		{"Init getter", () => { getter = TargetType.DelegateForGetStaticFieldValue("counter"); }}
 			              	};
 
 			var actionMap = new Dictionary<string, Action>
@@ -246,8 +246,8 @@ namespace FasterflectBenchmark
 			                		{"Direct get", () => { int counter = Person.counter; }},
 			                		{"Reflection set", () => fieldInfo.SetValue(TargetType, 1)},
 			                		{"Reflection get", () => fieldInfo.GetValue(TargetType)},
-			                		{"Fasterflect set", () => TargetType.SetField("counter", 1)},
-			                		{"Fasterflect get", () => TargetType.GetField<int>("counter")},
+			                		{"Fasterflect set", () => TargetType.SetFieldValue("counter", 1)},
+			                		{"Fasterflect get", () => TargetType.GetFieldValue("counter")},
 			                		{"Fasterflect cached set", () => setter(1)},
 			                		{"Fasterflect cached get", () => getter()},
 			                	};
@@ -262,8 +262,8 @@ namespace FasterflectBenchmark
 			var initMap = new Dictionary<string, Action>
 			              	{
 			              		{"Init info", () => { propInfo = TargetType.GetProperty("Age", BindingFlags.NonPublic | BindingFlags.Instance); }},
-			              		{"Init setter", () => { setter = TargetType.DelegateForSetProperty("Age"); }},
-			              		{"Init getter", () => { getter = TargetType.DelegateForGetProperty("Age"); }}
+			              		{"Init setter", () => { setter = TargetType.DelegateForSetPropertyValue("Age"); }},
+			              		{"Init getter", () => { getter = TargetType.DelegateForGetPropertyValue("Age"); }}
 			              	};
 			dynamic tmp = TargetPerson;
 			var actionMap = new Dictionary<string, Action>
@@ -274,8 +274,8 @@ namespace FasterflectBenchmark
 			                		{"'dynamic' get", () => { dynamic age = tmp.Age; }},
 			                		{"Reflection set", () => propInfo.SetValue(TargetPerson, 10, null)},
 			                		{"Reflection get", () => propInfo.GetValue(TargetPerson, null)},
-			                		{"Fasterflect set", () => TargetPerson.SetProperty("Age", 10)},
-			                		{"Fasterflect get", () => TargetPerson.GetProperty<int>("Age")},
+			                		{"Fasterflect set", () => TargetPerson.SetPropertyValue("Age", 10)},
+			                		{"Fasterflect get", () => TargetPerson.GetPropertyValue("Age")},
 			                		{"Fasterflect cached set", () => setter(TargetPerson, 10)},
 			                		{"Fasterflect cached get", () => getter(TargetPerson)},
 			                	};
@@ -291,8 +291,8 @@ namespace FasterflectBenchmark
 			var initMap = new Dictionary<string, Action>
 			              	{
 			              		{"Init info", () => { propInfo = TargetType.GetProperty("Counter", BindingFlags.NonPublic | BindingFlags.Static); }},
-			              		{"Init setter", () => { setter = TargetType.DelegateForSetStaticProperty("Counter"); }},
-			              		{"Init getter", () => { getter = TargetType.DelegateForGetStaticProperty("Counter"); }}
+			              		{"Init setter", () => { setter = TargetType.DelegateForSetStaticPropertyValue("Counter"); }},
+			              		{"Init getter", () => { getter = TargetType.DelegateForGetStaticPropertyValue("Counter"); }}
 			              	};
 
 			var actionMap = new Dictionary<string, Action>
@@ -301,8 +301,8 @@ namespace FasterflectBenchmark
 			                		{"Direct get", () => { int counter = Person.Counter; }},
 			                		{"Reflection set", () => propInfo.SetValue(TargetType, 10, null)},
 			                		{"Reflection get", () => propInfo.GetValue(TargetType, null)},
-			                		{"Fasterflect set", () => TargetType.SetProperty("Counter", 10)},
-			                		{"Fasterflect get", () => TargetType.GetProperty<int>("Counter")},
+			                		{"Fasterflect set", () => TargetType.SetPropertyValue("Counter", 10)},
+			                		{"Fasterflect get", () => TargetType.GetPropertyValue("Counter")},
 			                		{"Fasterflect cached set", () => setter(10)},
 			                		{"Fasterflect cached get", () => getter()},
 			                	};
@@ -334,7 +334,7 @@ namespace FasterflectBenchmark
 			                		{"Reflection set", () => setterInfo.Invoke(TargetPerson, new object[] {1, 2, null})},
 			                		{"Reflection get", () => getterInfo.Invoke(TargetPerson, new object[] {1, 2})},
 			                		{"Fasterflect set", () => TargetPerson.SetIndexer(new[] {typeof (int), typeof (int), typeof (object)}, new object[] {1, 2, null})},
-			                		{"Fasterflect get", () => TargetPerson.GetIndexer<object>(new[] {typeof (int), typeof (int)}, new object[] {1, 2})},
+			                		{"Fasterflect get", () => TargetPerson.GetIndexer(new[] {typeof (int), typeof (int)}, new object[] {1, 2})},
 			                		{"Fasterflect cached set", () => setter(TargetPerson, 1, 2, null)},
 			                		{"Fasterflect cached get", () => getter(TargetPerson, 1, 2)},
 			                	};
