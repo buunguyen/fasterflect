@@ -130,39 +130,54 @@ namespace FasterflectTest
 
                 obj = type.CreateInstance(new[] { typeof(int) }, 1);
                 Assert.IsNotNull(obj);
-                Assert.AreEqual(1, obj.GetField<int>("Age"));
+                Assert.AreEqual(1, obj.GetFieldValue("Age"));
 
                 obj = type.CreateInstance(new[] { typeof(int?) }, 1);
                 Assert.IsNotNull(obj);
-                Assert.AreEqual(1, obj.GetField<int?>("Id"));
+                Assert.AreEqual(1, obj.GetFieldValue("Id"));
 
                 obj = type.CreateInstance(new[] { typeof(int?) }, new object[]{null});
                 Assert.IsNotNull(obj);
-                Assert.AreEqual(null, obj.GetField<int?>("Id"));
+                Assert.AreEqual(null, obj.GetFieldValue( "Id" ));
 
                 obj = type.CreateInstance(new[] { typeof(string) }, "Jane");
                 Assert.IsNotNull(obj);
-                Assert.AreEqual("Jane", obj.GetField<string>("Name"));
+                Assert.AreEqual("Jane", obj.GetFieldValue("Name"));
 
                 obj = type.CreateInstance(new[] { typeof(object) }, type);
                 Assert.IsNotNull(obj);
-                Assert.AreSame(type, obj.GetField<object>("Data"));
+                Assert.AreSame(type, obj.GetFieldValue("Data"));
 
                 obj = type.CreateInstance(new[] { typeof(object) }, 1.1d);
                 Assert.IsNotNull(obj);
-                Assert.AreEqual(1.1d, obj.GetField<double>("Data"));
+                Assert.AreEqual(1.1d, obj.GetFieldValue("Data"));
 
                 var peer = new PersonClass(1);
                 obj = type.CreateInstance(new[] { typeof(PersonClass) }, peer);
                 Assert.IsNotNull(obj);
-                Assert.AreSame(peer, obj.GetField<PersonClass>("Peer"));
+                Assert.AreSame(peer, obj.GetFieldValue("Peer"));
 
                 var peers = new[] { new PersonClass(1), new PersonClass(1) };
                 obj = type.CreateInstance(new[] { typeof(PersonClass).MakeArrayType() },
                     new object[] { peers });
                 Assert.IsNotNull(obj);
-                Assert.AreSame(peers, obj.GetField<PersonClass[]>("Peers"));
+                Assert.AreSame(peers, obj.GetFieldValue("Peers"));
             });
+        }
+
+        [TestMethod]
+        public void Test_create_instances_via_ctor_info()
+        {
+            TypeList.ForEach( type =>
+              {
+                  var ctorInfo = type.Constructor();
+                  Assert.IsNotNull( ctorInfo.CreateInstance() );
+
+                  ctorInfo = type.Constructor( new[] { typeof(int) } );
+                  var obj = ctorInfo.CreateInstance(1);
+                  Assert.IsNotNull( obj );
+                  Assert.AreEqual( 1, obj.GetFieldValue( "Age" ) );
+              });
         }
 
         [TestMethod]
@@ -170,7 +185,7 @@ namespace FasterflectTest
         {
             var peer = new Employee(1);
             var obj = typeof(PersonClass).CreateInstance(new[] { typeof(Employee) }, peer);
-            Assert.AreSame(peer, obj.GetField<Employee>("Peer"));
+            Assert.AreSame(peer, obj.GetFieldValue("Peer"));
         }
 
         [TestMethod]

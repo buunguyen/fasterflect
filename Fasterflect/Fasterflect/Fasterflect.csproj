@@ -82,22 +82,24 @@
     <Compile Include="Caching\MonitorLock.cs" />
     <Compile Include="Caching\LockStrategy.cs" />
     <Compile Include="Caching\DelegateCache.cs" />
-    <Compile Include="CloneExtensions.cs" />
+    <Compile Include="Extensions\Core\ConstructorInfoExtensions.cs" />
+    <Compile Include="Extensions\Utils\CloneExtensions.cs" />
     <Compile Include="Common\Constants.cs" />
-    <Compile Include="ConstructorExtensions.cs" />
-    <Compile Include="AttributeExtensions.cs" />
-    <Compile Include="ArrayExtensions.cs" />
+    <Compile Include="Extensions\Core\ConstructorExtensions.cs" />
+    <Compile Include="Extensions\Core\AttributeExtensions.cs" />
+    <Compile Include="Extensions\Core\ArrayExtensions.cs" />
     <Compile Include="Emitter\LookupUtils.cs" />
     <Compile Include="Common\Flags.cs" />
-    <Compile Include="FieldInfoExtensions.cs" />
+    <Compile Include="Extensions\Core\FieldInfoExtensions.cs" />
+    <Compile Include="Extensions\Core\MemberInfoExtensions.cs" />
     <Compile Include="ObjectConstruction\TypeConverter.cs" />
-    <Compile Include="PropertyInfoExtensions.cs" />
-    <Compile Include="TypeExtensions.cs" />
-    <Compile Include="MemberExtensions.cs" />
-    <Compile Include="PropertyExtensions.cs" />
-    <Compile Include="FieldExtensions.cs" />
-    <Compile Include="MethodExtensions.cs" />
-    <Compile Include="Delegates.cs" />
+    <Compile Include="Extensions\Core\PropertyInfoExtensions.cs" />
+    <Compile Include="Extensions\Core\TypeExtensions.cs" />
+    <Compile Include="Extensions\Core\MemberExtensions.cs" />
+    <Compile Include="Extensions\Core\PropertyExtensions.cs" />
+    <Compile Include="Extensions\Core\FieldExtensions.cs" />
+    <Compile Include="Extensions\Core\MethodExtensions.cs" />
+    <Compile Include="Common\Delegates.cs" />
     <Compile Include="Emitter\ArrayGetEmitter.cs" />
     <Compile Include="Emitter\ArraySetEmitter.cs" />
     <Compile Include="Emitter\BaseEmitter.cs" />
@@ -118,7 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="bnk.snk" />
-    <Compile Include="MethodInfoExtensions.cs" />
+    <Compile Include="Extensions\Core\MethodInfoExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
@@ -145,6 +147,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

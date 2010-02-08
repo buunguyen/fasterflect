@@ -28,7 +28,7 @@ namespace Fasterflect.Caching
 		private static volatile Cache<CallInfo, Delegate> cache = new Cache<CallInfo, Delegate>();
 		
 		/// <summary>
-		/// Get the corresponding delegate for the specified <param name="callInfo"/>.
+		/// GetValue the corresponding delegate for the specified <param name="callInfo"/>.
 		/// </summary>
 		/// <returns>A delegate if one was found and null otherwise.</returns>
 		public static Delegate Get( CallInfo callInfo )
@@ -54,7 +54,7 @@ namespace Fasterflect.Caching
 		
 		#region Delegate Cache Methods
 		/// <summary>
-		/// Get the corresponding delegate for the specified <param name="callInfo"/>.
+		/// GetValue the corresponding delegate for the specified <param name="callInfo"/>.
 		/// If there's no existing delegate, a new one is created by invoking the 
 		/// construction method <param name="createDelegateAction" /> and the result is added 
 		/// to the map for subsequent accesses.
@@ -70,7 +70,7 @@ namespace Fasterflect.Caching
 		}
 
 		/// <summary>
-		/// Get the corresponding delegate for the specified <param name="callInfo"/>.
+		/// GetValue the corresponding delegate for the specified <param name="callInfo"/>.
 		/// If there's no existing delegate, a new one is created by invoking the 
 		/// construction method <param name="createDelegateAction" /> and the result is added 
 		/// to the map for subsequent accesses.
