@@ -27,19 +27,42 @@ namespace Fasterflect.ObjectConstruction
 {
 	internal class SourceInfo
 	{
+		#region EqualityComparer
+		internal class SourceInfoComparer : IEqualityComparer<SourceInfo>
+		{
+			#region Implementation of IEqualityComparer<SourceInfo>
+			public bool Equals( SourceInfo x, SourceInfo y )
+			{
+				return x.Equals( y );
+			}
+
+			public int GetHashCode( SourceInfo obj )
+			{
+				return obj.hashCode;
+			}
+			#endregion
+		}
+		#endregion
+
+		#region Fields
+		private static readonly SourceInfoComparer comparer = new SourceInfoComparer();
 		private bool[] paramKinds;
 		private string[] paramNames;
 		private Type[] paramTypes;
 		private MemberGetter[] paramValueReaders;
 		private Type type;
+		private int hashCode;
+		#endregion
 
-		public SourceInfo(Type type)
+		#region Constructors
+		public SourceInfo( Type type )
 		{
 			this.type = type;
-			ExtractParameterInfo(type);
+			ExtractParameterInfo( type );
+			hashCode = CalculateHashCode();
 		}
 
-		public SourceInfo(Type type, string[] names, Type[] types)
+		public SourceInfo( Type type, string[] names, Type[] types )
 		{
 			this.type = type;
 			paramNames = names;
@@ -49,9 +72,25 @@ namespace Fasterflect.ObjectConstruction
 			{
 				paramKinds[i] = true;
 			}
+			hashCode = CalculateHashCode();
 		}
+		#endregion
 
 		#region Properties
+		public static SourceInfoComparer Comparer
+		{
+			get { return comparer; }
+		}
+
+		public Type Type
+		{
+			get { return type; }
+		}
+
+		public int HashCode
+		{
+			get { return hashCode; }
+		}
 
 		public string[] ParamNames
 		{
@@ -76,21 +115,9 @@ namespace Fasterflect.ObjectConstruction
 				return paramValueReaders;
 			}
 		}
-
-		public MemberGetter GetReader(string memberName)
-		{
-			int index = Array.IndexOf(paramNames, memberName);
-			MemberGetter reader = paramValueReaders[index];
-			if (reader == null)
-			{
-				reader = paramKinds[index] ? type.DelegateForGetField(memberName) : type.DelegateForGetProperty(memberName);
-				paramValueReaders[index] = reader;
-			}
-			return reader;
-		}
-
 		#endregion
 
+		#region Parameter Value Access
 		public object[] GetParameterValues(object source)
 		{
 			InitializeParameterValueReaders();
@@ -100,6 +127,18 @@ namespace Fasterflect.ObjectConstruction
 				paramValues[i] = paramValueReaders[i](source);
 			}
 			return paramValues;
+		}
+
+		internal MemberGetter GetReader(string memberName)
+		{
+			int index = Array.IndexOf(paramNames, memberName);
+			MemberGetter reader = paramValueReaders[index];
+			if (reader == null)
+			{
+				reader = paramKinds[index] ? type.DelegateForGetField(memberName) : type.DelegateForGetProperty(memberName);
+				paramValueReaders[index] = reader;
+			}
+			return reader;
 		}
 
 		private void InitializeParameterValueReaders()
@@ -114,10 +153,40 @@ namespace Fasterflect.ObjectConstruction
 				}
 			}
 		}
+		#endregion
 
-		#region Anonymous Type Helper
+		#region Equals + GetHashCode
+		public override bool Equals( object obj )
+		{
+			var other = obj as SourceInfo;
+			if (other == null) return false;
+			if (other == this) return true;
+			if( hashCode != other.GetHashCode() ) return false;
 
-		internal void ExtractParameterInfo(Type type)
+			if( type != other.Type || paramNames.Length != other.ParamNames.Length )
+				return false;
+			for( int i = 0; i < paramNames.Length; i++ )
+			{
+				if( paramNames[ i ] != other.ParamNames[ i ] || paramTypes[ i ] != other.ParamTypes[ i ] )
+					return false;
+			}
+			return true;
+		}
+		public override int GetHashCode()
+		{
+			return hashCode;
+		}
+		internal int CalculateHashCode()
+		{
+			int hash = type.GetHashCode();
+			for( int i = 0; i < paramNames.Length; i++ )
+			    hash += (i + 31) * paramNames[ i ].GetHashCode() ^ paramTypes[ i ].GetHashCode();
+			return hash;
+		}
+		#endregion
+
+		#region Anonymous Type Helper (ExtractParameterInfo)
+		internal void ExtractParameterInfo( Type type )
 		{
             IList<MemberInfo> members = type.Members(MemberTypes.Field | MemberTypes.Property, Flags.InstanceCriteria);
 			var names = new List<string>(members.Count);
@@ -140,7 +209,6 @@ namespace Fasterflect.ObjectConstruction
 			paramTypes = types.ToArray();
 			paramKinds = kinds.ToArray();
 		}
-
 		#endregion
 	}
 }

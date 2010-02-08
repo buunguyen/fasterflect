@@ -25,6 +25,30 @@ namespace Fasterflect.Caching
 {
 	internal static class DelegateCache
 	{
+		private static volatile Cache<CallInfo, Delegate> cache = new Cache<CallInfo, Delegate>();
+		
+		/// <summary>
+		/// Get the corresponding delegate for the specified <param name="callInfo"/>.
+		/// </summary>
+		/// <returns>A delegate if one was found and null otherwise.</returns>
+		public static Delegate Get( CallInfo callInfo )
+		{
+			return cache.Get( callInfo );
+		}
+		/// <summary>
+		/// Inserts the supplied <paramref name="action"/> delegate into the cache using <paramref name="callInfo"/>
+		/// as the key. The <paramref name="strategy"/> parameter can be used to have the action stored using a weak
+		/// reference.
+		/// </summary>
+		public static void Insert( CallInfo callInfo, Delegate action, CacheStrategy strategy )
+        {
+			cache.Insert( callInfo, action, strategy );
+		}
+	}
+
+	#region DelegateCache using CacheStore
+	internal static class DelegateCacheCacheStore
+	{
 	    private static readonly ILock synchronizer = new ReaderWriterLock();
 		private static volatile CacheStore<CallInfo, Delegate> cache = new CacheStore<CallInfo, Delegate>( LockStrategy.Monitor );
 		
@@ -94,4 +118,5 @@ namespace Fasterflect.Caching
 		}
 		#endregion
 	}
+	#endregion
 }

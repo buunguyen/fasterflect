@@ -21,8 +21,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using Fasterflect;
+using Fasterflect.Caching;
+using Fasterflect.Common;
+using Fasterflect.Emitter;
+using Fasterflect.ObjectConstruction;
 
 namespace FasterflectBenchmark
 {
@@ -81,7 +87,7 @@ namespace FasterflectBenchmark
 		}
 		#endregion
 
-		private static readonly int[] Iterations = new[] { 20000, 2000000};
+		private static readonly int[] Iterations = new[] { 20000, 2000000 };
 		private static readonly object[] NoArgArray = new object[0];
 		private static readonly object[] ArgArray = new object[] {10};
 		private static readonly Type TargetType = typeof (Person);
@@ -90,15 +96,70 @@ namespace FasterflectBenchmark
 
 		public static void Main(string[] args)
 		{
-            RunTryCreateInstanceBenchmark();
-            RunConstructorBenchmark();
-            RunFieldBenchmark();
-            RunStaticFieldBenchmark();
-            RunPropertyBenchmark();
-            RunStaticPropertyBenchmark();
-            RunMethodInvocationBenchmark();
-            RunStaticMethodInvocationBenchmark();
-            RunIndexerBenchmark();
+			RunDictionaryBenchmark();
+			RunHashCodeBenchmark();
+			RunTryCreateInstanceBenchmark();
+			RunConstructorBenchmark();
+			RunFieldBenchmark();
+			RunStaticFieldBenchmark();
+			RunPropertyBenchmark();
+			RunStaticPropertyBenchmark();
+			RunMethodInvocationBenchmark();
+			RunStaticMethodInvocationBenchmark();
+			RunIndexerBenchmark();
+		}
+
+		private static void RunDictionaryBenchmark()
+		{
+			int dictionarySize = 1000;
+			int index = new Random( (int) (DateTime.Now.Ticks % int.MaxValue) ).Next( 0, dictionarySize );
+			List<string> stringList = Enumerable.Range( 0, dictionarySize ).Select( s => Path.GetRandomFileName() + Path.GetRandomFileName() ).ToList();
+			Dictionary<string, string> stringDictionary = stringList.ToDictionary( s => s, s => s );
+			var stringCacheStore = new CacheStore<string, CacheEntry<string, string>>( LockStrategy.Monitor );
+			stringList.ForEach( s => stringCacheStore.Insert( s, new CacheEntry<string, string>( s, s, CacheStrategy.Permanent ) ) );
+			var stringCache = new Cache<string,string>();
+			stringList.ForEach( s => stringCache.Insert( s, s, CacheStrategy.Permanent ) );
+			
+			string key = stringList[ index ];
+			var callInfo = new CallInfo( TargetType, MemberTypes.Field, "name", Constants.ArrayOfObjectType, false );
+
+			var initMap = new Dictionary<string, Action> {};
+			var actionMap = new Dictionary<string, Action>
+			                	{
+									{"Dictionary ContainsKey", () => stringDictionary.ContainsKey( key ) },
+									{"Dictionary Indexer", () => { var x = stringDictionary[ key ]; } },
+									{"Dictionary TryGetValue", () => { string s; stringDictionary.TryGetValue( key, out s ); } },
+									//{"List Contains", () => stringList.Contains( key ) },
+									//{"List Linq First", () => stringList.First( item => item == key ) },
+									{"CacheStore Monitor Get", () => stringCacheStore.Get( key ) },
+									{"Cache Interlocked Get", () => stringCache.Get( key ) },
+									{"GetDelegate", () => DelegateCache.Get( callInfo ) },
+			                	};
+			Execute("Dictionary Benchmark", initMap, actionMap);
+		}
+
+
+		private static void RunHashCodeBenchmark()
+		{
+			var callInfo = new CallInfo( TargetType, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, false );
+			var callInfoOther = new CallInfo( typeof(CallInfo), MemberTypes.Field, "other", new [] { typeof(string) } );
+			var sourceInfo = new SourceInfo( new { ID=42, Name="Test" }.GetType() );
+			var sourceInfoOther = new SourceInfo( new { id=42, Name="Test" }.GetType() );
+
+			var initMap = new Dictionary<string, Action> {};
+			var actionMap = new Dictionary<string, Action>
+			                	{
+			                		{"CallInfo GetHashCode", () => callInfo.GetHashCode() },
+			                		{"CallInfo Equals Other", () => callInfo.Equals( callInfoOther ) },
+			                		{"SourceInfo GetHashCode", () => sourceInfo.GetHashCode() },
+			                		{"SourceInfo Equals Other", () => sourceInfo.Equals( sourceInfoOther ) },
+			                		{"string GetHashCode", () => "foo".GetHashCode() },
+			                		{"string Equals", () => "foo".Equals( "bar" ) },
+									{"new CallInfo", () => new CallInfo(TargetType, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, false) },
+									{"new SourceInfo", () => new SourceInfo( TargetType, new [] { "ID", "Name" }, new [] { typeof(int), typeof(string) } ) },
+									{"new SourceInfo anon", () => new SourceInfo( new { ID=42, Name="Test" }.GetType() ) },
+			                	};
+			Execute("HashCode Benchmark", initMap, actionMap);
 		}
 
 		private static void RunTryCreateInstanceBenchmark()
@@ -110,9 +171,9 @@ namespace FasterflectBenchmark
 			var initMap = new Dictionary<string, Action> {};
 			var actionMap = new Dictionary<string, Action>
 			                	{
-									{"CreateInstance [empty]", () => typeof (Person).TryCreateInstance(new {})},
-									{"CreateInstance [n+t+v]", () => typeof (Person).TryCreateInstance(names, types, values)},
-			                		{"CreateInstance [object]", () => typeof (Person).TryCreateInstance(new {Age = 42, Name = "Arthur Dent"})},
+									{"TryCreateInstance [empty]", () => typeof (Person).TryCreateInstance(new {})},
+									{"TryCreateInstance [n+t+v]", () => typeof (Person).TryCreateInstance(names, types, values)},
+			                		{"TryCreateInstance [object]", () => typeof (Person).TryCreateInstance(new {Age = 42, Name = "Arthur Dent"})},
 			                	};
 			Execute("TryCreateInstance Benchmark", initMap, actionMap);
 		}
@@ -145,24 +206,24 @@ namespace FasterflectBenchmark
 			MemberGetter getter = null;
 			var initMap = new Dictionary<string, Action>
 			              	{
-			              		{"Init info", () => { fieldInfo = TargetType.GetField("name", BindingFlags.NonPublic | BindingFlags.Instance); }},
-			              		{"Init setter", () => { setter = TargetType.DelegateForSetField("name"); }},
-			              		{"Init getter", () => { getter = TargetType.DelegateForGetField("name"); }}
+								{"Init info", () => { fieldInfo = TargetType.GetField("name", BindingFlags.NonPublic | BindingFlags.Instance); }},
+								{"Init setter", () => { setter = TargetType.DelegateForSetField("name"); }},
+								{"Init getter", () => { getter = TargetType.DelegateForGetField("name"); }}
 			              	};
 
 			dynamic tmp = TargetPerson;
 			var actionMap = new Dictionary<string, Action>
 			                	{
-			                		{"Direct set", () => { TargetPerson.name = "John"; }},
-			                		{"Direct get", () => { string name = TargetPerson.name; }},
-			                		{"'dynamic' set", () => { tmp.name = "John"; }},
-			                		{"'dynamic' get", () => { dynamic name = tmp.name; }},
-			                		{"Reflection set", () => fieldInfo.SetValue(TargetPerson, "John")},
-			                		{"Reflection get", () => fieldInfo.GetValue(TargetPerson)},
-			                		{"Fasterflect set", () => TargetPerson.SetField("name", "John")},
-			                		{"Fasterflect get", () => TargetPerson.GetField<string>("name")},
-			                		{"Fasterflect cached set", () => setter(TargetPerson, "John")},
-			                		{"Fasterflect cached get", () => getter(TargetPerson)},
+									{"Direct set", () => { TargetPerson.name = "John"; }},
+									{"Direct get", () => { string name = TargetPerson.name; }},
+									{"'dynamic' set", () => { tmp.name = "John"; }},
+									{"'dynamic' get", () => { dynamic name = tmp.name; }},
+									{"Reflection set", () => fieldInfo.SetValue(TargetPerson, "John")},
+									{"Reflection get", () => fieldInfo.GetValue(TargetPerson)},
+									{"Fasterflect set", () => TargetPerson.SetField("name", "John")},
+									{"Fasterflect get", () => TargetPerson.GetField<string>("name")},
+									{"Fasterflect cached set", () => setter(TargetPerson, "John")},
+									{"Fasterflect cached get", () => getter(TargetPerson)},
 			                	};
 			Execute("Field Benchmark", initMap, actionMap);
 		}

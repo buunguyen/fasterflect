@@ -33,12 +33,13 @@ namespace Fasterflect.ObjectConstruction
 		public static MethodMap PrepareInvoke( this Type type, string[] paramNames, Type[] paramTypes,
 		                                       object[] sampleParamValues )
 		{
-			int hash = MethodMap.GetParameterHash( paramNames, paramTypes );
-			MethodMap map = cache.GetMap( type, hash );
+			SourceInfo sourceInfo = new SourceInfo( type, paramNames, paramTypes );
+			int hash = sourceInfo.HashCode;
+			MethodMap map = cache.GetMap( hash );
 			if( map == null )
 			{
 				map = DetermineBestConstructorMatch( type, paramNames, paramTypes, sampleParamValues );
-				cache.AddMap( type, hash, map );
+				cache.AddMap( hash, map );
 			}
 			return map;
 		}
