@@ -24,33 +24,31 @@ using Fasterflect.Caching;
 
 namespace Fasterflect.ObjectConstruction
 {
-	#region MapCache with CacheStore
+	#region MapCache
 	internal class MapCache
 	{
 		/// <summary>
 		/// This field is used to cache information on objects used as parameters for object construction, which
 		/// improves performance for subsequent instantiations of the same type using a compatible source type.
 		/// </summary>
-		private readonly CacheStore<Type, SourceInfo> sources = new CacheStore<Type, SourceInfo>( LockStrategy.Monitor );
+		private readonly Cache<Type, SourceInfo> sources = new Cache<Type, SourceInfo>();
 
 		/// <summary>
 		/// This field contains a dictionary mapping from a particular constructor to all known parameter sets,
 		/// each with an associated MethodMap responsible for creating instances of the type using the given
 		/// constructor and parameter set.
 		/// </summary>
-		private readonly CacheStore<long, MethodMap> maps = new CacheStore<long, MethodMap>( LockStrategy.Monitor );
+		private readonly Cache<int, MethodMap> maps = new Cache<int, MethodMap>();
 
 		#region Map Cache Methods
-		public MethodMap GetMap( Type type, int parameterHashCode )
+		public MethodMap GetMap( int sourceInfoHash )
 		{
-			long key = (((long) type.GetHashCode()) << 32) + parameterHashCode;
-			return maps.Get( key );
+			return maps.Get( sourceInfoHash );
 		}
 
-		public void AddMap( Type type, int parameterHashCode, MethodMap map )
+		public void AddMap( int sourceInfoHash, MethodMap map )
 		{
-			long key = (((long) type.GetHashCode()) << 32) + parameterHashCode;
-			maps.Insert( key, map, CacheStrategy.Temporary );
+			maps.Insert( sourceInfoHash, map, CacheStrategy.Temporary );
 		}
 		#endregion
 

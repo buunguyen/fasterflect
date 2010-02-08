@@ -44,7 +44,6 @@ namespace Fasterflect.ObjectConstruction
 		protected Type[] paramTypes;
 		protected BitArray parameterDefaultValueMask; // marks fields where default values will be used
 		protected IDictionary<string, object> parameterDefaultValues;
-		protected int parameterHashCode;
 		// protected BitArray parameterInjectionValueMask; // marks fields where injected values will be used
 		// protected BitArray parameterNullValueMask; // marks fields where null values will be used
 		protected int[] parameterOrderMap;
@@ -68,7 +67,6 @@ namespace Fasterflect.ObjectConstruction
 			this.method = method;
 			this.paramNames = paramNames;
 			this.paramTypes = paramTypes;
-			parameterHashCode = GetParameterHash( paramNames, paramTypes );
 			requiredParameterCount = method.Parameters().Count;
 			this.allowUnusedParameters = allowUnusedParameters;
 			parameters = method.Parameters();
@@ -301,18 +299,6 @@ namespace Fasterflect.ObjectConstruction
 			parameterDefaultValues[ parameterName ] = parameterValue;
 		}
 		#endregion
-		#endregion
-
-		#region Parameter List Identification
-		internal static int GetParameterHash( string[] names, Type[] types )
-		{
-			int hash = 0;
-			for( int i = 0; i < names.Length; i++ )
-			{
-				hash ^= names[ i ].GetHashCode() ^ types[ i ].GetHashCode();
-			}
-			return hash;
-		}
 		#endregion
 
 		#region Dependency Injection Helpers

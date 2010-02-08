@@ -76,6 +76,7 @@
     <Compile Include="Caching\CacheEntry.cs" />
     <Compile Include="Caching\CacheStore.cs" />
     <Compile Include="Caching\CacheStrategy.cs" />
+    <Compile Include="Caching\Cache.cs" />
     <Compile Include="Caching\ILock.cs" />
     <Compile Include="Caching\ReaderWriterLock.cs" />
     <Compile Include="Caching\MonitorLock.cs" />

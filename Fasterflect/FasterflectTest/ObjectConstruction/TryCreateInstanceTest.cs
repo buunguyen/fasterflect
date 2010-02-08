@@ -162,13 +162,11 @@ namespace FasterflectTest.ObjectConstruction
 		{
 			object source1 = new { Id = 42 };
 			SourceInfo sample1 = new SourceInfo( source1.GetType() );
-			int hash1 = MethodMap.GetParameterHash( sample1.ParamNames, sample1.ParamTypes );
 
 			object source2 = new { Id = 5 };
 			SourceInfo sample2 = new SourceInfo( source2.GetType() );
-			int hash2 = MethodMap.GetParameterHash( sample2.ParamNames, sample2.ParamTypes );
 
-			Assert.AreEqual( hash1, hash2 );
+			Assert.AreEqual( sample1.HashCode, sample2.HashCode );
 		}
 
 		[TestMethod]
@@ -176,17 +174,6 @@ namespace FasterflectTest.ObjectConstruction
 		{
 			int[] hashes = GetSampleHashes(); 
 			CollectionAssert.AllItemsAreUnique( hashes );
-		}
-
-		[TestMethod]
-		public void TestMapCacheHashGenerator_SameTypeDifferentParametersShouldGiveUniqueHash()
-		{
-			int[] parameterHashes = GetSampleHashes();
-			long[] cacheHashes = new long[ parameterHashes.Length ];
-			int index = 0;
-			Type type = typeof(Lion);
-			Array.ForEach( parameterHashes, i => { cacheHashes[ index ] = (((long) type.GetHashCode()) << 32) + parameterHashes[ index++ ]; } );
-			CollectionAssert.AllItemsAreUnique( cacheHashes );
 		}
 
 		private static int[] GetSampleHashes()
@@ -202,7 +189,7 @@ namespace FasterflectTest.ObjectConstruction
 			Array.ForEach( sources, s => { infos[ index++ ] = new SourceInfo( s.GetType() ); } );
 			index = 0;
 			int[] hashes = new int[ sources.Length ];
-			Array.ForEach( infos, i => { hashes[ index++ ] = MethodMap.GetParameterHash( i.ParamNames, i.ParamTypes ); } );
+			Array.ForEach( infos, i => { hashes[ index++ ] = i.HashCode; } );
 			return hashes;
 		}
 		#endregion

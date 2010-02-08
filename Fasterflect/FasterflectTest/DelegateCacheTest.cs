@@ -79,7 +79,8 @@ namespace FasterflectTest
         {
             target = new Person();
             targetType = typeof(Person);
-            delegateMap = typeof(DelegateCache).GetField<CacheStore<CallInfo,Delegate>>("cache").GetField<IDictionary>("entries");
+            //delegateMap = typeof(DelegateCache).GetField<CacheStore<CallInfo,Delegate>>("cache").GetField<IDictionary>("entries");
+            delegateMap = typeof(DelegateCache).GetField<Cache<CallInfo,Delegate>>("cache").GetField<IDictionary>("entries");
         }
 
         private void Execute_cache_test(params Action[] actions)

@@ -29,10 +29,16 @@ namespace Fasterflect.Emitter
 	internal abstract class BaseEmitter
 	{
 		protected CallInfo callInfo;
-
+		
 		public Delegate GetDelegate()
 		{
-			return DelegateCache.GetDelegate(callInfo, CreateDelegate);
+			Delegate action = DelegateCache.Get( callInfo );
+			if( action == null )
+			{
+				action = CreateDelegate();
+				DelegateCache.Insert( callInfo, action, CacheStrategy.Temporary );
+			}
+			return action;
 		}
 
 		protected internal abstract Delegate CreateDelegate();
