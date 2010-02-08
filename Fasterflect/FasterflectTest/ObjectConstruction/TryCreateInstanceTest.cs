@@ -27,56 +27,6 @@ namespace FasterflectTest.ObjectConstruction
 	[TestClass]
 	public class TryCreateInstanceTest
 	{
-		#region Sample Reflection Classes
-		//private class Person
-		//{
-		//    public int? Id { get; set; }
-		//    public DateTime Birthday { get; set; }
-		//    public string Name { get; set; }
-		//    public int Age { get { return DateTime.Now.Year - Birthday.Year + (DateTime.Now.DayOfYear >= Birthday.DayOfYear ? 1 : 0); } }
-		//    public int ConstructorInstanceUsed { get; private set; }
-
-		//    public Person()
-		//    {
-		//        ConstructorInstanceUsed = 1;
-		//    }
-
-		//    public Person( int id )
-		//    {
-		//        Id = id;
-		//        ConstructorInstanceUsed = 2;
-		//    }
-
-		//    public Person( DateTime birthday, string name )
-		//    {
-		//        Birthday = birthday;
-		//        Name = name;
-		//        ConstructorInstanceUsed = 3;
-		//    }
-
-		//    public Person( int id, DateTime birthday, string name )
-		//    {
-		//        Id = id;
-		//        Birthday = birthday;
-		//        Name = name;
-		//        ConstructorInstanceUsed = 4;
-		//    }
-		//}
-
-		//private enum Department { Development, Marketing, Sales }
-
-		//private class Employee : Person
-		//{
-		//    public string Initials { get; private set; }
-		//    public Department Department { get; private set; }
-
-		//    public Employee( int id, string initials ) : base( id )
-		//    {
-		//        Initials = initials;
-		//    }
-		//}
-		#endregion
-
 		#region TryCreateInstance Tests
 		[TestMethod]
 		public void TestTryCreateInstanceWithMatchingEmptyArgumentShouldInvokeConstructor1()
