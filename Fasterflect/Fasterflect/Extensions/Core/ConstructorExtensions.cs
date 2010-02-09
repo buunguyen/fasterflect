@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Fasterflect.Caching;
 using Fasterflect.Emitter;
 using Fasterflect.ObjectConstruction;
 
@@ -30,7 +31,13 @@ namespace Fasterflect
     /// </summary>
     public static class ConstructorExtensions
     {
-        #region Constructor Invocation (CreateInstance)
+		/// <summary>
+		/// This field is used to cache information on objects used as parameters for object construction, which
+		/// improves performance for subsequent instantiations of the same type using a compatible source type.
+		/// </summary>
+		private static readonly Cache<Type, SourceInfo> sourceInfoCache = new Cache<Type, SourceInfo>();
+
+		#region Constructor Invocation (CreateInstance)
         /// <summary>
         /// Invokes the no-arg constructor on type <paramref name="targetType"/>.
         /// </summary>
@@ -89,11 +96,11 @@ namespace Fasterflect
         public static object TryCreateInstance( this Type type, object source )
         {
             Type sourceType = source.GetType();
-            SourceInfo sourceInfo = MapFactory.GetSourceInfo( sourceType );
+            SourceInfo sourceInfo = sourceInfoCache.Get( sourceType );
             if( sourceInfo == null )
             {
                 sourceInfo = new SourceInfo( sourceType );
-                MapFactory.AddSourceInfo( sourceType, sourceInfo );
+                sourceInfoCache.Insert( sourceType, sourceInfo );
             }
             object[] paramValues = sourceInfo.GetParameterValues( source );
             MethodMap map = type.PrepareInvoke( sourceInfo.ParamNames, sourceInfo.ParamTypes, paramValues );

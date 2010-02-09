@@ -96,8 +96,8 @@ namespace FasterflectBenchmark
 
 		public static void Main(string[] args)
 		{
-			RunDictionaryBenchmark();
-			RunHashCodeBenchmark();
+			//RunDictionaryBenchmark();
+			//RunHashCodeBenchmark();
 			RunTryCreateInstanceBenchmark();
 			RunConstructorBenchmark();
 			RunFieldBenchmark();
@@ -109,14 +109,13 @@ namespace FasterflectBenchmark
 			RunIndexerBenchmark();
 		}
 
+		#region Internal Testing
 		private static void RunDictionaryBenchmark()
 		{
 			int dictionarySize = 1000;
 			int index = new Random( (int) (DateTime.Now.Ticks % int.MaxValue) ).Next( 0, dictionarySize );
 			List<string> stringList = Enumerable.Range( 0, dictionarySize ).Select( s => Path.GetRandomFileName() + Path.GetRandomFileName() ).ToList();
 			Dictionary<string, string> stringDictionary = stringList.ToDictionary( s => s, s => s );
-			var stringCacheStore = new CacheStore<string, CacheEntry<string, string>>( LockStrategy.Monitor );
-			stringList.ForEach( s => stringCacheStore.Insert( s, new CacheEntry<string, string>( s, s, CacheStrategy.Permanent ) ) );
 			var stringCache = new Cache<string,string>();
 			stringList.ForEach( s => stringCache.Insert( s, s, CacheStrategy.Permanent ) );
 			
@@ -131,13 +130,10 @@ namespace FasterflectBenchmark
 									{"Dictionary TryGetValue", () => { string s; stringDictionary.TryGetValue( key, out s ); } },
 									//{"List Contains", () => stringList.Contains( key ) },
 									//{"List Linq First", () => stringList.First( item => item == key ) },
-									{"CacheStore Monitor GetValue", () => stringCacheStore.Get( key ) },
-									{"Cache Interlocked GetValue", () => stringCache.Get( key ) },
-									{"GetDelegate", () => DelegateCache.Get( callInfo ) },
+									{"Cache GetValue", () => stringCache.Get( key ) },
 			                	};
 			Execute("Dictionary Benchmark", initMap, actionMap);
 		}
-
 
 		private static void RunHashCodeBenchmark()
 		{
@@ -161,7 +157,9 @@ namespace FasterflectBenchmark
 			                	};
 			Execute("HashCode Benchmark", initMap, actionMap);
 		}
+		#endregion
 
+		#region Fasterflect Core
 		private static void RunTryCreateInstanceBenchmark()
 		{
 			var names = new string[] {"Age", "Name"};
@@ -406,7 +404,9 @@ namespace FasterflectBenchmark
 			                	};
 			Execute("Static Method Invocations", initMap, actionMap);
 		}
+		#endregion
 
+		#region Execute & Measure
 		private static void Execute(string name, Dictionary<string, Action> initMap,
 		                            Dictionary<string, Action> actionMap)
 		{
@@ -438,5 +438,6 @@ namespace FasterflectBenchmark
 				watch.Reset();
 			}
 		}
+		#endregion
 	}
 }

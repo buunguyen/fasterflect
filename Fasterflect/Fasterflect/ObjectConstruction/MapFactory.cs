@@ -17,7 +17,10 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using Fasterflect.Caching;
 
 namespace Fasterflect.ObjectConstruction
 {
@@ -27,7 +30,12 @@ namespace Fasterflect.ObjectConstruction
 	/// </summary>
 	internal static class MapFactory
 	{
-		private static readonly MapCache cache = new MapCache();
+		/// <summary>
+		/// This field contains a dictionary mapping from a particular constructor to all known parameter sets,
+		/// each with an associated MethodMap responsible for creating instances of the type using the given
+		/// constructor and parameter set.
+		/// </summary>
+		private static readonly Cache<int, MethodMap> mapCache = new Cache<int, MethodMap>();
 
 		#region Map Construction
 		public static MethodMap PrepareInvoke( this Type type, string[] paramNames, Type[] paramTypes,
@@ -35,11 +43,11 @@ namespace Fasterflect.ObjectConstruction
 		{
 			SourceInfo sourceInfo = new SourceInfo( type, paramNames, paramTypes );
 			int hash = sourceInfo.HashCode;
-			MethodMap map = cache.GetMap( hash );
+			MethodMap map = mapCache.Get( hash );
 			if( map == null )
 			{
 				map = DetermineBestConstructorMatch( type, paramNames, paramTypes, sampleParamValues );
-				cache.AddMap( hash, map );
+				mapCache.Insert( hash, map );
 			}
 			return map;
 		}
@@ -70,17 +78,12 @@ namespace Fasterflect.ObjectConstruction
 			if( bestMap != null )
 			{
 				bestMap.InitializeInvoker();
-				// TODO warn user that code has non-optimal performance
-				//if( best.Cost > 0 )
-				//	Check.LogInfo( "Best available constructor for type {0} is non-optimal (cost {1}).", typeMap.Type, best.Cost );
 				return bestMap;
 			}
-			// TODO return improved error message when no valid constructor could be found
-			//StringBuilder sb = new StringBuilder();
-			//sb.AppendFormat( "No constructor found for type {0} using parameters:{1}",
-			//                 type.Name, Environment.NewLine );
-			//sb.AppendFormat( "{0}{1}", TypeFormatter.Format( parameters, "=", ", ", 3 ), Environment.NewLine );
-			throw new MissingMethodException( type.Name, ".ctor" );
+			var sb = new StringBuilder();
+			sb.AppendFormat( "No constructor found for type {0} using parameters:{1}", type.Name, Environment.NewLine );
+			sb.AppendFormat( "{0}{1}", string.Join( ", ", Enumerable.Range( 0, paramNames.Length ).Select( i => string.Format( "{0}:{1}", paramNames[ i ], paramTypes[ i ] ) ) ), Environment.NewLine );
+			throw new MissingMethodException( sb.ToString() );
 		}
 
 		private static MethodMap CreateMap( MethodBase method, string[] paramNames, Type[] paramTypes,
@@ -94,19 +97,5 @@ namespace Fasterflect.ObjectConstruction
 			return new MethodMap( method, paramNames, paramTypes, sampleParamValues, allowUnusedParameters );
 		}
 		#endregion
-
-		#region SourceInfo Lookups
-		internal static SourceInfo GetSourceInfo( Type sourceType )
-		{
-			return cache.GetSourceInfo( sourceType );
-		}
-
-		internal static void AddSourceInfo( Type sourceType, SourceInfo sourceInfo )
-		{
-			cache.AddSourceInfo( sourceType, sourceInfo );
-		}
-		#endregion
-
-		//private static readonly MapCacheOriginal cache = new MapCacheOriginal();
 	}
 }

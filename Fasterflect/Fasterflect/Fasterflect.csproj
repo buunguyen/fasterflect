@@ -74,15 +74,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Caching\CacheEntry.cs" />
-    <Compile Include="Caching\CacheStore.cs" />
     <Compile Include="Caching\CacheStrategy.cs" />
     <Compile Include="Caching\Cache.cs" />
-    <Compile Include="Caching\ILock.cs" />
-    <Compile Include="Caching\ReaderWriterLock.cs" />
-    <Compile Include="Caching\MonitorLock.cs" />
-    <Compile Include="Caching\LockStrategy.cs" />
-    <Compile Include="Caching\DelegateCache.cs" />
     <Compile Include="Extensions\Core\ConstructorInfoExtensions.cs" />
     <Compile Include="Extensions\Utils\CloneExtensions.cs" />
     <Compile Include="Common\Constants.cs" />
@@ -112,7 +105,6 @@
     <Compile Include="Emitter\MemberSetEmitter.cs" />
     <Compile Include="ObjectConstruction\ConstructorMap.cs" />
     <Compile Include="ObjectConstruction\MapFactory.cs" />
-    <Compile Include="ObjectConstruction\MapCache.cs" />
     <Compile Include="ObjectConstruction\SourceInfo.cs" />
     <Compile Include="ObjectConstruction\MethodMap.cs" />
     <Compile Include="Common\Utils.cs" />
