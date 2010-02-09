@@ -21,37 +21,17 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Fasterflect.Common;
 
 namespace Fasterflect.ObjectConstruction
 {
 	internal class SourceInfo
 	{
-		#region EqualityComparer
-		internal class SourceInfoComparer : IEqualityComparer<SourceInfo>
-		{
-			#region Implementation of IEqualityComparer<SourceInfo>
-			public bool Equals( SourceInfo x, SourceInfo y )
-			{
-				return x.Equals( y );
-			}
-
-			public int GetHashCode( SourceInfo obj )
-			{
-				return obj.hashCode;
-			}
-			#endregion
-		}
-		#endregion
-
 		#region Fields
-		private static readonly SourceInfoComparer comparer = new SourceInfoComparer();
 		private bool[] paramKinds;
 		private string[] paramNames;
 		private Type[] paramTypes;
 		private MemberGetter[] paramValueReaders;
 		private Type type;
-		private int hashCode;
 		#endregion
 
 		#region Constructors
@@ -59,7 +39,6 @@ namespace Fasterflect.ObjectConstruction
 		{
 			this.type = type;
 			ExtractParameterInfo( type );
-			hashCode = CalculateHashCode();
 		}
 
 		public SourceInfo( Type type, string[] names, Type[] types )
@@ -72,24 +51,13 @@ namespace Fasterflect.ObjectConstruction
 			{
 				paramKinds[i] = true;
 			}
-			hashCode = CalculateHashCode();
 		}
 		#endregion
 
 		#region Properties
-		public static SourceInfoComparer Comparer
-		{
-			get { return comparer; }
-		}
-
 		public Type Type
 		{
 			get { return type; }
-		}
-
-		public int HashCode
-		{
-			get { return hashCode; }
 		}
 
 		public string[] ParamNames
@@ -161,7 +129,6 @@ namespace Fasterflect.ObjectConstruction
 			var other = obj as SourceInfo;
 			if (other == null) return false;
 			if (other == this) return true;
-			if( hashCode != other.GetHashCode() ) return false;
 
 			if( type != other.Type || paramNames.Length != other.ParamNames.Length )
 				return false;
@@ -173,10 +140,6 @@ namespace Fasterflect.ObjectConstruction
 			return true;
 		}
 		public override int GetHashCode()
-		{
-			return hashCode;
-		}
-		internal int CalculateHashCode()
 		{
 			int hash = type.GetHashCode();
 			for( int i = 0; i < paramNames.Length; i++ )
