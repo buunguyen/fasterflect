@@ -58,7 +58,7 @@ namespace Fasterflect.Emitter
                 ConstructorInfo ctorInfo = LookupUtils.GetConstructor(callInfo);
 				if (callInfo.HasRefParam)
 				{
-					int byRefParamsCount = CreateLocalsForByRefParams(generator, 0);
+					int byRefParamsCount = CreateLocalsForByRefParams(generator, 0, ctorInfo);
 					generator.DeclareLocal(callInfo.TargetType); // T tmp;
 					GenerateNewObjInvocation(generator, ctorInfo); // new T();
 					generator.Emit(OpCodes.Stloc, byRefParamsCount); // tmp = <stack>;

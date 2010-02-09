@@ -94,7 +94,7 @@ namespace FasterflectSample
             // Due to struct type's pass-by-value nature, in order for struct to be used 
             // properly with Fasterflect, you need to convert it into a holder (wrapper) first.  
             // The call below does nothing if obj is reference type so when unsure, just call it.
-            obj = obj.CreateHolderIfValueType();
+            obj = obj.WrapIfValueType();
 
             // id and name should have been set properly
             AssertTrue(1 == (int)obj.GetFieldValue("id"));
@@ -106,7 +106,7 @@ namespace FasterflectSample
             // If there's null argument, or when we're unsure whether there's a null argument
             // we must explicitly specify the param type array
             obj = type.CreateInstance(new[] { typeof(int), typeof(string) }, new object[] { 1, null })
-                .CreateHolderIfValueType();
+                .WrapIfValueType();
 
             // id and name should have been set properly
             AssertTrue(1 == (int)obj.GetFieldValue("id"));
@@ -174,7 +174,7 @@ namespace FasterflectSample
             ConstructorInvoker ctor = type.DelegateForCreateInstance(new[] { typeof(int), typeof(string) });
             range.ForEach(i =>
             {
-                object obj = ctor(i, "_" + i).CreateHolderIfValueType();
+                object obj = ctor(i, "_" + i).WrapIfValueType();
                 AssertTrue(++currentInstanceCount == (int)count());
                 AssertTrue(i == (int)obj.GetFieldValue("id"));
                 AssertTrue("_" + i == obj.GetPropertyValue("Name").ToString());
@@ -185,13 +185,13 @@ namespace FasterflectSample
             MemberSetter nameSetter = type.DelegateForSetPropertyValue("Name");
             MemberGetter nameGetter = type.DelegateForGetPropertyValue("Name");
 
-            object person = ctor(1, "Buu").CreateHolderIfValueType();
+            object person = ctor(1, "Buu").WrapIfValueType();
             AssertTrue("Buu" == (string)nameGetter(person));
             nameSetter(person, "Doe");
             AssertTrue("Doe" == (string)nameGetter(person));
 
             // Another example
-            person = type.CreateInstance().CreateHolderIfValueType();
+            person = type.CreateInstance().WrapIfValueType();
             MethodInvoker walk = type.DelegateForInvoke("Walk", new[] { typeof(int) });
             range.ForEach(i => walk(person, i));
             AssertTrue(range.Sum() == (int)person.GetFieldValue("milesTraveled"));

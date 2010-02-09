@@ -23,7 +23,7 @@ using System.Reflection;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FasterflectTest
+namespace FasterflectTest.Lookup
 {
     [TestClass]
     public class ConstructorTest
@@ -101,106 +101,6 @@ namespace FasterflectTest
                     typeof(PersonClass), 
                     typeof(PersonStruct)
                 };
-		#endregion
-
-		#region CreateInstance Tests
-		[TestMethod]
-        public void Test_use_constructor_with_byref_params()
-        {
-            TypeList.ForEach(type =>
-            {
-                var parameters = new object[] { 0, "original" };
-                var obj = type.CreateInstance(new[] {
-                                                    typeof(int).MakeByRefType(),
-                                                    typeof(string).MakeByRefType()
-                                               }, parameters);
-                Assert.IsNotNull(obj);
-                Assert.AreEqual(1, parameters[0]);
-                Assert.AreEqual("changed", parameters[1]);
-            });
-        }
-
-        [TestMethod]
-        public void Test_create_instances()
-        {
-            TypeList.ForEach(type =>
-            {
-                var obj = type.CreateInstance();
-                Assert.IsNotNull(obj);
-
-                obj = type.CreateInstance(new[] { typeof(int) }, 1);
-                Assert.IsNotNull(obj);
-                Assert.AreEqual(1, obj.GetFieldValue("Age"));
-
-                obj = type.CreateInstance(new[] { typeof(int?) }, 1);
-                Assert.IsNotNull(obj);
-                Assert.AreEqual(1, obj.GetFieldValue("Id"));
-
-                obj = type.CreateInstance(new[] { typeof(int?) }, new object[]{null});
-                Assert.IsNotNull(obj);
-                Assert.AreEqual(null, obj.GetFieldValue( "Id" ));
-
-                obj = type.CreateInstance(new[] { typeof(string) }, "Jane");
-                Assert.IsNotNull(obj);
-                Assert.AreEqual("Jane", obj.GetFieldValue("Name"));
-
-                obj = type.CreateInstance(new[] { typeof(object) }, type);
-                Assert.IsNotNull(obj);
-                Assert.AreSame(type, obj.GetFieldValue("Data"));
-
-                obj = type.CreateInstance(new[] { typeof(object) }, 1.1d);
-                Assert.IsNotNull(obj);
-                Assert.AreEqual(1.1d, obj.GetFieldValue("Data"));
-
-                var peer = new PersonClass(1);
-                obj = type.CreateInstance(new[] { typeof(PersonClass) }, peer);
-                Assert.IsNotNull(obj);
-                Assert.AreSame(peer, obj.GetFieldValue("Peer"));
-
-                var peers = new[] { new PersonClass(1), new PersonClass(1) };
-                obj = type.CreateInstance(new[] { typeof(PersonClass).MakeArrayType() },
-                    new object[] { peers });
-                Assert.IsNotNull(obj);
-                Assert.AreSame(peers, obj.GetFieldValue("Peers"));
-            });
-        }
-
-        [TestMethod]
-        public void Test_create_instances_via_ctor_info()
-        {
-            TypeList.ForEach( type =>
-              {
-                  var ctorInfo = type.Constructor();
-                  Assert.IsNotNull( ctorInfo.CreateInstance() );
-
-                  ctorInfo = type.Constructor( new[] { typeof(int) } );
-                  var obj = ctorInfo.CreateInstance(1);
-                  Assert.IsNotNull( obj );
-                  Assert.AreEqual( 1, obj.GetFieldValue( "Age" ) );
-              });
-        }
-
-        [TestMethod]
-        public void Test_invoke_with_co_variant_return_and_param_type()
-        {
-            var peer = new Employee(1);
-            var obj = typeof(PersonClass).CreateInstance(new[] { typeof(Employee) }, peer);
-            Assert.AreSame(peer, obj.GetFieldValue("Peer"));
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidCastException))]
-        public void Test_pass_invalid_data_type()
-        {
-            TypeList.ForEach(type => type.CreateInstance(new[] { typeof(int) }, "string"));
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(MissingMemberException))]
-        public void Test_pass_none_existant_constructor()
-        {
-            TypeList.ForEach(type => type.CreateInstance(new[] { typeof(int), typeof(int) }, 1, 2));
-        }
 		#endregion
 
 		#region Constructor Lookup Tests

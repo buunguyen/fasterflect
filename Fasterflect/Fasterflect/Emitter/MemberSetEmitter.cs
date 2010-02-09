@@ -68,7 +68,7 @@ namespace Fasterflect.Emitter
 			}
 			else
 			{
-				MethodInfo setMethod = LookupUtils.GetPropertySetMethod(callInfo);
+				MethodInfo setMethod = LookupUtils.GetPropertySetMethod((PropertyInfo) member, callInfo);
 
 				// ((T)arg0).set_XXX(arg1);
 				generator.Emit((callInfo.IsStatic || callInfo.IsTargetTypeStruct)

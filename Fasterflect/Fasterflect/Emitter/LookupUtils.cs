@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using Fasterflect.Common;
 
 namespace Fasterflect.Emitter
 {
@@ -49,20 +48,21 @@ namespace Fasterflect.Emitter
             throw new ArgumentException(callInfo.MemberTypes + " is not supported");
         }
 
-        public static MethodInfo GetPropertyGetMethod(CallInfo callInfo)
+        public static MethodInfo GetPropertyGetMethod(PropertyInfo propInfo, CallInfo callInfo)
         {
-            return GetPropertyMethod("get_", "Getter", callInfo);
+            var methodInfo = propInfo.GetGetMethod();
+            return methodInfo ?? GetPropertyMethod("get_", "Getter", callInfo);
         }
 
-        public static MethodInfo GetPropertySetMethod(CallInfo callInfo)
+        public static MethodInfo GetPropertySetMethod(PropertyInfo propInfo, CallInfo callInfo)
         {
-            return GetPropertyMethod("set_", "Setter", callInfo);
+            var methodInfo = propInfo.GetSetMethod();
+            return methodInfo ?? GetPropertyMethod("set_", "Setter", callInfo);
         }
 
         private static MethodInfo GetPropertyMethod(string infoPrefix, string errorPrefix, CallInfo callInfo)
         {
-            MethodInfo setMethod = callInfo.TargetType.GetMethod(infoPrefix + callInfo.Name,
-                                                                 Flags.DefaultCriteria | callInfo.ScopeFlag);
+            MethodInfo setMethod = callInfo.TargetType.Method(infoPrefix + callInfo.Name, Flags.DefaultCriteria | callInfo.ScopeFlag);
             if (setMethod == null)
                 throw new MissingMemberException(errorPrefix + " method for property " + callInfo.Name + " does not exist");
             return setMethod;

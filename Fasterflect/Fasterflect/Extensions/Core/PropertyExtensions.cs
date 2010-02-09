@@ -20,8 +20,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Fasterflect.Emitter;
 using Fasterflect.Common;
+using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
@@ -143,7 +143,7 @@ namespace Fasterflect
         public static Type SetProperties( this Type targetType, object sample, params string[] properties )
         {
             IList<PropertyInfo> propertyInfos = sample.GetType().Properties( properties );
-            propertyInfos.ForEach( prop => targetType.SetPropertyValue( prop.Name, prop.GetValue( sample ) ) );
+            propertyInfos.ForEach( prop => targetType.SetPropertyValue( prop.Name, prop.Get( sample ) ) );
             return targetType;
         }
 
@@ -173,7 +173,7 @@ namespace Fasterflect
         public static object SetProperties( this object target, object sample, params string[] properties )
         {
             IList<PropertyInfo> propertyInfos = sample.GetType().Properties( properties );
-            propertyInfos.ForEach( prop => target.SetPropertyValue( prop.Name, prop.GetValue( sample ) ) );
+            propertyInfos.ForEach( prop => target.SetPropertyValue( prop.Name, prop.Get( sample ) ) );
             return target;
         }
         #endregion
