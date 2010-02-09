@@ -19,7 +19,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -30,36 +29,11 @@ namespace Fasterflect.Emitter
 	/// </summary>
 	internal class CallInfo
 	{
-		#region EqualityComparer
-		internal class CallInfoComparer : IEqualityComparer<CallInfo>
-		{
-			#region Implementation of IEqualityComparer<CallInfo>
-			public bool Equals( CallInfo x, CallInfo y )
-			{
-				return x.Equals( y );
-			}
-
-			public int GetHashCode( CallInfo obj )
-			{
-				return obj.hashCode;
-			}
-			#endregion
-		}
-		#endregion
-
 		public Type TargetType { get; private set; }
         public MemberTypes MemberTypes { get; set; }
         public Type[] ParamTypes { get; private set; }
         public string Name { get; private set; }
         public bool IsStatic { get; private set; }
-		private readonly int hashCode;
-
-		private static readonly CallInfoComparer comparer = new CallInfoComparer();
-		
-		public static CallInfoComparer Comparer
-		{
-			get { return comparer; }
-		}
 
 		public CallInfo(Type targetType, MemberTypes memberTypes, string name, Type[] paramTypes)
 			: this(targetType, memberTypes, name, paramTypes, false)
@@ -73,7 +47,6 @@ namespace Fasterflect.Emitter
 			Name = name;
 			ParamTypes = paramTypes.Length == 0 ? Type.EmptyTypes : paramTypes;
 			IsStatic = isStatic;
-			hashCode = CalculateHashCode();
 		}
 
 		/// <summary>
@@ -117,7 +90,6 @@ namespace Fasterflect.Emitter
 			var other = obj as CallInfo;
 			if (other == null) return false;
 			if (other == this) return true;
-			if( hashCode != other.GetHashCode() ) return false;
 
 			if (other.TargetType != TargetType || other.MemberTypes != MemberTypes ||
 			    other.Name != Name || other.ParamTypes.Length != ParamTypes.Length)
@@ -130,21 +102,12 @@ namespace Fasterflect.Emitter
 
 		public override int GetHashCode()
 		{
-			return hashCode;
-		}
-
-		internal int CalculateHashCode()
-		{
-			// simple hash, 60ms
-			//return TargetType.GetHashCode() + (31 * (int) MemberTypes) ^ ParamTypes.Length * Name.GetHashCode();
-			
-			// decent hash, 100ms
 			int hash = TargetType.GetHashCode() * ((31 * (int) MemberTypes) ^ Name.GetHashCode());
 			for( int i = 0; i < ParamTypes.Length; i++ )
 			    hash += (i + 31) * ParamTypes[i].GetHashCode();
 			return hash;
 			
-			// original hash, 520ms
+			// original hash
 			//int hash = 7;
 			//hash = 31 * hash + TargetType.GetHashCode();
 			//hash = 31 * hash + MemberTypes.GetHashCode();

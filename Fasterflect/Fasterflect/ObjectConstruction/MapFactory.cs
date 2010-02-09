@@ -42,7 +42,7 @@ namespace Fasterflect.ObjectConstruction
 		                                       object[] sampleParamValues )
 		{
 			SourceInfo sourceInfo = new SourceInfo( type, paramNames, paramTypes );
-			int hash = sourceInfo.HashCode;
+			int hash = sourceInfo.GetHashCode();
 			MethodMap map = mapCache.Get( hash );
 			if( map == null )
 			{
