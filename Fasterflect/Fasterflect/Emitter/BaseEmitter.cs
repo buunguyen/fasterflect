@@ -42,7 +42,7 @@ namespace Fasterflect.Emitter
 
         protected internal abstract Delegate CreateDelegate();
 
-        protected static DynamicMethod CreateDynamicMethod( string name, Type targetType, Type returnType,
+        protected internal static DynamicMethod CreateDynamicMethod( string name, Type targetType, Type returnType,
                                                             Type[] paramTypes )
         {
             return new DynamicMethod( name, MethodAttributes.Static | MethodAttributes.Public,

@@ -4,11 +4,13 @@ namespace FasterflectTest.Model
 {
     public struct PersonStruct
     {
+		#pragma warning disable 0169, 0649
         private static int totalPeopleCreated;
         private string name;
         private int age;
         private double metersTravelled;
         private readonly Dictionary<string, PersonStruct?> friends;
+		#pragma warning restore 0169, 0649
 
         public static int TotalPeopleCreated
         {

@@ -42,9 +42,8 @@ namespace FasterflectTest.Invocation
         protected static void VerifyFields( object obj, object sample )
         {
             var properties = sample.GetType().Properties();
-            properties.ForEach(
-                                  propInfo =>
-                                  Assert.AreEqual( propInfo.Get( sample ), obj.GetFieldValue( propInfo.Name ) ) );
+            properties.ForEach( propInfo =>
+                                Assert.AreEqual( propInfo.Get( sample ), obj.GetFieldValue( propInfo.Name ) ) );
         }
 
         protected void _( Action<Type> assertionAction )

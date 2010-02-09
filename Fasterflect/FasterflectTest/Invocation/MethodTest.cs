@@ -25,8 +25,8 @@ namespace FasterflectTest.Invocation
             _( ( object person ) =>
                {
                    var elements = new[] { 1d, 2d, 3d, 4d, 5d };
-                   var methodInfo = person.GetType().Method( "Walk" );
-                   elements.ForEach( element => methodInfo.Invoke( element ) );
+                   var methodInfo = person.UnwrapIfWrapped().GetType().Method( "Walk" );
+                   elements.ForEach( element => methodInfo.Invoke( person, element ) );
                    Assert.AreEqual( elements.Sum(), person.GetFieldValue( "metersTravelled" ) );
                } );
         }
@@ -54,9 +54,9 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestInvokeExplicitlyImplementedMethod()
         {
-            var employee = EmployeeType.CreateInstance();
+			var employee = EmployeeType.CreateInstance();
             var currentMeters = (double) employee.GetFieldValue( "metersTravelled" );
-            employee.Invoke( "Swim", 100d );
+            employee.Invoke( "Swim", 100 );
             VerifyFields( employee, new { metersTravelled = currentMeters + 100 } );
         }
 

@@ -180,7 +180,6 @@ namespace Fasterflect
         #endregion
 
         #region Field Lookup
-
         #region Single Field
         /// <summary>
         /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
@@ -238,8 +237,7 @@ namespace Fasterflect
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
         public static FieldInfo Field( this Type type, string name, BindingFlags flags, Type fieldType )
         {
-            FieldInfo info =
-                type.Fields( flags ).FirstOrDefault( f => f.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) );
+            FieldInfo info = type.Fields( flags ).FirstOrDefault( f => f.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) );
             return info != null && (fieldType == null || fieldType.IsAssignableFrom( info.FieldType )) ? info : null;
         }
 
@@ -345,7 +343,6 @@ namespace Fasterflect
             return type.GetFields( flags ).ToList();
         }
         #endregion
-
         #endregion
     }
 }
