@@ -7,7 +7,7 @@ namespace Fasterflect
         /// <summary>
         /// Sets the static field identified by <paramref name="fieldInfo"/> with <paramref name="value" />.
         /// </summary>
-        public static void SetValue(this FieldInfo fieldInfo, object value)
+        public static void Set(this FieldInfo fieldInfo, object value)
         {
             fieldInfo.DelegateForSetStaticFieldValue()(value);
         }
@@ -16,7 +16,7 @@ namespace Fasterflect
         /// Sets the instance field identified by <paramref name="fieldInfo"/> of <paramref name="target"/>
         /// with <paramref name="value" />.
         /// </summary>
-        public static void SetValue(this FieldInfo fieldInfo, object target, object value)
+        public static void Set(this FieldInfo fieldInfo, object target, object value)
         {
             fieldInfo.DelegateForSetFieldValue()(target, value);
         }
@@ -24,7 +24,7 @@ namespace Fasterflect
         /// <summary>
         /// Gets the value of the static field identified by <paramref name="fieldInfo"/>.
         /// </summary>
-        public static object GetValue(this FieldInfo fieldInfo)
+        public static object Get(this FieldInfo fieldInfo)
         {
             return fieldInfo.DelegateForGetStaticFieldValue()();
         }
@@ -32,7 +32,7 @@ namespace Fasterflect
         /// <summary>
         /// Gets the value of the instance field identified by <paramref name="fieldInfo"/> of <paramref name="target"/>.
         /// </summary>
-        public static object GetValue(this FieldInfo fieldInfo, object target)
+        public static object Get(this FieldInfo fieldInfo, object target)
         {
             return fieldInfo.DelegateForGetFieldValue()( target );
         }

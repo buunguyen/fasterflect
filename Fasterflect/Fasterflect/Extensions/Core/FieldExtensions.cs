@@ -141,7 +141,7 @@ namespace Fasterflect
         public static Type SetFields( this Type targetType, object sample, params string[] propertiesToInclude )
         {
             var properties = sample.GetType().Properties( propertiesToInclude );
-            properties.ForEach( prop => targetType.SetFieldValue( prop.Name, prop.GetValue( sample ) ) );
+            properties.ForEach( prop => targetType.SetFieldValue( prop.Name, prop.Get( sample ) ) );
             return targetType;
         }
 
@@ -172,7 +172,7 @@ namespace Fasterflect
         public static object SetFields( this object target, object sample, params string[] propertiesToInclude )
         {
             var properties = sample.GetType().Properties( propertiesToInclude );
-            properties.ForEach( prop => target.SetFieldValue( prop.Name, prop.GetValue( sample ) ) );
+            properties.ForEach( prop => target.SetFieldValue( prop.Name, prop.Get( sample ) ) );
             return target;
         }
         #endregion

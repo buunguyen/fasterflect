@@ -77,6 +77,7 @@
     <Compile Include="Caching\CacheStrategy.cs" />
     <Compile Include="Caching\Cache.cs" />
     <Compile Include="Extensions\Core\ConstructorInfoExtensions.cs" />
+    <Compile Include="Extensions\Core\ValueTypeExtensions.cs" />
     <Compile Include="Extensions\Utils\CloneExtensions.cs" />
     <Compile Include="Common\Constants.cs" />
     <Compile Include="Extensions\Core\ConstructorExtensions.cs" />
@@ -88,7 +89,6 @@
     <Compile Include="Extensions\Core\MemberInfoExtensions.cs" />
     <Compile Include="ObjectConstruction\TypeConverter.cs" />
     <Compile Include="Extensions\Core\PropertyInfoExtensions.cs" />
-    <Compile Include="Extensions\Core\TypeExtensions.cs" />
     <Compile Include="Extensions\Core\MemberExtensions.cs" />
     <Compile Include="Extensions\Core\PropertyExtensions.cs" />
     <Compile Include="Extensions\Core\FieldExtensions.cs" />

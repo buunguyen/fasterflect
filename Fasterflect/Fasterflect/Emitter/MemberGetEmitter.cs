@@ -69,7 +69,7 @@ namespace Fasterflect.Emitter
 			else
 			{
 				var prop = member as PropertyInfo;
-                MethodInfo getMethod = LookupUtils.GetPropertyGetMethod(callInfo);
+                MethodInfo getMethod = LookupUtils.GetPropertyGetMethod(prop, callInfo);
 
 				// ((T)arag0|tmp).prop
 				generator.Emit((callInfo.IsStatic || callInfo.IsTargetTypeStruct)

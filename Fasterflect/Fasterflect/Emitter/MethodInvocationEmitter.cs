@@ -44,7 +44,7 @@ namespace Fasterflect.Emitter
 			int startUsableLocalIndex = 0;
 			if (callInfo.HasRefParam)
 			{
-				startUsableLocalIndex = CreateLocalsForByRefParams(generator, paramArrayIndex);
+                startUsableLocalIndex = CreateLocalsForByRefParams(generator, paramArrayIndex, methodInfo);
 				generator.DeclareLocal(hasReturnType
 				                       	? methodInfo.ReturnType
 				                       	: Constants.ObjectType); // T result;
