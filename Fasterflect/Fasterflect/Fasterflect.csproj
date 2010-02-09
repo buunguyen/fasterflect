@@ -76,9 +76,10 @@
   <ItemGroup>
     <Compile Include="Caching\CacheStrategy.cs" />
     <Compile Include="Caching\Cache.cs" />
+    <Compile Include="Emitter\CloneEmitter.cs" />
     <Compile Include="Extensions\Core\ConstructorInfoExtensions.cs" />
     <Compile Include="Extensions\Core\ValueTypeExtensions.cs" />
-    <Compile Include="Extensions\Utils\CloneExtensions.cs" />
+    <Compile Include="Extensions\Services\CloneExtensions.cs" />
     <Compile Include="Common\Constants.cs" />
     <Compile Include="Extensions\Core\ConstructorExtensions.cs" />
     <Compile Include="Extensions\Core\AttributeExtensions.cs" />
