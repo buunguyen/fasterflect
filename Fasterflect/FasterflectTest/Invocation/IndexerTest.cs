@@ -23,7 +23,7 @@ namespace FasterflectTest.Invocation
 
         private static void InvokeIndexer( Func<object, object[], object> getIndexerAction )
         {
-            _( ( personBase, elementType, elementTypeNullable ) =>
+            RunWith( ( personBase, elementType, elementTypeNullable ) =>
                {
                    var people = new[] { new object[] { "John", 10 }, new object[] { "Jane", 20 } };
                    people.ForEach( sample =>
@@ -42,7 +42,7 @@ namespace FasterflectTest.Invocation
                } );
         }
 
-        private static void _( Action<object, Type, Type> assertionAction )
+        private static void RunWith( Action<object, Type, Type> assertionAction )
         {
             Types.Select( t =>
                           {

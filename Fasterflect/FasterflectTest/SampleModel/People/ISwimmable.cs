@@ -2,6 +2,6 @@
 {
     public interface ISwimmable
     {
-        void Swim( int meters );
+        void Swim( double meters );
     }
 }

@@ -29,7 +29,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestDelegateRetrievalMethodsReturnCorrectDelegateType()
         {
-            _( ( Type type ) =>
+            RunWith( ( Type type ) =>
                {
                    var funcs = new Func<Delegate>[]
                                {

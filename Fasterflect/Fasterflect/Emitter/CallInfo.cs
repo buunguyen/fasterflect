@@ -34,19 +34,21 @@ namespace Fasterflect.Emitter
         public Type[] ParamTypes { get; private set; }
         public string Name { get; private set; }
         public bool IsStatic { get; private set; }
+	    public MemberInfo MemberInfo { get; private set; }
+        
+        public CallInfo(Type targetType, MemberTypes memberTypes, string name, Type[] paramTypes, bool isStatic)
+            : this(targetType, memberTypes, name, paramTypes, isStatic, null)
+        {
+        }
 
-		public CallInfo(Type targetType, MemberTypes memberTypes, string name, Type[] paramTypes)
-			: this(targetType, memberTypes, name, paramTypes, false)
+	    public CallInfo(Type targetType, MemberTypes memberTypes, string name, Type[] paramTypes, bool isStatic, MemberInfo memberInfo)
 		{
-		}
-
-		public CallInfo(Type targetType, MemberTypes memberTypes, string name, Type[] paramTypes, bool isStatic)
-		{
-			TargetType = targetType;
+            TargetType = targetType; 
 			MemberTypes = memberTypes;
 			Name = name;
 			ParamTypes = paramTypes.Length == 0 ? Type.EmptyTypes : paramTypes;
 			IsStatic = isStatic;
+	        MemberInfo = memberInfo;
 		}
 
 		/// <summary>
@@ -94,9 +96,11 @@ namespace Fasterflect.Emitter
 			if (other.TargetType != TargetType || other.MemberTypes != MemberTypes ||
 			    other.Name != Name || other.ParamTypes.Length != ParamTypes.Length)
 				return false;
+
 			for (int i = 0; i < ParamTypes.Length; i++)
 				if (ParamTypes[i] != other.ParamTypes[i])
 					return false;
+
 			return true;
 		}
 
@@ -106,15 +110,6 @@ namespace Fasterflect.Emitter
 			for( int i = 0; i < ParamTypes.Length; i++ )
 			    hash += (i + 31) * ParamTypes[i].GetHashCode();
 			return hash;
-			
-			// original hash
-			//int hash = 7;
-			//hash = 31 * hash + TargetType.GetHashCode();
-			//hash = 31 * hash + MemberTypes.GetHashCode();
-			//hash = 31 * hash + Name.GetHashCode();
-			//for (int i = 0; i < ParamTypes.Length; i++)
-			//    hash = 31 * hash + ParamTypes[i].GetHashCode();
-			//return hash;
 		}
 	}
 }

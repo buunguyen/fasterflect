@@ -21,15 +21,24 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
-using Fasterflect.Common;
 
 namespace Fasterflect.Emitter
 {
 	internal class MemberGetEmitter : BaseEmitter
-	{
-		public MemberGetEmitter(Type targetType, MemberTypes memberTypes, string fieldOrPropertyName, bool isStatic)
+    {
+        public MemberGetEmitter(MemberInfo memberInfo, bool isStatic)
+            : this(memberInfo.DeclaringType, memberInfo.MemberType, memberInfo.Name, isStatic, memberInfo)
+        {
+        }
+
+        public MemberGetEmitter(Type targetType, MemberTypes memberType, string fieldOrPropertyName, bool isStatic)
+            : this(targetType, memberType, fieldOrPropertyName, isStatic, null)
+        {
+        }
+
+		private MemberGetEmitter(Type targetType, MemberTypes memberType, string fieldOrPropertyName, bool isStatic, MemberInfo memberInfo)
 		{
-			callInfo = new CallInfo(targetType, memberTypes, fieldOrPropertyName, Type.EmptyTypes, isStatic);
+            callInfo = new CallInfo(targetType, memberType, fieldOrPropertyName, Type.EmptyTypes, isStatic, memberInfo);
 		}
 
 		protected internal override Delegate CreateDelegate()

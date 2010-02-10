@@ -10,7 +10,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestAccessStaticProperties()
         {
-            _( ( Type type ) =>
+            RunWith( ( Type type ) =>
                {
                    var totalPeopleCreated = (int) type.GetPropertyValue( "TotalPeopleCreated" ) + 1;
                    type.SetPropertyValue( "TotalPeopleCreated", totalPeopleCreated );
@@ -21,7 +21,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestSetStaticPropertyBySample()
         {
-            _( ( Type type ) =>
+            RunWith( ( Type type ) =>
                {
                    var totalPeopleCreated = (int) type.GetPropertyValue( "TotalPeopleCreated" ) + 1;
                    type.SetProperties( new { TotalPeopleCreated = totalPeopleCreated } );
@@ -32,7 +32,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestAccessStaticPropertyViaPropertyInfo()
         {
-            _( ( Type type ) =>
+            RunWith( ( Type type ) =>
                {
                    var propInfo = type.Property( "TotalPeopleCreated", Flags.StaticCriteria );
                    var totalPeopleCreated = (int) propInfo.Get() + 1;
@@ -44,7 +44,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestAccessInstanceProperties()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    var name = (string) person.GetPropertyValue( "Name" ) + " updated";
                    person.SetPropertyValue( "Name", name );
@@ -55,7 +55,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestAccessInstancePropertyViaPropertyInfo()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    var propInfo = person.UnwrapIfWrapped().GetType().Property( "Name" );
                    var name = (string) propInfo.Get( person ) + " updated";
@@ -67,7 +67,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestChainInstancePropertySetters()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    person.SetPropertyValue( "Name", "John" )
                        .SetPropertyValue( "Age", 20 )
@@ -79,7 +79,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestSetInstancePropertiesBySample()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    person.SetProperties( new { Name = "John", Age = 20, MetersTravelled = 120d } );
                    VerifyProperties( person, new { Name = "John", Age = 20, MetersTravelled = 120d } );
@@ -89,7 +89,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestSetInstancePropertiesBySampleWithFilter()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    var currentAge = (int) person.GetPropertyValue( "Age" );
                    person.SetProperties( new { Name = "John", Age = 20, MetersTravelled = 120d }, "Name",
@@ -118,42 +118,42 @@ namespace FasterflectTest.Invocation
         [ExpectedException( typeof(MissingMemberException) )]
         public void TestSetNotExistentProperty()
         {
-            _( ( object person ) => person.SetPropertyValue( "not_exist", null ) );
+            RunWith( ( object person ) => person.SetPropertyValue( "not_exist", null ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(MissingMemberException) )]
         public void TestSetNotExistentStaticProperty()
         {
-            _( ( Type type ) => type.SetPropertyValue( "not_exist", null ) );
+            RunWith( ( Type type ) => type.SetPropertyValue( "not_exist", null ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(MissingMemberException) )]
         public void TestGetNotExistentProperty()
         {
-            _( ( object person ) => person.GetPropertyValue( "not_exist" ) );
+            RunWith( ( object person ) => person.GetPropertyValue( "not_exist" ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(MissingMemberException) )]
         public void TestGetNotExistentStaticProperty()
         {
-            _( ( Type type ) => type.GetPropertyValue( "not_exist" ) );
+            RunWith( ( Type type ) => type.GetPropertyValue( "not_exist" ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(InvalidCastException) )]
         public void TestSetInvalidValueType()
         {
-            _( ( object person ) => person.SetPropertyValue( "MetersTravelled", 1 ) );
+            RunWith( ( object person ) => person.SetPropertyValue( "MetersTravelled", 1 ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(NullReferenceException) )]
         public void TestSetNullToValueType()
         {
-            _( ( object person ) => person.SetPropertyValue( "Age", null ) );
+            RunWith( ( object person ) => person.SetPropertyValue( "Age", null ) );
         }
     }
 }

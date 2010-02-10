@@ -11,7 +11,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestInvokeInstanceMethod()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    var elements = new[] { 1d, 2d, 3d, 4d, 5d };
                    elements.ForEach( element => person.Invoke( "Walk", element ) );
@@ -22,7 +22,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestInvokeInstanceMethodViaMethodInfo()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    var elements = new[] { 1d, 2d, 3d, 4d, 5d };
                    var methodInfo = person.UnwrapIfWrapped().GetType().Method( "Walk" );
@@ -43,7 +43,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestInvokeMethodWithOutArgument()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    var arguments = new object[] { 10d, null };
                    person.Invoke( "Walk", new[] { typeof(double), typeof(double).MakeByRefType() }, arguments );
@@ -56,7 +56,7 @@ namespace FasterflectTest.Invocation
         {
 			var employee = EmployeeType.CreateInstance();
             var currentMeters = (double) employee.GetFieldValue( "metersTravelled" );
-            employee.Invoke( "Swim", 100 );
+            employee.Invoke( "Swim", 100d );
             VerifyFields( employee, new { metersTravelled = currentMeters + 100 } );
         }
 
@@ -72,7 +72,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestInvokeStaticMethod()
         {
-            _( ( Type type ) =>
+            RunWith( ( Type type ) =>
                {
                    var totalPeopleCreated = (int) type.GetFieldValue( "totalPeopleCreated" );
                    Assert.AreEqual( totalPeopleCreated, type.Invoke( "GetTotalPeopleCreated" ) );
@@ -82,7 +82,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestInvokeStaticMethodViaMethodInfo()
         {
-            _( ( Type type ) =>
+            RunWith( ( Type type ) =>
                {
                    var totalPeopleCreated = (int) type.GetFieldValue( "totalPeopleCreated" );
                    Assert.AreEqual( totalPeopleCreated,
@@ -93,7 +93,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestInvokeStaticMethodsWithArgument()
         {
-            _( ( Type type ) =>
+            RunWith( ( Type type ) =>
                {
                    var totalPeopleCreated = (int) type.GetFieldValue( "totalPeopleCreated" );
                    Assert.AreEqual( totalPeopleCreated + 20, type.Invoke( "AdjustTotalPeopleCreated", 20 ) );
@@ -104,14 +104,14 @@ namespace FasterflectTest.Invocation
         [ExpectedException( typeof(MissingMethodException) )]
         public void TestInvokeNonExistentInstanceMethod()
         {
-            _( ( object person ) => person.Invoke( "not_exist" ) );
+            RunWith( ( object person ) => person.Invoke( "not_exist" ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(MissingMethodException) )]
         public void TestInvokeNonExistentStaticMethod()
         {
-            _( ( Type type ) => type.Invoke( "not_exist" ) );
+            RunWith( ( Type type ) => type.Invoke( "not_exist" ) );
         }
     }
 }

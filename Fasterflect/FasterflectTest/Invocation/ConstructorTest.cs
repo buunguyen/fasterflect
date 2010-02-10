@@ -19,7 +19,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestInvokeCtorWithPrimitiveArguments()
         {
-            _( type =>
+            RunWith( type =>
                {
                    var person = type.CreateInstance( "John", 10 ).WrapIfValueType();
                    VerifyFields( person, new { name = "John", age = 10 } );
@@ -29,7 +29,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestInvokeCtorWithComplexArgument()
         {
-            _( type =>
+            RunWith( type =>
                {
                    var person = type.CreateInstance( "John", 10 );
                    var copy = type.CreateInstance( person ).WrapIfValueType();
@@ -48,7 +48,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestInvokeCtorWithOutArgument()
         {
-            _( type =>
+            RunWith( type =>
                {
                    var arguments = new object[] { "John", 10, 0 };
                    var person = type.CreateInstance( new[] { typeof(string), typeof(int), typeof(int).MakeByRefType() },
@@ -71,20 +71,20 @@ namespace FasterflectTest.Invocation
         [ExpectedException( typeof(MissingMemberException) )]
         public void TestInvokeMissingCtor()
         {
-            _( type => type.CreateInstance( "oneStringArgument" ) );
+            RunWith( type => type.CreateInstance( "oneStringArgument" ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(NullReferenceException) )]
         public void TestInvokeCtorWithNullParametersTheWrongWay()
         {
-            _( type => type.CreateInstance( null, 10 ) );
+            RunWith( type => type.CreateInstance( null, 10 ) );
         }
 
         [TestMethod]
         public void TestInvokeCtorWithNullParametersTheRightWay()
         {
-            _( type =>
+            RunWith( type =>
                {
                    var person = type.CreateInstance( new[] { typeof(string), typeof(int) },
                                                      null, 10 ).WrapIfValueType();
@@ -103,7 +103,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestInvokeCtorViaConstructorInfo()
         {
-            _( type =>
+            RunWith( type =>
                {
                    ConstructorInfo ctorInfo = type.Constructor( typeof(string), typeof(int) );
                    var person = ctorInfo.CreateInstance( null, 10 ).WrapIfValueType();

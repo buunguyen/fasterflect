@@ -20,7 +20,6 @@ using System;
 using System.Reflection;
 using System.Reflection.Emit;
 using Fasterflect.Caching;
-using Fasterflect.Common;
 
 namespace Fasterflect.Emitter
 {

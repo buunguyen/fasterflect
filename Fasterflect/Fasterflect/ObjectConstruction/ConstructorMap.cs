@@ -44,7 +44,7 @@ namespace Fasterflect.ObjectConstruction
 					if( member != null )
 					{
 						object value = parameterTypeConvertMask[ i ] ? TypeConverter.Get( member.Type(), row[ i ] ) : row[ i ];
-						member.SetValue( target, value );
+						member.Set( target, value );
 					}
 				}
 			}

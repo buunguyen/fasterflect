@@ -95,7 +95,7 @@ namespace Fasterflect.Caching
         }
         #endregion
 
-        #region GetValue Methods
+        #region Get Methods
         /// <summary>
         /// Retrieves an entry from the cache using the given key.
         /// </summary>

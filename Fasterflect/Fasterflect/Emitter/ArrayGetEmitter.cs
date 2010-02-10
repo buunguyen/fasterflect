@@ -21,7 +21,6 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
-using Fasterflect.Common;
 
 namespace Fasterflect.Emitter
 {
@@ -30,7 +29,7 @@ namespace Fasterflect.Emitter
 		public ArrayGetEmitter(Type targetType)
 		{
 			callInfo = new CallInfo(targetType, MemberTypes.Method,
-			                        Constants.ArrayGetterName, new[] {typeof (int)});
+			                        Constants.ArrayGetterName, new[] {typeof (int)}, false);
 		}
 
 		protected internal override Delegate CreateDelegate()

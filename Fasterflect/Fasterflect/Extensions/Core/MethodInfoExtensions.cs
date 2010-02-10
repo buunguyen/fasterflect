@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
@@ -52,8 +54,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMethodInvoker DelegateForStaticInvoke(this MethodInfo methodInfo)
         {
-            return methodInfo.DeclaringType.DelegateForStaticInvoke( methodInfo.Name,
-                                                                     methodInfo.GetParameters().GetTypeArray() );
+            return (StaticMethodInvoker) new MethodInvocationEmitter(methodInfo, true).GetDelegate();
         }
 
         /// <summary>
@@ -61,8 +62,7 @@ namespace Fasterflect
         /// </summary>
         public static MethodInvoker DelegateForInvoke(this MethodInfo methodInfo)
         {
-            return methodInfo.DeclaringType.DelegateForInvoke( methodInfo.Name,
-                                                               methodInfo.GetParameters().GetTypeArray() );
+            return (MethodInvoker) new MethodInvocationEmitter(methodInfo, false).GetDelegate();
         }
 	}
 }
