@@ -76,6 +76,18 @@
   <ItemGroup>
     <Compile Include="Caching\CacheStrategy.cs" />
     <Compile Include="Caching\Cache.cs" />
+    <Compile Include="Common\Selectors\SelectorBase.cs" />
+    <Compile Include="Common\Selectors\Flags.cs" />
+    <Compile Include="Common\Selectors\Test.cs" />
+    <Compile Include="Common\Selectors\PartialNameMatch.cs" />
+    <Compile Include="Common\Selectors\ExplicitNameMatch.cs" />
+    <Compile Include="Common\Selectors\ExactParameterMatch.cs" />
+    <Compile Include="Common\Selectors\ParameterMatch.cs" />
+    <Compile Include="Common\Selectors\SelectorFactory.cs" />
+    <Compile Include="Common\Selectors\FasterflectFlags.cs" />
+    <Compile Include="Common\Selectors\IMemberSelector.cs" />
+    <Compile Include="Common\Selectors\IMethodSelector.cs" />
+    <Compile Include="Common\Selectors\ISelector.cs" />
     <Compile Include="Emitter\CloneEmitter.cs" />
     <Compile Include="Emitter\EmitHelper.cs" />
     <Compile Include="Extensions\Core\ConstructorInfoExtensions.cs" />
