@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
+
+// Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
 // you may not use this file except in compliance with the License. 
@@ -14,7 +15,9 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
+
 #endregion
+
 
 using System;
 using System.Reflection;
@@ -25,66 +28,58 @@ namespace Fasterflect.Emitter
 {
     internal abstract class BaseEmitter
     {
-		private static volatile Cache<CallInfo, Delegate> cache = new Cache<CallInfo, Delegate>();
+        private static volatile Cache<CallInfo, Delegate> cache = new Cache<CallInfo, Delegate>();
         protected CallInfo callInfo;
+        protected DynamicMethod method;
+        protected EmitHelper generator;
 
         public Delegate GetDelegate()
         {
-            Delegate action = cache.Get( callInfo );
-            if( action == null )
+            Delegate action = cache.Get(callInfo);
+            if (action == null)
             {
+                method = CreateDynamicMethod();
+                generator = new EmitHelper(method.GetILGenerator());
                 action = CreateDelegate();
-                cache.Insert( callInfo, action, CacheStrategy.Temporary );
+                cache.Insert(callInfo, action, CacheStrategy.Temporary);
             }
             return action;
         }
 
+        protected internal abstract DynamicMethod CreateDynamicMethod();
         protected internal abstract Delegate CreateDelegate();
 
-        protected internal static DynamicMethod CreateDynamicMethod( string name, Type targetType, Type returnType,
-                                                            Type[] paramTypes )
+        protected internal static DynamicMethod CreateDynamicMethod(string name, Type targetType, Type returnType,
+                                                                     Type[] paramTypes)
         {
-            return new DynamicMethod( name, MethodAttributes.Static | MethodAttributes.Public,
+            return new DynamicMethod(name, MethodAttributes.Static | MethodAttributes.Public,
                                       CallingConventions.Standard, returnType, paramTypes,
                                       targetType.IsArray ? targetType.GetElementType() : targetType,
-                                      true );
+                                      true);
         }
 
-        protected void LoadInnerStructToLocal( ILGenerator generator, int localPosition )
+        protected void LoadInnerStructToLocal(byte localPosition)
         {
-            generator.Emit( OpCodes.Castclass, Constants.StructType );
-            MethodInfo getMethod = Constants.StructType.GetMethod( "get_Value", BindingFlags.Public |
-                                                                                BindingFlags.Instance );
-            generator.Emit( OpCodes.Callvirt, getMethod );
-            generator.Emit( OpCodes.Unbox_Any, callInfo.TargetType );
-            generator.Emit( OpCodes.Stloc, localPosition );
-            generator.Emit( OpCodes.Ldloca_S, localPosition );
+            MethodInfo getMethod = Constants.StructType.GetMethod("get_Value", BindingFlags.Public |
+                                                                               BindingFlags.Instance);
+            generator
+                .castclass(Constants.StructType)    // (ValueTypeHolder)wrappedStruct
+                .callvirt(getMethod)                // <stack>.get_Value()
+                .unbox_any(callInfo.TargetType)     // unbox <stack>
+                .stloc(localPosition)               // localStr = <stack>
+                .ldloca_s(localPosition);           // load &localStr
         }
 
-        protected void StoreLocalToInnerStruct( ILGenerator generator, int localPosition )
+        protected void StoreLocalToInnerStruct(byte localPosition)
         {
-            generator.Emit( OpCodes.Ldarg_0 );
-            generator.Emit( OpCodes.Castclass, Constants.StructType );
-            MethodInfo setMethod = Constants.StructType.GetMethod( "set_Value", BindingFlags.Public |
-                                                                                BindingFlags.Instance );
-            generator.Emit( OpCodes.Ldloc, localPosition );
-            BoxIfValueType( generator, callInfo.TargetType );
-            generator.Emit( OpCodes.Callvirt, setMethod );
-        }
-
-        protected void BoxIfValueType( ILGenerator generator, Type type )
-        {
-            if( type.IsValueType )
-            {
-                generator.Emit( OpCodes.Box, type );
-            }
-        }
-
-        protected void UnboxOrCast( ILGenerator generator, Type type )
-        {
-            generator.Emit( type.IsValueType
-                                ? OpCodes.Unbox_Any
-                                : OpCodes.Castclass, type );
+            MethodInfo setMethod = Constants.StructType.GetMethod("set_Value", BindingFlags.Public |
+                                                                               BindingFlags.Instance);
+            generator
+                .ldarg_0                            // load arg-0 (this)
+                .castclass(Constants.StructType)    // wrappedStruct = (ValueTypeHolder)this
+                .ldloc(localPosition)               // load localStr
+                .boxIfValueType(callInfo.TargetType)// box <stack>
+                .callvirt(setMethod);               // wrappedStruct.set_Value(<stack>)
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿#region License
 
-// Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
+// Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
 // you may not use this file except in compliance with the License. 
@@ -26,9 +26,9 @@ namespace Fasterflect.Emitter
 {
 	internal abstract class InvocationEmitter : BaseEmitter
 	{
-		protected int CreateLocalsForByRefParams(ILGenerator generator, int paramArrayIndex, MethodBase invocationInfo)
+		protected byte CreateLocalsForByRefParams(byte paramArrayIndex, MethodBase invocationInfo)
         {
-			int numberOfByRefParams = 0;
+            byte numberOfByRefParams = 0;
 		    var parameters = invocationInfo.GetParameters();
 			for (int i = 0; i < callInfo.ParamTypes.Length; i++)
 			{
@@ -39,11 +39,12 @@ namespace Fasterflect.Emitter
 					generator.DeclareLocal(type);
                     if (!parameters[i].IsOut) // no initialization necessary is 'out' parameter
                     {
-                        generator.Emit( OpCodes.Ldarg, paramArrayIndex );
-                        generator.Emit( OpCodes.Ldc_I4, i );
-                        generator.Emit( OpCodes.Ldelem_Ref );
-                        UnboxOrCast( generator, type );
-                        generator.Emit( OpCodes.Stloc, numberOfByRefParams );
+                        generator.ldarg(paramArrayIndex)
+                                 .ldc_i4(i)
+                                 .ldelem_ref
+                                 .CastFromObject(type)
+                                 .stloc(numberOfByRefParams)
+                                 .end();
                     }
 				    numberOfByRefParams++;
 				}
@@ -51,43 +52,40 @@ namespace Fasterflect.Emitter
 			return numberOfByRefParams;
 		}
 
-		protected void AssignByRefParamsToArray(ILGenerator generator, int paramArrayIndex)
+		protected void AssignByRefParamsToArray(int paramArrayIndex)
 		{
-			int currentByRefParam = 0;
+			byte currentByRefParam = 0;
 			for (int i = 0; i < callInfo.ParamTypes.Length; i++)
 			{
 				Type paramType = callInfo.ParamTypes[i];
 				if (paramType.IsByRef)
 				{
-					generator.Emit(OpCodes.Ldarg, paramArrayIndex);
-					generator.Emit(OpCodes.Ldc_I4, i);
-					generator.Emit(OpCodes.Ldloc, currentByRefParam++);
-					Type type = paramType.GetElementType();
-					if (type.IsValueType)
-					{
-						generator.Emit(OpCodes.Box, type);
-					}
-					generator.Emit(OpCodes.Stelem_Ref);
+				    generator.ldarg( paramArrayIndex )
+    				         .ldc_i4( i )
+                             .ldloc(currentByRefParam++)
+                             .boxIfValueType(paramType.GetElementType())
+                             .stelem_ref
+                             .end();
 				}
 			}
 		}
 
-		protected void PushParamsOrLocalsToStack(ILGenerator generator, int paramArrayIndex)
+		protected void PushParamsOrLocalsToStack(int paramArrayIndex)
 		{
-			int currentByRefParam = 0;
+			byte currentByRefParam = 0;
 			for (int i = 0; i < callInfo.ParamTypes.Length; i++)
 			{
 				Type paramType = callInfo.ParamTypes[i];
 				if (paramType.IsByRef)
 				{
-					generator.Emit(OpCodes.Ldloca_S, currentByRefParam++);
+				    generator.ldloca_s( currentByRefParam++ );
 				}
 				else
 				{
-					generator.Emit(OpCodes.Ldarg, paramArrayIndex);
-					generator.Emit(OpCodes.Ldc_I4, i);
-					generator.Emit(OpCodes.Ldelem_Ref);
-					UnboxOrCast(generator, paramType);
+				    generator.ldarg( paramArrayIndex )
+				             .ldc_i4( i )
+				             .ldelem_ref
+                             .CastFromObject(paramType);
 				}
 			}
 		}

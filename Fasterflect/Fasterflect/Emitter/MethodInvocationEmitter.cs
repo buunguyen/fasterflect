@@ -1,6 +1,6 @@
 ﻿#region License
 
-// Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
+// Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
 // you may not use this file except in compliance with the License. 
@@ -41,83 +41,80 @@ namespace Fasterflect.Emitter
             callInfo = new CallInfo(targetType, MemberTypes.Method, name, paramTypes, isStatic, methodInfo);
         }
 
+        
+        protected internal override DynamicMethod CreateDynamicMethod()
+        {
+            return CreateDynamicMethod("invoke", callInfo.TargetType, Constants.ObjectType,
+                                       callInfo.IsStatic
+                                        ? new[] { Constants.ObjectType.MakeArrayType() }
+                                        : new[] { Constants.ObjectType, Constants.ObjectType.MakeArrayType() });
+        }
+
 		protected internal override Delegate CreateDelegate()
 		{
 			MethodInfo methodInfo = LookupUtils.GetMethod(callInfo);
-			DynamicMethod method = CreateDynamicMethod();
-			ILGenerator generator = method.GetILGenerator();
-
-			int paramArrayIndex = callInfo.IsStatic ? 0 : 1;
+			byte paramArrayIndex = callInfo.IsStatic ? (byte)0 : (byte)1;
 			bool hasReturnType = methodInfo.ReturnType != Constants.VoidType;
 
-			int startUsableLocalIndex = 0;
+			byte startUsableLocalIndex = 0;
 			if (callInfo.HasRefParam)
 			{
-                startUsableLocalIndex = CreateLocalsForByRefParams(generator, paramArrayIndex, methodInfo);
+                startUsableLocalIndex = CreateLocalsForByRefParams(paramArrayIndex, methodInfo);    // create by_ref_locals from argument array
 				generator.DeclareLocal(hasReturnType
 				                       	? methodInfo.ReturnType
-				                       	: Constants.ObjectType); // T result;
-				GenerateInvocation(methodInfo, generator, paramArrayIndex, startUsableLocalIndex + 1);
-				if (hasReturnType)
-					generator.Emit(OpCodes.Stloc, startUsableLocalIndex); // result = <stack>;
-				AssignByRefParamsToArray(generator, paramArrayIndex);
+				                       	: Constants.ObjectType);                                    // T result;
+                GenerateInvocation(methodInfo, paramArrayIndex, (byte)(startUsableLocalIndex + 1));  
+                if (hasReturnType)
+                    generator.stloc( startUsableLocalIndex );                                       // result = <stack>;
+                AssignByRefParamsToArray(paramArrayIndex);                                          // store by_ref_locals back to argument array
 			}
 			else
 			{
 				generator.DeclareLocal(hasReturnType
 				                       	? methodInfo.ReturnType
-				                       	: Constants.ObjectType); // T result;
-				GenerateInvocation(methodInfo, generator, paramArrayIndex, startUsableLocalIndex + 1);
+				                       	: Constants.ObjectType);                                    // T result;
+                GenerateInvocation(methodInfo, paramArrayIndex, (byte)(startUsableLocalIndex + 1));
 				if (hasReturnType)
-					generator.Emit(OpCodes.Stloc, startUsableLocalIndex); // result = <stack>;
+					generator.stloc( startUsableLocalIndex);                                        // result = <stack>;
 			}
 
 			if (callInfo.ShouldHandleInnerStruct)
 			{
-				StoreLocalToInnerStruct(generator, startUsableLocalIndex + 1); // ((ValueTypeHolder)arg0)).Value = tmp; 
+                StoreLocalToInnerStruct((byte)(startUsableLocalIndex + 1));                         // ((ValueTypeHolder)this)).Value = tmpStr; 
 			}
 			if (hasReturnType)
 			{
-				generator.Emit(OpCodes.Ldloc, startUsableLocalIndex); // push result;
-				BoxIfValueType(generator, methodInfo.ReturnType); // (box)result;
+				generator.ldloc( startUsableLocalIndex)                                             // push result;
+                         .boxIfValueType( methodInfo.ReturnType );                                  // box result;
 			}
 			else
 			{
-				generator.Emit(OpCodes.Ldnull);
+                generator.ldnull.end();                                                             // load null
 			}
-			generator.Emit(OpCodes.Ret);
+		    generator.ret();
 
 			return method.CreateDelegate(callInfo.IsStatic
 			                             	? typeof (StaticMethodInvoker)
 			                             	: typeof (MethodInvoker));
 		}
 
-		private void GenerateInvocation(MethodInfo methodInfo, ILGenerator generator,
-		                                int paramArrayIndex, int structLocalPosition)
+        private void GenerateInvocation(MethodInfo methodInfo, byte paramArrayIndex, byte structLocalPosition)
 		{
 			if (!callInfo.IsStatic)
 			{
-				generator.Emit(OpCodes.Ldarg_0); // arg0;
+				generator.ldarg_0.end();                                                    // load arg-0 (this);
 				if (callInfo.ShouldHandleInnerStruct)
 				{
-					generator.DeclareLocal(callInfo.TargetType); // T tmp;
-					LoadInnerStructToLocal(generator, structLocalPosition); // tmp = ((ValueTypeHolder)arg0)).Value;
+					generator.DeclareLocal(callInfo.TargetType);                            // TargetType tmpStr;
+					LoadInnerStructToLocal( structLocalPosition);                           // tmpStr = ((ValueTypeHolder)this)).Value;
 				}
 				else
 				{
-					generator.Emit(OpCodes.Castclass, callInfo.TargetType); // (T)arg0;
+					generator.castclass( callInfo.TargetType);                              // (TargetType)arg-0;
 				}
 			}
-			PushParamsOrLocalsToStack(generator, paramArrayIndex);
-			generator.Emit(callInfo.IsStatic ? OpCodes.Call : OpCodes.Callvirt, methodInfo);
-		}
-
-		protected DynamicMethod CreateDynamicMethod()
-		{
-			return CreateDynamicMethod("invoke", callInfo.TargetType, Constants.ObjectType,
-			                           callInfo.IsStatic
-			                           	? new[] {Constants.ObjectType.MakeArrayType()}
-			                           	: new[] {Constants.ObjectType, Constants.ObjectType.MakeArrayType()});
+            PushParamsOrLocalsToStack(paramArrayIndex);                                     // push arguments and by_ref_locals
+			generator.call(callInfo.IsStatic || callInfo.IsTargetTypeStruct, methodInfo);   // call OR callvirt
 		}
 	}
 }

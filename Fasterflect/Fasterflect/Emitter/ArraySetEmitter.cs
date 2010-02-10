@@ -1,6 +1,6 @@
 ﻿#region License
 
-// Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
+// Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
 // you may not use this file except in compliance with the License. 
@@ -18,6 +18,7 @@
 
 #endregion
 
+
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -31,28 +32,23 @@ namespace Fasterflect.Emitter
 			callInfo = new CallInfo(targetType, MemberTypes.Method, Constants.ArraySetterName,
                                     new[] { typeof(int), targetType.GetElementType() }, false);
 		}
+        
+        protected internal override DynamicMethod CreateDynamicMethod()
+        {
+            return CreateDynamicMethod(Constants.ArraySetterName, callInfo.TargetType, null,
+                new[] { Constants.ObjectType, Constants.IntType, Constants.ObjectType });
+        }
 
 		protected internal override Delegate CreateDelegate()
 		{
-			DynamicMethod method = CreateDynamicMethod(Constants.ArraySetterName, callInfo.TargetType, null,
-			                                           new[] {Constants.ObjectType, Constants.IntType, Constants.ObjectType});
-			ILGenerator generator = method.GetILGenerator();
 			Type elementType = callInfo.TargetType.GetElementType();
-
-			generator.Emit(OpCodes.Ldarg_0); // arg0;
-			generator.Emit(OpCodes.Castclass, callInfo.TargetType); // (T)arg0
-			generator.Emit(OpCodes.Ldarg_1); // arg1;
-			generator.Emit(OpCodes.Ldarg_2); // arg2;
-			UnboxOrCast(generator, elementType);
-			if (elementType.IsValueType)
-			{
-				generator.Emit(OpCodes.Stelem, elementType);
-			}
-			else
-			{
-				generator.Emit(OpCodes.Stelem_Ref);
-			}
-			generator.Emit(OpCodes.Ret);
+            generator.ldarg_0                           // load array
+                     .castclass(callInfo.TargetType)    // (T[])array
+                     .ldarg_1                           // load index
+                     .ldarg_2                           // load value
+                     .CastFromObject(elementType)       // (unbox | cast) value
+                     .stelem(elementType)               // array[index] = value
+		             .ret();
 			return method.CreateDelegate(typeof (ArrayElementSetter));
 		}
 	}

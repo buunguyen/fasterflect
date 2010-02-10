@@ -77,6 +77,7 @@
     <Compile Include="Caching\CacheStrategy.cs" />
     <Compile Include="Caching\Cache.cs" />
     <Compile Include="Emitter\CloneEmitter.cs" />
+    <Compile Include="Emitter\EmitHelper.cs" />
     <Compile Include="Extensions\Core\ConstructorInfoExtensions.cs" />
     <Compile Include="Extensions\Core\ValueTypeExtensions.cs" />
     <Compile Include="Extensions\Services\CloneExtensions.cs" />

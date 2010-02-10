@@ -1,6 +1,6 @@
 ﻿#region License
 
-// Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
+// Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
 // you may not use this file except in compliance with the License. 
@@ -18,6 +18,7 @@
 
 #endregion
 
+
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -32,26 +33,21 @@ namespace Fasterflect.Emitter
 			                        Constants.ArrayGetterName, new[] {typeof (int)}, false);
 		}
 
+        protected internal override DynamicMethod CreateDynamicMethod()
+        {
+            return CreateDynamicMethod(Constants.ArrayGetterName, callInfo.TargetType,
+                Constants.ObjectType, new[] {Constants.ObjectType, Constants.IntType});
+        }
+
 		protected internal override Delegate CreateDelegate()
 		{
-			DynamicMethod method = CreateDynamicMethod(Constants.ArrayGetterName, callInfo.TargetType,
-			                                           Constants.ObjectType, new[] {Constants.ObjectType, Constants.IntType});
-			ILGenerator generator = method.GetILGenerator();
 			Type elementType = callInfo.TargetType.GetElementType();
-
-			generator.Emit(OpCodes.Ldarg_0); // arg0;
-			generator.Emit(OpCodes.Castclass, callInfo.TargetType); // (T)arg0
-			generator.Emit(OpCodes.Ldarg_1); // arg1;
-			if (elementType.IsValueType)
-			{
-				generator.Emit(OpCodes.Ldelem, elementType);
-			}
-			else
-			{
-				generator.Emit(OpCodes.Ldelem_Ref);
-			}
-			BoxIfValueType(generator, elementType);
-			generator.Emit(OpCodes.Ret);
+            generator.ldarg_0                           // load array
+                     .castclass(callInfo.TargetType)    // (T[])array
+                     .ldarg_1                           // load index
+                     .ldelem( elementType )             // load array[index]
+		             .boxIfValueType( elementType )     // [box] return
+		             .ret();
 			return method.CreateDelegate(typeof (ArrayElementGetter));
 		}
 	}
