@@ -21,16 +21,25 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
-using Fasterflect.Common;
 
 namespace Fasterflect.Emitter
 {
 	internal class MethodInvocationEmitter : InvocationEmitter
-	{
+    {
+        public MethodInvocationEmitter(MethodInfo methodInfo, bool isStatic)
+            : this(methodInfo.Name, methodInfo.DeclaringType, methodInfo.GetParameters().GetTypeArray(), isStatic, methodInfo)
+        {
+        }
+
 		public MethodInvocationEmitter(string name, Type targetType, Type[] paramTypes, bool isStatic)
+            : this (name, targetType, paramTypes, isStatic, null)
 		{
-			callInfo = new CallInfo(targetType, MemberTypes.Method, name, paramTypes, isStatic);
 		}
+
+        private MethodInvocationEmitter(string name, Type targetType, Type[] paramTypes, bool isStatic, MemberInfo methodInfo)
+        {
+            callInfo = new CallInfo(targetType, MemberTypes.Method, name, paramTypes, isStatic, methodInfo);
+        }
 
 		protected internal override Delegate CreateDelegate()
 		{

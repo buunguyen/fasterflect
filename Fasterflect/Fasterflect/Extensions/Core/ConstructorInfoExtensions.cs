@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
@@ -25,7 +26,7 @@ namespace Fasterflect
         /// </summary>
         public static ConstructorInvoker DelegateForCreateInstance(this ConstructorInfo ctorInfo)
         {
-            return ctorInfo.DeclaringType.DelegateForCreateInstance( ctorInfo.GetParameters().GetTypeArray() );
+            return (ConstructorInvoker)new CtorInvocationEmitter(ctorInfo).GetDelegate();
         }
     }
 }

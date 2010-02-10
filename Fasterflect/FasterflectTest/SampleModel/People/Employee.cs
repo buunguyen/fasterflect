@@ -26,7 +26,7 @@
             Subordinates = subordinates;
         }
 
-        void ISwimmable.Swim( int meters )
+        void ISwimmable.Swim( double meters )
         {
             metersTravelled += meters;
         }

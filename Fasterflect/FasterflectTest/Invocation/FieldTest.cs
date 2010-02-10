@@ -10,7 +10,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestAccessStaticFields()
         {
-            _( ( Type type ) =>
+            RunWith( ( Type type ) =>
                {
                    var totalPeopleCreated = (int) type.GetFieldValue( "totalPeopleCreated" ) + 1;
                    type.SetFieldValue( "totalPeopleCreated", totalPeopleCreated );
@@ -21,7 +21,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestSetStaticFieldBySample()
         {
-            _( ( Type type ) =>
+            RunWith( ( Type type ) =>
                {
                    var totalPeopleCreated = (int) type.GetFieldValue( "totalPeopleCreated" ) + 1;
                    type.SetFields( new { totalPeopleCreated } );
@@ -32,7 +32,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestAccessStaticFieldViaFieldInfo()
         {
-            _( ( Type type ) =>
+            RunWith( ( Type type ) =>
                {
                    var fieldInfo = type.Field( "totalPeopleCreated", Flags.StaticCriteria );
                    var totalPeopleCreated = (int) fieldInfo.Get() + 1;
@@ -44,7 +44,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestAccessInstanceFields()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    var name = (string) person.GetFieldValue( "name" ) + " updated";
                    person.SetFieldValue( "name", name );
@@ -55,7 +55,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestAccessInstanceFieldViaFieldInfo()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    var fieldInfo = person.UnwrapIfWrapped().GetType().Field( "name" );
                    var name = (string) fieldInfo.Get( person ) + " updated";
@@ -67,7 +67,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestChainInstanceFieldSetters()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    person.SetFieldValue( "name", "John" )
                        .SetFieldValue( "age", 20 )
@@ -79,7 +79,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestSetInstanceFieldsBySample()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    person.SetFields( new { name = "John", age = 20, metersTravelled = 120d } );
                    VerifyFields( person, new { name = "John", age = 20, metersTravelled = 120d } );
@@ -89,7 +89,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestSetInstanceFieldsBySampleWithFilter()
         {
-            _( ( object person ) =>
+            RunWith( ( object person ) =>
                {
                    var currentAge = (int) person.GetFieldValue( "age" );
                    person.SetFields( new { name = "John", age = currentAge + 10, metersTravelled = 120d }, "name",
@@ -118,42 +118,42 @@ namespace FasterflectTest.Invocation
         [ExpectedException( typeof(MissingFieldException) )]
         public void TestSetNotExistentField()
         {
-            _( ( object person ) => person.SetFieldValue( "not_exist", null ) );
+            RunWith( ( object person ) => person.SetFieldValue( "not_exist", null ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(MissingFieldException) )]
         public void TestSetNotExistentStaticField()
         {
-            _( ( Type type ) => type.SetFieldValue( "not_exist", null ) );
+            RunWith( ( Type type ) => type.SetFieldValue( "not_exist", null ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(MissingFieldException) )]
         public void TestGetNotExistentField()
         {
-            _( ( object person ) => person.GetFieldValue( "not_exist" ) );
+            RunWith( ( object person ) => person.GetFieldValue( "not_exist" ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(MissingFieldException) )]
         public void TestGetNotExistentStaticField()
         {
-            _( ( Type type ) => type.GetFieldValue( "not_exist" ) );
+            RunWith( ( Type type ) => type.GetFieldValue( "not_exist" ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(InvalidCastException) )]
         public void TestSetInvalidValueType()
         {
-            _( ( object person ) => person.SetFieldValue( "metersTravelled", 1 ) );
+            RunWith( ( object person ) => person.SetFieldValue( "metersTravelled", 1 ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(NullReferenceException) )]
         public void TestSetNullToValueType()
         {
-            _( ( object person ) => person.SetFieldValue( "age", null ) );
+            RunWith( ( object person ) => person.SetFieldValue( "age", null ) );
         }
     }
 }

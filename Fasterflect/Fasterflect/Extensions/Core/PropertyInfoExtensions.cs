@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
@@ -42,7 +44,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberSetter DelegateForSetStaticPropertyValue(this PropertyInfo propInfo)
         {
-            return propInfo.DeclaringType.DelegateForSetStaticPropertyValue(propInfo.Name);
+            return (StaticMemberSetter) new MemberSetEmitter(propInfo, true).GetDelegate();
         }
 
         /// <summary>
@@ -50,7 +52,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberSetter DelegateForSetPropertyValue(this PropertyInfo propInfo)
         {
-            return propInfo.DeclaringType.DelegateForSetPropertyValue(propInfo.Name);
+            return (MemberSetter) new MemberSetEmitter(propInfo, false).GetDelegate();
         }
 
         /// <summary>
@@ -58,7 +60,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberGetter DelegateForGetStaticPropertyValue(this PropertyInfo propInfo)
         {
-            return propInfo.DeclaringType.DelegateForGetStaticPropertyValue(propInfo.Name);
+            return (StaticMemberGetter) new MemberGetEmitter(propInfo, true).GetDelegate();
         }
 
         /// <summary>
@@ -66,7 +68,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberGetter DelegateForGetPropertyValue(this PropertyInfo propInfo)
         {
-            return propInfo.DeclaringType.DelegateForGetPropertyValue(propInfo.Name);
+            return (MemberGetter) new MemberGetEmitter(propInfo, false).GetDelegate();
         }
     }
 }

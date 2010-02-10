@@ -21,7 +21,6 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
-using Fasterflect.Common;
 
 namespace Fasterflect.Emitter
 {
@@ -30,7 +29,7 @@ namespace Fasterflect.Emitter
 		public ArraySetEmitter(Type targetType)
 		{
 			callInfo = new CallInfo(targetType, MemberTypes.Method, Constants.ArraySetterName,
-			                        new[] {typeof (int), targetType.GetElementType()});
+                                    new[] { typeof(int), targetType.GetElementType() }, false);
 		}
 
 		protected internal override Delegate CreateDelegate()

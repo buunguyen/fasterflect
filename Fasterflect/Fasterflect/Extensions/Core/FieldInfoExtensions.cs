@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
@@ -42,7 +43,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberSetter DelegateForSetStaticFieldValue(this FieldInfo fieldInfo)
         {
-            return fieldInfo.DeclaringType.DelegateForSetStaticFieldValue(fieldInfo.Name);
+            return (StaticMemberSetter)new MemberSetEmitter(fieldInfo, true).GetDelegate();
         }
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberSetter DelegateForSetFieldValue(this FieldInfo fieldInfo)
         {
-            return fieldInfo.DeclaringType.DelegateForSetFieldValue(fieldInfo.Name);
+            return (MemberSetter)new MemberSetEmitter(fieldInfo, false).GetDelegate();
         }
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberGetter DelegateForGetStaticFieldValue(this FieldInfo fieldInfo)
         {
-            return fieldInfo.DeclaringType.DelegateForGetStaticFieldValue(fieldInfo.Name);
+            return (StaticMemberGetter)new MemberGetEmitter(fieldInfo, true).GetDelegate();
         }
 
         /// <summary>
@@ -66,7 +67,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberGetter DelegateForGetFieldValue(this FieldInfo fieldInfo)
         {
-            return fieldInfo.DeclaringType.DelegateForGetFieldValue(fieldInfo.Name);
+            return (MemberGetter)new MemberGetEmitter(fieldInfo, false).GetDelegate();
         }
     }
 }

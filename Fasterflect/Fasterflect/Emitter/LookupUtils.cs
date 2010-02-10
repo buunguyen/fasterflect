@@ -7,7 +7,11 @@ namespace Fasterflect.Emitter
     {
         public static ConstructorInfo GetConstructor(CallInfo callInfo)
         {
-            ConstructorInfo ctorInfo = callInfo.TargetType.GetConstructor(
+            ConstructorInfo ctorInfo = callInfo.MemberInfo as ConstructorInfo;
+            if (ctorInfo != null)
+                return ctorInfo;
+
+            ctorInfo = callInfo.TargetType.GetConstructor(
                 Flags.InstanceCriteria,
                 null, CallingConventions.HasThis, callInfo.ParamTypes, null);
             if (ctorInfo == null)
@@ -17,7 +21,11 @@ namespace Fasterflect.Emitter
 
         public static MethodInfo GetMethod(CallInfo callInfo)
         {
-            MethodInfo methodInfo = callInfo.TargetType.Method( callInfo.Name, callInfo.ScopeFlag | Flags.DefaultCriteria, callInfo.ParamTypes );
+            MethodInfo methodInfo = callInfo.MemberInfo as MethodInfo;
+            if (methodInfo != null)
+                return methodInfo;
+
+            methodInfo = callInfo.TargetType.Method( callInfo.Name, callInfo.ScopeFlag | Flags.DefaultCriteria, callInfo.ParamTypes );
             if (methodInfo == null)
                 throw new MissingMethodException(callInfo.IsStatic
                                                     ? "Static method "
@@ -27,21 +35,25 @@ namespace Fasterflect.Emitter
 
         public static MemberInfo GetMember(CallInfo callInfo)
         {
+            MemberInfo memberInfo = callInfo.MemberInfo;
+            if (memberInfo != null)
+                return memberInfo;
+
             if (callInfo.MemberTypes == MemberTypes.Property)
             {
-                PropertyInfo member = callInfo.TargetType.Property(callInfo.Name, Flags.DefaultCriteria | callInfo.ScopeFlag);
-                if (member == null)
+                memberInfo = callInfo.TargetType.Property(callInfo.Name, Flags.DefaultCriteria | callInfo.ScopeFlag);
+                if (memberInfo == null)
                         throw new MissingMemberException((callInfo.IsStatic ? "Static property" : "Property") +
                             " '" + callInfo.Name + "' does not exist");
-                return member;
+                return memberInfo;
             }
             if (callInfo.MemberTypes == MemberTypes.Field)
             {
-                FieldInfo field = callInfo.TargetType.Field(callInfo.Name, Flags.DefaultCriteria | callInfo.ScopeFlag);
-                if (field == null)
+                memberInfo = callInfo.TargetType.Field(callInfo.Name, Flags.DefaultCriteria | callInfo.ScopeFlag);
+                if (memberInfo == null)
                     throw new MissingFieldException((callInfo.IsStatic ? "Static field" : "Field") +
                         " '" + callInfo.Name + "' does not exist");
-                return field;
+                return memberInfo;
             }
             throw new ArgumentException(callInfo.MemberTypes + " is not supported");
         }

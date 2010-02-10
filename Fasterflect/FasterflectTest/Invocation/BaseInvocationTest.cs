@@ -46,12 +46,12 @@ namespace FasterflectTest.Invocation
                                 Assert.AreEqual( propInfo.Get( sample ), obj.GetFieldValue( propInfo.Name ) ) );
         }
 
-        protected void _( Action<Type> assertionAction )
+        protected void RunWith( Action<Type> assertionAction )
         {
             Types.ForEach( assertionAction );
         }
 
-        protected void _( Action<object> assertionAction )
+        protected void RunWith( Action<object> assertionAction )
         {
             Types.Select( t => t.CreateInstance().WrapIfValueType() ).ForEach( assertionAction );
         }

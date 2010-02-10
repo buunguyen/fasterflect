@@ -69,7 +69,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestDelegateIsProperlyCachedForArrayElement()
         {
-            _( ( Type type ) =>
+            RunWith( ( Type type ) =>
                {
                    object array = type.MakeArrayType().CreateInstance( 10 );
                    ExecuteCacheTest(
@@ -85,7 +85,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestDelegateIsProperlyCachedForConstructors()
         {
-            _( ( Type type ) => ExecuteCacheTest(
+            RunWith( ( Type type ) => ExecuteCacheTest(
                                                     () => type.CreateInstance(),
                                                     () => type.CreateInstance( "John", 10 ) ) );
         }

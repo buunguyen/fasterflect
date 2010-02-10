@@ -70,6 +70,7 @@
     <Compile Include="Invocation\DelegateTest.cs" />
     <Compile Include="Invocation\FieldTest.cs" />
     <Compile Include="Invocation\IndexerTest.cs" />
+    <Compile Include="Invocation\MemberTest.cs" />
     <Compile Include="Invocation\MethodTest.cs" />
     <Compile Include="Invocation\PropertyTest.cs" />
     <Compile Include="Invocation\TestUtils.cs" />

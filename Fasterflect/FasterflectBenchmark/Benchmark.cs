@@ -26,7 +26,6 @@ using System.Linq;
 using System.Reflection;
 using Fasterflect;
 using Fasterflect.Caching;
-using Fasterflect.Common;
 using Fasterflect.Emitter;
 using Fasterflect.ObjectConstruction;
 
@@ -138,7 +137,7 @@ namespace FasterflectBenchmark
 		private static void RunHashCodeBenchmark()
 		{
 			var callInfo = new CallInfo( TargetType, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, false );
-			var callInfoOther = new CallInfo( typeof(CallInfo), MemberTypes.Field, "other", new [] { typeof(string) } );
+			var callInfoOther = new CallInfo( typeof(CallInfo), MemberTypes.Field, "other", new [] { typeof(string) }, false );
 			var sourceInfo = new SourceInfo( new { ID=42, Name="Test" }.GetType() );
 			var sourceInfoOther = new SourceInfo( new { id=42, Name="Test" }.GetType() );
 

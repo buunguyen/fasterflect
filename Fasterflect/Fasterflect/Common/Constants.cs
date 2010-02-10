@@ -1,7 +1,7 @@
 ﻿using System;
 using Fasterflect.Emitter;
 
-namespace Fasterflect.Common
+namespace Fasterflect
 {
     internal static class Constants
     {
