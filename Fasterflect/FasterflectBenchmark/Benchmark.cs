@@ -1,6 +1,6 @@
 ﻿#region License
 
-// Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
+// Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
 // you may not use this file except in compliance with the License. 
@@ -90,25 +90,27 @@ namespace FasterflectBenchmark
 		private static readonly object[] NoArgArray = new object[0];
 		private static readonly object[] ArgArray = new object[] {10};
 		private static readonly Type TargetType = typeof (Person);
-		private static readonly Person TargetPerson = new Person();
+        private static readonly Person TargetPerson = new Person();
+        private static readonly Person[] PeopleArray = new Person[100];
 		private static readonly Stopwatch Watch = new Stopwatch();
 
 		public static void Main(string[] args)
 		{
-			//RunDictionaryBenchmark();
-			//RunHashCodeBenchmark();
-			RunTryCreateInstanceBenchmark();
-			RunConstructorBenchmark();
-			RunFieldBenchmark();
-			RunStaticFieldBenchmark();
-			RunPropertyBenchmark();
-			RunStaticPropertyBenchmark();
-			RunMethodInvocationBenchmark();
-			RunStaticMethodInvocationBenchmark();
-			RunIndexerBenchmark();
+            RunDictionaryBenchmark();
+            RunHashCodeBenchmark();
+            RunTryCreateInstanceBenchmark();
+            RunConstructorBenchmark();
+            RunFieldBenchmark();
+            RunStaticFieldBenchmark();
+            RunPropertyBenchmark();
+            RunStaticPropertyBenchmark();
+            RunMethodInvocationBenchmark();
+            RunStaticMethodInvocationBenchmark();
+            RunIndexerBenchmark();
+		    RunArrayBenchmark();
 		}
 
-		#region Internal Testing
+	    #region Internal Testing
 		private static void RunDictionaryBenchmark()
 		{
 			int dictionarySize = 1000;
@@ -403,6 +405,32 @@ namespace FasterflectBenchmark
 			                	};
 			Execute("Static Method Invocations", initMap, actionMap);
 		}
+
+        private static void RunArrayBenchmark()
+        {
+            ArrayElementGetter getter = null;
+            ArrayElementSetter setter = null;
+
+            var initMap = new Dictionary<string, Action>
+			              	{
+			              		{"Init setter", () => { setter = PeopleArray.GetType().DelegateForSetElement(); }},
+			              		{"Init getter", () => { getter = PeopleArray.GetType().DelegateForGetElement(); }}
+			              	};
+
+            dynamic tmp = TargetPerson;
+            var actionMap = new Dictionary<string, Action>
+			                	{
+			                		{"Direct set", () => { PeopleArray[5] = null; }},
+			                		{"Direct get", () => { var person = PeopleArray[5]; }},
+			                		{"Reflection set", () => ((Array)(object)PeopleArray).SetValue( null, 5 )},
+			                		{"Reflection get", () => ((Array)(object)PeopleArray).GetValue( 5 )},
+			                		{"Fasterflect set", () => PeopleArray.SetElement( 5, null )},
+			                		{"Fasterflect get", () => PeopleArray.GetElement( 5 )},
+			                		{"Fasterflect cached set", () => setter(PeopleArray, 5, null)},
+			                		{"Fasterflect cached get", () => getter(PeopleArray, 5)},
+			                	};
+            Execute("Indexer Benchmark", initMap, actionMap);
+        }
 		#endregion
 
 		#region Execute & Measure

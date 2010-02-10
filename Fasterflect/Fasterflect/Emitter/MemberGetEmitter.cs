@@ -1,6 +1,6 @@
 ﻿#region License
 
-// Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
+// Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
 // you may not use this file except in compliance with the License. 
@@ -41,62 +41,54 @@ namespace Fasterflect.Emitter
             callInfo = new CallInfo(targetType, memberType, fieldOrPropertyName, Type.EmptyTypes, isStatic, memberInfo);
 		}
 
-		protected internal override Delegate CreateDelegate()
+        protected internal override DynamicMethod CreateDynamicMethod()
+        {
+            return callInfo.IsStatic
+                                    ? CreateDynamicMethod("getter", callInfo.TargetType, Constants.ObjectType, null)
+                                    : CreateDynamicMethod("getter", callInfo.TargetType, Constants.ObjectType,
+                                                          new[] { Constants.ObjectType });
+        }
+
+	    protected internal override Delegate CreateDelegate()
 		{
 			MemberInfo member = LookupUtils.GetMember(callInfo);
-			DynamicMethod method = callInfo.IsStatic
-			                       	? CreateDynamicMethod("getter", callInfo.TargetType, Constants.ObjectType, null)
-			                       	: CreateDynamicMethod("getter", callInfo.TargetType, Constants.ObjectType,
-			                       	                      new[] {Constants.ObjectType});
-
-			ILGenerator generator = method.GetILGenerator();
 			bool handleInnerStruct = callInfo.ShouldHandleInnerStruct;
 
 			if (handleInnerStruct)
 			{
-				generator.Emit(OpCodes.Ldarg_0); // arg0
-				generator.DeclareLocal(callInfo.TargetType); // loc_0: T tmp;
-				LoadInnerStructToLocal(generator, 0); // tmp = ((ValueTypeHolder)arg0)).Value;
-				generator.DeclareLocal(Constants.ObjectType); // loc_1: T result;
+                generator.ldarg_0                               // load arg-0 (this)
+                         .DeclareLocal(callInfo.TargetType);    // TargetType tmpStr
+                LoadInnerStructToLocal(0);                      // tmpStr = ((ValueTypeHolder)this)).Value
+				generator.DeclareLocal(Constants.ObjectType);   // object result;
 			}
 			else if (!callInfo.IsStatic)
 			{
-				generator.Emit(OpCodes.Ldarg_0); // arg0
-				generator.Emit(OpCodes.Castclass, callInfo.TargetType); // (T)arg0
+                generator.ldarg_0                               // load arg-0 (this)
+				         .castclass( callInfo.TargetType);      // (TargetType)this
 			}
 
 			if (member.MemberType == MemberTypes.Field)
 			{
 				var field = member as FieldInfo;
-
-				// (object)((T)arag0|tmp).field
-				generator.Emit(callInfo.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, field);
-
-				// (object)((T)arag0|tmp).field
-				BoxIfValueType(generator, field.FieldType);
+                generator.ldfld(callInfo.IsStatic, field)       // (this|tmpStr).field OR TargetType.field
+                         .boxIfValueType(field.FieldType);      // (object)<stack>
 			}
 			else
 			{
 				var prop = member as PropertyInfo;
                 MethodInfo getMethod = LookupUtils.GetPropertyGetMethod(prop, callInfo);
-
-				// ((T)arag0|tmp).prop
-				generator.Emit((callInfo.IsStatic || callInfo.IsTargetTypeStruct)
-				               	? OpCodes.Call
-				               	: OpCodes.Callvirt, getMethod);
-
-				// (object)((T)arag0|tmp).prop
-				BoxIfValueType(generator, prop.PropertyType);
+                generator.call(callInfo.IsStatic || callInfo.IsTargetTypeStruct, getMethod) // (this|tmpStr).prop OR TargetType.prop
+                         .boxIfValueType(prop.PropertyType);                                // (object)<stack>
 			}
 
 			if (handleInnerStruct)
 			{
-				generator.Emit(OpCodes.Stloc_1); // result = <stack>
-				StoreLocalToInnerStruct(generator, 0); // ((ValueTypeHolder)arg0)).Value = tmp; 
-				generator.Emit(OpCodes.Ldloc_1); // push result
+                generator.stloc_1.end();        // resultLocal = <stack>
+				StoreLocalToInnerStruct(0);     // ((ValueTypeHolder)this)).Value = tmpStr
+				generator.ldloc_1.end();        // push resultLocal
 			}
 
-			generator.Emit(OpCodes.Ret);
+	        generator.ret();
 
 			return callInfo.IsStatic
 			       	? method.CreateDelegate(typeof (StaticMemberGetter))
