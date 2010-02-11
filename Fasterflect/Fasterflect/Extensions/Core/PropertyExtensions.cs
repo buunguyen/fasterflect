@@ -293,7 +293,7 @@ namespace Fasterflect
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
         public static PropertyInfo Property( this Type type, string name )
         {
-            return type.Property( name, Flags.InstanceCriteria, null );
+            return type.Properties( Flags.InstanceCriteria, name ).FirstOrDefault();
         }
 
         /// <summary>
@@ -304,7 +304,7 @@ namespace Fasterflect
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
         public static PropertyInfo Property( this Type type, string name, Flags flags )
         {
-            return type.Property( name, flags, null );
+        	return type.Properties( flags, name ).FirstOrDefault();
         }
 
         /// <summary>
@@ -316,12 +316,7 @@ namespace Fasterflect
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
         public static PropertyInfo Property( this Type type, string name, Flags flags, Type propertyType )
         {
-        	bool ignoreCase = flags.IsSet( Flags.IgnoreCase );
-            return type.Properties( flags ).FirstOrDefault( 
-				p => p.Name.Equals( name, ignoreCase 
-									? StringComparison.InvariantCultureIgnoreCase 
-									: StringComparison.InvariantCulture ) && 
-					 (propertyType == null || propertyType.IsAssignableFrom( p.PropertyType )) );
+        	return type.Properties( flags, name ).FirstOrDefault( p => propertyType == null || p.PropertyType.IsAssignableFrom( propertyType ) );
         }
         #endregion
 
@@ -339,23 +334,17 @@ namespace Fasterflect
         /// <summary>
         /// Find all public and non-public instance properties on the given <paramref name="type"/>,
         /// including properties defined on base types. The result can optionally be filtered by specifying
-        /// a case-insensitive list of property names to include using the <paramref name="properties"/>
-        /// parameter.
+        /// a list of property names to include using the <paramref name="names"/> parameter.
         /// </summary>
         /// <returns>A list of matching instance properties on the type.</returns>
         /// <param name="type">The type whose public properties are to be retrieved.</param>
-        /// <param name="properties">A comma delimited list of names of properties to be retrieved. If
-        /// this is <c>null</c>, all public properties are returned. Names are compared case-insensitively
-        /// using OrdinalIgnoreCase.</param>
-        /// <returns>A list of all public properties on the type filted by <paramref name="properties"/>.
+        /// <param name="names">A list of names of properties to be retrieved. If this is <c>null</c>, 
+        /// all properties are returned.</param>
+        /// <returns>A list of all public properties on the type filted by <paramref name="names"/>.
         /// This value will never be null.</returns>
-        public static IList<PropertyInfo> Properties( this Type type, params string[] properties )
+        public static IList<PropertyInfo> Properties( this Type type, params string[] names )
         {
-            IList<PropertyInfo> result = type.Properties( Flags.InstanceCriteria );
-            bool filter = properties != null && properties.Length > 0;
-            return filter
-                       ? result.Where( p => properties.Contains( p.Name, StringComparer.OrdinalIgnoreCase ) ).ToList()
-                       : result;
+        	return type.Properties( Flags.InstanceCriteria, names );
         }
 
         /// <summary>
@@ -363,24 +352,10 @@ namespace Fasterflect
         /// including properties defined on base types.
         /// </summary>
         /// <returns>A list of all matching properties on the type. This value will never be null.</returns>
-        public static IList<PropertyInfo> Properties( this Type type, Flags flags )
+        public static IList<PropertyInfo> Properties( this Type type, Flags flags, params string[] names )
         {
-			if( type == null || type == typeof(object) ) { return new List<PropertyInfo>(); }
-
-			flags = flags ?? Flags.Default;
-			bool recurse = flags.IsNotSet( Flags.DeclaredOnly);
-        	flags |= Flags.DeclaredOnly;
-            flags &= ~BindingFlags.FlattenHierarchy;
-
-			var properties = new List<PropertyInfo>( type.GetProperties( flags ) );
-            Type baseType = type.BaseType;
-            while( recurse && baseType != null && baseType != typeof(object) )
-            {
-                properties.AddRange( baseType.GetProperties( flags ) );
-                baseType = baseType.BaseType;
-            }
-            return properties;
-        }
+        	return type.Members( MemberTypes.Property, flags, names ).Cast<PropertyInfo>().ToList();
+		}
         #endregion
         #endregion
     }
