@@ -58,8 +58,7 @@ namespace Fasterflect
         /// <returns>Returns true if <paramref name="obj"/> is a wrapped object (instance of <see cref="ValueTypeHolder"/>).</returns>
         public static bool IsWrapped(this object obj)
         {
-            var holder = obj as ValueTypeHolder;
-            return holder != null;
+            return obj as ValueTypeHolder != null;
         }
 	}
 }
