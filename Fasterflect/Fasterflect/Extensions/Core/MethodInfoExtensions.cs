@@ -18,14 +18,16 @@
 
 #endregion
 
+using System.Collections.Generic;
 using System.Reflection;
 using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
     public static class MethodInfoExtensions
-    {
-        /// <summary>
+	{
+		#region Access
+		/// <summary>
         /// Invokes the static method identified by <paramref name="methodInfo"/> with no argument.
         /// </summary>
         /// <returns>The return value of the method.</returns>
@@ -82,6 +84,18 @@ namespace Fasterflect
         public static MethodInvoker DelegateForInvoke(this MethodInfo methodInfo)
         {
             return (MethodInvoker) new MethodInvocationEmitter(methodInfo, false).GetDelegate();
-        }
+		}
+		#endregion
+
+		#region Method Parameter Lookup
+		/// <summary>
+        /// Finds all parameters for the given <paramref name="method"/>.
+        /// </summary>
+        /// <returns>The list of parameters for the method. This value will never be null.</returns>
+        public static IList<ParameterInfo> Parameters( this MethodBase method )
+        {
+            return method.GetParameters();
+		}
+		#endregion
 	}
 }

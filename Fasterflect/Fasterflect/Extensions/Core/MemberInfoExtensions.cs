@@ -18,6 +18,7 @@
 
 #endregion
 
+using System;
 using System.Reflection;
 using Fasterflect.Emitter;
 
@@ -62,5 +63,45 @@ namespace Fasterflect
             var @delegate = (MemberSetter) new MemberSetEmitter( memberInfo, false ).GetDelegate();
             @delegate( target, value );
         }
+
+
+		#region MemberInfo Helpers
+		/// <summary>
+		/// Get the system type of the field or property identified by the <paramref name="member"/>.
+		/// </summary>
+		/// <returns>The system type of the member.</returns>
+		public static Type Type( this MemberInfo member )
+		{
+			var field = member as FieldInfo;
+			if( field != null )
+				return field.FieldType;
+			var property = member as PropertyInfo;
+			if( property != null )
+				return property.PropertyType;
+			throw new NotSupportedException( "Can only determine the type for fields and properties." );
+		}
+
+		/// <summary>
+		/// Find out whether a value can be read from the field or property identified by
+		/// the <paramref name="member"/>.
+		/// </summary>
+		/// <returns>True for fields and readable properties, false otherwise.</returns>
+		public static bool CanRead( this MemberInfo member )
+		{
+			var property = member as PropertyInfo;
+			return member is FieldInfo || (property != null && property.CanRead);
+		}
+
+		/// <summary>
+		/// Find out whether a value can be assigned to the field or property identified by
+		/// the <paramref name="member"/>.
+		/// </summary>
+		/// <returns>True for fields and writable properties, false otherwise.</returns>
+		public static bool CanWrite( this MemberInfo member )
+		{
+			var property = member as PropertyInfo;
+			return member is FieldInfo || (property != null && property.CanWrite);
+		}
+		#endregion
     }
 }

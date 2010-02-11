@@ -18,26 +18,11 @@
 
 using System;
 using System.Reflection;
-using Fasterflect.Selectors.Interfaces;
 
-namespace Fasterflect.Selectors
+namespace Fasterflect.Selectors.Interfaces
 {
-	internal class PartialNameMatch : IMemberSelector
+	internal interface ISelector
 	{
-		#region Implementation of IMemberSelector
-		public bool IsMatch( MemberInfo info, Flags flags, string name )
-		{
-			int index = info.Name.LastIndexOf( "." );
-			string memberName = ++index > 0 ? info.Name.Substring( index ) : info.Name;
-			return memberName.Contains( name );
-		}
-		#endregion
-
-		#region Implementation of ISelector
-		public bool IsMatch( MemberInfo info, MemberTypes memberTypes, Flags flags, string name, Type[] paramTypes, Type returnType )
-		{
-			return IsMatch( info, flags, name );
-		}
-		#endregion
+		bool IsMatch( MemberInfo info, MemberTypes memberTypes, Flags flags, string name, Type[] paramTypes, Type returnType );
 	}
 }

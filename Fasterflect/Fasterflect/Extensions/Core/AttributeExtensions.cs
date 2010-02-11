@@ -30,55 +30,7 @@ namespace Fasterflect
 	/// </summary>
 	public static class AttributeExtensions
 	{
-		#region Attribute (Multiple) Lookup
-		/// <summary>
-		/// Gets the <see href="Attribute"/>s associated with the <paramref name="source"/>. The resulting
-		/// list of attributes can optionally be filtered by suppliying a list of <paramref name="attributeTypes"/>
-		/// to include.
-		/// </summary>
-		/// <returns>A list of the attributes found on the source element. This value will never be null.</returns>
-		public static IList<Attribute> Attributes( this ICustomAttributeProvider source, params Type[] attributeTypes )
-		{
-			return source.GetCustomAttributes(true).Cast<Attribute>().Where( attr => attributeTypes.Length == 0 || 
-			                                                                         attributeTypes.Any( at => { Type type = attr.GetType();
-			                                                                                                     return at == type || at.IsSubclassOf(type); } ) ).ToList();
-		}
-
-		/// <summary>
-		/// Gets all <see href="Attribute"/>s of type <typeparamref name="T"/> associated with the <paramref name="source"/>.
-		/// </summary>
-		/// <returns>A list of the attributes found on the source element. This value will never be null.</returns>
-		public static IList<T> Attributes<T>( this ICustomAttributeProvider source ) where T : Attribute
-		{
-			return source.GetCustomAttributes( typeof(T), true ).Cast<T>().ToList();
-		}
-
-		/// <summary>
-		/// Gets the <see href="Attribute"/>s associated with the enumeration given in <paramref name="source"/>. 
-		/// </summary>
-		/// <typeparam name="T">The attribute type to search for.</typeparam>
-		/// <param name="source">An enumeration on which to search for attributes of the given type.</param>
-		/// <returns>A list of the attributes found on the supplied source. This value will never be null.</returns>
-		public static IList<T> Attributes<T>( this Enum source ) where T : Attribute
-		{
-			return source.Attributes( typeof(T) ).Cast<T>().ToList();
-		}
-
-		/// <summary>
-		/// Gets the <see href="Attribute"/>s associated with the enumeration given in <paramref name="source"/>. 
-		/// The resulting list of attributes can optionally be filtered by suppliying a list of <paramref name="attributeTypes"/>
-		/// to include.
-		/// </summary>
-		/// <returns>A list of the attributes found on the supplied source. This value will never be null.</returns>
-		public static IList<Attribute> Attributes( this Enum source, params Type[] attributeTypes )
-		{
-			Type type = source.GetType();
-			MemberInfo info = type.Member( source.ToString(), Flags.StaticCriteria | Flags.DeclaredOnly );
-			return info.Attributes( attributeTypes );
-		}
-		#endregion
-
-		#region Attribute (Single) Lookup
+		#region Attribute Lookup (Single)
 		/// <summary>
 		/// Gets the first <see href="Attribute"/> associated with the <paramref name="source"/>.
 		/// </summary>
@@ -133,7 +85,55 @@ namespace Fasterflect
 		}
 		#endregion
 
-		#region Attribute Presence Lookup
+		#region Attribute Lookup (Multiple)
+		/// <summary>
+		/// Gets the <see href="Attribute"/>s associated with the <paramref name="source"/>. The resulting
+		/// list of attributes can optionally be filtered by suppliying a list of <paramref name="attributeTypes"/>
+		/// to include.
+		/// </summary>
+		/// <returns>A list of the attributes found on the source element. This value will never be null.</returns>
+		public static IList<Attribute> Attributes( this ICustomAttributeProvider source, params Type[] attributeTypes )
+		{
+			return source.GetCustomAttributes(true).Cast<Attribute>().Where( attr => attributeTypes.Length == 0 || 
+			                                                                         attributeTypes.Any( at => { Type type = attr.GetType();
+			                                                                                                     return at == type || at.IsSubclassOf(type); } ) ).ToList();
+		}
+
+		/// <summary>
+		/// Gets all <see href="Attribute"/>s of type <typeparamref name="T"/> associated with the <paramref name="source"/>.
+		/// </summary>
+		/// <returns>A list of the attributes found on the source element. This value will never be null.</returns>
+		public static IList<T> Attributes<T>( this ICustomAttributeProvider source ) where T : Attribute
+		{
+			return source.GetCustomAttributes( typeof(T), true ).Cast<T>().ToList();
+		}
+
+		/// <summary>
+		/// Gets the <see href="Attribute"/>s associated with the enumeration given in <paramref name="source"/>. 
+		/// </summary>
+		/// <typeparam name="T">The attribute type to search for.</typeparam>
+		/// <param name="source">An enumeration on which to search for attributes of the given type.</param>
+		/// <returns>A list of the attributes found on the supplied source. This value will never be null.</returns>
+		public static IList<T> Attributes<T>( this Enum source ) where T : Attribute
+		{
+			return source.Attributes( typeof(T) ).Cast<T>().ToList();
+		}
+
+		/// <summary>
+		/// Gets the <see href="Attribute"/>s associated with the enumeration given in <paramref name="source"/>. 
+		/// The resulting list of attributes can optionally be filtered by suppliying a list of <paramref name="attributeTypes"/>
+		/// to include.
+		/// </summary>
+		/// <returns>A list of the attributes found on the supplied source. This value will never be null.</returns>
+		public static IList<Attribute> Attributes( this Enum source, params Type[] attributeTypes )
+		{
+			Type type = source.GetType();
+			MemberInfo info = type.Member( source.ToString(), Flags.StaticCriteria | Flags.DeclaredOnly );
+			return info.Attributes( attributeTypes );
+		}
+		#endregion
+
+		#region HasAttribute Lookup (Presence Detection)
 		/// <summary>
 		/// Find out whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
 		/// of type <paramref name="attributeType"/>.
@@ -175,7 +175,7 @@ namespace Fasterflect
 		}
 		#endregion
 
-		#region Types With Lookup
+		#region TypesWith Lookup
 		/// <summary>
 		/// Gets all types in the given <paramref name="assembly"/> that are decorated with an
 		/// <see href="Attribute"/> of the given <paramref name="attributeType"/>.
@@ -200,7 +200,7 @@ namespace Fasterflect
 		}
 		#endregion
 
-		#region Members With Lookup
+		#region MembersWith Lookup
 		/// <summary>
 		/// Gets all public and non-public instance members on the given <paramref name="type"/> that are 
 		/// decorated with an <see href="Attribute"/> of the given type <typeparamref name="T"/>. Only members
@@ -270,7 +270,7 @@ namespace Fasterflect
 		}
 		#endregion
 
-		#region Members And Attributes Lookup
+		#region MembersAndAttributes Lookup
 		/// <summary>
 		/// Gets a dictionary with all members on the given <paramref name="type"/> and their associated attributes.
 		/// Only members of the given <paramref name="memberTypes"/> and matching <paramref name="flags"/> will

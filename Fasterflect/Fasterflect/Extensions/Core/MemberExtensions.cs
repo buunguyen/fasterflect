@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Fasterflect.Selectors;
+using Fasterflect.Selectors.Core;
 
 namespace Fasterflect
 {
@@ -32,8 +32,7 @@ namespace Fasterflect
 	/// </summary>
 	public static class MemberExtensions
 	{
-		#region Member Lookup
-		#region Single Member
+		#region Member Lookup (Single)
 		/// <summary>
         /// Find the member identified by <paramref name="name"/> on the given <paramref name="type"/>. This 
 		/// method searches for public and non-public instance fields on both the type itself and all parent classes.
@@ -57,7 +56,7 @@ namespace Fasterflect
 		}
 		#endregion
 
-		#region Multiple Members: FieldsAndProperties
+		#region Member Lookup (FieldsAndProperties)
 		/// <summary>
         /// Find all public and non-public instance fields and properties on the given <paramref name="type"/>, 
 		/// including members defined on base types.
@@ -79,7 +78,7 @@ namespace Fasterflect
 		}
 		#endregion
 
-		#region Multiple Members
+		#region Member Lookup (Multiple)
 		/// <summary>
         /// Find all public and non-public instance members of the given <paramref name="memberTypes"/> on 
 		/// the given <paramref name="type"/>.
@@ -136,46 +135,6 @@ namespace Fasterflect
             }
 			var selectors = SelectorFactory.GetMemberSelectors( flags );
 			return members.Where( m => selectors.All( s => names.Any( n => s.IsMatch( m, flags, n ) ) ) ).ToList();
-		}
-		#endregion
-		#endregion
-
-		#region MemberInfo Helpers
-		/// <summary>
-		/// Get the system type of the field or property identified by the <paramref name="member"/>.
-		/// </summary>
-		/// <returns>The system type of the member.</returns>
-		public static Type Type( this MemberInfo member )
-		{
-			var field = member as FieldInfo;
-			if( field != null )
-				return field.FieldType;
-			var property = member as PropertyInfo;
-			if( property != null )
-				return property.PropertyType;
-			throw new NotSupportedException( "Can only determine the type for fields and properties." );
-		}
-
-		/// <summary>
-		/// Find out whether a value can be read from the field or property identified by
-		/// the <paramref name="member"/>.
-		/// </summary>
-		/// <returns>True for fields and readable properties, false otherwise.</returns>
-		public static bool CanRead( this MemberInfo member )
-		{
-			var property = member as PropertyInfo;
-			return member is FieldInfo || (property != null && property.CanRead);
-		}
-
-		/// <summary>
-		/// Find out whether a value can be assigned to the field or property identified by
-		/// the <paramref name="member"/>.
-		/// </summary>
-		/// <returns>True for fields and writable properties, false otherwise.</returns>
-		public static bool CanWrite( this MemberInfo member )
-		{
-			var property = member as PropertyInfo;
-			return member is FieldInfo || (property != null && property.CanWrite);
 		}
 		#endregion
 	}
