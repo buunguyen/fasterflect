@@ -189,7 +189,7 @@ namespace Fasterflect
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
         public static FieldInfo Field( this Type type, string name )
         {
-            return type.Field( name, Flags.InstanceCriteria, null );
+            return type.Fields( Flags.InstanceCriteria, name ).FirstOrDefault();
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace Fasterflect
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
         public static FieldInfo Field( this Type type, string name, Flags flags )
         {
-            return type.Field( name, flags, null );
+            return type.Fields( flags, name ).FirstOrDefault();
         }
 
         /// <summary>
@@ -212,12 +212,9 @@ namespace Fasterflect
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
         public static FieldInfo Field( this Type type, string name, Flags flags, Type fieldType )
         {
-        	bool ignoreCase = flags.IsSet( Flags.IgnoreCase );
-            return type.Fields( flags ).FirstOrDefault( 
-				f => f.Name.Equals( name, ignoreCase 
-									? StringComparison.InvariantCultureIgnoreCase 
-									: StringComparison.InvariantCulture ) && 
-					 (fieldType == null || fieldType.IsAssignableFrom( f.FieldType )) );
+        	bool exactMatch = flags.IsSet( Flags.ExactParameterMatch );
+        	return type.Fields( flags, name ).FirstOrDefault( f => fieldType == null || 
+				exactMatch ? f.FieldType == fieldType : f.FieldType.IsAssignableFrom( fieldType ) );
         }
         #endregion
 
@@ -237,25 +234,11 @@ namespace Fasterflect
         /// including fields defined on base types.
         /// </summary>
         /// <returns>A list of all matching fields on the type. This value will never be null.</returns>
-        public static IList<FieldInfo> Fields( this Type type, Flags flags )
+        public static IList<FieldInfo> Fields( this Type type, Flags flags, params string[] names )
         {
-			if( type == null || type == typeof(object) ) { return new List<FieldInfo>(); }
-
-			flags = flags ?? Flags.Default;
-			bool recurse = flags.IsNotSet( Flags.DeclaredOnly);
-        	flags |= Flags.DeclaredOnly;
-            flags &= ~BindingFlags.FlattenHierarchy;
-            
-			var fields = new List<FieldInfo>( type.GetFields( flags ) );
-            Type baseType = type.BaseType;
-            while( recurse && baseType != null && baseType != typeof(object) )
-            {
-                fields.AddRange( baseType.GetFields( flags ) );
-                baseType = baseType.BaseType;
-            }
-            return fields;
+        	return type.Members( MemberTypes.Field, flags, names ).Cast<FieldInfo>().ToList();
 		}
-        #endregion
+ 		#endregion
         #endregion
     }
 }

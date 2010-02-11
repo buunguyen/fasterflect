@@ -42,7 +42,7 @@ namespace Fasterflect
 		/// <returns>A single MemberInfo instance of the first found match or null if no match was found.</returns>
 		public static MemberInfo Member( this Type type, string name )
 		{
-			return type.Member( name, Flags.InstanceCriteria );
+			return type.Members( MemberTypes.All, Flags.InstanceCriteria, name ).FirstOrDefault();
 		}
 
 		/// <summary>
@@ -65,7 +65,7 @@ namespace Fasterflect
 		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
 		public static IList<MemberInfo> FieldsAndProperties( this Type type )
 		{
-			return type.Members( MemberTypes.Field | MemberTypes.Property, Flags.InstanceCriteria );
+			return type.Members( MemberTypes.Field | MemberTypes.Property, Flags.InstanceCriteria, null );
 		}
 
 		/// <summary>
@@ -75,7 +75,7 @@ namespace Fasterflect
 		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
 		public static IList<MemberInfo> FieldsAndProperties( this Type type, Flags flags )
 		{
-			return type.Members( MemberTypes.Field | MemberTypes.Property, flags );
+			return type.Members( MemberTypes.Field | MemberTypes.Property, flags, null );
 		}
 		#endregion
 
@@ -113,19 +113,19 @@ namespace Fasterflect
 
 		/// <summary>
         /// Find all members of the given <paramref name="memberTypes"/> on the given <paramref name="type"/> that 
-        /// match the specified <paramref name="flags"/>. If a value is supplied for the <paramref name="name"/>
+        /// match the specified <paramref name="flags"/>. If values are supplied for the <paramref name="names"/>
         /// parameter then filtering will be applied in accordance with the given <paramref name="flags"/>.
 		/// </summary>
 		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
-		public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes, Flags flags, string name )
+		public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes, Flags flags, params string[] names )
 		{
 			if( type == null || type == typeof(object) ) { return new List<MemberInfo>(); }
 
 			flags = flags ?? Flags.Default;
-			bool recurse = flags.IsNotSet( Flags.DeclaredOnly);
+			bool recurse = flags.IsNotSet( Flags.DeclaredOnly );
         	flags |= Flags.DeclaredOnly;
             flags &= ~BindingFlags.FlattenHierarchy;
-			flags = flags.SetIf( Flags.ExplicitNameMatch, !string.IsNullOrEmpty( name ) );
+			flags = flags.SetIf( Flags.ExplicitNameMatch, names != null && names.Length > 0 );
 
 			var members = new List<MemberInfo>( type.FindMembers( memberTypes, flags, null, null ) );
             Type baseType = type.BaseType;
@@ -135,7 +135,7 @@ namespace Fasterflect
                 baseType = baseType.BaseType;
             }
 			var selectors = SelectorFactory.GetMemberSelectors( flags );
-			return members.Where( m => selectors.All( s => s.IsMatch( m, flags, name ) ) ).ToList();
+			return members.Where( m => selectors.All( s => names.Any( n => s.IsMatch( m, flags, n ) ) ) ).ToList();
 		}
 		#endregion
 		#endregion
