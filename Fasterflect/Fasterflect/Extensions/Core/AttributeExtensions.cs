@@ -128,7 +128,7 @@ namespace Fasterflect
 		public static Attribute Attribute( this Enum source, Type attributeType )
 		{
 			Type type = source.GetType();
-			MemberInfo info = type.MemberDeclared( source.ToString(), Flags.StaticCriteria );
+			MemberInfo info = type.Member( source.ToString(), Flags.StaticCriteria | BindingFlags.DeclaredOnly );
 			return info.Attribute( attributeType );
 		}
 		#endregion

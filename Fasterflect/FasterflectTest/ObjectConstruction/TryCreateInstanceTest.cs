@@ -21,7 +21,7 @@
 using System;
 using Fasterflect;
 using Fasterflect.ObjectConstruction;
-using FasterflectTest.SampleModel;
+using FasterflectTest.SampleModel.Animals;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.ObjectConstruction
@@ -88,9 +88,9 @@ namespace FasterflectTest.ObjectConstruction
 			Assert.AreEqual( id, animal.ID );
 			Assert.AreEqual( name, animal.Name );
 			if( birthday.HasValue )
-				Assert.AreEqual( birthday, animal.Birthday );
+				Assert.AreEqual( birthday, animal.BirthDay );
 			else
-				Assert.IsNull( animal.Birthday );
+				Assert.IsNull( animal.BirthDay );
 		}
 
 		[TestMethod]

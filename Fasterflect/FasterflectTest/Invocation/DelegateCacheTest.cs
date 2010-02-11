@@ -79,11 +79,11 @@ namespace FasterflectTest.Invocation
                                    obj =>
                                    ExecuteCacheTest(
                                                        () =>
-                                                       obj.SetFieldValue( "Name", "John" ),
-                                                       () => obj.GetFieldValue( "Age" ) ) );
+                                                       obj.SetPropertyValue( "Name", "John" ),
+                                                       () => obj.GetPropertyValue( "Age" ) ) );
             Types.ForEach( type => ExecuteCacheTest(
-                                                       () => type.SetFieldValue( "TotalPeopleCreated", 1 ),
-                                                       () => type.GetFieldValue( "TotalPeopleCreated" ) ) );
+                                                       () => type.SetPropertyValue( "TotalPeopleCreated", 1 ),
+                                                       () => type.GetPropertyValue( "TotalPeopleCreated" ) ) );
         }
 
         [TestMethod]

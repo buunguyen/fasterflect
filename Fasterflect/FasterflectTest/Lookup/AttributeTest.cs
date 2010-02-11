@@ -25,7 +25,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Fasterflect;
-using FasterflectTest.SampleModel;
+using FasterflectTest.SampleModel.Animals;
 using FasterflectTest.SampleModel.Attributes;
 using FasterflectTest.SampleModel.Enumerations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -263,14 +263,14 @@ namespace FasterflectTest.Lookup
         public void TestFindSpecificAttributeOnField()
         {
             // inherited field
-            FieldInfo field = typeof(Lion).Field<DateTime>( "birthDay" );
+            FieldInfo field = typeof(Lion).Field( "birthDay", Flags.InstanceCriteria, typeof(DateTime) );
             Assert.IsNull( field );
-            field = typeof(Lion).Field<DateTime?>( "birthDay" );
+            field = typeof(Lion).Field( "birthDay", Flags.InstanceCriteria, typeof(DateTime?) );
             Assert.IsNotNull( field );
             Assert.IsNull( field.Attribute<CodeAttribute>() );
             Assert.IsNotNull( field.Attribute<DefaultValueAttribute>() );
             // declared field
-            field = typeof(Lion).Field<DateTime>( "lastMealTime" );
+            field = typeof(Lion).Field( "lastMealTime", Flags.InstanceCriteria, typeof(DateTime) );
             Assert.IsNotNull( field );
             Assert.IsNotNull( field.Attribute<CodeAttribute>() );
         }

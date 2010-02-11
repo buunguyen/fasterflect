@@ -21,7 +21,7 @@
 using System;
 using FasterflectTest.SampleModel.Enumerations;
 
-namespace FasterflectTest.SampleModel
+namespace FasterflectTest.SampleModel.Animals
 {
 	internal abstract class Reptile : Animal
 	{

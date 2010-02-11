@@ -20,6 +20,7 @@
 
 using System;
 using Fasterflect;
+using FasterflectTest.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.Services

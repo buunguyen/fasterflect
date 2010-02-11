@@ -20,60 +20,155 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Fasterflect;
+using FasterflectTest.SampleModel.Animals;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.Lookup
 {
     [TestClass]
-    public class FieldTest
+    public class FieldTest : BaseLookupTest
 	{
-		#region Test Data
-		private enum Color
-        {
-            Red, Green, Blue
-        }
-
-        private class PersonClass
-        {
-			#pragma warning disable 0169, 0649
-            private static int counter;
-            private int age;
-            public PersonClass peer;
-            internal Color[] favoriteColors;
-			#pragma warning restore 0169, 0649
-        }
-
-        private struct PersonStruct
-        {
-			#pragma warning disable 0169, 0649
-            private static int counter;
-            private int age;
-            public PersonClass peer; // can't use PersonStruct here (infinite initialization)
-            internal Color[] favoriteColors;
-			#pragma warning restore 0169, 0649
-        }
-
-        private static readonly List<Type> TypeList = new List<Type>
-                {
-                    typeof(PersonClass), 
-                    typeof(PersonStruct)
-                };
-		#endregion
-
-        #region Field Lookup
         #region Single Field
-        //public static FieldInfo Field<T>( this Type type, string name )
-		//public static FieldInfo Field<T>( this Type type, string name, BindingFlags flags )
-		//public static FieldInfo FieldDeclared<T>( this Type type, string name )
-		//public static FieldInfo FieldDeclared<T>( this Type type, string name, BindingFlags flags )
+        [TestMethod]
+		public void TestFieldInstance()
+        {
+			FieldInfo field = typeof(object).Field( "id" );
+			Assert.IsNull( field );
+
+			AnimalInstanceFieldNames.Select( s => typeof(Animal).Field( s ) ).ForEach( Assert.IsNotNull );
+			LionInstanceFieldNames.Select( s => typeof(Lion).Field( s ) ).ForEach( Assert.IsNotNull );
+        }
+
+        [TestMethod]
+		public void TestFieldInstanceIgnoreCase()
+        {
+        	BindingFlags flags = Flags.InstanceCriteria | BindingFlags.IgnoreCase;
+
+			AnimalInstanceFieldNames.Select( s => s.ToUpper() ).Select( s => typeof(Animal).Field( s, flags ) ).ForEach( Assert.IsNotNull );
+			LionInstanceFieldNames.Select( s => s.ToUpper() ).Select( s => typeof(Lion).Field( s, flags ) ).ForEach( Assert.IsNotNull );
+        }
+
+        [TestMethod]
+		public void TestFieldInstanceWithFieldType()
+        {
+        	BindingFlags flags = Flags.InstanceCriteria;
+
+			AnimalInstanceFieldNames.Select( s => typeof(Animal).Field( s, flags, AnimalInstanceFieldTypes[ Array.IndexOf( AnimalInstanceFieldNames, s ) ] ) ).ForEach( Assert.IsNotNull );
+			LionInstanceFieldNames.Select( s => typeof(Lion).Field( s, flags, LionInstanceFieldTypes[ Array.IndexOf( LionInstanceFieldNames, s ) ] ) ).ForEach( Assert.IsNotNull );
+        }
+
+        [TestMethod]
+		public void TestFieldInstanceDeclaredOnly()
+        {
+        	BindingFlags flags = Flags.InstanceCriteria | BindingFlags.DeclaredOnly;
+			
+			AnimalInstanceFieldNames.Select( s => typeof(Animal).Field( s, flags ) ).ForEach( Assert.IsNotNull );
+			LionDeclaredInstanceFieldNames.Select( s => typeof(Lion).Field( s, flags ) ).ForEach( Assert.IsNotNull );
+        }
+
+        [TestMethod]
+		public void TestFieldStatic()
+        {
+        	BindingFlags flags = Flags.StaticCriteria;
+			
+			AnimalInstanceFieldNames.Select( s => typeof(Animal).Field( s, flags ) ).ForEach( Assert.IsNull );
+
+			AnimalStaticFieldNames.Select( s => typeof(Animal).Field( s, flags ) ).ForEach( Assert.IsNotNull );
+			AnimalStaticFieldNames.Select( s => typeof(Lion).Field( s, flags ) ).ForEach( Assert.IsNotNull );
+        }
+
+        [TestMethod]
+		public void TestFieldStaticDeclaredOnly()
+        {
+        	BindingFlags flags = Flags.StaticCriteria | BindingFlags.DeclaredOnly;
+			
+			AnimalStaticFieldNames.Select( s => typeof(Animal).Field( s, flags ) ).ForEach( Assert.IsNotNull );
+			AnimalStaticFieldNames.Select( s => typeof(Lion).Field( s, flags ) ).ForEach( Assert.IsNull );
+        }
 		#endregion
 
 		#region Multiple Fields
-		//public static IList<FieldInfo> Fields( this Type type )
-		//public static IList<FieldInfo> Fields( this Type type, BindingFlags flags )
-		//public static IList<FieldInfo> FieldsDeclared( this Type type )
-		//public static IList<FieldInfo> FieldsDeclared( this Type type, BindingFlags flags )
+        [TestMethod]
+		public void TestFieldsInstance()
+        {
+			IList<FieldInfo> fields = typeof(object).Fields();
+			Assert.IsNotNull( fields );
+			Assert.AreEqual( 0, fields.Count );
+
+			fields = typeof(Animal).Fields();
+			Assert.AreEqual( AnimalInstanceFieldNames.Length, fields.Count );
+			Assert.IsTrue( AnimalInstanceFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
+			Assert.IsTrue( AnimalInstanceFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+
+			fields = typeof(Mammal).Fields();
+			Assert.AreEqual( AnimalInstanceFieldNames.Length, fields.Count );
+
+			fields = typeof(Lion).Fields();
+			Assert.AreEqual( LionInstanceFieldNames.Length, fields.Count );
+			Assert.IsTrue( LionInstanceFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
+			Assert.IsTrue( LionInstanceFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+        }
+
+        [TestMethod]
+		public void TestFieldsInstanceWithDeclaredOnlyFlag()
+        {
+			IList<FieldInfo> fields = typeof(object).Fields( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
+			Assert.IsNotNull( fields );
+			Assert.AreEqual( 0, fields.Count );
+
+			fields = typeof(Animal).Fields( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
+			Assert.AreEqual( AnimalInstanceFieldNames.Length, fields.Count );
+			Assert.IsTrue( AnimalInstanceFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
+			Assert.IsTrue( AnimalInstanceFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+
+			fields = typeof(Mammal).Fields( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
+			Assert.AreEqual( 0, fields.Count );
+
+			fields = typeof(Lion).Fields( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
+			Assert.AreEqual( LionDeclaredInstanceFieldNames.Length, fields.Count );
+			Assert.IsTrue( LionDeclaredInstanceFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
+			Assert.IsTrue( LionDeclaredInstanceFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+        }
+
+        [TestMethod]
+		public void TestFieldsStatic()
+        {
+			IList<FieldInfo> fields = typeof(object).Fields( Flags.StaticCriteria );
+			Assert.IsNotNull( fields );
+			Assert.AreEqual( 0, fields.Count );
+
+			fields = typeof(Animal).Fields( Flags.StaticCriteria );
+			Assert.AreEqual( AnimalStaticFieldNames.Length, fields.Count );
+			Assert.IsTrue( AnimalStaticFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
+			Assert.IsTrue( AnimalStaticFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+
+			fields = typeof(Lion).Fields( Flags.StaticCriteria );
+			Assert.AreEqual( AnimalStaticFieldNames.Length, fields.Count );
+			Assert.IsTrue( AnimalStaticFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
+			Assert.IsTrue( AnimalStaticFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+       }
+
+        [TestMethod]
+		public void TestFieldsStaticWithDeclaredOnlyFlag()
+        {
+			IList<FieldInfo> fields = typeof(object).Fields( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
+			Assert.IsNotNull( fields );
+			Assert.AreEqual( 0, fields.Count );
+
+			fields = typeof(Animal).Fields( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
+			Assert.AreEqual( AnimalStaticFieldNames.Length, fields.Count );
+			Assert.IsTrue( AnimalStaticFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
+			Assert.IsTrue( AnimalStaticFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+
+			fields = typeof(Mammal).Fields( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
+			Assert.AreEqual( 0, fields.Count );
+
+			fields = typeof(Lion).Fields( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
+			Assert.AreEqual( 0, fields.Count );
+        }
 		#endregion
-		#endregion
-	}
+ 	}
 }

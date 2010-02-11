@@ -171,13 +171,13 @@ namespace Fasterflect.ObjectConstruction
 				if( ! foundParam )
 				{
 					// check if we can use reflection to set some members
-					MemberInfo member = type.Member( paramName );
+					MemberInfo member = type.Property( paramName, Flags.InstanceCriteria | BindingFlags.IgnoreCase );
+					member = member != null && member.CanWrite() ? member : type.Field( paramName, Flags.InstanceCriteria | BindingFlags.IgnoreCase );
 					bool exists = member != null; 
 					Type memberType = member != null ? member.Type() : null;
-					bool usable = exists && member.CanWrite();
-					bool compatible = usable && memberType.IsAssignableFrom( paramType );
+					bool compatible = exists && memberType.IsAssignableFrom( paramType );
 					// avoid checking if implicit conversion is possible
-					bool convertible = usable && ! compatible && IsConvertible( paramType, memberType, sampleParamValues[ invokeParamIndex ] );
+					bool convertible = exists && ! compatible && IsConvertible( paramType, memberType, sampleParamValues[ invokeParamIndex ] );
 					if( method.IsConstructor && (compatible || convertible) )
 					{
 						members[ invokeParamIndex ] = member;

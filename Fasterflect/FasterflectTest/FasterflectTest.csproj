@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\BaseTest.cs" />
     <Compile Include="Invocation\ArrayTest.cs" />
     <Compile Include="Invocation\BaseInvocationTest.cs" />
     <Compile Include="Invocation\ConstructorTest.cs" />
@@ -73,9 +74,13 @@
     <Compile Include="Invocation\MemberTest.cs" />
     <Compile Include="Invocation\MethodTest.cs" />
     <Compile Include="Invocation\PropertyTest.cs" />
-    <Compile Include="Invocation\TestUtils.cs" />
+    <Compile Include="Common\TestUtils.cs" />
     <Compile Include="Lookup\AttributeTest.cs" />
+    <Compile Include="Lookup\BaseLookupTest.cs" />
     <Compile Include="Lookup\ConstructorTest.cs" />
+    <Compile Include="Lookup\MethodTest.cs" />
+    <Compile Include="Lookup\PropertyTest.cs" />
+    <Compile Include="Lookup\MemberTest.cs" />
     <Compile Include="Lookup\FieldTest.cs" />
     <Compile Include="ObjectConstruction\TryCreateInstanceTest.cs" />
     <Compile Include="ObjectConstruction\TypeConverterTest.cs" />
@@ -84,6 +89,7 @@
     <Compile Include="SampleModel\Animals\Attributes\CarnivoreAttribute.cs" />
     <Compile Include="SampleModel\Animals\Attributes\CodeAttribute.cs" />
     <Compile Include="SampleModel\Animals\Attributes\ZoneAttribute.cs" />
+    <Compile Include="SampleModel\Animals\Empty.cs" />
     <Compile Include="SampleModel\Animals\Enumerations\Climate.cs" />
     <Compile Include="SampleModel\Animals\Enumerations\Zone.cs" />
     <Compile Include="SampleModel\Animals\Enumerations\MovementCapabilities.cs" />

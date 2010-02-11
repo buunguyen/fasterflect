@@ -25,7 +25,7 @@ using Fasterflect;
 using FasterflectTest.SampleModel.Attributes;
 using FasterflectTest.SampleModel.Enumerations;
 
-namespace FasterflectTest.SampleModel
+namespace FasterflectTest.SampleModel.Animals
 {
 	[Zone(Zone.Savannah)]
 	[Serializable]
@@ -46,7 +46,7 @@ namespace FasterflectTest.SampleModel
 		#pragma warning restore 0169, 0649
 
 		#region Constructors
-		public Lion() : this( typeof(Lion).Property<string>( "Name" ).Attribute<DefaultValueAttribute>().Value.ToString() )
+		public Lion() : this( typeof(Lion).Property( "Name" ).Attribute<DefaultValueAttribute>().Value.ToString() )
 		{
 			ConstructorInstanceUsed = 1;
 		}
@@ -57,7 +57,7 @@ namespace FasterflectTest.SampleModel
 			ConstructorInstanceUsed = 2;
 		}
 
-		public Lion( int id ) : this( id, typeof(Lion).Property<string>( "Name" ).Attribute<DefaultValueAttribute>().Value.ToString() )
+		public Lion( int id ) : this( id, typeof(Lion).Property( "Name" ).Attribute<DefaultValueAttribute>().Value.ToString() )
 		{
 			ConstructorInstanceUsed = 3;
 		}
