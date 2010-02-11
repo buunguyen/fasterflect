@@ -19,6 +19,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Fasterflect.Selectors.Interfaces;
 
 namespace Fasterflect.Selectors
 {
@@ -27,6 +28,10 @@ namespace Fasterflect.Selectors
 		#region Implementation of IMethodSelector
 		public bool IsMatch( MethodBase info, Flags flags, Type[] paramTypes, Type returnType )
 		{
+			var mi = info as MethodInfo;
+			if( mi != null && returnType != null && ! returnType.IsAssignableFrom( mi.ReturnType ) )
+				return false;
+
        		var methodParameterTypes = info.Parameters().Select( p => p.ParameterType ).ToList();
 			if( methodParameterTypes.Count != paramTypes.Length )
 				return false;

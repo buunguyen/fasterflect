@@ -24,6 +24,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
+using Fasterflect.Selectors.Core;
 
 namespace Fasterflect
 {
@@ -155,42 +156,23 @@ namespace Fasterflect
         #endregion
         #endregion
 
-        #region Method Lookup
-        #region Single Method
+        #region Method Lookup (Single)
         /// <summary>
         /// Find the public or non-public instance method with the given <paramref name="name"/> on the
-        /// given <paramref name="type"/>. 
-        /// Use the <seealso href="Method"/> method if you wish to include base types in the search.
+        /// given <paramref name="type"/>.
         /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="name">The name of the method to search for. This argument must be supplied. The 
+        /// default behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> 
+        /// to include explicitly implemented interface members, <see href="Flags.PartialNameMatch"/> to locate
+        /// by substring, and <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
-        /// due to method overloading an exception will be raised.</returns>
-        public static MethodInfo MethodDeclared( this Type type, string name )
-        {
-            return type.MethodDeclared( name, Flags.InstanceCriteria );
-        }
-
-        /// <summary>
-        /// Find the method with the given <paramref name="name"/> and matching <paramref name="flags"/>
-        /// on the given <paramref name="type"/>.
-        /// Use the <seealso href="Method"/> method if you wish to include base types in the search.
-        /// </summary>
-        /// <returns>The specified method or null if no method was found. If there are multiple matches
-        /// due to method overloading an exception will be raised.</returns>
-        public static MethodInfo MethodDeclared( this Type type, string name, Flags flags )
-        {
-            return type.GetMethod( name, flags );
-        }
-
-		/// <summary>
-        /// Find the public or non-public instance method with the given <paramref name="name"/> on the
-        /// given <paramref name="type"/>. 
-        /// Use the <seealso href="MethodDeclared"/> method if you do not wish to include base types in the search.
-        /// </summary>
-        /// <returns>The specified method or null if no method was found. If there are multiple matches
-        /// due to method overloading an exception will be raised.</returns>
+        /// due to method overloading the first found match will be returned.</returns>
         public static MethodInfo Method( this Type type, string name )
         {
-            return type.Method( name, Flags.InstanceCriteria );
+			if( string.IsNullOrEmpty( name ) )
+				throw new ArgumentException( "You must supply a valid name to search for.", "name" );
+        	return type.Methods( Flags.InstanceCriteria, null, null, name ).FirstOrDefault();
         }
 
         /// <summary>
@@ -198,214 +180,113 @@ namespace Fasterflect
         /// on the given <paramref name="type"/>.
         /// Use the <seealso href="MethodDeclared"/> method if you do not wish to include base types in the search.
         /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="name">The name of the method to search for. This argument must be supplied. The 
+        /// default behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> 
+        /// to include explicitly implemented interface members, <see href="Flags.PartialNameMatch"/> to locate
+        /// by substring, and <see href="Flags.IgnoreCase"/> to ignore case.</param>
+        /// <param name="flags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
+        /// the search behavior and result filtering.</param>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
-        /// due to method overloading an exception will be raised.</returns>
+        /// due to method overloading the first found match will be returned.</returns>
         public static MethodInfo Method( this Type type, string name, Flags flags )
         {
-            return type.Methods( flags ).FirstOrDefault( m => m.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) );
+        	return type.Methods( flags, null, null, name ).FirstOrDefault();
         }
 
-        /// <summary>
-        /// Find the method with the given <paramref name="name"/> and matching <paramref name="flags"/>
-        /// on the given <paramref name="target"/> object, where the parameter types correspond in order with the
-        /// given <paramref name="paramTypes"/>.
-        /// Use the <seealso href="MethodDeclared"/> method if you do not wish to include base types in the search.
-        /// </summary>
-        /// <returns>The specified method or null if no method was found. If there are multiple matches
-        /// due to method overloading an exception will be raised.</returns>
-        public static MethodInfo Method( this object target, string name, Flags flags, Type[] paramTypes )
-        {
-        	return target.GetTypeAdjusted().Method( name, flags, paramTypes );
-        }
- 
         /// <summary>
         /// Find the method with the given <paramref name="name"/> and matching <paramref name="flags"/>
         /// on the given <paramref name="type"/> where the parameter types correspond in order with the
         /// given <paramref name="paramTypes"/>.
-        /// Use the <seealso href="MethodDeclared"/> method if you do not wish to include base types in the search.
         /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="name">The name of the method to search for. This argument must be supplied. The 
+        /// default behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> 
+        /// to include explicitly implemented interface members, <see href="Flags.PartialNameMatch"/> to locate
+        /// by substring, and <see href="Flags.IgnoreCase"/> to ignore case.</param>
+        /// <param name="flags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
+        /// the search behavior and result filtering.</param>
+        /// <param name="paramTypes">If this parameter is supplied then only methods with the same parameter signature
+        /// will be included in the result. The default behavior is to check only for assignment compatibility,
+        /// but this can be changed to exact matching by passing <see href="Flags.ExactParameterMatch"/>.</param>
+        /// <param name="returnType">If this parameter is supplied then only methods with the same return type signature
+        /// will be included in the result. The default behavior is to check only for assignment compatibility, but this 
+        /// can be changed to exact matching by passing <see href="Flags.ExactParameterMatch"/>.
+        /// </param>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
-        /// due to method overloading an exception will be raised.</returns>
-        public static MethodInfo Method( this Type type, string name, Flags flags, Type[] paramTypes )
+        /// due to method overloading the first found match will be returned.</returns>
+		public static MethodInfo Method( this Type type, string name, Flags flags, Type[] paramTypes, Type returnType )
         {
-        	IList<MethodInfo> methods = type.Methods( flags, name );
-        	bool findAnyOverload = paramTypes == null; // || paramTypes.Length == 0;
-			if( findAnyOverload )
-			{
-				return methods.Count > 0 ? methods[ 0 ] : null;
-			}
-        	foreach( var method in methods )
-        	{
-        		var methodParameterTypes = method.Parameters().Select( p => p.ParameterType ).ToList();
-				if( methodParameterTypes.Count != paramTypes.Length )
-					continue;
-				for( int i=0; i<methodParameterTypes.Count; i++ )
-				{
-					if( methodParameterTypes[ i ].IsAssignableFrom( paramTypes[ i ] ) )
-						continue;
-				}
-        		return method;
-        	}
-        	return null; // methods.FirstOrDefault( m => m.Parameters().Select( p => p.ParameterType ).SequenceEqual( paramTypes ) );
+        	return type.Methods( flags, paramTypes, returnType, name ).FirstOrDefault();
         }
         #endregion
 
-        #region Multiple Methods
-		#region MethodsDeclared
+        #region Method Lookup (Multiple)
         /// <summary>
-        /// Find all public and non-public instance methods declared on the given <paramref name="type"/>.
-        /// </summary>
-        /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> MethodsDeclared( this Type type )
-        {
-            return type.MethodsDeclared( Flags.InstanceCriteria, null );
-        }
-
-        /// <summary>
-        /// Find all methods declared on the given <paramref name="type"/> that match the specified <paramref name="flags"/>. 
-        /// </summary>
-        /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> MethodsDeclared( this Type type, Flags flags )
-        {
-            return type.MethodsDeclared( flags, null );
-        }
-
-        /// <summary>
-        /// Find all public and non-public instance methods declared on the given <paramref name="type"/> with the
-        /// given <paramref name="name"/>. If <c>null</c> is passed in the <paramref name="name"/>
-        /// parameter then no name filtering will be applied.
-        /// </summary>
-        /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> MethodsDeclared( this Type type, string name )
-        {
-            return type.MethodsDeclared( Flags.InstanceCriteria, name );
-        }
-
-        /// <summary>
-        /// Find all methods declared on the given <paramref name="type"/> with the given <paramref name="name"/> that 
-        /// match the specified <paramref name="flags"/>. If <c>null</c> is passed in the <paramref name="name"/>
-        /// parameter then no name filtering will be applied.
-        /// </summary>
-        /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> MethodsDeclared( this Type type, Flags flags, string name )
-        {
-            return type.GetMethods( flags ).Where( m => name == null || 
-												   m.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) || 
-												   m.Name.EndsWith( "."+name, StringComparison.OrdinalIgnoreCase ) ).ToList();
-        }
-		#endregion
-
-		#region Methods
-       	/// <summary>
         /// Find all public and non-public instance methods on the given <paramref name="type"/>.
         /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
         public static IList<MethodInfo> Methods( this Type type )
         {
-            return type.Methods( Flags.InstanceCriteria, null );
+            return type.Methods( Flags.InstanceCriteria, null, null, null );
         }
 
         /// <summary>
-        /// Find all methods on the given <paramref name="type"/> that match the specified <paramref name="flags"/>. 
+        /// Find all methods on the given <paramref name="type"/> that match the specified <paramref name="flags"/>.
         /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="flags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
+        /// the search behavior and result filtering.</param>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
         public static IList<MethodInfo> Methods( this Type type, Flags flags )
         {
-            return type.Methods( flags, null );
+            return type.Methods( flags, null, null, null );
         }
 
         /// <summary>
-        /// Find all public and non-public instance methods on the given <paramref name="type"/> with the
-        /// given <paramref name="name"/>. If <c>null</c> is passed in the <paramref name="name"/>
-        /// parameter then no name filtering will be applied.
+        /// Find all public and non-public instance methods on the given <paramref name="type"/> that match the 
+        /// given <paramref name="names"/>.
         /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="names">If this parameter is supplied then only methods whose name matches one of the supplied
+        /// names will be included in the result. The default behavior is to check for an exact, case-sensitive match.
+        /// Pass <see href="Flags.ExplicitNameMatch"/> to include explicitly implemented interface members, 
+        /// <see href="Flags.PartialNameMatch"/> to locate by substring, and <see href="Flags.IgnoreCase"/> to 
+        /// ignore case.</param>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> Methods( this Type type, string name )
+        public static IList<MethodInfo> Methods( this Type type, string[] names )
         {
-            return type.Methods( Flags.InstanceCriteria, name );
+            return type.Methods( Flags.InstanceCriteria, null, null, names );
         }
 
         /// <summary>
-        /// Find all methods on the given <paramref name="type"/> with the given <paramref name="name"/> that 
-        /// match the specified <paramref name="flags"/>. If <c>null</c> is passed in the <paramref name="name"/>
-        /// parameter then no name filtering will be applied.
+        /// Find all methods on the given <paramref name="type"/> that match the given lookup criteria and values.
         /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="flags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
+        /// the search behavior and result filtering.</param>
+        /// <param name="paramTypes">If this parameter is supplied then only methods with the same parameter signature
+        /// will be included in the result. The default behavior is to check only for assignment compatibility,
+        /// but this can be changed to exact matching by passing <see href="Flags.ExactParameterMatch"/>.</param>
+        /// <param name="returnType">If this parameter is supplied then only methods with the same return type signature
+        /// will be included in the result. The default behavior is to check only for assignment compatibility, but this 
+        /// can be changed to exact matching by passing <see href="Flags.ExactParameterMatch"/>.
+        /// </param>
+        /// <param name="names">If this parameter is supplied then only methods whose name matches one of the supplied
+        /// names will be included in the result. The default behavior is to check for an exact, case-sensitive match.
+        /// Pass <see href="Flags.ExplicitNameMatch"/> to include explicitly implemented interface members, 
+        /// <see href="Flags.PartialNameMatch"/> to locate by substring, and <see href="Flags.IgnoreCase"/> to 
+        /// ignore case.</param>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> Methods( this Type type, Flags flags, string name )
+        public static IList<MethodInfo> Methods( this Type type, Flags flags, Type[] paramTypes, Type returnType, params string[] names )
         {
-            // as we recurse below, reset flags to only include declared fields (avoid duplicates in result)
-            flags |= Flags.DeclaredOnly;
-            flags -= BindingFlags.FlattenHierarchy;
-            var methods = new List<MethodInfo>( type.MethodsDeclared( flags, name ) );
-            Type baseType = type.BaseType;
-            while( baseType != null && baseType != typeof(object) )
-            {
-                methods.AddRange( baseType.MethodsDeclared( flags, name ) );
-                baseType = baseType.BaseType;
-            }
-            return methods;
-        }
-        #endregion
-        #endregion
-		#endregion
+        	flags = flags ?? Flags.Default;
+        	flags = flags.SetIf( Flags.ParameterMatch, paramTypes != null );
+        	var methods = type.Members( MemberTypes.Method, flags, names ).Cast<MethodInfo>().ToList();
 
-		#region Method Parameter Lookup
-		/// <summary>
-        /// Finds all parameters for the given <paramref name="method"/>.
-        /// </summary>
-        /// <returns>The list of parameters for the method. This value will never be null.</returns>
-        public static IList<ParameterInfo> Parameters( this MethodBase method )
-        {
-            return method.GetParameters();
-        }
-
-        /// <summary>
-        /// Determines whether null can be assigned to the given <paramref name="parameter"/>.
-        /// </summary>
-        /// <returns>True if null can be assigned, false otherwise.</returns>
-        public static bool IsNullable( this ParameterInfo parameter )
-        {
-            return ! parameter.ParameterType.IsValueType || parameter.ParameterType.IsSubclassOf( typeof(Nullable) );
-        }
-
-        /// <summary>
-        /// Determines whether the given <paramref name="parameter"/> has the given <paramref name="name"/>.
-        /// The comparison uses OrdinalIgnoreCase and allows for a leading underscore in either name
-        /// to be ignored.
-        /// </summary>
-        /// <returns>True if the name is considered identical, false otherwise.</returns>
-        public static bool HasName( this ParameterInfo parameter, string name )
-        {
-            string parameterName = parameter.Name.StartsWith( "_" ) ? parameter.Name.Substring( 1 ) : parameter.Name;
-            name = name.StartsWith( "_" ) ? name.Substring( 1 ) : name;
-            return parameterName.Equals( name, StringComparison.OrdinalIgnoreCase );
-        }
-
-        /// <summary>
-        /// Determines whether the given <paramref name="parameter"/> has an associated default value as
-        /// supplied by an <see href="DefaultValueAttribute"/>. This method does not read the value of
-        /// the attribute. It also does not support C# 4.0 default parameter specifications.
-        /// </summary>
-        /// <returns>True if the attribute was detected, false otherwise.</returns>
-        public static bool HasDefaultValue( this ParameterInfo parameter )
-        {
-            var defaultValue = parameter.Attribute<DefaultValueAttribute>();
-            return defaultValue != null;
-        }
-
-        /// <summary>
-        /// Gets the default value associated with the given <paramref name="parameter"/>. The value is
-        /// obtained from the <see href="DefaultValueAttribute"/> if present on the parameter. This method 
-        /// does not support C# 4.0 default parameter specifications.
-        /// </summary>
-        /// <returns>The default value if one could be obtained and converted into the type of the parameter,
-        /// and null otherwise.</returns>
-        public static object DefaultValue( this ParameterInfo parameter )
-        {
-            var defaultValue = parameter.Attribute<DefaultValueAttribute>();
-            return defaultValue != null
-                       ? ObjectConstruction.TypeConverter.Get( parameter.ParameterType, defaultValue.Value )
-                       : null;
+			var selectors = SelectorFactory.GetMethodSelectors( flags );
+			return methods.Where( m => selectors.All( s => s.IsMatch( m, flags, paramTypes, returnType ) ) ).ToList();
         }
         #endregion
     }

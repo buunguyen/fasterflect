@@ -283,8 +283,7 @@ namespace Fasterflect
         }
         #endregion
 
-        #region Property Lookup
-        #region Single Property
+        #region Property Lookup (Single)
         /// <summary>
         /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>. This method 
         /// searches for public and non-public instance properties on both the type itself and all parent classes.
@@ -320,7 +319,7 @@ namespace Fasterflect
         }
         #endregion
 
-        #region Multiple Properties
+        #region Property Lookup (Multiple)
         /// <summary>
         /// Find all public and non-public instance properties on the given <paramref name="type"/>,
         /// including properties defined on base types.
@@ -356,7 +355,6 @@ namespace Fasterflect
         {
         	return type.Members( MemberTypes.Property, flags, names ).Cast<PropertyInfo>().ToList();
 		}
-        #endregion
         #endregion
     }
 }

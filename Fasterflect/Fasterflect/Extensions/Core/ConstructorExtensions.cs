@@ -172,29 +172,7 @@ namespace Fasterflect
         }
         #endregion
 
-        #region Constructor Lookup
-        /// <summary>
-        /// Find all public and non-public constructors (that are not abstract) on the given <paramref name="type"/>.
-        /// </summary>
-        /// <param name="type">The type to reflect on.</param>
-        /// <returns>A list of matching constructors. This value will never be null.</returns>
-        public static IList<ConstructorInfo> Constructors( this Type type )
-        {
-            return type.Constructors( Flags.InstanceCriteria );
-        }
-
-        /// <summary>
-        /// Find all constructors matching the given <paramref name="flags"/> (and that are not abstract)
-        /// on the given <paramref name="type"/>.
-        /// </summary>
-        /// <param name="type">The type to reflect on.</param>
-        /// <param name="flags">The search criteria to use when reflecting.</param>
-        /// <returns>A list of matching constructors. This value will never be null.</returns>
-        public static IList<ConstructorInfo> Constructors( this Type type, Flags flags )
-        {
-            return type.GetConstructors( flags ).Where( ci => !ci.IsAbstract ).ToList();
-        }
-
+        #region Constructor Lookup (Single)
         /// <summary>
         /// Find the constructor corresponding to the supplied <paramref name="parameterTypes"/> on the
         /// given <paramref name="type"/>.
@@ -220,5 +198,29 @@ namespace Fasterflect
             return type.GetConstructor( flags, null, parameterTypes, null );
         }
         #endregion
-    }
+
+        #region Constructor Lookup (Multiple)
+        /// <summary>
+        /// Find all public and non-public constructors (that are not abstract) on the given <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">The type to reflect on.</param>
+        /// <returns>A list of matching constructors. This value will never be null.</returns>
+        public static IList<ConstructorInfo> Constructors( this Type type )
+        {
+            return type.Constructors( Flags.InstanceCriteria );
+        }
+
+        /// <summary>
+        /// Find all constructors matching the given <paramref name="flags"/> (and that are not abstract)
+        /// on the given <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">The type to reflect on.</param>
+        /// <param name="flags">The search criteria to use when reflecting.</param>
+        /// <returns>A list of matching constructors. This value will never be null.</returns>
+        public static IList<ConstructorInfo> Constructors( this Type type, Flags flags )
+        {
+            return type.GetConstructors( flags ).Where( ci => !ci.IsAbstract ).ToList();
+        }
+        #endregion
+   }
 }

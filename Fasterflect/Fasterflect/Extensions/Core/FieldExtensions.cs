@@ -179,8 +179,7 @@ namespace Fasterflect
         #endregion
         #endregion
 
-        #region Field Lookup
-        #region Single Field
+        #region Field Lookup (Single)
         /// <summary>
         /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. This method 
         /// searches for public and non-public instance fields on both the type itself and all parent classes.
@@ -218,7 +217,7 @@ namespace Fasterflect
         }
         #endregion
 
-        #region Multiple Fields
+        #region Field Lookup (Multiple)
         /// <summary>
         /// Find all public and non-public instance fields on the given <paramref name="type"/>,
         /// including fields defined on base types.
@@ -238,7 +237,6 @@ namespace Fasterflect
         {
         	return type.Members( MemberTypes.Field, flags, names ).Cast<FieldInfo>().ToList();
 		}
- 		#endregion
         #endregion
     }
 }

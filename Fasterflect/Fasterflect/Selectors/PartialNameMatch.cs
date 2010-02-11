@@ -18,6 +18,7 @@
 
 using System;
 using System.Reflection;
+using Fasterflect.Selectors.Interfaces;
 
 namespace Fasterflect.Selectors
 {
