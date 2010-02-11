@@ -22,7 +22,7 @@ using System;
 using FasterflectTest.SampleModel.Attributes;
 using FasterflectTest.SampleModel.Enumerations;
 
-namespace FasterflectTest.SampleModel
+namespace FasterflectTest.SampleModel.Animals
 {
 	internal class Snake : Reptile
 	{

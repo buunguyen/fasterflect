@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace FasterflectTest.SampleModel
+namespace FasterflectTest.SampleModel.Animals
 {
 	internal sealed class Zoo : Collection<Animal>
 	{

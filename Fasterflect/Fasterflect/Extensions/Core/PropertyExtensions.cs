@@ -284,21 +284,7 @@ namespace Fasterflect
         #endregion
 
         #region Property Lookup
-
         #region Single Property
-        /// <summary>
-        /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
-        /// if supplied for the <typeparamref name="T"/> parameter then the properties type must be assignment
-        /// compatible with this type. This method searches for public and non-public instance properties on both 
-        /// the type itself and all parent classes.
-        /// Use the <seealso href="PropertyDeclared"/> method if you do not wish to search base types.  
-        /// </summary>
-        /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
-        public static PropertyInfo Property<T>( this Type type, string name )
-        {
-            return type.Property( name, Flags.InstanceCriteria, typeof(T) );
-        }
-
         /// <summary>
         /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>. This method 
         /// searches for public and non-public instance properties on both the type itself and all parent classes.
@@ -308,18 +294,6 @@ namespace Fasterflect
         public static PropertyInfo Property( this Type type, string name )
         {
             return type.Property( name, Flags.InstanceCriteria, null );
-        }
-
-        /// <summary>
-        /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
-        /// if supplied for the <typeparamref name="T"/> parameter then the properties type must be assignment
-        /// compatible with this type. Use the <paramref name="flags"/> parameter to define the scope of the search.
-        /// Use the <seealso href="PropertyDeclared"/> method if you do not wish to search base types.  
-        /// </summary>
-        /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
-        public static PropertyInfo Property<T>( this Type type, string name, BindingFlags flags )
-        {
-            return type.Property( name, flags, typeof(T) );
         }
 
         /// <summary>
@@ -342,62 +316,12 @@ namespace Fasterflect
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
         public static PropertyInfo Property( this Type type, string name, BindingFlags flags, Type propertyType )
         {
-            PropertyInfo info =
-                type.Properties( flags ).FirstOrDefault( p => p.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) );
-            return info != null && (propertyType == null || propertyType.IsAssignableFrom( info.PropertyType ))
-                       ? info
-                       : null;
-        }
-
-        /// <summary>
-        /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
-        /// if supplied for the <typeparamref name="T"/> parameter then the properties type must be assignment
-        /// compatible with this type. 
-        /// This method searches for public and non-public instance properties on the specified type only.
-        /// Use the <seealso href="Property"/> method if you wish to include base types in the search.
-        /// </summary>
-        /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
-        public static PropertyInfo PropertyDeclared<T>( this Type type, string name )
-        {
-            return type.PropertyDeclared( name, Flags.InstanceCriteria, typeof(T) );
-        }
-
-        /// <summary>
-        /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>.
-        /// This method searches for public and non-public instance properties on the specified type only.
-        /// Use the <seealso href="Property"/> method if you wish to include base types in the search.
-        /// </summary>
-        /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
-        public static PropertyInfo PropertyDeclared( this Type type, string name )
-        {
-            return type.PropertyDeclared( name, Flags.InstanceCriteria, null );
-        }
-
-        /// <summary>
-        /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
-        /// if supplied for the <typeparamref name="T"/> parameter then the properties type must be assignment
-        /// compatible with this type. Use the <paramref name="flags"/> parameter to define the scope of the search.
-        /// Use the <seealso href="Property"/> method if you wish to include base types in the search.
-        /// </summary>
-        /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
-        public static PropertyInfo PropertyDeclared<T>( this Type type, string name, BindingFlags flags )
-        {
-            return type.PropertyDeclared( name, flags, typeof(T) );
-        }
-
-        /// <summary>
-        /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
-        /// if supplied for the <paramref name="propertyType"/> parameter then the properties type must be assignment
-        /// compatible with this type. Use the <paramref name="flags"/> parameter to define the scope of the search.
-        /// Use the <seealso href="Property"/> method if you wish to include base types in the search.
-        /// </summary>
-        /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
-        public static PropertyInfo PropertyDeclared( this Type type, string name, BindingFlags flags, Type propertyType )
-        {
-            PropertyInfo info = type.GetProperty( name, flags );
-            return info != null && (propertyType == null || propertyType.IsAssignableFrom( info.PropertyType ))
-                       ? info
-                       : null;
+        	bool ignoreCase = (flags & BindingFlags.IgnoreCase) == BindingFlags.IgnoreCase;
+            return type.Properties( flags ).FirstOrDefault( 
+				p => p.Name.Equals( name, ignoreCase 
+									? StringComparison.InvariantCultureIgnoreCase 
+									: StringComparison.InvariantCulture ) && 
+					 (propertyType == null || propertyType.IsAssignableFrom( p.PropertyType )) );
         }
         #endregion
 
@@ -441,41 +365,22 @@ namespace Fasterflect
         /// <returns>A list of all matching properties on the type. This value will never be null.</returns>
         public static IList<PropertyInfo> Properties( this Type type, BindingFlags flags )
         {
-            // as we recurse below, reset flags to only include declared properties (avoid duplicates in result)
-            flags |= BindingFlags.DeclaredOnly;
-            flags -= BindingFlags.FlattenHierarchy;
-            var properties = new List<PropertyInfo>( type.PropertiesDeclared( flags ) );
+			if( type == null || type == typeof(object) ) { return new List<PropertyInfo>(); }
+
+			bool recurse = (flags & BindingFlags.DeclaredOnly) == BindingFlags.Default;
+        	flags |= BindingFlags.DeclaredOnly;
+            flags &= ~BindingFlags.FlattenHierarchy;
+
+			var properties = new List<PropertyInfo>( type.GetProperties( flags ) );
             Type baseType = type.BaseType;
-            while( baseType != null && baseType != typeof(object) )
+            while( recurse && baseType != null && baseType != typeof(object) )
             {
-                properties.AddRange( baseType.PropertiesDeclared( flags ) );
+                properties.AddRange( baseType.GetProperties( flags ) );
                 baseType = baseType.BaseType;
             }
             return properties;
         }
-
-        /// <summary>
-        /// Find all public and non-public instance properties declared on the given <paramref name="type"/>.
-        /// Use the <seealso href="Properties"/> method if you wish to include base types in the search.
-        /// </summary>
-        /// <returns>A list of all instance properties declared on the type. This value will never be null.</returns>
-        public static IList<PropertyInfo> PropertiesDeclared( this Type type )
-        {
-            return type.PropertiesDeclared( Flags.InstanceCriteria );
-        }
-
-        /// <summary>
-        /// Find all properties declared on the given <paramref name="type"/> that match the specified <paramref name="flags"/>.
-        /// Use the <seealso href="Properties"/> method if you wish to include base types in the search.
-        /// </summary>
-        /// <returns>A list of all instance properties declared on the type. This value will never be null.</returns>
-        public static IList<PropertyInfo> PropertiesDeclared( this Type type, BindingFlags flags )
-        {
-            flags |= BindingFlags.DeclaredOnly;
-            return type.GetProperties( flags ).ToList();
-        }
         #endregion
-
         #endregion
     }
 }

@@ -52,29 +52,11 @@ namespace Fasterflect
 		/// <returns>A single MemberInfo instance of the first found match or null if no match was found.</returns>
 		public static MemberInfo Member( this Type type, string name, BindingFlags flags )
 		{
-            return type.Members( flags ).FirstOrDefault( m => m.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) );
-		}
-
-		/// <summary>
-        /// Find the member identified by <paramref name="name"/> declared on the given <paramref name="type"/>. This 
-		/// method searches for public and non-public instance fields only on the specified type.
-        /// Use the <see href="Member"/> method if you wish to include parent/base types in the search.
-		/// </summary>
-		/// <returns>A single MemberInfo instance of the first found match or null if no match was found.</returns>
-		public static MemberInfo MemberDeclared( this Type type, string name )
-		{
-			return type.MemberDeclared( name, Flags.InstanceCriteria );
-		}
-
-		/// <summary>
-        /// Find the member identified by <paramref name="name"/> declared on the given <paramref name="type"/>. Use 
-		/// the <paramref name="flags"/> parameter to define the scope of the search.
-        /// Use the <see href="Member"/> method if you wish to include parent/base types in the search.
-		/// </summary>
-		/// <returns>A single MemberInfo instance of the first found match or null if no match was found.</returns>
-		public static MemberInfo MemberDeclared( this Type type, string name, BindingFlags flags )
-		{
-            return type.FindMembers( MemberTypes.All, flags, null, null ).FirstOrDefault( m => m.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) );
+        	bool ignoreCase = (flags & BindingFlags.IgnoreCase) == BindingFlags.IgnoreCase;
+            return type.Members( flags ).FirstOrDefault( 
+				m => m.Name.Equals( name, ignoreCase 
+									? StringComparison.InvariantCultureIgnoreCase 
+									: StringComparison.InvariantCulture ) );
 		}
 		#endregion
 
@@ -128,50 +110,20 @@ namespace Fasterflect
 		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
 		public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes, BindingFlags flags )
 		{
-			// as we recurse below, reset flags to only include declared fields (avoid duplicates in result)
-			flags |= BindingFlags.DeclaredOnly;
-			flags -= BindingFlags.FlattenHierarchy;
-			var members = new List<MemberInfo>( type.MembersDeclared( memberTypes, flags ) );
-			Type baseType = type.BaseType;
-			while( baseType != null && baseType != typeof(object) )
-			{
-				members.AddRange( baseType.MembersDeclared( memberTypes, flags ) );
-				baseType = baseType.BaseType;
-			}
-			return members;
-		}
+			if( type == null || type == typeof(object) ) { return new List<MemberInfo>(); }
 
-		/// <summary>
-        /// Find all public and non-public instance members of the given <paramref name="memberTypes"/> declared
-		/// on the given <paramref name="type"/>.
-		/// Use the <see href="Members"/> method if you wish to include base types in the search.
-		/// </summary>
-		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
-		public static IList<MemberInfo> MembersDeclared( this Type type, MemberTypes memberTypes )
-		{
-			return type.MembersDeclared( memberTypes, Flags.InstanceCriteria );
-		}
+			bool recurse = (flags & BindingFlags.DeclaredOnly) == BindingFlags.Default;
+        	flags |= BindingFlags.DeclaredOnly;
+            flags &= ~BindingFlags.FlattenHierarchy;
 
-		/// <summary>
-        /// Find all members declared on the given <paramref name="type"/> that match the specified
-		/// <paramref name="flags"/>.
-		/// Use the <see href="Members"/> method if you wish to include base types in the search.
-		/// </summary>
-		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
-		public static IList<MemberInfo> MembersDeclared( this Type type, BindingFlags flags )
-		{
-			return type.MembersDeclared( MemberTypes.All, flags );
-		}
-
-		/// <summary>
-        /// Find all members of the given <paramref name="memberTypes"/> declared on the given <paramref name="type"/>
-		/// that match the specified <paramref name="flags"/>.
-		/// Use the <see href="Members"/> method if you wish to include base types in the search.
-		/// </summary>
-		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
-		public static IList<MemberInfo> MembersDeclared( this Type type, MemberTypes memberTypes, BindingFlags flags )
-		{
-			return type.FindMembers( memberTypes, flags, null, null );
+			var members = new List<MemberInfo>( type.GetMembers( flags ) );
+            Type baseType = type.BaseType;
+            while( recurse && baseType != null && baseType != typeof(object) )
+            {
+                members.AddRange( baseType.GetMembers( flags ) );
+                baseType = baseType.BaseType;
+            }
+            return members.Where( m => (m.MemberType & memberTypes) != 0 ).ToList();
 		}
 		#endregion
 		#endregion

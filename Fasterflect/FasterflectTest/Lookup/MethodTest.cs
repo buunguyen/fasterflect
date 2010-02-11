@@ -19,19 +19,13 @@
 #endregion
 
 using System;
-using FasterflectTest.Common;
-using FasterflectTest.Model;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FasterflectTest.Invocation
+namespace FasterflectTest.Lookup
 {
-    public abstract class BaseInvocationTest : BaseTest
-    {
-        protected static readonly Type EmployeeType = typeof(Employee);
-        protected static readonly Type PersonType = typeof(Person);
-        protected static readonly Type PersonStructType = typeof(PersonStruct);
-
-    	protected BaseInvocationTest() : base( new [] { PersonType, PersonStructType } )
-    	{
-    	}
-    }
+    [TestClass]
+    public class MethodTest
+	{
+	}
 }

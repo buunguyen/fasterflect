@@ -18,20 +18,17 @@
 
 #endregion
 
-using System;
-using FasterflectTest.Common;
-using FasterflectTest.Model;
-
-namespace FasterflectTest.Invocation
+namespace FasterflectTest.Common
 {
-    public abstract class BaseInvocationTest : BaseTest
+    public static class TestUtils
     {
-        protected static readonly Type EmployeeType = typeof(Employee);
-        protected static readonly Type PersonType = typeof(Person);
-        protected static readonly Type PersonStructType = typeof(PersonStruct);
-
-    	protected BaseInvocationTest() : base( new [] { PersonType, PersonStructType } )
-    	{
-    	}
+        public static string FirstCharUpper( this string str )
+        {
+            if( string.IsNullOrEmpty( str ) )
+            {
+                return str;
+            }
+            return str.Substring( 0, 1 ).ToUpper() + str.Substring( 1 );
+        }
     }
 }

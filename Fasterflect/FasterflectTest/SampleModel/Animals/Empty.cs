@@ -19,19 +19,14 @@
 #endregion
 
 using System;
-using FasterflectTest.Common;
-using FasterflectTest.Model;
+using System.ComponentModel;
+using System.Diagnostics;
+using FasterflectTest.SampleModel.Attributes;
+using FasterflectTest.SampleModel.Enumerations;
 
-namespace FasterflectTest.Invocation
+namespace FasterflectTest.SampleModel.Animals
 {
-    public abstract class BaseInvocationTest : BaseTest
-    {
-        protected static readonly Type EmployeeType = typeof(Employee);
-        protected static readonly Type PersonType = typeof(Person);
-        protected static readonly Type PersonStructType = typeof(PersonStruct);
-
-    	protected BaseInvocationTest() : base( new [] { PersonType, PersonStructType } )
-    	{
-    	}
-    }
+	internal class Empty
+	{
+	}
 }

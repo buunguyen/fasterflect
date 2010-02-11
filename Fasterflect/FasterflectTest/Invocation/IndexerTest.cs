@@ -41,7 +41,7 @@ namespace FasterflectTest.Invocation
             InvokeIndexer( ( person, sample ) => person.GetIndexer( sample[ 0 ], sample[ 1 ] ) );
         }
 
-        private static void InvokeIndexer( Func<object, object[], object> getIndexerAction )
+        private void InvokeIndexer( Func<object, object[], object> getIndexerAction )
         {
             RunWith( ( personBase, elementType, elementTypeNullable ) =>
                {
@@ -62,7 +62,7 @@ namespace FasterflectTest.Invocation
                } );
         }
 
-        private static void RunWith( Action<object, Type, Type> assertionAction )
+        private void RunWith( Action<object, Type, Type> assertionAction )
         {
             Types.Select( t =>
                           {

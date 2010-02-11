@@ -46,9 +46,31 @@ namespace Fasterflect.Selectors
 	    IgnoreReturn         = 0x1000000,
 
 		// Fasterflect
+
+		/// <summary>
+		/// If this option is specified the search for a named member will perform a partial match instead
+		/// of an exact match.   
+		/// </summary>
 		PartialNameMatch     = 0x100000000,
+		/// <summary>
+		/// If this option is specified the search for a named member will include explicitly implemented
+		/// interface members.
+		/// </summary>
 	    ExplicitNameMatch    = 0x200000000,
+		/// <summary>
+		/// If this option is specified the parameter types are verified for assignment compatibility
+		/// with the supplied parameter types.   
+		/// </summary>
 	    ParameterMatch       = 0x400000000,
+		/// <summary>
+		/// If this option is specified the parameter types must match exactly rather than by
+		/// assignment compatibility. 
+		/// </summary>
 	    ExactParameterMatch  = 0x800000000,
+		/// <summary>
+		/// If this option is specified all fields that are backing fields for automatic properties
+		/// will be excluded from the result. This option only applies to field and member lookups.
+		/// </summary>
+	    ExcludeBackingFields = 0x1000000000,
 	}
 }

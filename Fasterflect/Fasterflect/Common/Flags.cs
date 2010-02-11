@@ -40,8 +40,7 @@ namespace Fasterflect
         /// <summary>
         /// Search criteria encompassing all public and non-public static members, including those of parent classes.
         /// </summary>
-        public static readonly BindingFlags StaticCriteria = DefaultCriteria | BindingFlags.Static |
-                                                             BindingFlags.FlattenHierarchy;
+        public static readonly BindingFlags StaticCriteria = DefaultCriteria | BindingFlags.Static;
 
         /// <summary>
         /// Search criteria encompassing all members, including those of parent classes.

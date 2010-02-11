@@ -24,7 +24,7 @@ using System.Diagnostics;
 using FasterflectTest.SampleModel.Attributes;
 using FasterflectTest.SampleModel.Enumerations;
 
-namespace FasterflectTest.SampleModel
+namespace FasterflectTest.SampleModel.Animals
 {
 	[DebuggerDisplay("ID={id}, Type={GetType()}")]
 	internal abstract class Animal
@@ -36,7 +36,7 @@ namespace FasterflectTest.SampleModel
 		private DateTime? birthDay;
 
 		public int ID { get { return id; } }
-		public DateTime? Birthday { get { return birthDay; } set { birthDay = value; } }
+		public DateTime? BirthDay { get { return birthDay; } set { birthDay = value; } }
 		public Climate ClimateRequirements { get; private set; }
 		[Code("Movement")]
 		public MovementCapabilities MovementCapabilities { get; private set; }
