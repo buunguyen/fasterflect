@@ -78,13 +78,11 @@
     <Compile Include="Caching\Cache.cs" />
     <Compile Include="Selectors\SelectorBase.cs" />
     <Compile Include="Selectors\Flags.cs" />
-    <Compile Include="Selectors\Test.cs" />
     <Compile Include="Selectors\PartialNameMatch.cs" />
     <Compile Include="Selectors\ExplicitNameMatch.cs" />
     <Compile Include="Selectors\ExactParameterMatch.cs" />
     <Compile Include="Selectors\ParameterMatch.cs" />
     <Compile Include="Selectors\SelectorFactory.cs" />
-    <Compile Include="Selectors\FasterflectFlags.cs" />
     <Compile Include="Selectors\IMemberSelector.cs" />
     <Compile Include="Selectors\IMethodSelector.cs" />
     <Compile Include="Selectors\ISelector.cs" />

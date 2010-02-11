@@ -198,7 +198,7 @@ namespace Fasterflect
         /// Use the <seealso href="FieldDeclared"/> method if you do not wish to search base types.  
         /// </summary>
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
-        public static FieldInfo Field( this Type type, string name, BindingFlags flags )
+        public static FieldInfo Field( this Type type, string name, Flags flags )
         {
             return type.Field( name, flags, null );
         }
@@ -210,9 +210,9 @@ namespace Fasterflect
         /// Use the <seealso href="FieldDeclared"/> method if you do not wish to search base types.  
         /// </summary>
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
-        public static FieldInfo Field( this Type type, string name, BindingFlags flags, Type fieldType )
+        public static FieldInfo Field( this Type type, string name, Flags flags, Type fieldType )
         {
-        	bool ignoreCase = (flags & BindingFlags.IgnoreCase) == BindingFlags.IgnoreCase;
+        	bool ignoreCase = flags.IsSet( Flags.IgnoreCase );
             return type.Fields( flags ).FirstOrDefault( 
 				f => f.Name.Equals( name, ignoreCase 
 									? StringComparison.InvariantCultureIgnoreCase 
@@ -237,12 +237,13 @@ namespace Fasterflect
         /// including fields defined on base types.
         /// </summary>
         /// <returns>A list of all matching fields on the type. This value will never be null.</returns>
-        public static IList<FieldInfo> Fields( this Type type, BindingFlags flags )
+        public static IList<FieldInfo> Fields( this Type type, Flags flags )
         {
 			if( type == null || type == typeof(object) ) { return new List<FieldInfo>(); }
 
-			bool recurse = (flags & BindingFlags.DeclaredOnly) == BindingFlags.Default;
-        	flags |= BindingFlags.DeclaredOnly;
+			flags = flags ?? Flags.Default;
+			bool recurse = flags.IsNotSet( Flags.DeclaredOnly);
+        	flags |= Flags.DeclaredOnly;
             flags &= ~BindingFlags.FlattenHierarchy;
             
 			var fields = new List<FieldInfo>( type.GetFields( flags ) );

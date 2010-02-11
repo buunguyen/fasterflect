@@ -302,7 +302,7 @@ namespace Fasterflect
         /// Use the <seealso href="PropertyDeclared"/> method if you do not wish to search base types.  
         /// </summary>
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
-        public static PropertyInfo Property( this Type type, string name, BindingFlags flags )
+        public static PropertyInfo Property( this Type type, string name, Flags flags )
         {
             return type.Property( name, flags, null );
         }
@@ -314,9 +314,9 @@ namespace Fasterflect
         /// Use the <seealso href="PropertyDeclared"/> method if you do not wish to search base types.  
         /// </summary>
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
-        public static PropertyInfo Property( this Type type, string name, BindingFlags flags, Type propertyType )
+        public static PropertyInfo Property( this Type type, string name, Flags flags, Type propertyType )
         {
-        	bool ignoreCase = (flags & BindingFlags.IgnoreCase) == BindingFlags.IgnoreCase;
+        	bool ignoreCase = flags.IsSet( Flags.IgnoreCase );
             return type.Properties( flags ).FirstOrDefault( 
 				p => p.Name.Equals( name, ignoreCase 
 									? StringComparison.InvariantCultureIgnoreCase 
@@ -363,12 +363,13 @@ namespace Fasterflect
         /// including properties defined on base types.
         /// </summary>
         /// <returns>A list of all matching properties on the type. This value will never be null.</returns>
-        public static IList<PropertyInfo> Properties( this Type type, BindingFlags flags )
+        public static IList<PropertyInfo> Properties( this Type type, Flags flags )
         {
 			if( type == null || type == typeof(object) ) { return new List<PropertyInfo>(); }
 
-			bool recurse = (flags & BindingFlags.DeclaredOnly) == BindingFlags.Default;
-        	flags |= BindingFlags.DeclaredOnly;
+			flags = flags ?? Flags.Default;
+			bool recurse = flags.IsNotSet( Flags.DeclaredOnly);
+        	flags |= Flags.DeclaredOnly;
             flags &= ~BindingFlags.FlattenHierarchy;
 
 			var properties = new List<PropertyInfo>( type.GetProperties( flags ) );

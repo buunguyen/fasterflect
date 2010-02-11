@@ -18,12 +18,6 @@
 
 #endregion
 
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using FasterflectTest.SampleModel.Attributes;
-using FasterflectTest.SampleModel.Enumerations;
-
 namespace FasterflectTest.SampleModel.Animals
 {
 	internal class Empty

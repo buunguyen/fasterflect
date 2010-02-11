@@ -73,7 +73,7 @@ namespace Fasterflect
 		public static IList<Attribute> Attributes( this Enum source, params Type[] attributeTypes )
 		{
 			Type type = source.GetType();
-			MemberInfo info = type.Member( source.ToString(), Flags.StaticCriteria );
+			MemberInfo info = type.Member( source.ToString(), Flags.StaticCriteria | Flags.DeclaredOnly );
 			return info.Attributes( attributeTypes );
 		}
 		#endregion
@@ -128,7 +128,7 @@ namespace Fasterflect
 		public static Attribute Attribute( this Enum source, Type attributeType )
 		{
 			Type type = source.GetType();
-			MemberInfo info = type.Member( source.ToString(), Flags.StaticCriteria | BindingFlags.DeclaredOnly );
+			MemberInfo info = type.Member( source.ToString(), Flags.StaticCriteria | Flags.DeclaredOnly );
 			return info.Attribute( attributeType );
 		}
 		#endregion
@@ -220,7 +220,7 @@ namespace Fasterflect
 		/// public and non-public, instance and static members in the result.
 		/// </summary>
 		/// <returns>A list of all matching members. This value will never be null.</returns>
-		public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes, BindingFlags flags )
+		public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes, Flags flags )
 		{
             return type.MembersWith( memberTypes, flags, typeof(T) );
 		}
@@ -247,7 +247,7 @@ namespace Fasterflect
 		/// at least one of these will be included.
 		/// </summary>
 		/// <returns>A list of all matching members. This value will never be null.</returns>
-		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes, BindingFlags flags,
+		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes, Flags flags,
 		                                             params Type[] attributeTypes )
 		{
 			var query = from m in type.Members( memberTypes, flags )
@@ -282,7 +282,7 @@ namespace Fasterflect
 		/// <returns>An dictionary mapping all matching members to their associated attributes. This value
 		/// will never be null.</returns>
 		public static IDictionary<MemberInfo, List<Attribute>> MembersAndAttributes( this Type type, MemberTypes memberTypes,
-		                                                                             BindingFlags flags,
+		                                                                             Flags flags,
 		                                                                             params Type[] attributeTypes )
 		{
 			var members = from m in type.Members( memberTypes, flags )

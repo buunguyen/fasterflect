@@ -19,7 +19,7 @@
 #endregion
 
 using System;
-using FasterflectTest.SampleModel.Enumerations;
+using FasterflectTest.SampleModel.Animals.Enumerations;
 
 namespace FasterflectTest.SampleModel.Animals
 {

@@ -26,8 +26,11 @@ namespace Fasterflect.Selectors
 		#region Implementation of IMemberSelector
 		public bool IsMatch( MemberInfo info, Flags flags, string name )
 		{
-            return name == null || info.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) || 
-								   info.Name.EndsWith( "."+name, StringComparison.OrdinalIgnoreCase );
+			bool ignoreCase = flags.IsSet( Flags.IgnoreCase );
+			StringComparison comparison = ignoreCase
+			                              	? StringComparison.InvariantCultureIgnoreCase
+			                              	: StringComparison.InvariantCulture;
+            return info.Name.Equals( name, comparison ) || info.Name.EndsWith( "."+name, comparison );
 		}
 		#endregion
 

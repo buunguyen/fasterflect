@@ -92,7 +92,7 @@ namespace Fasterflect
 		/// including those defined on base classes, from the <paramref name="source"/> object to the
 		/// <paramref name="target"/> object. 
 		/// </summary>
-		public static void CopyProperties( this object source, object target, BindingFlags flags )
+		public static void CopyProperties( this object source, object target, Flags flags )
 		{
 			if( source == null || target == null )
 				throw new ArgumentException( "Unable to copy to or from null instance." );
