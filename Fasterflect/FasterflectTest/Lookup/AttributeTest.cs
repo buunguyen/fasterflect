@@ -26,8 +26,8 @@ using System.Linq;
 using System.Reflection;
 using Fasterflect;
 using FasterflectTest.SampleModel.Animals;
-using FasterflectTest.SampleModel.Attributes;
-using FasterflectTest.SampleModel.Enumerations;
+using FasterflectTest.SampleModel.Animals.Attributes;
+using FasterflectTest.SampleModel.Animals.Enumerations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.Lookup

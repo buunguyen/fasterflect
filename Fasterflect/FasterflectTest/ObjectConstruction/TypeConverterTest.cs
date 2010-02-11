@@ -22,7 +22,7 @@ using System;
 using System.Linq;
 using Fasterflect.ObjectConstruction;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FasterflectTest.SampleModel.Enumerations;
+using FasterflectTest.SampleModel.Animals.Enumerations;
 
 namespace FasterflectTest.ObjectConstruction
 {

@@ -429,7 +429,7 @@ namespace FasterflectBenchmark
 			                		{"Fasterflect cached set", () => setter(PeopleArray, 5, null)},
 			                		{"Fasterflect cached get", () => getter(PeopleArray, 5)},
 			                	};
-            Execute("Indexer Benchmark", initMap, actionMap);
+            Execute("Array Benchmark", initMap, actionMap);
         }
 		#endregion
 

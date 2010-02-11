@@ -19,9 +19,9 @@
 #endregion
 
 using System;
-using FasterflectTest.SampleModel.Attributes;
+using FasterflectTest.SampleModel.Animals.Attributes;
 
-namespace FasterflectTest.SampleModel.Enumerations
+namespace FasterflectTest.SampleModel.Animals.Enumerations
 {
 	[Flags]
 	[Code("Temperature")]

@@ -31,9 +31,9 @@ namespace Fasterflect.Emitter
 	{
 		private readonly Type sourceType;
 		private readonly Type targetType;
-		private readonly BindingFlags flags;
+		private readonly Flags flags;
 
-		public CloneEmitter( Type sourceType, Type targetType, BindingFlags flags )
+		public CloneEmitter( Type sourceType, Type targetType, Flags flags )
 		{
 			this.sourceType = sourceType;
 			this.targetType = targetType;
@@ -59,7 +59,7 @@ namespace Fasterflect.Emitter
 			return method.CreateDelegate( typeof(MemberSetter) );
 		}
 
-		internal static IDictionary<PropertyInfo,PropertyInfo> GetMatchingProperties( Type sourceType, Type targetType, BindingFlags flags )
+		internal static IDictionary<PropertyInfo,PropertyInfo> GetMatchingProperties( Type sourceType, Type targetType, Flags flags )
 		{
 		    var query = from s in sourceType.Properties( flags )
 		                from t in targetType.Properties( flags )

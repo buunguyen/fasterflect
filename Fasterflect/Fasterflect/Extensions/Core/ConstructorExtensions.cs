@@ -190,7 +190,7 @@ namespace Fasterflect
         /// <param name="type">The type to reflect on.</param>
         /// <param name="flags">The search criteria to use when reflecting.</param>
         /// <returns>A list of matching constructors. This value will never be null.</returns>
-        public static IList<ConstructorInfo> Constructors( this Type type, BindingFlags flags )
+        public static IList<ConstructorInfo> Constructors( this Type type, Flags flags )
         {
             return type.GetConstructors( flags ).Where( ci => !ci.IsAbstract ).ToList();
         }
@@ -215,7 +215,7 @@ namespace Fasterflect
         /// <param name="flags">The search criteria to use when reflecting.</param>
         /// <param name="parameterTypes">The types of the constructor parameters in order.</param>
         /// <returns>The matching constructor or null if no match was found.</returns>
-        public static ConstructorInfo Constructor( this Type type, BindingFlags flags, params Type[] parameterTypes )
+        public static ConstructorInfo Constructor( this Type type, Flags flags, params Type[] parameterTypes )
         {
             return type.GetConstructor( flags, null, parameterTypes, null );
         }

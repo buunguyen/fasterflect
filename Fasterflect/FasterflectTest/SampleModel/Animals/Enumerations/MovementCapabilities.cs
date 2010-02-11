@@ -20,7 +20,7 @@
 
 using System;
 
-namespace FasterflectTest.SampleModel.Enumerations
+namespace FasterflectTest.SampleModel.Animals.Enumerations
 {
 	[Flags]
 	internal enum MovementCapabilities

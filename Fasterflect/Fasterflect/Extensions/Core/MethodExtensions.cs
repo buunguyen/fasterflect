@@ -176,7 +176,7 @@ namespace Fasterflect
         /// </summary>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
         /// due to method overloading an exception will be raised.</returns>
-        public static MethodInfo MethodDeclared( this Type type, string name, BindingFlags flags )
+        public static MethodInfo MethodDeclared( this Type type, string name, Flags flags )
         {
             return type.GetMethod( name, flags );
         }
@@ -200,7 +200,7 @@ namespace Fasterflect
         /// </summary>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
         /// due to method overloading an exception will be raised.</returns>
-        public static MethodInfo Method( this Type type, string name, BindingFlags flags )
+        public static MethodInfo Method( this Type type, string name, Flags flags )
         {
             return type.Methods( flags ).FirstOrDefault( m => m.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) );
         }
@@ -213,7 +213,7 @@ namespace Fasterflect
         /// </summary>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
         /// due to method overloading an exception will be raised.</returns>
-        public static MethodInfo Method( this object target, string name, BindingFlags flags, Type[] paramTypes )
+        public static MethodInfo Method( this object target, string name, Flags flags, Type[] paramTypes )
         {
         	return target.GetTypeAdjusted().Method( name, flags, paramTypes );
         }
@@ -226,7 +226,7 @@ namespace Fasterflect
         /// </summary>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
         /// due to method overloading an exception will be raised.</returns>
-        public static MethodInfo Method( this Type type, string name, BindingFlags flags, Type[] paramTypes )
+        public static MethodInfo Method( this Type type, string name, Flags flags, Type[] paramTypes )
         {
         	IList<MethodInfo> methods = type.Methods( flags, name );
         	bool findAnyOverload = paramTypes == null; // || paramTypes.Length == 0;
@@ -265,7 +265,7 @@ namespace Fasterflect
         /// Find all methods declared on the given <paramref name="type"/> that match the specified <paramref name="flags"/>. 
         /// </summary>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> MethodsDeclared( this Type type, BindingFlags flags )
+        public static IList<MethodInfo> MethodsDeclared( this Type type, Flags flags )
         {
             return type.MethodsDeclared( flags, null );
         }
@@ -287,7 +287,7 @@ namespace Fasterflect
         /// parameter then no name filtering will be applied.
         /// </summary>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> MethodsDeclared( this Type type, BindingFlags flags, string name )
+        public static IList<MethodInfo> MethodsDeclared( this Type type, Flags flags, string name )
         {
             return type.GetMethods( flags ).Where( m => name == null || 
 												   m.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) || 
@@ -309,7 +309,7 @@ namespace Fasterflect
         /// Find all methods on the given <paramref name="type"/> that match the specified <paramref name="flags"/>. 
         /// </summary>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> Methods( this Type type, BindingFlags flags )
+        public static IList<MethodInfo> Methods( this Type type, Flags flags )
         {
             return type.Methods( flags, null );
         }
@@ -331,10 +331,10 @@ namespace Fasterflect
         /// parameter then no name filtering will be applied.
         /// </summary>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> Methods( this Type type, BindingFlags flags, string name )
+        public static IList<MethodInfo> Methods( this Type type, Flags flags, string name )
         {
             // as we recurse below, reset flags to only include declared fields (avoid duplicates in result)
-            flags |= BindingFlags.DeclaredOnly;
+            flags |= Flags.DeclaredOnly;
             flags -= BindingFlags.FlattenHierarchy;
             var methods = new List<MethodInfo>( type.MethodsDeclared( flags, name ) );
             Type baseType = type.BaseType;

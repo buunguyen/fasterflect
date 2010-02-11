@@ -20,7 +20,7 @@
 
 using System;
 
-namespace FasterflectTest.SampleModel.Attributes
+namespace FasterflectTest.SampleModel.Animals.Attributes
 {
 	[AttributeUsage(AttributeTargets.All)]
 	internal class CodeAttribute : Attribute 
