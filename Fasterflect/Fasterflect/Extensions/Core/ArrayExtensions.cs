@@ -33,18 +33,18 @@ namespace Fasterflect
         /// Sets <paramref name="value"/> to the element at position <paramref name="index"/> of <paramref name="array"/>.
         /// </summary>
         /// <returns><paramref name="array"/>.</returns>
-        public static object SetElement( this object array, int index, object value )
+        public static object SetElement( this object array, long index, object value )
         {
-            DelegateForSetElement( array.GetTypeAdjusted() )( array, index, value );
+            ((Array) array).SetValue( value, index );
             return array;
         }
 
         /// <summary>
         /// Retrieves the element at position <paramref name="index"/> of <paramref name="array"/>.
         /// </summary>
-        public static object GetElement( this object array, int index )
+        public static object GetElement( this object array, long index )
         {
-            return DelegateForGetElement( array.GetTypeAdjusted() )( array, index );
+            return ((Array)array).GetValue( index );
         }
 
         /// <summary>
