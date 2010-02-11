@@ -20,6 +20,7 @@
 
 using System;
 using Fasterflect;
+using FasterflectTest.Common;
 using FasterflectTest.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -28,12 +29,12 @@ namespace FasterflectTest.Invocation
     [TestClass]
     public class ArrayTest : BaseInvocationTest
     {
-        private static readonly Type[] types = new[] { typeof(Person[]), typeof(PersonStruct[]) };
+        public ArrayTest() : base(typeof(Person[]), typeof(PersonStruct[])) {}
 
         [TestMethod]
         public void TestConstructArrays()
         {
-            types.ForEach(type =>
+            RunWith((Type type) =>
             {
                 var obj = type.CreateInstance(10);
                 Assert.IsNotNull(obj);
@@ -44,7 +45,7 @@ namespace FasterflectTest.Invocation
         [TestMethod]
         public void TestGetSetElements()
         {
-            types.ForEach(type =>
+            RunWith((Type type) =>
             {
                 var array = type.CreateInstance(10);
                 var instance = type.GetElementType().CreateInstance().WrapIfValueType();

@@ -33,5 +33,10 @@ namespace FasterflectTest.Invocation
     	protected BaseInvocationTest() : base( new [] { PersonType, PersonStructType } )
     	{
     	}
+
+        protected BaseInvocationTest(Type classType, Type structType)
+            : base(new []{classType, structType})
+        {
+        }
     }
 }
