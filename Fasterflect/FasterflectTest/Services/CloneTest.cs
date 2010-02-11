@@ -122,6 +122,7 @@ namespace FasterflectTest.Services
 			Person person = new Person( 42, birthday, "Arthur Dent" );
 			Person copy = new Person();
 			person.CopyProperties( copy );
+			copy.SetFieldValue( "lastModified", person.GetFieldValue( "lastModified" ) );
 			Verify( person, copy );
 		}
 		#endregion
