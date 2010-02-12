@@ -170,9 +170,7 @@ namespace Fasterflect
         /// due to method overloading the first found match will be returned.</returns>
         public static MethodInfo Method( this Type type, string name )
         {
-			if( string.IsNullOrEmpty( name ) )
-				throw new ArgumentException( "You must supply a valid name to search for.", "name" );
-        	return type.Methods( Flags.InstanceCriteria, null, null, name ).FirstOrDefault();
+        	return type.Method( name, Flags.InstanceCriteria, null, null );
         }
 
         /// <summary>
@@ -191,7 +189,7 @@ namespace Fasterflect
         /// due to method overloading the first found match will be returned.</returns>
         public static MethodInfo Method( this Type type, string name, Flags flags )
         {
-        	return type.Methods( flags, null, null, name ).FirstOrDefault();
+        	return type.Method( name, flags, null, null );
         }
 
         /// <summary>
@@ -217,6 +215,8 @@ namespace Fasterflect
         /// due to method overloading the first found match will be returned.</returns>
 		public static MethodInfo Method( this Type type, string name, Flags flags, Type[] paramTypes, Type returnType )
         {
+			if( string.IsNullOrEmpty( name ) )
+				throw new ArgumentException( "You must supply a valid name to search for.", "name" );
         	return type.Methods( flags, paramTypes, returnType, name ).FirstOrDefault();
         }
         #endregion
@@ -229,7 +229,7 @@ namespace Fasterflect
         /// <returns>A list of all matching methods. This value will never be null.</returns>
         public static IList<MethodInfo> Methods( this Type type )
         {
-            return type.Methods( Flags.InstanceCriteria, null, null, null );
+            return type.Methods( Flags.InstanceCriteria, null, (Type) null, null );
         }
 
         /// <summary>
@@ -241,7 +241,7 @@ namespace Fasterflect
         /// <returns>A list of all matching methods. This value will never be null.</returns>
         public static IList<MethodInfo> Methods( this Type type, Flags flags )
         {
-            return type.Methods( flags, null, null, null );
+            return type.Methods( flags, null, (Type) null, null );
         }
 
         /// <summary>
@@ -255,9 +255,27 @@ namespace Fasterflect
         /// <see href="Flags.PartialNameMatch"/> to locate by substring, and <see href="Flags.IgnoreCase"/> to 
         /// ignore case.</param>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> Methods( this Type type, string[] names )
+		public static IList<MethodInfo> Methods( this Type type, params string[] names )
+		{
+		    return type.Methods( Flags.InstanceCriteria, null, null, names );
+		}
+
+        /// <summary>
+        /// Find all public and non-public instance methods on the given <paramref name="type"/> that match the 
+        /// given <paramref name="names"/>.
+        /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="flags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
+        /// the search behavior and result filtering.</param>
+        /// <param name="names">If this parameter is supplied then only methods whose name matches one of the supplied
+        /// names will be included in the result. The default behavior is to check for an exact, case-sensitive match.
+        /// Pass <see href="Flags.ExplicitNameMatch"/> to include explicitly implemented interface members, 
+        /// <see href="Flags.PartialNameMatch"/> to locate by substring, and <see href="Flags.IgnoreCase"/> to 
+        /// ignore case.</param>
+        /// <returns>A list of all matching methods. This value will never be null.</returns>
+        public static IList<MethodInfo> Methods( this Type type, Flags flags, params string[] names )
         {
-            return type.Methods( Flags.InstanceCriteria, null, null, names );
+            return type.Methods( flags, null, null, names );
         }
 
         /// <summary>
@@ -282,7 +300,8 @@ namespace Fasterflect
         public static IList<MethodInfo> Methods( this Type type, Flags flags, Type[] paramTypes, Type returnType, params string[] names )
         {
         	flags = flags ?? Flags.Default;
-        	flags = flags.SetIf( Flags.ParameterMatch, paramTypes != null );
+        	flags = Flags.SetIf( flags, Flags.ParameterMatch, paramTypes != null );
+        	flags = Flags.ClearIf( flags, Flags.ExactParameterMatch, paramTypes == null );
         	var methods = type.Members( MemberTypes.Method, flags, names ).Cast<MethodInfo>().ToList();
 
 			var selectors = SelectorFactory.GetMethodSelectors( flags );

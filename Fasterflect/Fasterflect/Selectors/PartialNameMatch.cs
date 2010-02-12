@@ -27,8 +27,12 @@ namespace Fasterflect.Selectors
 		#region Implementation of IMemberSelector
 		public bool IsMatch( MemberInfo info, Flags flags, string name )
 		{
-			int index = info.Name.LastIndexOf( "." );
-			string memberName = ++index > 0 ? info.Name.Substring( index ) : info.Name;
+			if( name == null )
+				return false;
+
+			bool reserved = name == ".ctor" || name == ".cctor";
+			int index = reserved ? -1 : info.Name.LastIndexOf( '.' ) + 1;
+			string memberName = index > 0 ? info.Name.Substring( index ) : info.Name;
 			return memberName.Contains( name );
 		}
 		#endregion

@@ -18,14 +18,40 @@
 
 #endregion
 
+using System;
 using FasterflectTest.SampleModel.Animals.Enumerations;
+using FasterflectTest.SampleModel.Animals.Interfaces;
 
 namespace FasterflectTest.SampleModel.Animals
 {
-	internal class Snake : Reptile
+	internal class Snake : Reptile, ISwim, IBite
 	{
 		public Snake() : base( Climate.Hot, MovementCapabilities.Land )
 		{
+			HasDeadlyBite = true;
+		}
+
+		// regular member
+		public bool HasDeadlyBite { get; private set; } 
+
+		// ISwim
+		void ISwim.Move( double distance )
+		{
+			SwimDistance += distance;
+		}
+		public virtual double SwimDistance { get; private set; } 
+
+		// ISlide
+		public override void Move( double distance )
+		{
+			SlideDistance += distance;
+		}
+		public override double SlideDistance { get; protected set; } 
+
+		// IBite
+		public bool Bite( Animal animal )
+		{
+			return HasDeadlyBite;
 		}
 	}
 }

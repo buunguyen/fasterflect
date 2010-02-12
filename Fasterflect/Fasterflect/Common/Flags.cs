@@ -70,11 +70,12 @@ namespace Fasterflect
         /// </summary>
         public static readonly Flags ExactParameterMatch = new Flags(0x800000000);
         /// <summary>
-        /// If this option is specified all fields that are backing fields for automatic properties
-        /// will be excluded from the result. This option only applies to field and member lookups.
+        /// If this option is specified all members that are backers for another member, such as backing
+        /// fields for automatic properties or get/set methods for properties, will be excluded from the 
+        /// result.
         /// </summary>
-        public static readonly Flags ExcludeBackingFields = new Flags(0x1000000000);
-		#endregion
+        public static readonly Flags ExcludeBackingMembers = new Flags(0x1000000000);
+ 		#endregion
 
 		#region Common Selections
 		public static readonly Flags Default = Public | NonPublic;
@@ -134,9 +135,13 @@ namespace Fasterflect
 			return (flags & mask) == 0;
 		}
 
-		public Flags SetIf( Flags mask, bool condition )
+		public static Flags SetIf( Flags flags, Flags mask, bool condition )
 		{
-			return condition ? flags | mask : this;
+			return condition ? flags | mask : flags;
+		}
+		public static Flags ClearIf( Flags flags, Flags mask, bool condition )
+		{
+			return condition ? flags & ~mask : flags;
 		}
 		#endregion
 

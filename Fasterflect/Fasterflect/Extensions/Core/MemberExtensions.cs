@@ -124,7 +124,6 @@ namespace Fasterflect
 			bool recurse = flags.IsNotSet( Flags.DeclaredOnly );
         	flags |= Flags.DeclaredOnly;
             flags &= ~BindingFlags.FlattenHierarchy;
-			flags = flags.SetIf( Flags.ExplicitNameMatch, names != null && names.Length > 0 );
 
 			var members = new List<MemberInfo>( type.FindMembers( memberTypes, flags, null, null ) );
             Type baseType = type.BaseType;
@@ -133,8 +132,18 @@ namespace Fasterflect
                 members.AddRange( baseType.FindMembers( memberTypes, flags, null, null ) );
                 baseType = baseType.BaseType;
             }
-			var selectors = SelectorFactory.GetMemberSelectors( flags );
-			return members.Where( m => selectors.All( s => names.Any( n => s.IsMatch( m, flags, n ) ) ) ).ToList();
+
+			if( names != null && names.Length > 0)
+			{
+				// TODO do we want this flag to be set automatically?
+				flags = Flags.SetIf( flags, Flags.ExplicitNameMatch, names != null && names.Length > 0 );
+				flags = Flags.ClearIf( flags, Flags.ExplicitNameMatch, flags.IsSet( Flags.PartialNameMatch ) );
+
+				var selectors = SelectorFactory.GetMemberSelectors( flags );
+				members = members.Where( m => selectors.All( s => names.Any( n => s.IsMatch( m, flags, n ) ) ) ).ToList();
+				
+			}
+			return members;
 		}
 		#endregion
 	}

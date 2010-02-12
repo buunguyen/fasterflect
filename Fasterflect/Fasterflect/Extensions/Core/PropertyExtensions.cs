@@ -292,7 +292,7 @@ namespace Fasterflect
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
         public static PropertyInfo Property( this Type type, string name )
         {
-            return type.Properties( Flags.InstanceCriteria, name ).FirstOrDefault();
+        	return type.Property( name, Flags.InstanceCriteria, null );
         }
 
         /// <summary>
@@ -303,7 +303,7 @@ namespace Fasterflect
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
         public static PropertyInfo Property( this Type type, string name, Flags flags )
         {
-        	return type.Properties( flags, name ).FirstOrDefault();
+        	return type.Property( name, flags, null );
         }
 
         /// <summary>
@@ -315,7 +315,12 @@ namespace Fasterflect
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
         public static PropertyInfo Property( this Type type, string name, Flags flags, Type propertyType )
         {
-        	return type.Properties( flags, name ).FirstOrDefault( p => propertyType == null || p.PropertyType.IsAssignableFrom( propertyType ) );
+			if( string.IsNullOrEmpty( name ) )
+				throw new ArgumentException( "You must supply a valid name to search for.", "name" );
+
+			bool exactMatch = flags.IsSet( Flags.ExactParameterMatch );
+        	return type.Properties( flags, name ).FirstOrDefault( p => propertyType == null || 
+				(exactMatch ? p.PropertyType == propertyType : p.PropertyType.IsAssignableFrom( propertyType )) );
         }
         #endregion
 

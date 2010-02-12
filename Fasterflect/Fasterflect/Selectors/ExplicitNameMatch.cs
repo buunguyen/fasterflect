@@ -27,11 +27,20 @@ namespace Fasterflect.Selectors
 		#region Implementation of IMemberSelector
 		public bool IsMatch( MemberInfo info, Flags flags, string name )
 		{
+			if( name == null )
+				return false;
 			bool ignoreCase = flags.IsSet( Flags.IgnoreCase );
 			StringComparison comparison = ignoreCase
 			                              	? StringComparison.InvariantCultureIgnoreCase
 			                              	: StringComparison.InvariantCulture;
-            return info.Name.Equals( name, comparison ) || info.Name.EndsWith( "."+name, comparison );
+
+			bool reserved = name.Equals( ".ctor", comparison ) || name.Equals( ".cctor", comparison );
+			int index = reserved ? -1 : info.Name.LastIndexOf( '.' ) + 1;
+			string memberName = index > 0 ? info.Name.Substring( index ) : info.Name;
+			// TODO design is broken when we have to do stuff like this
+			if( flags.IsSet( Flags.PartialNameMatch ) )
+				return ignoreCase ? memberName.ToUpperInvariant().Contains( name.ToUpperInvariant() ) : memberName.Contains( name );
+			return memberName.Equals( name, comparison );
 		}
 		#endregion
 
