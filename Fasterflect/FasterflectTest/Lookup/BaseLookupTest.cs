@@ -97,5 +97,34 @@ namespace FasterflectTest.Lookup
 		protected static readonly string[] LionInstanceMemberNames = LionDeclaredInstanceMemberNames.Concat( AnimalInstanceMemberNames ).Concat( MammalDeclaredInstanceMemberNames ).ToArray();
 		protected static readonly MemberTypes[] LionInstanceMemberTypes = LionDeclaredInstanceMemberTypes.Concat( AnimalInstanceMemberTypes ).Concat( MammalDeclaredInstanceMemberTypes ).ToArray();
 		#endregion
+
+		#region Reptile Info
+		protected static readonly string[] ReptileDeclaredInstancePropertyNames = { "SlideDistance" };
+    	protected static readonly Type[] ReptileDeclaredInstancePropertyTypes = { typeof(double) };
+    	protected static readonly string[] ReptileDeclaredInstanceMethodNames = { "get_SlideDistance", "set_SlideDistance", "Move" };
+    	protected static readonly Type[][] ReptileDeclaredInstanceMethodParameterTypes = { new [] { typeof(double) } };
+
+    	protected static readonly string[] ReptileInstancePropertyNames = 
+			AnimalInstancePropertyNames.Concat( ReptileDeclaredInstancePropertyNames ).ToArray();
+    	protected static readonly Type[] ReptileInstancePropertyTypes = 
+			AnimalInstancePropertyTypes.Concat( ReptileDeclaredInstancePropertyTypes ).ToArray();
+    	protected static readonly string[] ReptileInstanceMethodNames = 
+			AnimalInstanceMethodNames.Concat( ReptileDeclaredInstanceMethodNames ).ToArray();
+		#endregion
+
+		#region Snake Info
+		protected static readonly string[] SnakeDeclaredInstancePropertyNames = { "HasDeadlyBite", "SwimDistance", "SlideDistance" };
+    	protected static readonly Type[] SnakeDeclaredInstancePropertyTypes = { typeof(bool), typeof(double), typeof(double) };
+    	protected static readonly string[] SnakeDeclaredInstanceMethodNames = { "get_HasDeadlyBite", "set_HasDeadlyBite", "get_SwimDistance", "set_SwimDistance", 
+																		        "get_SlideDistance", "set_SlideDistance", "Move", "Move", "Bite" };
+    	protected static readonly int SnakeConstructorCount = 2;
+
+    	protected static readonly string[] SnakeInstancePropertyNames =
+    		ReptileInstancePropertyNames.Concat( SnakeDeclaredInstancePropertyNames ).ToArray();
+    	protected static readonly Type[] SnakeInstancePropertyTypes = 
+			ReptileInstancePropertyTypes.Concat( SnakeDeclaredInstancePropertyTypes ).ToArray();
+    	protected static readonly string[] SnakeInstanceMethodNames = 
+			ReptileInstanceMethodNames.Concat( SnakeDeclaredInstanceMethodNames ).ToArray();
+		#endregion
 	}
 }

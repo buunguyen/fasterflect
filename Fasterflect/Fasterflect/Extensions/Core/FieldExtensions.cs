@@ -188,7 +188,7 @@ namespace Fasterflect
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
         public static FieldInfo Field( this Type type, string name )
         {
-            return type.Fields( Flags.InstanceCriteria, name ).FirstOrDefault();
+            return type.Field( name, Flags.InstanceCriteria, null );
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace Fasterflect
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
         public static FieldInfo Field( this Type type, string name, Flags flags )
         {
-            return type.Fields( flags, name ).FirstOrDefault();
+            return type.Field( name, flags, null );
         }
 
         /// <summary>
@@ -211,9 +211,12 @@ namespace Fasterflect
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
         public static FieldInfo Field( this Type type, string name, Flags flags, Type fieldType )
         {
-        	bool exactMatch = flags.IsSet( Flags.ExactParameterMatch );
+			if( string.IsNullOrEmpty( name ) )
+				throw new ArgumentException( "You must supply a valid name to search for.", "name" );
+
+			bool exactMatch = flags.IsSet( Flags.ExactParameterMatch );
         	return type.Fields( flags, name ).FirstOrDefault( f => fieldType == null || 
-				exactMatch ? f.FieldType == fieldType : f.FieldType.IsAssignableFrom( fieldType ) );
+				(exactMatch ? f.FieldType == fieldType : f.FieldType.IsAssignableFrom( fieldType )) );
         }
         #endregion
 

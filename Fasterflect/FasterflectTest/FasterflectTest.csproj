@@ -89,12 +89,12 @@
     <Compile Include="SampleModel\Animals\Attributes\CarnivoreAttribute.cs" />
     <Compile Include="SampleModel\Animals\Attributes\CodeAttribute.cs" />
     <Compile Include="SampleModel\Animals\Attributes\ZoneAttribute.cs" />
-    <Compile Include="SampleModel\Animals\Empty.cs" />
     <Compile Include="SampleModel\Animals\Enumerations\Climate.cs" />
     <Compile Include="SampleModel\Animals\Enumerations\Zone.cs" />
     <Compile Include="SampleModel\Animals\Enumerations\MovementCapabilities.cs" />
-    <Compile Include="SampleModel\Animals\Interfaces\IFood.cs" />
-    <Compile Include="SampleModel\Animals\Interfaces\IAnimal.cs" />
+    <Compile Include="SampleModel\Animals\Interfaces\ISwim.cs" />
+    <Compile Include="SampleModel\Animals\Interfaces\ISlide.cs" />
+    <Compile Include="SampleModel\Animals\Interfaces\IBite.cs" />
     <Compile Include="SampleModel\Animals\Mammal.cs" />
     <Compile Include="SampleModel\Animals\Giraffe.cs" />
     <Compile Include="SampleModel\People\Employee.cs" />

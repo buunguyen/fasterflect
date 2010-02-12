@@ -45,7 +45,7 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestMemberInstanceIgnoreCase()
         {
-        	BindingFlags flags = Flags.InstanceCriteria | BindingFlags.IgnoreCase;
+        	Flags flags = Flags.InstanceCriteria | Flags.IgnoreCase;
 
 			AnimalInstanceMemberNames.Select( s => s.ToUpper() ).Select( s => typeof(Animal).Member( s, flags ) ).ForEach( Assert.IsNotNull );
 			LionInstanceMemberNames.Select( s => s.ToUpper() ).Select( s => typeof(Lion).Member( s, flags ) ).ForEach( Assert.IsNotNull );
@@ -54,7 +54,7 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestMemberInstanceDeclaredOnly()
         {
-        	BindingFlags flags = Flags.InstanceCriteria | BindingFlags.DeclaredOnly;
+        	Flags flags = Flags.InstanceCriteria | Flags.DeclaredOnly;
 			
 			AnimalInstanceMemberNames.Select( s => typeof(Animal).Member( s, flags ) ).ForEach( Assert.IsNotNull );
 			LionDeclaredInstanceMemberNames.Select( s => typeof(Lion).Member( s, flags ) ).ForEach( Assert.IsNotNull );
@@ -63,7 +63,7 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestMemberStatic()
         {
-        	BindingFlags flags = Flags.StaticCriteria;
+        	Flags flags = Flags.StaticCriteria;
 			
 			AnimalInstanceMemberNames.Select( s => typeof(Animal).Member( s, flags ) ).ForEach( Assert.IsNull );
 
@@ -74,7 +74,7 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestMemberStaticDeclaredOnly()
         {
-        	BindingFlags flags = Flags.StaticCriteria | BindingFlags.DeclaredOnly;
+        	Flags flags = Flags.StaticCriteria | Flags.DeclaredOnly;
 			
 			AnimalStaticMemberNames.Select( s => typeof(Animal).Member( s, flags ) ).ForEach( Assert.IsNotNull );
 			AnimalStaticMemberNames.Select( s => typeof(Lion).Member( s, flags ) ).ForEach( Assert.IsNull );
@@ -106,19 +106,19 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestMembersInstanceWithDeclaredOnlyFlag()
         {
-			IList<MemberInfo> members = typeof(object).Members( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
+			IList<MemberInfo> members = typeof(object).Members( Flags.InstanceCriteria | Flags.DeclaredOnly );
 			Assert.IsNotNull( members );
 			Assert.AreEqual( 0, members.Count );
 
-			members = typeof(Animal).Members( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
+			members = typeof(Animal).Members( Flags.InstanceCriteria | Flags.DeclaredOnly );
 			Assert.AreEqual( AnimalInstanceMemberNames.Length, members.Count );
 			CollectionAssert.AreEquivalent( AnimalInstanceMemberNames, members.Select( m => m.Name ).ToArray() );
 			CollectionAssert.AreEquivalent( AnimalInstanceMemberTypes, members.Select( m => m.MemberType ).ToArray() );
 
-			members = typeof(Mammal).Members( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
+			members = typeof(Mammal).Members( Flags.InstanceCriteria | Flags.DeclaredOnly );
 			Assert.AreEqual( MammalDeclaredInstanceMemberNames.Length, members.Count );
 
-			members = typeof(Lion).Members( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
+			members = typeof(Lion).Members( Flags.InstanceCriteria | Flags.DeclaredOnly );
 			Assert.AreEqual( LionDeclaredInstanceMemberNames.Length, members.Count );
 			CollectionAssert.AreEquivalent( LionDeclaredInstanceMemberNames, members.Select( m => m.Name ).ToArray() );
 			CollectionAssert.AreEquivalent( LionDeclaredInstanceMemberTypes, members.Select( m => m.MemberType ).ToArray() );
@@ -145,19 +145,19 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestMembersStaticWithDeclaredOnlyFlag()
         {
-			IList<MemberInfo> members = typeof(object).Members( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
+			IList<MemberInfo> members = typeof(object).Members( Flags.StaticCriteria | Flags.DeclaredOnly );
 			Assert.IsNotNull( members );
 			Assert.AreEqual( 0, members.Count );
 
-			members = typeof(Animal).Members( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
+			members = typeof(Animal).Members( Flags.StaticCriteria | Flags.DeclaredOnly );
 			Assert.AreEqual( AnimalStaticMemberNames.Length, members.Count );
 			CollectionAssert.AreEquivalent( AnimalStaticMemberNames, members.Select( m => m.Name ).ToArray() );
 			CollectionAssert.AreEquivalent( AnimalStaticMemberTypes, members.Select( m => m.MemberType ).ToArray() );
 
-			members = typeof(Mammal).Members( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
+			members = typeof(Mammal).Members( Flags.StaticCriteria | Flags.DeclaredOnly );
 			Assert.AreEqual( 0, members.Count );
 
-			members = typeof(Lion).Members( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
+			members = typeof(Lion).Members( Flags.StaticCriteria | Flags.DeclaredOnly );
 			Assert.AreEqual( 0, members.Count );
         }
 		#endregion

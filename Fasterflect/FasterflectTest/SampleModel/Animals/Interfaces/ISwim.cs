@@ -18,9 +18,14 @@
 
 #endregion
 
-namespace FasterflectTest.SampleModel.Animals
+using System;
+
+namespace FasterflectTest.SampleModel.Animals.Interfaces
 {
-	internal class Empty
+	internal interface ISwim
 	{
+		double SwimDistance { get; } 
+
+		void Move( double distance );
 	}
 }

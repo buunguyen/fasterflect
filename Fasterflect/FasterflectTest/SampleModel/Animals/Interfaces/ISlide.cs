@@ -18,23 +18,12 @@
 
 #endregion
 
-using FasterflectTest.SampleModel.Animals.Enumerations;
-using FasterflectTest.SampleModel.Animals.Interfaces;
-
-namespace FasterflectTest.SampleModel.Animals
+namespace FasterflectTest.SampleModel.Animals.Interfaces
 {
-	internal abstract class Reptile : Animal, ISlide
+	internal interface ISlide
 	{
-		protected Reptile( Climate climateRequirements, MovementCapabilities movementCapabilities ) : base( climateRequirements, movementCapabilities )
-		{
-		}
+		double SlideDistance { get; } 
 
-		protected Reptile( int id, Climate climateRequirements, MovementCapabilities movementCapabilities ) : base( id, climateRequirements, movementCapabilities )
-		{
-		}
-
-		public virtual double SlideDistance { get; protected set; }
-
-		public abstract void Move( double distance );
+		void Move( double distance );
 	}
 }

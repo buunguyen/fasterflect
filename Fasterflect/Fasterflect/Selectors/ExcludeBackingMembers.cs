@@ -22,25 +22,21 @@ using Fasterflect.Selectors.Interfaces;
 
 namespace Fasterflect.Selectors
 {
-	internal class PartialNameMatch : IMemberSelector
+	internal class ExcludeBackingMembers : IMemberSelector
 	{
 		#region Implementation of IMemberSelector
 		public bool IsMatch( MemberInfo info, Flags flags, string name )
 		{
-			if( name == null )
-				return false;
-
-			bool reserved = name == ".ctor" || name == ".cctor";
-			int index = reserved ? -1 : info.Name.LastIndexOf( '.' ) + 1;
-			string memberName = index > 0 ? info.Name.Substring( index ) : info.Name;
-			return memberName.Contains( name );
+			bool ignoreField = info.MemberType == MemberTypes.Field && info.Name.StartsWith( "<" );
+			bool ignoreMethod = info is MethodInfo ? (info as MethodInfo).Attributes.HasFlag( MethodAttributes.SpecialName ) : false;
+			return ! (ignoreField || ignoreMethod);
 		}
 		#endregion
 
 		#region Implementation of ISelector
 		public bool IsMatch( MemberInfo info, MemberTypes memberTypes, Flags flags, string name, Type[] paramTypes, Type returnType )
 		{
-			return IsMatch( info, flags, name );
+			return IsMatch( info as MethodBase, flags, name );
 		}
 		#endregion
 	}
