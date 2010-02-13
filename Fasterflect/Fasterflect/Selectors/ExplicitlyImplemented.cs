@@ -22,24 +22,22 @@ using Fasterflect.Selectors.Interfaces;
 
 namespace Fasterflect.Selectors
 {
-	internal class PartialNameMatch : IMemberSelector
+	internal class ExcludeExplicitlyImplemented : IMemberSelector
 	{
 		#region Implementation of IMemberSelector
 		public bool IsMatch( MemberInfo info, Flags flags, string name )
 		{
-			if( name == null )
-				return false;
 			string memberName = flags.IsSet( Flags.TrimExplicitlyImplemented )
 			                    	? info.Name.TrimExplicitlyImplementedName()
 			                    	: info.Name;
-			return memberName.Contains( name );
+			return info.Name == memberName;
 		}
 		#endregion
 
 		#region Implementation of ISelector
 		public bool IsMatch( MemberInfo info, MemberTypes memberTypes, Flags flags, string name, Type[] paramTypes, Type returnType )
 		{
-			return IsMatch( info, flags, name );
+			return IsMatch( info as MethodBase, flags, name );
 		}
 		#endregion
 	}
