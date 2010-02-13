@@ -63,7 +63,7 @@ namespace Fasterflect
         /// </summary>
         public static object CreateInstance( this Type targetType, Type[] paramTypes, params object[] parameters )
         {
-            return DelegateForCreateInstance( targetType, paramTypes )( parameters );
+            return DelegateForCreateInstance( targetType, paramTypes ?? parameters.GetTypeArray() )( parameters );
         }
 
         /// <summary>

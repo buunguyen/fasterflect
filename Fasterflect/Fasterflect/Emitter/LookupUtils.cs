@@ -32,7 +32,7 @@ namespace Fasterflect.Emitter
                 return ctorInfo;
 
             ctorInfo = callInfo.TargetType.GetConstructor(
-                Flags.InstanceCriteria,
+                Flags.InstanceCriteria | Flags.ParameterMatch,
                 null, CallingConventions.HasThis, callInfo.ParamTypes, null);
             if (ctorInfo == null)
                 throw new MissingMemberException("Constructor does not exist");
