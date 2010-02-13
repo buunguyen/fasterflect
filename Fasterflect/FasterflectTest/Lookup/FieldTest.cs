@@ -72,7 +72,7 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestFieldStatic()
         {
-        	BindingFlags flags = Flags.StaticCriteria;
+        	Flags flags = Flags.StaticCriteria;
 			
 			AnimalInstanceFieldNames.Select( s => typeof(Animal).Field( s, flags ) ).ForEach( Assert.IsNull );
 

@@ -133,16 +133,11 @@ namespace Fasterflect
                 baseType = baseType.BaseType;
             }
 
-			if( names != null && names.Length > 0)
-			{
-				// TODO do we want this flag to be set automatically?
-				flags = Flags.SetIf( flags, Flags.ExplicitNameMatch, names != null && names.Length > 0 );
-				flags = Flags.ClearIf( flags, Flags.ExplicitNameMatch, flags.IsSet( Flags.PartialNameMatch ) );
-
-				var selectors = SelectorFactory.GetMemberSelectors( flags );
-				members = members.Where( m => selectors.All( s => names.Any( n => s.IsMatch( m, flags, n ) ) ) ).ToList();
-				
-			}
+			bool hasNames = names != null && names.Length > 0;
+			flags = Flags.SetOnlyIf( flags, Flags.NameMatch, hasNames && ! flags.IsSet( Flags.PartialNameMatch ) );
+			flags = Flags.ClearIf( flags, Flags.PartialNameMatch, ! hasNames );
+			var selectors = SelectorFactory.GetMemberSelectors( flags ).ToList();
+			members = members.Where( m => selectors.All( s => hasNames ? names.Any( n => s.IsMatch( m, flags, n ) ) : s.IsMatch( m, flags, null ) ) ).ToList();
 			return members;
 		}
 		#endregion

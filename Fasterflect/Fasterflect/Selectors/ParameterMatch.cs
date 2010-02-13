@@ -35,7 +35,7 @@ namespace Fasterflect.Selectors
        		var methodParameterTypes = info.Parameters().Select( p => p.ParameterType ).ToList();
 			if( methodParameterTypes.Count != paramTypes.Length )
 				return false;
-			return !methodParameterTypes.Where( ( t, i ) => ! t.IsAssignableFrom( paramTypes[ i ] ) ).Any();
+			return ! methodParameterTypes.Where( ( t, i ) => ! t.IsAssignableFrom( paramTypes[ i ] ) ).Any();
 		}
 		#endregion
 

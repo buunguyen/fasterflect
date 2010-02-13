@@ -27,8 +27,9 @@ namespace Fasterflect.Selectors.Core
         private static readonly IDictionary<Flags, ISelector> selectorMap = new
             Dictionary<Flags, ISelector>
                {
+                   { Flags.NameMatch, new NameMatch() },
                    { Flags.PartialNameMatch, new PartialNameMatch() },
-                   { Flags.ExplicitNameMatch, new ExplicitNameMatch() },
+                   { Flags.ExcludeExplicitlyImplemented, new ExcludeExplicitlyImplemented() },
                    { Flags.ParameterMatch, new ParameterMatch() },
                    { Flags.ExactParameterMatch, new ExactParameterMatch() },
 				   { Flags.ExcludeBackingMembers, new ExcludeBackingMembers() }
@@ -52,8 +53,8 @@ namespace Fasterflect.Selectors.Core
         private static IEnumerable<T> GetSelectorsOfType<T>(Flags flags)
         {
             return from key in selectorMap.Keys
-                   where (flags & key) == key && typeof(T).IsAssignableFrom( selectorMap[key].GetType() )
-                   select (T)selectorMap[key];
+                   where flags.IsSet( key ) && typeof(T).IsAssignableFrom( selectorMap[ key ].GetType() )
+                   select (T)selectorMap[ key ];
         }
 	}
 }

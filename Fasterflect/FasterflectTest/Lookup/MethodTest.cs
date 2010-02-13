@@ -178,7 +178,7 @@ namespace FasterflectTest.Lookup
 			CollectionAssert.AreEquivalent( SnakeInstanceMethodNames.Where( s => s.Contains( "_" ) ).ToList(), methods.Select( m => m.Name ).ToList() );
 
 			methods = typeof(Snake).Methods( flags );
-			CollectionAssert.AreEquivalent( SnakeInstanceMethodNames, methods.Select( m => m.Name.Contains( "." ) ? m.Name.Substring( m.Name.LastIndexOf( "." )+1 ) : m.Name ).ToList() );
+			CollectionAssert.AreEquivalent( SnakeInstanceMethodNames, methods.Select( m => m.Name.TrimExplicitlyImplementedName() ).ToList() );
         }
 
 		[TestMethod]

@@ -31,7 +31,7 @@ namespace Fasterflect.Selectors
  			var mi = info as MethodInfo;
 			if( mi != null && returnType != null && returnType != mi.ReturnType )
 				return false;
-
+			
 			return info.Parameters().Select( p => p.ParameterType ).SequenceEqual( paramTypes );
 		}
 		#endregion

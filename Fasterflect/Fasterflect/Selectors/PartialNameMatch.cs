@@ -29,10 +29,9 @@ namespace Fasterflect.Selectors
 		{
 			if( name == null )
 				return false;
-
-			bool reserved = name == ".ctor" || name == ".cctor";
-			int index = reserved ? -1 : info.Name.LastIndexOf( '.' ) + 1;
-			string memberName = index > 0 ? info.Name.Substring( index ) : info.Name;
+			string memberName = flags.IsSet( Flags.TrimExplicitlyImplemented )
+			                    	? info.Name.TrimExplicitlyImplementedName()
+			                    	: info.Name;
 			return memberName.Contains( name );
 		}
 		#endregion
