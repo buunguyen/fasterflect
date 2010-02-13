@@ -23,7 +23,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Fasterflect;
-using FasterflectTest.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FasterflectTest.SampleModel.Animals;
 
@@ -151,7 +150,7 @@ namespace FasterflectTest.Lookup
 		public void TestFindMethodsInstanceWithDeclaredOnly()
         {
 			var methods = typeof(Animal).Methods( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
-			Assert.IsTrue( AnimalInstanceMethodNames.SequenceEqual( methods.Select( m => m.Name ) ) );
+			CollectionAssert.AreEquivalent( AnimalInstanceMethodNames, methods.Select( m => m.Name ).ToList() );
 
 			methods = typeof(Reptile).Methods( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
 			CollectionAssert.AreEquivalent( ReptileDeclaredInstanceMethodNames, methods.Select( m => m.Name ).ToList() );
@@ -188,22 +187,18 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 0, methods.Count );
 
 			methods = typeof(Animal).Methods( AnimalInstanceMethodNames );
-			Assert.AreEqual( AnimalInstanceMethodNames.Length, methods.Count );
-			Assert.IsTrue( AnimalInstanceMethodNames.SequenceEqual( methods.Select( m => m.Name ) ) );
+			CollectionAssert.AreEquivalent( AnimalInstanceMethodNames, methods.Select( m => m.Name ).ToArray() );
 
 			methods = typeof(Snake).Methods( AnimalInstanceMethodNames );
-			Assert.AreEqual( AnimalInstanceMethodNames.Length, methods.Count );
-			Assert.IsTrue( AnimalInstanceMethodNames.SequenceEqual( methods.Select( m => m.Name ) ) );
+			CollectionAssert.AreEquivalent( AnimalInstanceMethodNames, methods.Select( m => m.Name ).ToArray() );
 
 			var list = AnimalInstanceMethodNames.Where( s => s.Contains( "C" ) ).ToArray();
 			methods = typeof(Animal).Methods( list );
-			Assert.AreEqual( list.Length, methods.Count );
-			Assert.IsTrue( list.SequenceEqual( methods.Select( m => m.Name ) ) );
+			CollectionAssert.AreEquivalent( list, methods.Select( m => m.Name ).ToArray() );
 
 			list = AnimalInstanceMethodNames.Where( s => s.Contains( "B" ) ).ToArray();
 			methods = typeof(Snake).Methods( list );
-			Assert.AreEqual( list.Length, methods.Count );
-			Assert.IsTrue( list.SequenceEqual( methods.Select( m => m.Name ) ) );
+			CollectionAssert.AreEquivalent( list, methods.Select( m => m.Name ).ToArray() );
         }
 		#endregion
 	}

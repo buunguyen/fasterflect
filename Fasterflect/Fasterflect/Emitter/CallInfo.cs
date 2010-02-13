@@ -47,7 +47,7 @@ namespace Fasterflect.Emitter
             TargetType = targetType; 
 			MemberTypes = memberTypes;
 			Name = name;
-			ParamTypes = paramTypes.Length == 0 ? Type.EmptyTypes : paramTypes;
+			ParamTypes = paramTypes == null || paramTypes.Length == 0 ? Type.EmptyTypes : paramTypes;
 			IsStatic = isStatic;
 	        MemberInfo = memberInfo;
 		}

@@ -99,17 +99,15 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 0, fields.Count );
 
 			fields = typeof(Animal).Fields();
-			Assert.AreEqual( AnimalInstanceFieldNames.Length, fields.Count );
-			Assert.IsTrue( AnimalInstanceFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
-			Assert.IsTrue( AnimalInstanceFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+			CollectionAssert.AreEquivalent( AnimalInstanceFieldNames, fields.Select( f => f.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( AnimalInstanceFieldTypes, fields.Select( f => f.FieldType ).ToArray() );
 
 			fields = typeof(Mammal).Fields();
 			Assert.AreEqual( AnimalInstanceFieldNames.Length, fields.Count );
 
 			fields = typeof(Lion).Fields();
-			Assert.AreEqual( LionInstanceFieldNames.Length, fields.Count );
-			Assert.IsTrue( LionInstanceFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
-			Assert.IsTrue( LionInstanceFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+			CollectionAssert.AreEquivalent( LionInstanceFieldNames, fields.Select( f => f.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( LionInstanceFieldTypes, fields.Select( f => f.FieldType ).ToArray() );
         }
 
         [TestMethod]
@@ -120,17 +118,15 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 0, fields.Count );
 
 			fields = typeof(Animal).Fields( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
-			Assert.AreEqual( AnimalInstanceFieldNames.Length, fields.Count );
-			Assert.IsTrue( AnimalInstanceFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
-			Assert.IsTrue( AnimalInstanceFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+			CollectionAssert.AreEquivalent( AnimalInstanceFieldNames, fields.Select( f => f.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( AnimalInstanceFieldTypes, fields.Select( f => f.FieldType ).ToArray() );
 
 			fields = typeof(Mammal).Fields( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
 			Assert.AreEqual( 0, fields.Count );
 
 			fields = typeof(Lion).Fields( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
-			Assert.AreEqual( LionDeclaredInstanceFieldNames.Length, fields.Count );
-			Assert.IsTrue( LionDeclaredInstanceFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
-			Assert.IsTrue( LionDeclaredInstanceFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+			CollectionAssert.AreEquivalent( LionDeclaredInstanceFieldNames, fields.Select( f => f.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( LionDeclaredInstanceFieldTypes, fields.Select( f => f.FieldType ).ToArray() );
         }
 
         [TestMethod]
@@ -141,14 +137,12 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 0, fields.Count );
 
 			fields = typeof(Animal).Fields( Flags.StaticCriteria );
-			Assert.AreEqual( AnimalStaticFieldNames.Length, fields.Count );
-			Assert.IsTrue( AnimalStaticFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
-			Assert.IsTrue( AnimalStaticFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+			CollectionAssert.AreEquivalent( AnimalStaticFieldNames, fields.Select( f => f.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( AnimalStaticFieldTypes, fields.Select( f => f.FieldType ).ToArray() );
 
 			fields = typeof(Lion).Fields( Flags.StaticCriteria );
-			Assert.AreEqual( AnimalStaticFieldNames.Length, fields.Count );
-			Assert.IsTrue( AnimalStaticFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
-			Assert.IsTrue( AnimalStaticFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+			CollectionAssert.AreEquivalent( AnimalStaticFieldNames, fields.Select( f => f.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( AnimalStaticFieldTypes, fields.Select( f => f.FieldType ).ToArray() );
        }
 
         [TestMethod]
@@ -159,9 +153,8 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 0, fields.Count );
 
 			fields = typeof(Animal).Fields( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
-			Assert.AreEqual( AnimalStaticFieldNames.Length, fields.Count );
-			Assert.IsTrue( AnimalStaticFieldNames.SequenceEqual( fields.Select( f => f.Name ) ) );
-			Assert.IsTrue( AnimalStaticFieldTypes.SequenceEqual( fields.Select( f => f.FieldType ) ) );
+			CollectionAssert.AreEquivalent( AnimalStaticFieldNames, fields.Select( f => f.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( AnimalStaticFieldTypes, fields.Select( f => f.FieldType ).ToArray() );
 
 			fields = typeof(Mammal).Fields( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
 			Assert.AreEqual( 0, fields.Count );

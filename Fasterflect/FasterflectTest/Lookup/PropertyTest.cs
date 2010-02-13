@@ -102,17 +102,15 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 0, properties.Count );
 
 			properties = typeof(Animal).Properties();
-			Assert.AreEqual( AnimalInstanceFieldNames.Length, properties.Count );
-			Assert.IsTrue( AnimalInstancePropertyNames.SequenceEqual( properties.Select( p => p.Name ) ) );
-			Assert.IsTrue( AnimalInstancePropertyTypes.SequenceEqual( properties.Select( p => p.PropertyType ) ) );
+			CollectionAssert.AreEquivalent( AnimalInstancePropertyNames, properties.Select( p => p.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( AnimalInstancePropertyTypes, properties.Select( p => p.PropertyType ).ToArray() );
 
 			properties = typeof(Mammal).Properties();
 			Assert.AreEqual( AnimalInstanceFieldNames.Length, properties.Count );
 
 			properties = typeof(Lion).Properties();
-			Assert.AreEqual( LionInstancePropertyNames.Length, properties.Count );
-			Assert.IsTrue( LionInstancePropertyNames.SequenceEqual( properties.Select( p => p.Name ) ) );
-			Assert.IsTrue( LionInstancePropertyTypes.SequenceEqual( properties.Select( p => p.PropertyType ) ) );
+			CollectionAssert.AreEquivalent( LionInstancePropertyNames, properties.Select( p => p.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( LionInstancePropertyTypes, properties.Select( p => p.PropertyType ).ToArray() );
         }
 
         [TestMethod]
@@ -123,18 +121,15 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 0, properties.Count );
 
 			properties = typeof(Animal).Properties( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
-			Assert.AreEqual( AnimalInstancePropertyNames.Length, properties.Count );
-        	var x = properties.Select( p => p.Name );
-			Assert.IsTrue( AnimalInstancePropertyNames.SequenceEqual( properties.Select( p => p.Name ) ) );
-			Assert.IsTrue( AnimalInstancePropertyTypes.SequenceEqual( properties.Select( p => p.PropertyType ) ) );
+			CollectionAssert.AreEquivalent( AnimalInstancePropertyNames, properties.Select( p => p.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( AnimalInstancePropertyTypes, properties.Select( p => p.PropertyType ).ToArray() );
 
 			properties = typeof(Mammal).Properties( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
 			Assert.AreEqual( 0, properties.Count );
 
 			properties = typeof(Lion).Properties( Flags.InstanceCriteria | BindingFlags.DeclaredOnly );
-			Assert.AreEqual( LionDeclaredInstancePropertyNames.Length, properties.Count );
-			Assert.IsTrue( LionDeclaredInstancePropertyNames.SequenceEqual( properties.Select( p => p.Name ) ) );
-			Assert.IsTrue( LionDeclaredInstancePropertyTypes.SequenceEqual( properties.Select( p => p.PropertyType ) ) );
+			CollectionAssert.AreEquivalent( LionDeclaredInstancePropertyNames, properties.Select( p => p.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( LionDeclaredInstancePropertyTypes, properties.Select( p => p.PropertyType ).ToArray() );
         }
 
         [TestMethod]
@@ -145,17 +140,15 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 0, properties.Count );
 
 			properties = typeof(Animal).Properties( Flags.StaticCriteria );
-			Assert.AreEqual( AnimalStaticPropertyNames.Length, properties.Count );
-			Assert.IsTrue( AnimalStaticPropertyNames.SequenceEqual( properties.Select( p => p.Name ) ) );
-			Assert.IsTrue( AnimalStaticPropertyTypes.SequenceEqual( properties.Select( p => p.PropertyType ) ) );
+			CollectionAssert.AreEquivalent( AnimalStaticPropertyNames, properties.Select( p => p.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( AnimalStaticPropertyTypes, properties.Select( p => p.PropertyType ).ToArray() );
 
 			properties = typeof(Mammal).Properties( Flags.StaticCriteria );
 			Assert.AreEqual( AnimalStaticPropertyNames.Length, properties.Count );
 
 			properties = typeof(Lion).Properties( Flags.StaticCriteria );
-			Assert.AreEqual( AnimalStaticPropertyNames.Length, properties.Count );
-			Assert.IsTrue( AnimalStaticPropertyNames.SequenceEqual( properties.Select( p => p.Name ) ) );
-			Assert.IsTrue( AnimalStaticPropertyTypes.SequenceEqual( properties.Select( p => p.PropertyType ) ) );
+			CollectionAssert.AreEquivalent( AnimalStaticPropertyNames, properties.Select( p => p.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( AnimalStaticPropertyTypes, properties.Select( p => p.PropertyType ).ToArray() );
        }
 
         [TestMethod]
@@ -166,9 +159,8 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 0, properties.Count );
 
 			properties = typeof(Animal).Properties( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
-			Assert.AreEqual( AnimalStaticPropertyNames.Length, properties.Count );
-			Assert.IsTrue( AnimalStaticPropertyNames.SequenceEqual( properties.Select( p => p.Name ) ) );
-			Assert.IsTrue( AnimalStaticPropertyTypes.SequenceEqual( properties.Select( p => p.PropertyType ) ) );
+			CollectionAssert.AreEquivalent( AnimalStaticPropertyNames, properties.Select( p => p.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( AnimalStaticPropertyTypes, properties.Select( p => p.PropertyType ).ToArray() );
 
 			properties = typeof(Mammal).Properties( Flags.StaticCriteria | BindingFlags.DeclaredOnly );
 			Assert.AreEqual( 0, properties.Count );
@@ -184,23 +176,19 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 0, properties.Count );
 
 			properties = typeof(Animal).Properties( AnimalInstancePropertyNames );
-			Assert.AreEqual( AnimalInstanceFieldNames.Length, properties.Count );
-			Assert.IsTrue( AnimalInstancePropertyNames.SequenceEqual( properties.Select( p => p.Name ) ) );
+			CollectionAssert.AreEquivalent( AnimalInstancePropertyNames, properties.Select( p => p.Name ).ToArray() );
 
 			properties = typeof(Lion).Properties( AnimalInstancePropertyNames );
-			Assert.AreEqual( AnimalInstancePropertyNames.Length, properties.Count );
-			Assert.IsTrue( AnimalInstancePropertyNames.SequenceEqual( properties.Select( p => p.Name ) ) );
-			Assert.IsTrue( AnimalInstancePropertyTypes.SequenceEqual( properties.Select( p => p.PropertyType ) ) );
+			CollectionAssert.AreEquivalent( AnimalInstancePropertyNames, properties.Select( p => p.Name ).ToArray() );
+			CollectionAssert.AreEquivalent( AnimalInstancePropertyTypes, properties.Select( p => p.PropertyType ).ToArray() );
 
 			var list = AnimalInstancePropertyNames.Where( s => s.Contains( "C" ) ).ToArray();
 			properties = typeof(Animal).Properties( list );
-			Assert.AreEqual( list.Length, properties.Count );
-			Assert.IsTrue( list.SequenceEqual( properties.Select( p => p.Name ) ) );
+			CollectionAssert.AreEquivalent( list, properties.Select( p => p.Name ).ToArray() );
 
 			list = AnimalInstancePropertyNames.Where( s => s.Contains( "B" ) ).ToArray();
 			properties = typeof(Lion).Properties( list );
-			Assert.AreEqual( list.Length, properties.Count );
-			Assert.IsTrue( list.SequenceEqual( properties.Select( p => p.Name ) ) );
+			CollectionAssert.AreEquivalent( list, properties.Select( p => p.Name ).ToArray() );
         }
 		#endregion
 	}

@@ -95,10 +95,16 @@ namespace FasterflectTest.Invocation
         }
 
         [TestMethod]
-        [ExpectedException( typeof(NullReferenceException) )]
-        public void TestInvokeCtorWithNullParametersTheWrongWay()
+        [ExpectedException( typeof(MissingMemberException) )]
+        public void TestInvokeCtorWithNullParameterTypesAndInvalidParameterList()
         {
             RunWith( type => type.CreateInstance( null, 10 ) );
+        }
+
+        [TestMethod]
+        public void TestInvokeCtorWithNullParameterTypesAndValidParameterList()
+        {
+            RunWith( type => type.CreateInstance( new Type[ 0 ], null, 10 ) );
         }
 
         [TestMethod]
