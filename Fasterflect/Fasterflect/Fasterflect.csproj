@@ -81,7 +81,7 @@
     <Compile Include="Selectors\ExcludeBackingMembers.cs" />
     <Compile Include="Selectors\Core\SelectorBase.cs" />
     <Compile Include="Selectors\PartialNameMatch.cs" />
-    <Compile Include="Selectors\ExplicitlyImplemented.cs" />
+    <Compile Include="Selectors\ExcludeExplicitlyImplemented.cs" />
     <Compile Include="Selectors\ExactParameterMatch.cs" />
     <Compile Include="Selectors\ParameterMatch.cs" />
     <Compile Include="Selectors\Core\SelectorFactory.cs" />
