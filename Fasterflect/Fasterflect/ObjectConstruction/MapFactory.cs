@@ -84,7 +84,7 @@ namespace Fasterflect.ObjectConstruction
 			}
 			var sb = new StringBuilder();
 			sb.AppendFormat( "No constructor found for type {0} using parameters:{1}", type.Name, Environment.NewLine );
-			sb.AppendFormat( "{0}{1}", string.Join( ", ", Enumerable.Range( 0, paramNames.Length ).Select( i => string.Format( "{0}:{1}", paramNames[ i ], paramTypes[ i ] ) ) ), Environment.NewLine );
+			sb.AppendFormat( "{0}{1}", string.Join( ", ", Enumerable.Range( 0, paramNames.Length ).Select( i => string.Format( "{0}:{1}", paramNames[ i ], paramTypes[ i ] ) ).ToArray() ), Environment.NewLine );
 			throw new MissingMethodException( sb.ToString() );
 		}
 
