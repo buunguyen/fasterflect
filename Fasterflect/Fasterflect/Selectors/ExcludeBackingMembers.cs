@@ -28,8 +28,15 @@ namespace Fasterflect.Selectors
 		public bool IsMatch( MemberInfo info, Flags flags, string name )
 		{
 			bool ignoreField = info.MemberType == MemberTypes.Field && info.Name.StartsWith( "<" );
-			bool ignoreMethod = info is MethodInfo ? (info as MethodInfo).Attributes.HasFlag( MethodAttributes.SpecialName ) : false;
+			bool ignoreMethod = HasFlag( info as MethodInfo, MethodAttributes.SpecialName );
 			return ! (ignoreField || ignoreMethod);
+		}
+
+		private static bool HasFlag( MethodInfo info, MethodAttributes attributes )
+		{
+			if( info == null )
+				return false;
+			return (info.Attributes & attributes) == attributes;
 		}
 		#endregion
 
