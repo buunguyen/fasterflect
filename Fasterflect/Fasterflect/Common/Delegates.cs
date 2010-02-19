@@ -86,4 +86,11 @@ namespace Fasterflect
 	/// <param name="parameters">The properly-ordered parameter list of the constructor.</param>
 	/// <returns>An instance of type whose constructor is invoked.</returns>
 	public delegate object ConstructorInvoker(params object[] parameters);
+
+	/// <summary>
+	/// A delegate to copy member values from one object instance to another of the same type.
+	/// </summary>
+	/// <param name="source">The object whose member values will be read.</param>
+	/// <param name="target">The object whose member values will be written.</param>
+	public delegate void MemberCopier(object source, object target);
 }
