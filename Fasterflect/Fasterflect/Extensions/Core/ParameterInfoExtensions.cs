@@ -43,11 +43,12 @@ namespace Fasterflect
         /// The comparison uses OrdinalIgnoreCase and allows for a leading underscore in either name
         /// to be ignored.
         /// </summary>
-        /// <returns>True if the name is considered identical, false otherwise.</returns>
+        /// <returns>True if the name is considered identical, false otherwise. If either parameter
+        /// is null an exception will be thrown.</returns>
         public static bool HasName( this ParameterInfo parameter, string name )
         {
-            string parameterName = parameter.Name.StartsWith( "_" ) ? parameter.Name.Substring( 1 ) : parameter.Name;
-            name = name.StartsWith( "_" ) ? name.Substring( 1 ) : name;
+            string parameterName = parameter.Name.Length > 0 && parameter.Name[ 0 ] == '_' ? parameter.Name.Substring( 1 ) : parameter.Name;
+            name = name.Length > 0 && name[ 0 ] == '_' ? name.Substring( 1 ) : name;
             return parameterName.Equals( name, StringComparison.OrdinalIgnoreCase );
         }
 

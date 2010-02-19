@@ -102,6 +102,20 @@ namespace Fasterflect
 			var property = member as PropertyInfo;
 			return member is FieldInfo || (property != null && property.CanWrite);
 		}
+
+        /// <summary>
+        /// Determines whether the given <paramref name="member"/> has the given <paramref name="name"/>.
+        /// The comparison uses OrdinalIgnoreCase and allows for a leading underscore in either name
+        /// to be ignored.
+        /// </summary>
+        /// <returns>True if the name is considered identical, false otherwise. If either parameter
+        /// is null an exception will be thrown.</returns>
+        public static bool HasName( this MemberInfo member, string name )
+        {
+            string memberName = member.Name.Length > 0 && member.Name[ 0 ] == '_' ? member.Name.Substring( 1 ) : member.Name;
+            name = name.Length > 0 && name[ 0 ] == '_' ? name.Substring( 1 ) : name;
+            return memberName.Equals( name, StringComparison.OrdinalIgnoreCase );
+        }
 		#endregion
     }
 }
