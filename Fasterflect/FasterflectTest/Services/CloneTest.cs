@@ -114,6 +114,18 @@ namespace FasterflectTest.Services
 		}
 		#endregion
 
+		#region CopyFields
+		[TestMethod]
+		public void TestCopyFields()
+		{
+			DateTime birthday = new DateTime( 1973, 1, 27 );
+			Person person = new Person( 42, birthday, "Arthur Dent" );
+			Person copy = new Person();
+			person.CopyFields( copy );
+			Verify( person, copy );
+		}
+		#endregion
+
 		#region CopyProperties
 		[TestMethod]
 		public void TestCopyProperties()

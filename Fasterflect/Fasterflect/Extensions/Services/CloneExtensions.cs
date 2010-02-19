@@ -76,6 +76,30 @@ namespace Fasterflect
 		}
 		#endregion
 
+		#region CopyFields
+		/// <summary>
+		/// This method will copy all public and non-public instance fields, including those defined on
+		/// base classes, from the <paramref name="source"/> object to the <paramref name="target"/> object.
+		/// </summary>
+		public static void CopyFields( this object source, object target )
+		{
+			source.CopyFields( target, Flags.InstanceCriteria );
+		}
+
+		/// <summary>
+		/// This method will copy all fields matching the specified <paramref name="flags"/>, including those 
+		/// defined on base classes, from the <paramref name="source"/> object to the <paramref name="target"/>
+		/// object.
+		/// </summary>
+		public static void CopyFields( this object source, object target, Flags flags )
+		{
+			if( source == null || target == null )
+				throw new ArgumentException( "Unable to copy to or from null instance." );
+			var copier = (MemberCopier) new CloneEmitter( source.GetType(), target.GetType(), flags, MemberTypes.Field ).GetDelegate();
+			copier( source, target );
+		}
+		#endregion
+
 		#region CopyProperties
 		/// <summary>
 		/// This method will shallowly copy all public and non-public instance properties, including
@@ -96,7 +120,7 @@ namespace Fasterflect
 		{
 			if( source == null || target == null )
 				throw new ArgumentException( "Unable to copy to or from null instance." );
-			var copier = (MemberSetter) new CloneEmitter( source.GetType(), target.GetType(), flags ).CreateDelegate();
+			var copier = (MemberCopier) new CloneEmitter( source.GetType(), target.GetType(), flags, MemberTypes.Property ).GetDelegate();
 			copier( source, target );
 		}
 		#endregion
