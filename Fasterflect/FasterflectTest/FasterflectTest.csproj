@@ -78,6 +78,7 @@
     <Compile Include="Lookup\AttributeTest.cs" />
     <Compile Include="Lookup\BaseLookupTest.cs" />
     <Compile Include="Lookup\ConstructorTest.cs" />
+    <Compile Include="Lookup\TryGetSetTest.cs" />
     <Compile Include="Lookup\MethodTest.cs" />
     <Compile Include="Lookup\PropertyTest.cs" />
     <Compile Include="Lookup\MemberTest.cs" />

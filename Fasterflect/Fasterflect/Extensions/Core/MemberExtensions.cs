@@ -141,5 +141,40 @@ namespace Fasterflect
 			return members;
 		}
 		#endregion
+
+		#region Member Combined
+		#region TryGetValue
+		public static object TryGetValue( this object source, string name )
+		{
+			return TryGetValue( source, name, Flags.InstanceCriteria );
+		}
+
+		public static object TryGetValue( this object source, string name, Flags flags )
+		{
+			Type type = source.GetType();
+			var info = type.Member( name, flags );
+			return info != null ? info.Get( source ) : null;
+		}
+		#endregion
+
+		#region TrySetValue
+		public static bool TrySetValue( this object source, string name, object value )
+		{
+			return TrySetValue( source, name, value, Flags.InstanceCriteria );
+		}
+
+		public static bool TrySetValue( this object source, string name, object value, Flags flags )
+		{
+			Type type = source.GetType();
+			var info = type.Member( name, flags );
+			if( info != null )
+			{
+				info.Set( source, value );
+				return true;
+			}
+			return false;
+		}
+		#endregion
+    	#endregion
 	}
 }

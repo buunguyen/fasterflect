@@ -241,5 +241,40 @@ namespace Fasterflect
         	return type.Members( MemberTypes.Field, flags, names ).Cast<FieldInfo>().ToList();
 		}
         #endregion
-    }
+
+		#region Field Combined
+		#region TryGetValue
+		public static object TryGetFieldValue( this object source, string name )
+		{
+			return TryGetFieldValue( source, name, Flags.InstanceCriteria );
+		}
+
+		public static object TryGetFieldValue( this object source, string name, Flags flags )
+		{
+			Type type = source.GetType();
+			var info = type.Field( name, flags );
+			return info != null ? info.Get( source ) : null;
+		}
+		#endregion
+
+		#region TrySetValue
+		public static bool TrySetFieldValue( this object source, string name, object value )
+		{
+			return TrySetFieldValue( source, name, value, Flags.InstanceCriteria );
+		}
+
+		public static bool TrySetFieldValue( this object source, string name, object value, Flags flags )
+		{
+			Type type = source.GetType();
+			var info = type.Field( name, flags );
+			if( info != null )
+			{
+				info.Set( source, value );
+				return true;
+			}
+			return false;
+		}
+		#endregion
+    	#endregion
+	}
 }
