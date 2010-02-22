@@ -74,43 +74,119 @@ namespace Fasterflect
         }
 
         /// <summary>
+        /// Sets the static field <paramref name="fieldName"/> of type <paramref name="targetType"/>
+        /// with the specified <paramref name="value" />.
+        /// </summary>
+        /// <returns><paramref name="targetType"/>.</returns>
+        public static Type SetFieldValue(this Type targetType, Flags flags, string fieldName, object value)
+        {
+            DelegateForSetStaticFieldValue(targetType, flags, fieldName)(value);
+            return targetType;
+        }
+
+        /// <summary>
+        /// Sets the instance field <paramref name="fieldName"/> of object <paramref name="target"/>
+        /// with the specified <paramref name="value" />.
+        /// </summary>
+        /// <returns><paramref name="target"/>.</returns>
+        public static object SetFieldValue(this object target, Flags flags, string fieldName, object value)
+        {
+            DelegateForSetFieldValue(target.GetTypeAdjusted(), flags, fieldName)(target, value);
+            return target;
+        }
+
+        /// <summary>
+        /// Gets the value of the static field <paramref name="fieldName"/> of type 
+        /// <paramref name="targetType"/>.
+        /// </summary>
+        public static object GetFieldValue(this Type targetType, Flags flags, string fieldName)
+        {
+            return DelegateForGetStaticFieldValue(targetType, flags, fieldName)();
+        }
+
+        /// <summary>
+        /// Gets the value of the instance field <paramref name="fieldName"/> of object
+        /// <paramref name="target"/>.
+        /// </summary>
+        public static object GetFieldValue(this object target, Flags flags, string fieldName)
+        {
+            return DelegateForGetFieldValue(target.GetTypeAdjusted(), flags, fieldName)(target);
+        }
+
+        /// <summary>
         /// Creates a delegate which can set the value of the static field <paramref name="fieldName"/> of 
         /// type <paramref name="targetType"/>.
         /// </summary>
-        public static StaticMemberSetter DelegateForSetStaticFieldValue( this Type targetType, string fieldName )
+        public static StaticMemberSetter DelegateForSetStaticFieldValue(this Type targetType, string fieldName)
         {
-            return
-                (StaticMemberSetter)
-                new MemberSetEmitter( targetType, MemberTypes.Field, fieldName, true ).GetDelegate();
+            return DelegateForSetStaticFieldValue( targetType, Flags.DefaultCriteria, fieldName );
         }
 
         /// <summary>
         /// Creates a delegate which can set the value of the instance field <paramref name="fieldName"/> of 
         /// type <paramref name="targetType"/>.
         /// </summary>
-        public static MemberSetter DelegateForSetFieldValue( this Type targetType, string fieldName )
+        public static MemberSetter DelegateForSetFieldValue(this Type targetType, string fieldName)
         {
-            return (MemberSetter) new MemberSetEmitter( targetType, MemberTypes.Field, fieldName, false ).GetDelegate();
+            return DelegateForSetFieldValue( targetType, Flags.DefaultCriteria, fieldName );
         }
 
         /// <summary>
         /// Creates a delegate which can get the value of the static field <paramref name="fieldName"/> of 
         /// type <paramref name="targetType"/>.
         /// </summary>
-        public static StaticMemberGetter DelegateForGetStaticFieldValue( this Type targetType, string fieldName )
+        public static StaticMemberGetter DelegateForGetStaticFieldValue(this Type targetType, string fieldName)
         {
-            return
-                (StaticMemberGetter)
-                new MemberGetEmitter( targetType, MemberTypes.Field, fieldName, true ).GetDelegate();
+            return DelegateForGetStaticFieldValue( targetType, Flags.DefaultCriteria, fieldName );
         }
 
         /// <summary>
         /// Creates a delegate which can get the value of the instance field <paramref name="fieldName"/> of 
         /// type <paramref name="targetType"/>.
         /// </summary>
-        public static MemberGetter DelegateForGetFieldValue( this Type targetType, string fieldName )
+        public static MemberGetter DelegateForGetFieldValue(this Type targetType, string fieldName)
         {
-            return (MemberGetter) new MemberGetEmitter( targetType, MemberTypes.Field, fieldName, false ).GetDelegate();
+            return DelegateForGetFieldValue( targetType, Flags.DefaultCriteria, fieldName );
+        }
+
+        /// <summary>
+        /// Creates a delegate which can set the value of the static field <paramref name="fieldName"/> of 
+        /// type <paramref name="targetType"/>.
+        /// </summary>
+        public static StaticMemberSetter DelegateForSetStaticFieldValue(this Type targetType, Flags flags, string fieldName)
+        {
+            return
+                (StaticMemberSetter)
+                new MemberSetEmitter(targetType, flags, MemberTypes.Field, fieldName, true).GetDelegate();
+        }
+
+        /// <summary>
+        /// Creates a delegate which can set the value of the instance field <paramref name="fieldName"/> of 
+        /// type <paramref name="targetType"/>.
+        /// </summary>
+        public static MemberSetter DelegateForSetFieldValue(this Type targetType, Flags flags, string fieldName)
+        {
+            return (MemberSetter)new MemberSetEmitter(targetType, flags, MemberTypes.Field, fieldName, false).GetDelegate();
+        }
+
+        /// <summary>
+        /// Creates a delegate which can get the value of the static field <paramref name="fieldName"/> of 
+        /// type <paramref name="targetType"/>.
+        /// </summary>
+        public static StaticMemberGetter DelegateForGetStaticFieldValue(this Type targetType, Flags flags, string fieldName)
+        {
+            return
+                (StaticMemberGetter)
+                new MemberGetEmitter(targetType, flags, MemberTypes.Field, fieldName, true).GetDelegate();
+        }
+
+        /// <summary>
+        /// Creates a delegate which can get the value of the instance field <paramref name="fieldName"/> of 
+        /// type <paramref name="targetType"/>.
+        /// </summary>
+        public static MemberGetter DelegateForGetFieldValue(this Type targetType, Flags flags, string fieldName)
+        {
+            return (MemberGetter)new MemberGetEmitter(targetType, flags, MemberTypes.Field, fieldName, false).GetDelegate();
         }
         #endregion
 

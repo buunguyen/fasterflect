@@ -96,9 +96,9 @@ namespace FasterflectBenchmark
 
 		public static void Main(string[] args)
 		{
-            RunDictionaryBenchmark();
-            RunHashCodeBenchmark();
-            RunTryCreateInstanceBenchmark();
+            //RunDictionaryBenchmark();
+            //RunHashCodeBenchmark();
+            //RunTryCreateInstanceBenchmark();
             RunConstructorBenchmark();
             RunFieldBenchmark();
             RunStaticFieldBenchmark();
@@ -107,7 +107,7 @@ namespace FasterflectBenchmark
             RunMethodInvocationBenchmark();
             RunStaticMethodInvocationBenchmark();
             RunIndexerBenchmark();
-		    RunArrayBenchmark();
+            RunArrayBenchmark();
 		}
 
 	    #region Internal Testing
@@ -121,7 +121,7 @@ namespace FasterflectBenchmark
 			stringList.ForEach( s => stringCache.Insert( s, s, CacheStrategy.Permanent ) );
 			
 			string key = stringList[ index ];
-			var callInfo = new CallInfo( TargetType, MemberTypes.Field, "name", Constants.ArrayOfObjectType, false );
+			var callInfo = new CallInfo( TargetType, Flags.DefaultCriteria, MemberTypes.Field, "name", Constants.ArrayOfObjectType, false, null );
 
 			var initMap = new Dictionary<string, Action> {};
 			var actionMap = new Dictionary<string, Action>
@@ -138,8 +138,8 @@ namespace FasterflectBenchmark
 
 		private static void RunHashCodeBenchmark()
 		{
-			var callInfo = new CallInfo( TargetType, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, false );
-			var callInfoOther = new CallInfo( typeof(CallInfo), MemberTypes.Field, "other", new [] { typeof(string) }, false );
+			var callInfo = new CallInfo( TargetType, Flags.DefaultCriteria, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, false, null );
+            var callInfoOther = new CallInfo(typeof(CallInfo), Flags.DefaultCriteria, MemberTypes.Field, "other", new[] { typeof(string) }, false, null);
 			var sourceInfo = new SourceInfo( new { ID=42, Name="Test" }.GetType() );
 			var sourceInfoOther = new SourceInfo( new { id=42, Name="Test" }.GetType() );
 
@@ -152,7 +152,7 @@ namespace FasterflectBenchmark
 			                		{"SourceInfo Equals Other", () => sourceInfo.Equals( sourceInfoOther ) },
 			                		{"string GetHashCode", () => "foo".GetHashCode() },
 			                		{"string Equals", () => "foo".Equals( "bar" ) },
-									{"new CallInfo", () => new CallInfo(TargetType, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, false) },
+									{"new CallInfo", () => new CallInfo(TargetType, Flags.DefaultCriteria, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, false, null) },
 									{"new SourceInfo", () => new SourceInfo( TargetType, new [] { "ID", "Name" }, new [] { typeof(int), typeof(string) } ) },
 									{"new SourceInfo anon", () => new SourceInfo( new { ID=42, Name="Test" }.GetType() ) },
 			                	};

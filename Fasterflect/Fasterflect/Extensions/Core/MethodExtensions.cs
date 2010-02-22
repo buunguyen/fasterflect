@@ -43,7 +43,7 @@ namespace Fasterflect
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
         public static object Invoke( this Type targetType, string methodName )
         {
-            return DelegateForStaticInvoke( targetType, methodName, Type.EmptyTypes )();
+            return DelegateForStaticInvoke( targetType, methodName )();
         }
 
         /// <summary>
@@ -69,28 +69,84 @@ namespace Fasterflect
         public static object Invoke( this Type targetType, string methodName, Type[] paramTypes,
                                      params object[] parameters )
         {
-            return DelegateForStaticInvoke( targetType, methodName, paramTypes )( parameters );
+            return
+                DelegateForStaticInvoke( targetType, methodName, paramTypes ?? parameters.GetTypeArray() )( parameters );
+        }
+
+        /// <summary>
+        /// Invokes the static method specified by <paramref name="methodName"/> of type
+        /// <paramref name="targetType"/>.
+        /// </summary>
+        /// <returns>The return value of the method.</returns>
+        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
+        public static object Invoke(this Type targetType, Flags flags, string methodName)
+        {
+            return DelegateForStaticInvoke(targetType, flags, methodName, Type.EmptyTypes)();
+        }
+
+        /// <summary>
+        /// Invokes the static method specified by <paramref name="methodName"/> of type
+        /// <paramref name="targetType"/> using <paramref name="parameters"/> as arguments.
+        /// Method parameter types are inferred from <paramref name="parameters"/> which 
+        /// must contain no null argument or else, <c>NullReferenceException</c> is thrown.
+        /// </summary>
+        /// <returns>The return value of the method.</returns>
+        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
+        public static object Invoke(this Type targetType, Flags flags, string methodName, params object[] parameters)
+        {
+            return DelegateForStaticInvoke( targetType, flags, methodName, parameters.GetTypeArray() )( parameters );
+        }
+
+        /// <summary>
+        /// Invokes the static method specified by <paramref name="methodName"/> of type
+        /// <paramref name="targetType"/> using <paramref name="parameters"/> as arguments.
+        /// Method parameter types are specified by <paramref name="paramTypes"/>.
+        /// </summary>
+        /// <returns>The return value of the method.</returns>
+        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
+        public static object Invoke(this Type targetType, Flags flags, string methodName, Type[] paramTypes,
+                                     params object[] parameters)
+        {
+            return DelegateForStaticInvoke( targetType, flags, methodName, paramTypes )( parameters );
         }
 
         /// <summary>
         /// Creates a delegate which can invoke the static method <paramref name="methodName"/> 
         /// on type <paramref name="targetType"/>.
         /// </summary>
-        public static StaticMethodInvoker DelegateForStaticInvoke( this Type targetType, string methodName )
+        public static StaticMethodInvoker DelegateForStaticInvoke(this Type targetType, string methodName)
         {
-            return (StaticMethodInvoker)
-                   new MethodInvocationEmitter( methodName, targetType, Type.EmptyTypes, true ).GetDelegate();
+            return DelegateForStaticInvoke(targetType, methodName, Type.EmptyTypes);
         }
 
         /// <summary>
         /// Creates a delegate which can invoke the static method <paramref name="methodName"/> 
         /// whose parameter types are specified by <paramref name="paramTypes"/> on type <paramref name="targetType"/>.
         /// </summary>
-        public static StaticMethodInvoker DelegateForStaticInvoke( this Type targetType, string methodName,
-                                                                   params Type[] paramTypes )
+        public static StaticMethodInvoker DelegateForStaticInvoke(this Type targetType, string methodName,
+                                                                   params Type[] paramTypes)
+        {
+            return DelegateForStaticInvoke(targetType, Flags.DefaultCriteria, methodName, paramTypes);
+        }
+
+        /// <summary>
+        /// Creates a delegate which can invoke the static method <paramref name="methodName"/> 
+        /// on type <paramref name="targetType"/>.
+        /// </summary>
+        public static StaticMethodInvoker DelegateForStaticInvoke(this Type targetType, Flags flags, string methodName)
+        {
+            return DelegateForStaticInvoke( targetType, flags, methodName, Type.EmptyTypes );
+        }
+
+        /// <summary>
+        /// Creates a delegate which can invoke the static method <paramref name="methodName"/> 
+        /// whose parameter types are specified by <paramref name="paramTypes"/> on type <paramref name="targetType"/>.
+        /// </summary>
+        public static StaticMethodInvoker DelegateForStaticInvoke(this Type targetType, Flags flags, string methodName,
+                                                                   params Type[] paramTypes)
         {
             return (StaticMethodInvoker)
-                   new MethodInvocationEmitter( methodName, targetType, paramTypes, true ).GetDelegate();
+                   new MethodInvocationEmitter(targetType, flags, methodName, paramTypes, true).GetDelegate();
         }
         #endregion
 
@@ -103,7 +159,7 @@ namespace Fasterflect
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
         public static object Invoke( this object target, string methodName )
         {
-            return DelegateForInvoke( target.GetTypeAdjusted(), methodName, Type.EmptyTypes )( target );
+            return DelegateForInvoke( target.GetTypeAdjusted(), methodName )( target );
         }
 
         /// <summary>
@@ -134,24 +190,78 @@ namespace Fasterflect
         }
 
         /// <summary>
+        /// Invokes the instance method specified by <paramref name="methodName"/> of object
+        /// <paramref name="target"/>.
+        /// </summary>
+        /// <returns>The return value of the method.</returns>
+        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
+        public static object Invoke(this object target, Flags flags, string methodName)
+        {
+            return DelegateForInvoke(target.GetTypeAdjusted(), flags, methodName, Type.EmptyTypes)(target);
+        }
+
+        /// <summary>
+        /// Invokes the instance method specified by <paramref name="methodName"/> of object
+        /// <paramref name="target"/> using <paramref name="parameters"/> as arguments.
+        /// Method parameter types are inferred from <paramref name="parameters"/> which 
+        /// must contain no null argument or else, <c>NullReferenceException</c> is thrown.
+        /// </summary>
+        /// <returns>The return value of the method.</returns>
+        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
+        public static object Invoke(this object target, Flags flags, string methodName, params object[] parameters)
+        {
+            return DelegateForInvoke(target.GetTypeAdjusted(), flags, methodName, parameters.GetTypeArray())(target,
+                                                                                                         parameters);
+        }
+
+        /// <summary>
+        /// Invokes the instance method specified by <paramref name="methodName"/> of object
+        /// <paramref name="target"/> using <paramref name="parameters"/> as arguments.
+        /// Method parameter types are specified by <paramref name="paramTypes"/>.
+        /// </summary>
+        /// <returns>The return value of the method.</returns>
+        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
+        public static object Invoke(this object target, Flags flags, string methodName, Type[] paramTypes,
+                                     params object[] parameters)
+        {
+            return DelegateForInvoke(target.GetTypeAdjusted(), flags, methodName, paramTypes)(target, parameters);
+        }
+
+        /// <summary>
         /// Creates a delegate which can invoke the instance method <paramref name="methodName"/> 
         /// on type <paramref name="targetType"/>.
         /// </summary>
-        public static MethodInvoker DelegateForInvoke( this Type targetType, string methodName )
+        public static MethodInvoker DelegateForInvoke(this Type targetType, string methodName)
         {
-            return
-                (MethodInvoker)
-                new MethodInvocationEmitter( methodName, targetType, Type.EmptyTypes, false ).GetDelegate();
+            return DelegateForInvoke( targetType, methodName, Type.EmptyTypes );
         }
 
         /// <summary>
         /// Creates a delegate which can invoke the instance method <paramref name="methodName"/> 
         /// whose parameter types are specified by <paramref name="paramTypes"/> on type <paramref name="targetType"/>.
         /// </summary>
-        public static MethodInvoker DelegateForInvoke( this Type targetType, string methodName, params Type[] paramTypes )
+        public static MethodInvoker DelegateForInvoke(this Type targetType, string methodName, params Type[] paramTypes)
+        {
+            return DelegateForInvoke( targetType, Flags.DefaultCriteria, methodName, paramTypes );
+        }
+
+        /// <summary>
+        /// Creates a delegate which can invoke the instance method <paramref name="methodName"/> 
+        /// on type <paramref name="targetType"/>.
+        /// </summary>
+        public static MethodInvoker DelegateForInvoke(this Type targetType, Flags flags, string methodName)
+        {
+            return DelegateForInvoke( targetType, flags, methodName, Type.EmptyTypes );
+        }
+
+        /// <summary>
+        /// Creates a delegate which can invoke the instance method <paramref name="methodName"/> 
+        /// whose parameter types are specified by <paramref name="paramTypes"/> on type <paramref name="targetType"/>.
+        /// </summary>
+        public static MethodInvoker DelegateForInvoke(this Type targetType, Flags flags, string methodName, params Type[] paramTypes)
         {
             return
-                (MethodInvoker) new MethodInvocationEmitter( methodName, targetType, paramTypes, false ).GetDelegate();
+                (MethodInvoker)new MethodInvocationEmitter(targetType, flags, methodName, paramTypes, false).GetDelegate();
         }
         #endregion
         #endregion
@@ -299,7 +409,7 @@ namespace Fasterflect
         /// <returns>A list of all matching methods. This value will never be null.</returns>
         public static IList<MethodInfo> Methods( this Type type, Flags flags, Type[] paramTypes, Type returnType, params string[] names )
         {
-        	flags = flags ?? Flags.Default;
+        	//flags = flags ?? Flags.Default;
         	flags = Flags.SetIf( flags, Flags.ParameterMatch, paramTypes != null );
         	flags = Flags.ClearIf( flags, Flags.ExactParameterMatch, paramTypes == null );
         	var methods = type.Members( MemberTypes.Method, flags, names ).Cast<MethodInfo>().ToList();

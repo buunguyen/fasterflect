@@ -73,47 +73,123 @@ namespace Fasterflect
         }
 
         /// <summary>
+        /// Sets the static property <paramref name="propertyName"/> of type <paramref name="targetType"/>
+        /// with the specified <paramref name="value" />.
+        /// </summary>
+        /// <returns><paramref name="targetType"/>.</returns>
+        public static Type SetPropertyValue(this Type targetType, Flags flags, string propertyName, object value)
+        {
+            DelegateForSetStaticPropertyValue(targetType, flags, propertyName)(value);
+            return targetType;
+        }
+
+        /// <summary>
+        /// Sets the instance property <paramref name="propertyName"/> of object <paramref name="target"/>
+        /// with the specified <paramref name="value" />.
+        /// </summary>
+        /// <returns><paramref name="target"/>.</returns>
+        public static object SetPropertyValue(this object target, Flags flags, string propertyName, object value)
+        {
+            DelegateForSetPropertyValue(target.GetTypeAdjusted(), flags, propertyName)(target, value);
+            return target;
+        }
+
+        /// <summary>
+        /// Gets the value of the static property <paramref name="propertyName"/> of type 
+        /// <paramref name="targetType"/>.
+        /// </summary>
+        public static object GetPropertyValue(this Type targetType, Flags flags, string propertyName)
+        {
+            return DelegateForGetStaticPropertyValue(targetType, flags, propertyName)();
+        }
+
+        /// <summary>
+        /// Gets the value of the property <paramref name="propertyName"/> of object
+        /// <paramref name="target"/>.
+        /// </summary>
+        public static object GetPropertyValue(this object target, Flags flags, string propertyName)
+        {
+            return DelegateForGetPropertyValue(target.GetTypeAdjusted(), flags, propertyName)(target);
+        }
+
+        /// <summary>
         /// Creates a delegate which can set the value of the static property <paramref name="propertyName"/>
         /// of type <paramref name="targetType"/>.
         /// </summary>
-        public static StaticMemberSetter DelegateForSetStaticPropertyValue( this Type targetType, string propertyName )
+        public static StaticMemberSetter DelegateForSetStaticPropertyValue(this Type targetType, string propertyName)
         {
-            return
-                (StaticMemberSetter)
-                new MemberSetEmitter( targetType, MemberTypes.Property, propertyName, true ).GetDelegate();
+            return DelegateForSetStaticPropertyValue( targetType, Flags.DefaultCriteria, propertyName );
         }
 
         /// <summary>
         /// Creates a delegate which can set the value of the instance property <paramref name="propertyName"/>
         /// of type <paramref name="targetType"/>.
         /// </summary>
-        public static MemberSetter DelegateForSetPropertyValue( this Type targetType, string propertyName )
+        public static MemberSetter DelegateForSetPropertyValue(this Type targetType, string propertyName)
         {
-            return
-                (MemberSetter)
-                new MemberSetEmitter( targetType, MemberTypes.Property, propertyName, false ).GetDelegate();
+            return DelegateForSetPropertyValue(targetType, Flags.DefaultCriteria, propertyName);
         }
 
         /// <summary>
         /// Creates a delegate which can get the value of the static property <paramref name="propertyName"/>
         /// of type <paramref name="targetType"/>.
         /// </summary>
-        public static StaticMemberGetter DelegateForGetStaticPropertyValue( this Type targetType, string propertyName )
+        public static StaticMemberGetter DelegateForGetStaticPropertyValue(this Type targetType, string propertyName)
         {
-            return
-                (StaticMemberGetter)
-                new MemberGetEmitter( targetType, MemberTypes.Property, propertyName, true ).GetDelegate();
+            return DelegateForGetStaticPropertyValue( targetType, Flags.DefaultCriteria, propertyName );
         }
 
         /// <summary>
         /// Creates a delegate which can get the value of the instance property <paramref name="propertyName"/>
         /// of type <paramref name="targetType"/>.
         /// </summary>
-        public static MemberGetter DelegateForGetPropertyValue( this Type targetType, string propertyName )
+        public static MemberGetter DelegateForGetPropertyValue(this Type targetType, string propertyName)
+        {
+            return DelegateForGetPropertyValue( targetType, Flags.DefaultCriteria, propertyName );
+        }
+
+        /// <summary>
+        /// Creates a delegate which can set the value of the static property <paramref name="propertyName"/>
+        /// of type <paramref name="targetType"/>.
+        /// </summary>
+        public static StaticMemberSetter DelegateForSetStaticPropertyValue(this Type targetType, Flags flags, string propertyName)
+        {
+            return
+                (StaticMemberSetter)
+                new MemberSetEmitter(targetType, flags, MemberTypes.Property, propertyName, true).GetDelegate();
+        }
+
+        /// <summary>
+        /// Creates a delegate which can set the value of the instance property <paramref name="propertyName"/>
+        /// of type <paramref name="targetType"/>.
+        /// </summary>
+        public static MemberSetter DelegateForSetPropertyValue(this Type targetType, Flags flags, string propertyName)
+        {
+            return
+                (MemberSetter)
+                new MemberSetEmitter(targetType, flags, MemberTypes.Property, propertyName, false).GetDelegate();
+        }
+
+        /// <summary>
+        /// Creates a delegate which can get the value of the static property <paramref name="propertyName"/>
+        /// of type <paramref name="targetType"/>.
+        /// </summary>
+        public static StaticMemberGetter DelegateForGetStaticPropertyValue(this Type targetType, Flags flags, string propertyName)
+        {
+            return
+                (StaticMemberGetter)
+                new MemberGetEmitter(targetType, flags, MemberTypes.Property, propertyName, true).GetDelegate();
+        }
+
+        /// <summary>
+        /// Creates a delegate which can get the value of the instance property <paramref name="propertyName"/>
+        /// of type <paramref name="targetType"/>.
+        /// </summary>
+        public static MemberGetter DelegateForGetPropertyValue(this Type targetType, Flags flags, string propertyName)
         {
             return
                 (MemberGetter)
-                new MemberGetEmitter( targetType, MemberTypes.Property, propertyName, false ).GetDelegate();
+                new MemberGetEmitter( targetType, flags, MemberTypes.Property, propertyName, false).GetDelegate();
         }
         #endregion
 
@@ -251,6 +327,76 @@ namespace Fasterflect
         }
 
         /// <summary>
+        /// Sets the value of the indexer of object <paramref name="target"/>
+        /// </summary>
+        /// <param name="target">The object whose indexer is to be set.</param>
+        /// <param name="parameters">The list of the indexer parameters plus the value to be set to the indexer.
+        /// The parameter types are determined from these parameters, therefore no parameter can be <c>null</c>.
+        /// If any parameter is <c>null</c> (or you can't be sure of that, i.e. receive from a variable), 
+        /// use a different overload of this method.</param>
+        /// <returns>The object whose indexer is to be set.</returns>
+        /// <example>
+        /// If the indexer is of type <c>string</c> and accepts one parameter of type <c>int</c>, this 
+        /// method should be invoked as follow:
+        /// <code>
+        /// target.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
+        /// </code>
+        /// </example>
+        public static object SetIndexer(this object target, Flags flags, params object[] parameters)
+        {
+            DelegateForSetIndexer(target.GetTypeAdjusted(), flags, parameters.GetTypeArray())(target, parameters);
+            return target;
+        }
+
+        /// <summary>
+        /// Sets the value of the indexer of object <paramref name="target"/>
+        /// </summary>
+        /// <param name="target">The object whose indexer is to be set.</param>
+        /// <param name="paramTypes">The types of the indexer parameters (must be in the right order), plus
+        /// the type of the indexer.</param>
+        /// <param name="parameters">The list of the indexer parameters plus the value to be set to the indexer.
+        /// This list must match with the <paramref name="paramTypes"/> list.</param>
+        /// <returns>The object whose indexer is to be set.</returns>
+        /// <example>
+        /// If the indexer is of type <c>string</c> and accepts one parameter of type <c>int</c>, this 
+        /// method should be invoked as follow:
+        /// <code>
+        /// target.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
+        /// </code>
+        /// </example>
+        public static object SetIndexer(this object target, Flags flags, Type[] paramTypes, params object[] parameters)
+        {
+            DelegateForSetIndexer(target.GetTypeAdjusted(), flags, paramTypes)(target, parameters);
+            return target;
+        }
+
+        /// <summary>
+        /// Gets the value of the indexer of object <paramref name="target"/>
+        /// </summary>
+        /// <param name="target">The object whose indexer is to be retrieved.</param>
+        /// <param name="parameters">The list of the indexer parameters.
+        /// The parameter types are determined from these parameters, therefore no parameter can be <code>null</code>.
+        /// If any parameter is <code>null</code> (or you can't be sure of that, i.e. receive from a variable), 
+        /// use a different overload of this method.</param>
+        /// <returns>The value returned by the indexer.</returns>
+        public static object GetIndexer(this object target, Flags flags, params object[] parameters)
+        {
+            return DelegateForGetIndexer(target.GetTypeAdjusted(), flags, parameters.GetTypeArray())(target, parameters);
+        }
+
+        /// <summary>
+        /// Gets the value of the indexer of object <paramref name="target"/>
+        /// </summary>
+        /// <param name="target">The object whose indexer is to be retrieved.</param>
+        /// <param name="paramTypes">The types of the indexer parameters (must be in the right order).</param>
+        /// <param name="parameters">The list of the indexer parameters.</param>
+        /// <returns>The value returned by the indexer.</returns>
+        public static object GetIndexer(this object target, Flags flags, Type[] paramTypes, params object[] parameters)
+        {
+            return DelegateForGetIndexer(target.GetTypeAdjusted(), flags, paramTypes)(target, parameters);
+        }
+
+        /// <summary>
         /// Creates a delegate which can set an indexer
         /// </summary>
         /// <param name="targetType">The type which the indexer belongs to.</param>
@@ -264,10 +410,9 @@ namespace Fasterflect
         /// MethodInvoker invoker = type.DelegateForSetIndexer(new Type[]{typeof(int), typeof(string)});
         /// </code>
         /// </example>
-        public static MethodInvoker DelegateForSetIndexer( this Type targetType, params Type[] paramTypes )
+        public static MethodInvoker DelegateForSetIndexer(this Type targetType, params Type[] paramTypes)
         {
-            return (MethodInvoker) new MethodInvocationEmitter(
-                                       Constants.IndexerSetterName, targetType, paramTypes, false ).GetDelegate();
+            return DelegateForSetIndexer( targetType, Flags.DefaultCriteria, paramTypes );
         }
 
         /// <summary>
@@ -276,10 +421,41 @@ namespace Fasterflect
         /// <param name="targetType">The type which the indexer belongs to.</param>
         /// <param name="paramTypes">The types of the indexer parameters (must be in the right order).</param>
         /// <returns>The delegate which can get the value of an indexer.</returns>
-        public static MethodInvoker DelegateForGetIndexer( this Type targetType, params Type[] paramTypes )
+        public static MethodInvoker DelegateForGetIndexer(this Type targetType, params Type[] paramTypes)
         {
-            return (MethodInvoker) new MethodInvocationEmitter(
-                                       Constants.IndexerGetterName, targetType, paramTypes, false ).GetDelegate();
+            return DelegateForGetIndexer(targetType, Flags.DefaultCriteria, paramTypes);
+        }
+
+        /// <summary>
+        /// Creates a delegate which can set an indexer
+        /// </summary>
+        /// <param name="targetType">The type which the indexer belongs to.</param>
+        /// <param name="paramTypes">The types of the indexer parameters (must be in the right order), plus
+        /// the type of the indexer.</param>
+        /// <returns>A delegate which can set an indexer.</returns>
+        /// <example>
+        /// If the indexer is of type <c>string</c> and accepts one parameter of type <c>int</c>, this 
+        /// method should be invoked as follow:
+        /// <code>
+        /// MethodInvoker invoker = type.DelegateForSetIndexer(new Type[]{typeof(int), typeof(string)});
+        /// </code>
+        /// </example>
+        public static MethodInvoker DelegateForSetIndexer(this Type targetType, Flags flags, params Type[] paramTypes)
+        {
+            return (MethodInvoker)new MethodInvocationEmitter(targetType, flags, Constants.IndexerSetterName, paramTypes, false).
+                GetDelegate();
+        }
+
+        /// <summary>
+        /// Creates a delegate which can get the value of an indexer.
+        /// </summary>
+        /// <param name="targetType">The type which the indexer belongs to.</param>
+        /// <param name="paramTypes">The types of the indexer parameters (must be in the right order).</param>
+        /// <returns>The delegate which can get the value of an indexer.</returns>
+        public static MethodInvoker DelegateForGetIndexer(this Type targetType, Flags flags, params Type[] paramTypes)
+        {
+            return (MethodInvoker)new MethodInvocationEmitter( targetType, flags, Constants.IndexerGetterName, paramTypes, false ).
+                    GetDelegate();
         }
         #endregion
 

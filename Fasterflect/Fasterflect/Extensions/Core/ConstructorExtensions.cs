@@ -45,7 +45,7 @@ namespace Fasterflect
         /// </summary>
         public static object CreateInstance( this Type targetType )
         {
-            return DelegateForCreateInstance( targetType, Type.EmptyTypes )();
+            return DelegateForCreateInstance( targetType )();
         }
 
         /// <summary>
@@ -63,24 +63,67 @@ namespace Fasterflect
         /// </summary>
         public static object CreateInstance( this Type targetType, Type[] paramTypes, params object[] parameters )
         {
-            return DelegateForCreateInstance( targetType, paramTypes ?? parameters.GetTypeArray() )( parameters );
+            return DelegateForCreateInstance( targetType, paramTypes )( parameters );
+        }
+
+        /// <summary>
+        /// Invokes the no-arg constructor on type <paramref name="targetType"/>.
+        /// </summary>
+        public static object CreateInstance(this Type targetType, Flags flags)
+        {
+            return DelegateForCreateInstance( targetType, flags )();
+        }
+
+        /// <summary>
+        /// Invokes a constructor whose parameter types are inferred from <paramref name="parameters" /> 
+        /// on the type <paramref name="targetType"/> with <paramref name="parameters" /> being the arguments.
+        /// </summary>
+        public static object CreateInstance(this Type targetType, Flags flags, params object[] parameters)
+        {
+            return DelegateForCreateInstance( targetType, flags, parameters.GetTypeArray() )( parameters );
+        }
+
+        /// <summary>
+        /// Invokes a constructor whose parameter types are <paramref name="paramTypes" /> 
+        /// on the type <paramref name="targetType"/> with <paramref name="parameters" /> being the arguments.
+        /// </summary>
+        public static object CreateInstance(this Type targetType, Flags flags, Type[] paramTypes, params object[] parameters)
+        {
+            return DelegateForCreateInstance( targetType, flags, paramTypes )( parameters );
         }
 
         /// <summary>
         /// Creates a delegate which can invoke the no-arg constructor on type <paramref name="targetType"/>.
         /// </summary>
-        public static ConstructorInvoker DelegateForCreateInstance( this Type targetType )
+        public static ConstructorInvoker DelegateForCreateInstance(this Type targetType)
         {
-            return DelegateForCreateInstance( targetType, Type.EmptyTypes );
+            return DelegateForCreateInstance(targetType, Type.EmptyTypes);
         }
 
         /// <summary>
         /// Creates a delegate which can invoke the constructor whose parameter types are <paramref name="paramTypes" />
         /// on the type <paramref name="targetType"/>. 
         /// </summary>
-        public static ConstructorInvoker DelegateForCreateInstance( this Type targetType, params Type[] paramTypes )
+        public static ConstructorInvoker DelegateForCreateInstance(this Type targetType, params Type[] paramTypes)
         {
-            return (ConstructorInvoker) new CtorInvocationEmitter( targetType, paramTypes ).GetDelegate();
+            return DelegateForCreateInstance(targetType, Flags.InstanceCriteria | Flags.ParameterMatch, paramTypes);
+        }
+
+        /// <summary>
+        /// Creates a delegate which can invoke the no-arg constructor on type <paramref name="targetType"/>.
+        /// </summary>
+        public static ConstructorInvoker DelegateForCreateInstance(this Type targetType, Flags flags)
+        {
+            return DelegateForCreateInstance(targetType, flags, Type.EmptyTypes);
+        }
+
+        /// <summary>
+        /// Creates a delegate which can invoke the constructor whose parameter types are <paramref name="paramTypes" />
+        /// on the type <paramref name="targetType"/>. 
+        /// </summary>
+        public static ConstructorInvoker DelegateForCreateInstance(this Type targetType, Flags flags, params Type[] paramTypes)
+        {
+            return (ConstructorInvoker) new CtorInvocationEmitter( targetType, flags, paramTypes ).GetDelegate();
         }
         #endregion
 

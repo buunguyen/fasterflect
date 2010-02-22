@@ -30,7 +30,7 @@ namespace Fasterflect
 	/// This class encapsulates common <see cref="BindingFlags"/> combinations and provides various
 	/// additional Fasterflect-specific flags to further tailor the lookup experience.
 	/// </summary>
-	public sealed class Flags
+	public struct Flags
 	{
 		private readonly long flags;
 		private static readonly Dictionary<Flags,string> flagNames = new Dictionary<Flags, string>( 64 );
@@ -80,6 +80,7 @@ namespace Fasterflect
 		#endregion
 
         #region FasterflectFlags
+
         /// <summary>
         /// If this option is specified the search for a named member will perform an exact match on the
         /// full member name. If <see href="TrimExplicitlyImplemented"/> is specified the trimmed name is
@@ -213,11 +214,11 @@ namespace Fasterflect
 		}
 		public static Flags SetOnlyIf( Flags flags, Flags mask, bool condition )
 		{
-			return condition ? flags | mask : flags & ~mask;
+			return condition ? flags | mask : (Flags)(flags & ~mask);
 		}
 		public static Flags ClearIf( Flags flags, Flags mask, bool condition )
 		{
-			return condition ? flags & ~mask : flags;
+			return condition ? (Flags)(flags & ~mask) : flags;
 		}
 		#endregion
 
@@ -265,7 +266,7 @@ namespace Fasterflect
 		{
 			return new Flags( (long)m );
 		}
-		public static implicit operator Flags( long m )
+		public static explicit operator Flags( long m )
 		{
 			return new Flags( m );
 		}
@@ -282,7 +283,8 @@ namespace Fasterflect
 		#region ToString
 		public override string ToString()
 		{
-			var names = flagNames.Where( kvp => IsSet( kvp.Key ) ).Select( kvp => kvp.Value ).OrderBy( n => n ).ToList();
+		    Flags @this = this;
+		    var names = flagNames.Where( kvp => @this.IsSet( kvp.Key ) ).Select( kvp => kvp.Value ).OrderBy( n => n ).ToList();
 			int index = 0;
 			var sb = new StringBuilder();
 			names.ForEach( n => sb.AppendFormat( "{0}{1}", n, ++index < names.Count ? " | " : "" ) );

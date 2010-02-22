@@ -31,9 +31,7 @@ namespace Fasterflect.Emitter
             if (ctorInfo != null)
                 return ctorInfo;
 
-            ctorInfo = callInfo.TargetType.GetConstructor(
-                Flags.InstanceCriteria | Flags.ParameterMatch,
-                null, CallingConventions.HasThis, callInfo.ParamTypes, null);
+            ctorInfo = callInfo.TargetType.Constructor( callInfo.Flags, callInfo.ParamTypes );
             if (ctorInfo == null)
                 throw new MissingMemberException("Constructor does not exist");
             return ctorInfo;
@@ -45,7 +43,7 @@ namespace Fasterflect.Emitter
             if (methodInfo != null)
                 return methodInfo;
 
-            methodInfo = callInfo.TargetType.Method( callInfo.Name, callInfo.ScopeFlag | Flags.DefaultCriteria, callInfo.ParamTypes, null );
+            methodInfo = callInfo.TargetType.Method( callInfo.Name, callInfo.Flags, callInfo.ParamTypes, null );
             if (methodInfo == null)
                 throw new MissingMethodException(callInfo.IsStatic
                                                     ? "Static method "
@@ -61,7 +59,7 @@ namespace Fasterflect.Emitter
 
             if (callInfo.MemberTypes == MemberTypes.Property)
             {
-                memberInfo = callInfo.TargetType.Property(callInfo.Name, Flags.DefaultCriteria | callInfo.ScopeFlag);
+                memberInfo = callInfo.TargetType.Property(callInfo.Name, callInfo.Flags);
                 if (memberInfo == null)
                         throw new MissingMemberException((callInfo.IsStatic ? "Static property" : "Property") +
                             " '" + callInfo.Name + "' does not exist");
@@ -69,7 +67,7 @@ namespace Fasterflect.Emitter
             }
             if (callInfo.MemberTypes == MemberTypes.Field)
             {
-                memberInfo = callInfo.TargetType.Field(callInfo.Name, Flags.DefaultCriteria | callInfo.ScopeFlag);
+                memberInfo = callInfo.TargetType.Field(callInfo.Name, callInfo.Flags);
                 if (memberInfo == null)
                     throw new MissingFieldException((callInfo.IsStatic ? "Static field" : "Field") +
                         " '" + callInfo.Name + "' does not exist");
@@ -92,7 +90,7 @@ namespace Fasterflect.Emitter
 
         private static MethodInfo GetPropertyMethod(string infoPrefix, string errorPrefix, CallInfo callInfo)
         {
-            MethodInfo setMethod = callInfo.TargetType.Method(infoPrefix + callInfo.Name, Flags.DefaultCriteria | callInfo.ScopeFlag);
+            MethodInfo setMethod = callInfo.TargetType.Method(infoPrefix + callInfo.Name, callInfo.Flags);
             if (setMethod == null)
                 throw new MissingMemberException(errorPrefix + " method for property " + callInfo.Name + " does not exist");
             return setMethod;

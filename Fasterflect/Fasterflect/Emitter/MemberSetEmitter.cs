@@ -27,18 +27,18 @@ namespace Fasterflect.Emitter
     internal class MemberSetEmitter : BaseEmitter
     {
         public MemberSetEmitter(MemberInfo memberInfo, bool isStatic)
-            : this(memberInfo.DeclaringType, memberInfo.MemberType, memberInfo.Name, isStatic, memberInfo)
+            : this(memberInfo.DeclaringType, null, memberInfo.MemberType, memberInfo.Name, isStatic, memberInfo)
         {
         }
 
-		public MemberSetEmitter(Type targetType, MemberTypes memberType, string fieldOrProperty, bool isStatic)
-            : this(targetType, memberType, fieldOrProperty, isStatic, null)
+		public MemberSetEmitter(Type targetType, Flags flags, MemberTypes memberType, string fieldOrProperty, bool isStatic)
+            : this(targetType, flags, memberType, fieldOrProperty, isStatic, null)
 		{
 		}
 
-        private MemberSetEmitter(Type targetType, MemberTypes memberType, string fieldOrProperty, bool isStatic, MemberInfo memberInfo)
+        private MemberSetEmitter(Type targetType, Flags? flags, MemberTypes memberType, string fieldOrProperty, bool isStatic, MemberInfo memberInfo)
         {
-            callInfo = new CallInfo(targetType, memberType, fieldOrProperty,
+            callInfo = new CallInfo(targetType, flags, memberType, fieldOrProperty,
                                     Constants.ArrayOfObjectType, isStatic, memberInfo);
         }
 
