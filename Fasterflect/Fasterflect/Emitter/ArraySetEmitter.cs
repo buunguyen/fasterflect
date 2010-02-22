@@ -29,8 +29,8 @@ namespace Fasterflect.Emitter
 	{
 		public ArraySetEmitter(Type targetType)
 		{
-			callInfo = new CallInfo(targetType, MemberTypes.Method, Constants.ArraySetterName,
-                                    new[] { typeof(int), targetType.GetElementType() }, false);
+			callInfo = new CallInfo(targetType, null, MemberTypes.Method, Constants.ArraySetterName,
+                                    new[] { typeof(int), targetType.GetElementType() }, false, null);
 		}
         
         protected internal override DynamicMethod CreateDynamicMethod()

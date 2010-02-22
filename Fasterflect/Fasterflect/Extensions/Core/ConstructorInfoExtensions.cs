@@ -18,6 +18,7 @@
 
 #endregion
 
+using System;
 using System.Reflection;
 using Fasterflect.Emitter;
 

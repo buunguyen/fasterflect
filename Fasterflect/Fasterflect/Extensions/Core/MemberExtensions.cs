@@ -120,7 +120,7 @@ namespace Fasterflect
 		{
 			if( type == null || type == typeof(object) ) { return new List<MemberInfo>(); }
 
-			flags = flags ?? Flags.Default;
+			//flags = flags ?? Flags.Default;
 			bool recurse = flags.IsNotSet( Flags.DeclaredOnly );
         	flags |= Flags.DeclaredOnly;
             flags &= ~BindingFlags.FlattenHierarchy;
