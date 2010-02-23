@@ -262,21 +262,17 @@ namespace FasterflectTest.Lookup
         [TestMethod]
         public void TestFindSpecificAttributeOnField()
         {
-            // inherited field using exact type
-            FieldInfo field = typeof(Lion).Field( "birthDay", Flags.InstanceCriteria | Flags.ExactParameterMatch, typeof(DateTime) );
-            Assert.IsNull( field );
-            // inherited field using assignment compatibilty (default)
-			field = typeof(Lion).Field( "birthDay", Flags.InstanceCriteria, typeof(DateTime) );
+            // declared field
+            FieldInfo field = typeof(Lion).Field( "lastMealTime", Flags.InstanceCriteria | Flags.DeclaredOnly );
             Assert.IsNotNull( field );
-			// inherited field using exact type
-            field = typeof(Lion).Field( "birthDay", Flags.InstanceCriteria, typeof(DateTime?) );
+            Assert.IsNotNull( field.Attribute<CodeAttribute>() );
+            // inherited field
+            field = typeof(Lion).Field( "birthDay", Flags.InstanceCriteria );
+            Assert.IsNotNull( field );
+            field = typeof(Lion).Field( "birthDay", Flags.InstanceCriteria );
             Assert.IsNotNull( field );
             Assert.IsNull( field.Attribute<CodeAttribute>() );
             Assert.IsNotNull( field.Attribute<DefaultValueAttribute>() );
-            // declared field
-            field = typeof(Lion).Field( "lastMealTime", Flags.InstanceCriteria, typeof(DateTime) );
-            Assert.IsNotNull( field );
-            Assert.IsNotNull( field.Attribute<CodeAttribute>() );
         }
 
         [TestMethod]

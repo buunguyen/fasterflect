@@ -55,15 +55,6 @@ namespace FasterflectTest.Lookup
         }
 
         [TestMethod]
-		public void TestPropertyInstanceWithPropertyType()
-        {
-        	BindingFlags flags = Flags.InstanceCriteria;
-
-			AnimalInstancePropertyNames.Select( s => typeof(Animal).Property( s, flags, AnimalInstancePropertyTypes[ Array.IndexOf( AnimalInstancePropertyNames, s ) ] ) ).ForEach( Assert.IsNotNull );
-			LionInstancePropertyNames.Select( s => typeof(Lion).Property( s, flags, LionInstancePropertyTypes[ Array.IndexOf( LionInstancePropertyNames, s ) ] ) ).ForEach( Assert.IsNotNull );
-        }
-
-        [TestMethod]
 		public void TestPropertyInstanceDeclaredOnly()
         {
         	BindingFlags flags = Flags.InstanceCriteria | BindingFlags.DeclaredOnly;

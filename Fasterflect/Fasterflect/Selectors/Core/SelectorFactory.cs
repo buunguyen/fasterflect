@@ -31,7 +31,7 @@ namespace Fasterflect.Selectors.Core
                    { Flags.PartialNameMatch, new PartialNameMatch() },
                    { Flags.ExcludeExplicitlyImplemented, new ExcludeExplicitlyImplemented() },
                    { Flags.ParameterMatch, new ParameterMatch() },
-                   { Flags.ExactParameterMatch, new ExactParameterMatch() },
+                   // { Flags.ExactParameterMatch, new ExactParameterMatch() },
 				   { Flags.ExcludeBackingMembers, new ExcludeBackingMembers() }
                };
 

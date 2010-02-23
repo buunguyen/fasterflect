@@ -43,7 +43,7 @@ namespace Fasterflect.Emitter
             if (methodInfo != null)
                 return methodInfo;
 
-            methodInfo = callInfo.TargetType.Method( callInfo.Name, callInfo.Flags, callInfo.ParamTypes, null );
+            methodInfo = callInfo.TargetType.Method( callInfo.Name, callInfo.Flags, callInfo.ParamTypes );
             if (methodInfo == null)
                 throw new MissingMethodException(callInfo.IsStatic
                                                     ? "Static method "

@@ -52,15 +52,6 @@ namespace FasterflectTest.Lookup
         }
 
         [TestMethod]
-		public void TestFieldInstanceWithFieldType()
-        {
-        	BindingFlags flags = Flags.InstanceCriteria;
-
-			AnimalInstanceFieldNames.Select( s => typeof(Animal).Field( s, flags, AnimalInstanceFieldTypes[ Array.IndexOf( AnimalInstanceFieldNames, s ) ] ) ).ForEach( Assert.IsNotNull );
-			LionInstanceFieldNames.Select( s => typeof(Lion).Field( s, flags, LionInstanceFieldTypes[ Array.IndexOf( LionInstanceFieldNames, s ) ] ) ).ForEach( Assert.IsNotNull );
-        }
-
-        [TestMethod]
 		public void TestFieldInstanceDeclaredOnly()
         {
         	BindingFlags flags = Flags.InstanceCriteria | BindingFlags.DeclaredOnly;

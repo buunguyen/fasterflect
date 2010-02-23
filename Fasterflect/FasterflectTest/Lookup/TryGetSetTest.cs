@@ -57,7 +57,7 @@ namespace FasterflectTest.Lookup
         }
 
         [TestMethod]
-		public void TestTryGetSetMembe()
+		public void TestTryGetSetMember()
         {
 			Lion lion = new Lion( 42, "Scar" );
 			// tryget

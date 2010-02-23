@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
+using Fasterflect.Internal;
 
 namespace Fasterflect
 {
@@ -264,35 +265,34 @@ namespace Fasterflect
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
         public static FieldInfo Field( this Type type, string name )
         {
-            return type.Field( name, Flags.InstanceCriteria, null );
+            return type.Field( name, Flags.InstanceCriteria );
         }
 
         /// <summary>
         /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. 
         /// Use the <paramref name="flags"/> parameter to define the scope of the search.
-        /// Use the <seealso href="FieldDeclared"/> method if you do not wish to search base types.  
         /// </summary>
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
         public static FieldInfo Field( this Type type, string name, Flags flags )
         {
-            return type.Field( name, flags, null );
-        }
+			// we need to check all fields to do partial name matches
+			if( flags.IsAnySet( Flags.PartialNameMatch | Flags.TrimExplicitlyImplemented ) )
+				return type.Fields( flags, name ).FirstOrDefault();
 
-        /// <summary>
-        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
-        /// if supplied for the <paramref name="fieldType"/> parameter then the fields type must be assignment
-        /// compatible with this type. Use the <paramref name="flags"/> parameter to define the scope of the search.
-        /// Use the <seealso href="FieldDeclared"/> method if you do not wish to search base types.  
-        /// </summary>
-        /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
-        public static FieldInfo Field( this Type type, string name, Flags flags, Type fieldType )
-        {
-			if( string.IsNullOrEmpty( name ) )
-				throw new ArgumentException( "You must supply a valid name to search for.", "name" );
-
-			bool exactMatch = flags.IsSet( Flags.ExactParameterMatch );
-        	return type.Fields( flags, name ).FirstOrDefault( f => fieldType == null || 
-				(exactMatch ? f.FieldType == fieldType : f.FieldType.IsAssignableFrom( fieldType )) );
+			var result = type.GetField( name, flags );
+			if( result == null && flags.IsNotSet( Flags.DeclaredOnly ) )
+			{ 
+				if( type.BaseType != typeof(object) && type.BaseType != null )
+        			return type.BaseType.Field( name, flags );
+			}
+			bool hasSpecialFlags = flags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+			if( hasSpecialFlags )
+			{
+				IList<FieldInfo> fields = new List<FieldInfo> { result };
+				fields = fields.Filter( flags );
+				return fields.Count > 0 ? fields[ 0 ] : null;
+			}
+			return result;
         }
         #endregion
 
@@ -314,7 +314,40 @@ namespace Fasterflect
         /// <returns>A list of all matching fields on the type. This value will never be null.</returns>
         public static IList<FieldInfo> Fields( this Type type, Flags flags, params string[] names )
         {
-        	return type.Members( MemberTypes.Field, flags, names ).Cast<FieldInfo>().ToList();
+			if( type == null || type == typeof(object) ) { return new FieldInfo[ 0 ]; }
+
+			bool recurse = flags.IsNotSet( Flags.DeclaredOnly );
+			bool hasNames = names != null && names.Length > 0;
+			bool hasSpecialFlags = flags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+        	
+			if( ! recurse && ! hasNames && ! hasSpecialFlags )
+				return type.GetFields( flags ) ?? new FieldInfo[ 0 ];
+
+			var fields = GetFields( type, flags );
+			fields = hasSpecialFlags ? fields.Filter( flags ) : fields;
+			fields = hasNames ? fields.Filter( flags, names ) : fields;
+			return fields;
+		}
+
+        private static IList<FieldInfo> GetFields( Type type, Flags flags )
+        {
+			bool recurse = flags.IsNotSet( Flags.DeclaredOnly );
+
+			if( ! recurse )
+				return type.GetFields( flags ) ?? new FieldInfo[ 0 ];
+
+			flags |= Flags.DeclaredOnly;
+			flags &= ~BindingFlags.FlattenHierarchy;
+
+        	var fields = new List<FieldInfo>();
+			fields.AddRange( type.GetFields( flags ) );
+			Type baseType = type.BaseType;
+			while( baseType != null && baseType != typeof(object) )
+			{
+				fields.AddRange( baseType.GetFields( flags ) );
+			    baseType = baseType.BaseType;
+			}
+			return fields;
 		}
         #endregion
 

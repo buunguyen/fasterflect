@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Fasterflect.Internal;
 using Fasterflect.Selectors.Core;
 
 namespace Fasterflect
@@ -52,9 +53,23 @@ namespace Fasterflect
 		/// <returns>A single MemberInfo instance of the first found match or null if no match was found.</returns>
 		public static MemberInfo Member( this Type type, string name, Flags flags )
 		{
-			return type.Members( MemberTypes.All, flags, name ).FirstOrDefault();
+			// we need to check all members to do partial name matches
+			if( flags.IsAnySet( Flags.PartialNameMatch | Flags.TrimExplicitlyImplemented ) )
+				return type.Members( MemberTypes.All, flags, name ).FirstOrDefault();
+
+			IList<MemberInfo> result = type.GetMember( name, flags );
+			bool hasSpecialFlags = flags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+			result = hasSpecialFlags && result.Count > 0 ? result.Filter( flags ) : result;
+			bool found = result.Count > 0;
+			
+			if( ! found && flags.IsNotSet( Flags.DeclaredOnly ) )
+			{ 
+				if( type.BaseType != typeof(object) && type.BaseType != null )
+        			return type.BaseType.Member( name, flags );
+			}
+			return found ? result[ 0 ] : null;
 		}
-		#endregion
+ 		#endregion
 
 		#region Member Lookup (FieldsAndProperties)
 		/// <summary>
@@ -116,30 +131,42 @@ namespace Fasterflect
         /// parameter then filtering will be applied in accordance with the given <paramref name="flags"/>.
 		/// </summary>
 		/// <returns>A list of all matching members on the type. This value will never be null.</returns>
-		public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes, Flags flags, params string[] names )
-		{
-			if( type == null || type == typeof(object) ) { return new List<MemberInfo>(); }
+        public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes, Flags flags, params string[] names )
+        {
+			if( type == null || type == typeof(object) ) { return new MemberInfo[ 0 ]; }
 
-			//flags = flags ?? Flags.Default;
 			bool recurse = flags.IsNotSet( Flags.DeclaredOnly );
-        	flags |= Flags.DeclaredOnly;
-            flags &= ~BindingFlags.FlattenHierarchy;
-
-			var members = new List<MemberInfo>( type.FindMembers( memberTypes, flags, null, null ) );
-            Type baseType = type.BaseType;
-            while( recurse && baseType != null && baseType != typeof(object) )
-            {
-                members.AddRange( baseType.FindMembers( memberTypes, flags, null, null ) );
-                baseType = baseType.BaseType;
-            }
-
 			bool hasNames = names != null && names.Length > 0;
-			flags = Flags.SetOnlyIf( flags, Flags.NameMatch, hasNames && ! flags.IsSet( Flags.PartialNameMatch ) );
-			flags = Flags.ClearIf( flags, Flags.PartialNameMatch, ! hasNames );
-			var selectors = SelectorFactory.GetMemberSelectors( flags ).ToList();
-			members = members.Where( m => selectors.All( s => hasNames ? names.Any( n => s.IsMatch( m, flags, n ) ) : s.IsMatch( m, flags, null ) ) ).ToList();
+			bool hasSpecialFlags = flags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+        	
+			if( ! recurse && ! hasNames && ! hasSpecialFlags )
+				return type.FindMembers( memberTypes, flags, null, null );
+
+			var members = GetMembers( type, memberTypes, flags );
+			members = hasSpecialFlags ? members.Filter( flags ) : members;
+			members = hasNames ? members.Filter( flags, names ) : members;
 			return members;
 		}
+        private static IList<MemberInfo> GetMembers( Type type, MemberTypes memberTypes, Flags flags )
+        {
+			bool recurse = flags.IsNotSet( Flags.DeclaredOnly );
+
+			if( ! recurse )
+				return type.FindMembers( memberTypes, flags, null, null );
+
+			flags |= Flags.DeclaredOnly;
+			flags &= ~BindingFlags.FlattenHierarchy;
+
+        	var members = new List<MemberInfo>();
+			members.AddRange( type.FindMembers( memberTypes, flags, null, null ) );
+			Type baseType = type.BaseType;
+			while( baseType != null && baseType != typeof(object) )
+			{
+				members.AddRange( baseType.FindMembers( memberTypes, flags, null, null ) );
+			    baseType = baseType.BaseType;
+			}
+			return members;
+		}		
 		#endregion
 
 		#region Member Combined
@@ -166,10 +193,16 @@ namespace Fasterflect
 		public static bool TrySetValue( this object source, string name, object value, Flags flags )
 		{
 			Type type = source.GetType();
-			var info = type.Member( name, flags );
-			if( info != null )
+			var property = type.Property( name, flags );
+			if( property != null && property.CanWrite )
 			{
-				info.Set( source, value );
+				property.Set( source, value );
+				return true;
+			}
+			var field = type.Field( name, flags );
+			if( field != null )
+			{
+				field.Set( source, value );
 				return true;
 			}
 			return false;

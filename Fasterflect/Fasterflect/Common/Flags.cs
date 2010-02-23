@@ -52,7 +52,7 @@ namespace Fasterflect
 	        flagNames[ TrimExplicitlyImplemented ] = "TrimExplicitlyImplemented"; // new Flags( 1L << 34 );
 	        flagNames[ ExcludeExplicitlyImplemented ] = "ExcludeExplicitlyImplemented"; // = new Flags( 1L << 35 );
 	        flagNames[ ParameterMatch ] = "ParameterMatch"; // = new Flags( 1L << 36 );
-	        flagNames[ ExactParameterMatch ] = "ExactParameterMatch"; // = new Flags( 1L << 37 );
+	        //flagNames[ ExactParameterMatch ] = "ExactParameterMatch"; // = new Flags( 1L << 37 );
 	        flagNames[ ExcludeBackingMembers ] = "ExcludeBackingMembers"; // = new Flags( 1L << 38 );
 
 	        flagNames[ VisibilityMatch ] = "VisibilityMatch"; // = new Flags( 1L << 55 );
@@ -73,6 +73,7 @@ namespace Fasterflect
 		public static readonly Flags None = new Flags( (long)BindingFlags.Default );
         public static readonly Flags IgnoreCase = new Flags((long)BindingFlags.IgnoreCase);
         public static readonly Flags DeclaredOnly = new Flags((long)BindingFlags.DeclaredOnly);
+        public static readonly Flags ExactBinding = new Flags((long)BindingFlags.ExactBinding);
         public static readonly Flags Public = new Flags((long)BindingFlags.Public);
         public static readonly Flags NonPublic = new Flags((long)BindingFlags.NonPublic);
         public static readonly Flags Instance = new Flags((long)BindingFlags.Instance);
@@ -114,11 +115,11 @@ namespace Fasterflect
         /// implicit conversion of primitive types. This options is set automatically when applicable.   
         /// </summary>
         public static readonly Flags ParameterMatch = new Flags( 1L << 36 );
-        /// <summary>
-        /// If this option is specified the parameter types must match exactly rather than by
-        /// assignment compatibility. 
-        /// </summary>
-        public static readonly Flags ExactParameterMatch = new Flags( 1L << 37 );
+		/// <summary>
+		/// If this option is specified the parameter types must match exactly rather than by
+		/// assignment compatibility. 
+		/// </summary>
+		//public static readonly Flags ExactParameterMatch = new Flags( 1L << 37 );
         /// <summary>
         /// If this option is specified all members that are backers for another member, such as backing
         /// fields for automatic properties or get/set methods for properties, will be excluded from the 
@@ -163,7 +164,7 @@ namespace Fasterflect
 		/// <summary>
         /// Search criteria encompassing all public and non-public members.
         /// </summary>
-        public static readonly Flags DefaultCriteria = Public | NonPublic | TrimExplicitlyImplemented;
+        public static readonly Flags DefaultCriteria = Public | NonPublic;
 
         /// <summary>
         /// Search criteria encompassing all public and non-public instance members.

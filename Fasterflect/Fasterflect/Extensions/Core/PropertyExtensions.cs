@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
+using Fasterflect.Internal;
+using Fasterflect.Selectors.Core;
 
 namespace Fasterflect
 {
@@ -468,35 +470,34 @@ namespace Fasterflect
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
         public static PropertyInfo Property( this Type type, string name )
         {
-        	return type.Property( name, Flags.InstanceCriteria, null );
+        	return type.Property( name, Flags.InstanceCriteria );
         }
 
         /// <summary>
         /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>. 
         /// Use the <paramref name="flags"/> parameter to define the scope of the search.
-        /// Use the <seealso href="PropertyDeclared"/> method if you do not wish to search base types.  
         /// </summary>
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
         public static PropertyInfo Property( this Type type, string name, Flags flags )
         {
-        	return type.Property( name, flags, null );
-        }
+			// we need to check all properties to do partial name matches
+			if( flags.IsAnySet( Flags.PartialNameMatch | Flags.TrimExplicitlyImplemented ) )
+				return type.Properties( flags, name ).FirstOrDefault();
 
-        /// <summary>
-        /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>. If a value
-        /// if supplied for the <paramref name="propertyType"/> parameter then the properties type must be assignment
-        /// compatible with this type. Use the <paramref name="flags"/> parameter to define the scope of the search.
-        /// Use the <seealso href="PropertyDeclared"/> method if you do not wish to search base types.  
-        /// </summary>
-        /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
-        public static PropertyInfo Property( this Type type, string name, Flags flags, Type propertyType )
-        {
-			if( string.IsNullOrEmpty( name ) )
-				throw new ArgumentException( "You must supply a valid name to search for.", "name" );
-
-			bool exactMatch = flags.IsSet( Flags.ExactParameterMatch );
-        	return type.Properties( flags, name ).FirstOrDefault( p => propertyType == null || 
-				(exactMatch ? p.PropertyType == propertyType : p.PropertyType.IsAssignableFrom( propertyType )) );
+        	var result = type.GetProperty( name, flags );
+        	if( result == null && flags.IsNotSet( Flags.DeclaredOnly ) )
+			{ 
+				if( type.BaseType != typeof(object) && type.BaseType != null )
+        			return type.BaseType.Property( name, flags );
+			}
+			bool hasSpecialFlags = flags.IsSet( Flags.ExcludeExplicitlyImplemented );
+			if( hasSpecialFlags )
+			{
+				IList<PropertyInfo> properties = new List<PropertyInfo> { result };
+				properties = properties.Filter( flags );
+				return properties.Count > 0 ? properties[ 0 ] : null;
+			}
+			return result;
         }
         #endregion
 
@@ -534,9 +535,69 @@ namespace Fasterflect
         /// <returns>A list of all matching properties on the type. This value will never be null.</returns>
         public static IList<PropertyInfo> Properties( this Type type, Flags flags, params string[] names )
         {
-        	return type.Members( MemberTypes.Property, flags, names ).Cast<PropertyInfo>().ToList();
+			if( type == null || type == typeof(object) ) { return new PropertyInfo[ 0 ]; }
+
+			bool recurse = flags.IsNotSet( Flags.DeclaredOnly );
+			bool hasNames = names != null && names.Length > 0;
+			bool hasSpecialFlags = flags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+        	
+			if( ! recurse && ! hasNames && ! hasSpecialFlags )
+				return type.GetProperties( flags ) ?? new PropertyInfo[ 0 ];
+
+			var properties = GetProperties( type, flags );
+			properties = hasSpecialFlags ? properties.Filter( flags ) : properties;
+			properties = hasNames ? properties.Filter( flags, names ) : properties;
+			return properties;
 		}
-        #endregion
+
+        private static IList<PropertyInfo> GetProperties( Type type, Flags flags )
+        {
+			bool recurse = flags.IsNotSet( Flags.DeclaredOnly );
+
+			if( ! recurse )
+				return type.GetProperties( flags ) ?? new PropertyInfo[ 0 ];
+
+			flags |= Flags.DeclaredOnly;
+			flags &= ~BindingFlags.FlattenHierarchy;
+
+        	var properties = new List<PropertyInfo>();
+			properties.AddRange( type.GetProperties( flags ) );
+			Type baseType = type.BaseType;
+			while( baseType != null && baseType != typeof(object) )
+			{
+				properties.AddRange( baseType.GetProperties( flags ) );
+			    baseType = baseType.BaseType;
+			}
+			return properties;
+		}
+
+		/// <summary>
+		/// This method applies name filtering to a set of properties.
+		/// </summary>
+		private static IList<PropertyInfo> ApplyFilters( IList<PropertyInfo> members, Flags flags, string[] names )
+		{
+			var result = new List<PropertyInfo>( members.Count );
+			bool isPartial = flags.IsSet( Flags.PartialNameMatch );
+			bool trimExplicit = flags.IsSet( Flags.TrimExplicitlyImplemented );
+
+			for( int i = 0; i < members.Count; i++ )
+			{
+				var member = members[ i ];
+				for( int j = 0; j < names.Length; j++ )
+				{
+					var name = names[ j ];
+					var memberName = trimExplicit ? member.Name.TrimExplicitlyImplementedName() : member.Name;
+					bool match = (isPartial && memberName.Contains( name )) || memberName == name;
+					if( match )
+					{
+						result.Add( member );
+						break;
+					}
+				}
+			}
+			return members;
+		}
+    	#endregion
 
 		#region Property Combined
 		#region TryGetValue
