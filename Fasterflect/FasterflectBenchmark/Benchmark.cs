@@ -96,19 +96,20 @@ namespace FasterflectBenchmark
 
 		public static void Main(string[] args)
 		{
-			RunDictionaryBenchmark();
-			RunHashCodeBenchmark();
-			RunLookupBenchmark();
-			RunTryCreateInstanceBenchmark();
-			RunConstructorBenchmark();
-			RunFieldBenchmark();
-			RunStaticFieldBenchmark();
-			RunPropertyBenchmark();
-			RunStaticPropertyBenchmark();
-			RunMethodInvocationBenchmark();
-			RunStaticMethodInvocationBenchmark();
-			RunIndexerBenchmark();
-			RunArrayBenchmark();
+            //RunDictionaryBenchmark();
+            //RunHashCodeBenchmark();
+            //RunLookupBenchmark();
+            //RunTryCreateInstanceBenchmark();
+            RunConstructorBenchmark();
+            RunFieldBenchmark();
+            RunStaticFieldBenchmark();
+            RunPropertyBenchmark();
+            RunStaticPropertyBenchmark();
+            RunMethodInvocationBenchmark();
+            RunStaticMethodInvocationBenchmark();
+            RunIndexerBenchmark();
+            RunArrayBenchmark();
+		    RunMetadataIntegrationBenchmark();
 		}
 
 	    #region Internal Testing
@@ -122,7 +123,7 @@ namespace FasterflectBenchmark
 			stringList.ForEach( s => stringCache.Insert( s, s, CacheStrategy.Permanent ) );
 			
 			string key = stringList[ index ];
-			var callInfo = new CallInfo( TargetType, Flags.DefaultCriteria, MemberTypes.Field, "name", Constants.ArrayOfObjectType, false, null );
+			var callInfo = new CallInfo( TargetType, Flags.AllInstance, MemberTypes.Field, "name", Constants.ArrayOfObjectType, null );
 
 			var initMap = new Dictionary<string, Action> {};
 			var actionMap = new Dictionary<string, Action>
@@ -139,8 +140,8 @@ namespace FasterflectBenchmark
 
 		private static void RunHashCodeBenchmark()
 		{
-			var callInfo = new CallInfo( TargetType, Flags.DefaultCriteria, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, false, null );
-            var callInfoOther = new CallInfo(typeof(CallInfo), Flags.DefaultCriteria, MemberTypes.Field, "other", new[] { typeof(string) }, false, null);
+			var callInfo = new CallInfo( TargetType, Flags.AllInstance, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, null );
+            var callInfoOther = new CallInfo(typeof(CallInfo), Flags.AllInstance, MemberTypes.Field, "other", new[] { typeof(string) }, null);
 			var sourceInfo = new SourceInfo( new { ID=42, Name="Test" }.GetType() );
 			var sourceInfoOther = new SourceInfo( new { id=42, Name="Test" }.GetType() );
 
@@ -153,7 +154,7 @@ namespace FasterflectBenchmark
 			                		{"SourceInfo Equals Other", () => sourceInfo.Equals( sourceInfoOther ) },
 			                		{"string GetHashCode", () => "foo".GetHashCode() },
 			                		{"string Equals", () => "foo".Equals( "bar" ) },
-									{"new CallInfo", () => new CallInfo(TargetType, Flags.DefaultCriteria, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, false, null) },
+									{"new CallInfo", () => new CallInfo(TargetType, Flags.AllInstance, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, null) },
 									{"new SourceInfo", () => new SourceInfo( TargetType, new [] { "ID", "Name" }, new [] { typeof(int), typeof(string) } ) },
 									{"new SourceInfo anon", () => new SourceInfo( new { ID=42, Name="Test" }.GetType() ) },
 			                	};
@@ -228,6 +229,84 @@ namespace FasterflectBenchmark
 			                	};
 			Execute("TryCreateInstance Benchmark", initMap, actionMap);
 		}
+
+        private static void RunMetadataIntegrationBenchmark()
+        {
+            ConstructorInfo ctorInfo = null;
+            PropertyInfo propInfo = null;
+            PropertyInfo staticPropInfo = null;
+            FieldInfo fieldInfo = null;
+            FieldInfo staticFieldInfo = null;
+            MethodInfo noArgMethodInfo = null;
+            MethodInfo argMethodInfo = null;
+            MethodInfo noArgStaticMethodInfo = null;
+            MethodInfo argStaticMethodInfo = null;
+
+            var initMap = new Dictionary<string, Action>
+			              	{
+			              		{"Init ctor info", () => {ctorInfo = typeof (Person).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[0], null);}},
+			              		{"Init property info", () => { propInfo = TargetType.GetProperty("Age", BindingFlags.NonPublic | BindingFlags.Instance); }},                                
+			              		{"Init static property info", () => { staticPropInfo = TargetType.GetProperty("Counter", BindingFlags.NonPublic | BindingFlags.Static); }},
+			              		{"Init field info", () => { fieldInfo = TargetType.GetField("name", BindingFlags.NonPublic | BindingFlags.Instance); }},                                
+                                {"Init static field info", () => { staticFieldInfo = TargetType.GetField("counter", BindingFlags.NonPublic | BindingFlags.Static); }},
+			              		{"Init no-arg info", () => {noArgMethodInfo = TargetType.GetMethod("Walk", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[0], null);}},
+			              		{"Init arg info", () => {argMethodInfo = TargetType.GetMethod("Walk", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] {typeof (int)}, null);}},
+			              		{"Init static no-arg info", () => {noArgStaticMethodInfo = TargetType.GetMethod("Generate", BindingFlags.NonPublic | BindingFlags.Static, null, new Type[0], null);}},
+			              		{"Init static arg info", () => {argStaticMethodInfo = TargetType.GetMethod("Generate", BindingFlags.NonPublic | BindingFlags.Static, null, new[] {typeof (int)}, null);}},
+			              	};
+
+            dynamic tmp = TargetPerson;
+            var actionMap = new Dictionary<string, Action>
+			                	{
+			                		{"Direct ctor", () => new Person()},
+			                		{"Reflection ctor", () => ctorInfo.Invoke(NoArgArray)},
+			                		{"Fasterflect ctor", () => ctorInfo.CreateInstance(NoArgArray)},
+
+                                    
+									{"Direct instance field set", () => { TargetPerson.name = "John"; }},
+									{"Direct instance field get", () => { string name = TargetPerson.name; }},
+									{"Reflection instance field set", () => fieldInfo.SetValue(TargetPerson, "John")},
+									{"Reflection instance field get", () => fieldInfo.GetValue(TargetPerson)},
+									{"Fasterflect instance field set", () => fieldInfo.Set(TargetPerson, "John")},
+									{"Fasterflect instance field get", () => fieldInfo.Get(TargetPerson)},
+
+			                		{"Direct static field set", () => { Person.counter = 1; }},
+			                		{"Direct static field get", () => { int counter = Person.counter; }},
+			                		{"Reflection static field set", () => staticFieldInfo.SetValue(TargetType, 1)},
+			                		{"Reflection static field get", () => staticFieldInfo.GetValue(TargetType)},
+			                		{"Fasterflect static field set", () => staticFieldInfo.Set(1)},
+			                		{"Fasterflect static field get", () => staticFieldInfo.Get()},
+
+                                    {"Direct instance property set", () => { TargetPerson.Age = 10; }},
+			                		{"Direct instance property get", () => { int age = TargetPerson.Age; }},
+			                		{"Reflection instance property set", () => propInfo.SetValue(TargetPerson, 10, null)},
+			                		{"Reflection instance property get", () => propInfo.GetValue(TargetPerson, null)},
+			                		{"Fasterflect instance property set", () => propInfo.Set(TargetPerson, 10)},
+			                		{"Fasterflect instance property get", () => propInfo.Get(TargetPerson)},
+
+			                		{"Direct static property set", () => { Person.Counter = 10; }},
+			                		{"Direct static property get", () => { int counter = Person.Counter; }},
+			                		{"Reflection static property set", () => staticPropInfo.SetValue(TargetType, 10, null)},
+			                		{"Reflection static property get", () => staticPropInfo.GetValue(TargetType, null)},
+			                		{"Fasterflect static property set", () => staticPropInfo.Set(10)},
+			                		{"Fasterflect static property get", () => staticPropInfo.Get()},
+
+                                    {"Direct invoke", () => TargetPerson.Walk()},
+                                    {"Direct invoke (arg)", () => TargetPerson.Walk(10)},
+                                    {"Reflection invoke", () => noArgMethodInfo.Invoke(TargetPerson, NoArgArray)},
+                                    {"Reflection invoke (arg)", () => argMethodInfo.Invoke(TargetPerson, ArgArray)},
+                                    {"Fasterflect invoke", () => noArgMethodInfo.Invoke(TargetPerson)},
+                                    {"Fasterflect invoke (arg)", () => argMethodInfo.Invoke(TargetPerson, ArgArray)},
+                                    
+			                		{"Direct static invoke", () => Person.Generate()},
+			                		{"Direct static invoke (arg)", () => Person.Generate(10)},
+			                		{"Reflection static invoke", () => noArgStaticMethodInfo.Invoke(TargetType, NoArgArray)},
+			                		{"Reflection static invoke (arg)", () => argStaticMethodInfo.Invoke(TargetType, ArgArray)},
+			                		{"Fasterflect static invoke", () => noArgStaticMethodInfo.Invoke()},
+			                		{"Fasterflect static invoke (arg)", () => argStaticMethodInfo.Invoke(ArgArray)},
+			                	};
+            Execute("Metadata Integration Benchmark", initMap, actionMap);
+        }
 
 		private static void RunConstructorBenchmark()
 		{

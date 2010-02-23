@@ -25,6 +25,7 @@ using System.Reflection;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FasterflectTest.SampleModel.Animals;
+using Fasterflect.Internal;
 
 namespace FasterflectTest.Lookup
 {
@@ -87,7 +88,7 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestFindMethodInstanceWithParameterMatch()
         {
-			// Flags.ParameterMatch should be applied automatically if parameter types are supplied
+			// BindingFlags.ParameterMatch should be applied automatically if parameter types are supplied
         	Flags flags = Flags.InstanceCriteria;
 
 			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new Type[] {} ) );
@@ -177,7 +178,7 @@ namespace FasterflectTest.Lookup
 			CollectionAssert.AreEquivalent( SnakeInstanceMethodNames.Where( s => s.Contains( "_" ) ).ToList(), methods.Select( m => m.Name ).ToList() );
 
 			methods = typeof(Snake).Methods( flags );
-			CollectionAssert.AreEquivalent( SnakeInstanceMethodNames, methods.Select( m => m.Name.TrimExplicitlyImplementedName() ).ToList() );
+            CollectionAssert.AreEquivalent(SnakeInstanceMethodNames, methods.Select(m => m.Name.TrimExplicitlyImplementedName()).ToList());
         }
 
 		[TestMethod]

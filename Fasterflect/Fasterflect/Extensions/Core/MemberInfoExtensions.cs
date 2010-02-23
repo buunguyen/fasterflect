@@ -1,5 +1,4 @@
 ﻿#region License
-
 // Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,7 +14,6 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System;
@@ -31,7 +29,7 @@ namespace Fasterflect
         /// </summary>
         public static object Get( this MemberInfo memberInfo )
         {
-            var @delegate = (StaticMemberGetter) new MemberGetEmitter( memberInfo, true ).GetDelegate();
+            var @delegate = (StaticMemberGetter) new MemberGetEmitter( memberInfo, Flags.AllStatic ).GetDelegate();
             return @delegate();
         }
 
@@ -40,7 +38,7 @@ namespace Fasterflect
         /// </summary>
         public static void Set( this MemberInfo memberInfo, object value )
         {
-            var @delegate = (StaticMemberSetter) new MemberSetEmitter( memberInfo, true ).GetDelegate();
+            var @delegate = (StaticMemberSetter) new MemberSetEmitter( memberInfo, Flags.AllStatic ).GetDelegate();
             @delegate( value );
         }
 
@@ -50,7 +48,7 @@ namespace Fasterflect
         /// </summary>
         public static object Get( this MemberInfo memberInfo, object target )
         {
-            var @delegate = (MemberGetter) new MemberGetEmitter( memberInfo, false ).GetDelegate();
+            var @delegate = (MemberGetter) new MemberGetEmitter( memberInfo, Flags.AllInstance ).GetDelegate();
             return @delegate( target );
         }
 
@@ -60,48 +58,51 @@ namespace Fasterflect
         /// </summary>
         public static void Set( this MemberInfo memberInfo, object target, object value )
         {
-            var @delegate = (MemberSetter) new MemberSetEmitter( memberInfo, false ).GetDelegate();
+            var @delegate = (MemberSetter) new MemberSetEmitter( memberInfo, Flags.AllInstance ).GetDelegate();
             @delegate( target, value );
         }
 
+        #region MemberInfo Helpers
+        /// <summary>
+        /// Get the system type of the field or property identified by the <paramref name="member"/>.
+        /// </summary>
+        /// <returns>The system type of the member.</returns>
+        public static Type Type( this MemberInfo member )
+        {
+            var field = member as FieldInfo;
+            if( field != null )
+            {
+                return field.FieldType;
+            }
+            var property = member as PropertyInfo;
+            if( property != null )
+            {
+                return property.PropertyType;
+            }
+            throw new NotSupportedException( "Can only determine the type for fields and properties." );
+        }
 
-		#region MemberInfo Helpers
-		/// <summary>
-		/// Get the system type of the field or property identified by the <paramref name="member"/>.
-		/// </summary>
-		/// <returns>The system type of the member.</returns>
-		public static Type Type( this MemberInfo member )
-		{
-			var field = member as FieldInfo;
-			if( field != null )
-				return field.FieldType;
-			var property = member as PropertyInfo;
-			if( property != null )
-				return property.PropertyType;
-			throw new NotSupportedException( "Can only determine the type for fields and properties." );
-		}
+        /// <summary>
+        /// Find out whether a value can be read from the field or property identified by
+        /// the <paramref name="member"/>.
+        /// </summary>
+        /// <returns>True for fields and readable properties, false otherwise.</returns>
+        public static bool CanRead( this MemberInfo member )
+        {
+            var property = member as PropertyInfo;
+            return member is FieldInfo || (property != null && property.CanRead);
+        }
 
-		/// <summary>
-		/// Find out whether a value can be read from the field or property identified by
-		/// the <paramref name="member"/>.
-		/// </summary>
-		/// <returns>True for fields and readable properties, false otherwise.</returns>
-		public static bool CanRead( this MemberInfo member )
-		{
-			var property = member as PropertyInfo;
-			return member is FieldInfo || (property != null && property.CanRead);
-		}
-
-		/// <summary>
-		/// Find out whether a value can be assigned to the field or property identified by
-		/// the <paramref name="member"/>.
-		/// </summary>
-		/// <returns>True for fields and writable properties, false otherwise.</returns>
-		public static bool CanWrite( this MemberInfo member )
-		{
-			var property = member as PropertyInfo;
-			return member is FieldInfo || (property != null && property.CanWrite);
-		}
+        /// <summary>
+        /// Find out whether a value can be assigned to the field or property identified by
+        /// the <paramref name="member"/>.
+        /// </summary>
+        /// <returns>True for fields and writable properties, false otherwise.</returns>
+        public static bool CanWrite( this MemberInfo member )
+        {
+            var property = member as PropertyInfo;
+            return member is FieldInfo || (property != null && property.CanWrite);
+        }
 
         /// <summary>
         /// Determines whether the given <paramref name="member"/> has the given <paramref name="name"/>.
@@ -112,10 +113,12 @@ namespace Fasterflect
         /// is null an exception will be thrown.</returns>
         public static bool HasName( this MemberInfo member, string name )
         {
-            string memberName = member.Name.Length > 0 && member.Name[ 0 ] == '_' ? member.Name.Substring( 1 ) : member.Name;
+            string memberName = member.Name.Length > 0 && member.Name[ 0 ] == '_'
+                                    ? member.Name.Substring( 1 )
+                                    : member.Name;
             name = name.Length > 0 && name[ 0 ] == '_' ? name.Substring( 1 ) : name;
             return memberName.Equals( name, StringComparison.OrdinalIgnoreCase );
         }
-		#endregion
+        #endregion
     }
 }

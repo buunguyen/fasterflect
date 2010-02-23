@@ -26,15 +26,15 @@ namespace Fasterflect.Emitter
 {
 	internal class CtorInvocationEmitter : InvocationEmitter
     {
-        public CtorInvocationEmitter(ConstructorInfo ctorInfo)
-            : this(ctorInfo.DeclaringType, null, ctorInfo.GetParameters().GetTypeArray(), ctorInfo) {}
+        public CtorInvocationEmitter(ConstructorInfo ctorInfo, Flags bindingFlags)
+            : this(ctorInfo.DeclaringType, bindingFlags, ctorInfo.GetParameters().GetTypeArray(), ctorInfo) { }
 
-        public CtorInvocationEmitter(Type targetType, Flags flags, Type[] paramTypes)
-            : this (targetType, flags, paramTypes, null) {}
+        public CtorInvocationEmitter(Type targetType, Flags bindingFlags, Type[] paramTypes)
+            : this(targetType, bindingFlags, paramTypes, null) { }
 
-		private CtorInvocationEmitter(Type targetType, Flags? flags, Type[] paramTypes, ConstructorInfo ctorInfo)
+		private CtorInvocationEmitter(Type targetType, Flags flags, Type[] parameterTypes, ConstructorInfo ctorInfo)
 		{
-            callInfo = new CallInfo(targetType, flags, MemberTypes.Constructor, targetType.Name, paramTypes, false, ctorInfo);
+            callInfo = new CallInfo(targetType, flags, MemberTypes.Constructor, targetType.Name, parameterTypes, ctorInfo);
 		}
         
 		protected internal override DynamicMethod CreateDynamicMethod()

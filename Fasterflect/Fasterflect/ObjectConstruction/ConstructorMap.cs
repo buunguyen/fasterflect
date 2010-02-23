@@ -27,9 +27,9 @@ namespace Fasterflect.ObjectConstruction
 	{
 		private ConstructorInvoker invoker;
 
-		public ConstructorMap( ConstructorInfo constructor, string[] paramNames, Type[] paramTypes, 
+		public ConstructorMap( ConstructorInfo constructor, string[] paramNames, Type[] parameterTypes, 
 			                   object[] sampleParamValues, bool allowUnusedParameters )
-			: base( constructor, paramNames, paramTypes, sampleParamValues, allowUnusedParameters )
+            : base(constructor, paramNames, parameterTypes, sampleParamValues, allowUnusedParameters)
 		{
 		}
 

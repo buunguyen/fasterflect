@@ -1,5 +1,4 @@
 #region License
-
 // Copyright © 2009 www.bltoolkit.net
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
@@ -18,7 +17,6 @@
 // COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 #endregion
 
 using System;
@@ -41,14 +39,18 @@ namespace Fasterflect.Emitter
         /// with the specified <see cref="System.Reflection.Emit.ILGenerator"/>.
         /// </summary>
         /// <param name="ilGenerator">The <see cref="System.Reflection.Emit.ILGenerator"/> to use.</param>
-        public EmitHelper(ILGenerator ilGenerator)
+        public EmitHelper( ILGenerator ilGenerator )
         {
-            if (ilGenerator == null) throw new ArgumentNullException("ilGenerator");
+            if( ilGenerator == null )
+            {
+                throw new ArgumentNullException( "ilGenerator" );
+            }
 
             _ilGenerator = ilGenerator;
         }
 
         private readonly ILGenerator _ilGenerator;
+
         /// <summary>
         /// Gets MSIL generator.
         /// </summary>
@@ -62,23 +64,26 @@ namespace Fasterflect.Emitter
         /// </summary>
         /// <param name="emitHelper">The <see cref="EmitHelper"/>.</param>
         /// <returns>An ILGenerator.</returns>
-        public static implicit operator ILGenerator(EmitHelper emitHelper)
+        public static implicit operator ILGenerator( EmitHelper emitHelper )
         {
-            if (emitHelper == null) throw new ArgumentNullException("emitHelper");
+            if( emitHelper == null )
+            {
+                throw new ArgumentNullException( "emitHelper" );
+            }
 
             return emitHelper.ILGenerator;
         }
 
         #region ILGenerator Methods
-
         /// <summary>
         /// Begins a catch block.
         /// </summary>
         /// <param name="exceptionType">The Type object that represents the exception.</param>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.BeginCatchBlock(Type)">ILGenerator.BeginCatchBlock Method</seealso>
-        public EmitHelper BeginCatchBlock(Type exceptionType)
+        public EmitHelper BeginCatchBlock( Type exceptionType )
         {
-            _ilGenerator.BeginCatchBlock(exceptionType); return this;
+            _ilGenerator.BeginCatchBlock( exceptionType );
+            return this;
         }
 
         /// <summary>
@@ -87,7 +92,8 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.BeginExceptFilterBlock">ILGenerator.BeginCatchBlock Method</seealso>
         public EmitHelper BeginExceptFilterBlock()
         {
-            _ilGenerator.BeginExceptFilterBlock(); return this;
+            _ilGenerator.BeginExceptFilterBlock();
+            return this;
         }
 
         /// <summary>
@@ -105,7 +111,8 @@ namespace Fasterflect.Emitter
         /// <returns>Current instance of the <see cref="EmitHelper"/>.</returns>
         public EmitHelper BeginFaultBlock()
         {
-            _ilGenerator.BeginFaultBlock(); return this;
+            _ilGenerator.BeginFaultBlock();
+            return this;
         }
 
         /// <summary>
@@ -114,7 +121,8 @@ namespace Fasterflect.Emitter
         /// <returns>Current instance of the <see cref="EmitHelper"/>.</returns>
         public EmitHelper BeginFinallyBlock()
         {
-            _ilGenerator.BeginFinallyBlock(); return this;
+            _ilGenerator.BeginFinallyBlock();
+            return this;
         }
 
         /// <summary>
@@ -123,7 +131,8 @@ namespace Fasterflect.Emitter
         /// <returns>Current instance of the <see cref="EmitHelper"/>.</returns>
         public EmitHelper BeginScope()
         {
-            _ilGenerator.BeginScope(); return this;
+            _ilGenerator.BeginScope();
+            return this;
         }
 
         /// <summary>
@@ -131,9 +140,9 @@ namespace Fasterflect.Emitter
         /// </summary>
         /// <param name="localType">The Type of the local variable.</param>
         /// <returns>The declared local variable.</returns>
-        public LocalBuilder DeclareLocal(Type localType)
+        public LocalBuilder DeclareLocal( Type localType )
         {
-            return _ilGenerator.DeclareLocal(localType);
+            return _ilGenerator.DeclareLocal( localType );
         }
 
         /// <summary>
@@ -142,9 +151,9 @@ namespace Fasterflect.Emitter
         /// <param name="localType">The Type of the local variable.</param>
         /// <param name="pinned"><b>true</b> to pin the object in memory; otherwise, <b>false</b>.</param>
         /// <returns>The declared local variable.</returns>
-        public LocalBuilder DeclareLocal(Type localType, bool pinned)
+        public LocalBuilder DeclareLocal( Type localType, bool pinned )
         {
-            return _ilGenerator.DeclareLocal(localType, pinned);
+            return _ilGenerator.DeclareLocal( localType, pinned );
         }
 
         /// <summary>
@@ -162,7 +171,8 @@ namespace Fasterflect.Emitter
         /// <returns>Current instance of the <see cref="EmitHelper"/>.</returns>
         public EmitHelper EndExceptionBlock()
         {
-            _ilGenerator.EndExceptionBlock(); return this;
+            _ilGenerator.EndExceptionBlock();
+            return this;
         }
 
         /// <summary>
@@ -171,7 +181,8 @@ namespace Fasterflect.Emitter
         /// <returns>Current instance of the <see cref="EmitHelper"/>.</returns>
         public EmitHelper EndScope()
         {
-            _ilGenerator.EndScope(); return this;
+            _ilGenerator.EndScope();
+            return this;
         }
 
         /// <summary>
@@ -180,9 +191,10 @@ namespace Fasterflect.Emitter
         /// </summary>
         /// <param name="loc">The label for which to set an index.</param>
         /// <returns>Current instance of the <see cref="EmitHelper"/>.</returns>
-        public EmitHelper MarkLabel(Label loc)
+        public EmitHelper MarkLabel( Label loc )
         {
-            _ilGenerator.MarkLabel(loc); return this;
+            _ilGenerator.MarkLabel( loc );
+            return this;
         }
 
         /// <summary>
@@ -199,9 +211,9 @@ namespace Fasterflect.Emitter
             int startLine,
             int startColumn,
             int endLine,
-            int endColumn)
+            int endColumn )
         {
-            _ilGenerator.MarkSequencePoint(document, startLine, startColumn, endLine, endColumn);
+            _ilGenerator.MarkSequencePoint( document, startLine, startColumn, endLine, endColumn );
             return this;
         }
 
@@ -210,9 +222,10 @@ namespace Fasterflect.Emitter
         /// </summary>
         /// <param name="exceptionType">The class of the type of exception to throw.</param>
         /// <returns>Current instance of the <see cref="EmitHelper"/>.</returns>
-        public EmitHelper ThrowException(Type exceptionType)
+        public EmitHelper ThrowException( Type exceptionType )
         {
-            _ilGenerator.ThrowException(exceptionType); return this;
+            _ilGenerator.ThrowException( exceptionType );
+            return this;
         }
 
         /// <summary>
@@ -221,45 +234,46 @@ namespace Fasterflect.Emitter
         /// </summary>
         /// <param name="namespaceName">The namespace to be used in evaluating locals and watches for the current active lexical scope.</param>
         /// <returns>Current instance of the <see cref="EmitHelper"/>.</returns>
-        public EmitHelper UsingNamespace(string namespaceName)
+        public EmitHelper UsingNamespace( string namespaceName )
         {
-            _ilGenerator.UsingNamespace(namespaceName); return this;
+            _ilGenerator.UsingNamespace( namespaceName );
+            return this;
         }
-
         #endregion
 
         #region Addtional Methods
-        public EmitHelper ldelem(Type type)
+        public EmitHelper ldelem( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Ldelem, type); return this;
-        }
-
-        public EmitHelper stelem(Type type)
-        {
-            _ilGenerator.Emit(OpCodes.Stelem, type); return this;
-        }
-
-        public EmitHelper call(bool isStatic, MethodInfo methodInfo)
-        {
-            _ilGenerator.Emit(isStatic ? OpCodes.Call : OpCodes.Callvirt, methodInfo);
+            _ilGenerator.Emit( OpCodes.Ldelem, type );
             return this;
         }
 
-        public EmitHelper ldfld(bool isStatic, FieldInfo fieldInfo)
+        public EmitHelper stelem( Type type )
         {
-            _ilGenerator.Emit(isStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, fieldInfo);
+            _ilGenerator.Emit( OpCodes.Stelem, type );
             return this;
         }
 
-        public EmitHelper stfld(bool isStatic, FieldInfo fieldInfo)
+        public EmitHelper call( bool isStatic, MethodInfo methodInfo )
         {
-            _ilGenerator.Emit(isStatic ? OpCodes.Stsfld : OpCodes.Stfld, fieldInfo);
+            _ilGenerator.Emit( isStatic ? OpCodes.Call : OpCodes.Callvirt, methodInfo );
+            return this;
+        }
+
+        public EmitHelper ldfld( bool isStatic, FieldInfo fieldInfo )
+        {
+            _ilGenerator.Emit( isStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, fieldInfo );
+            return this;
+        }
+
+        public EmitHelper stfld( bool isStatic, FieldInfo fieldInfo )
+        {
+            _ilGenerator.Emit( isStatic ? OpCodes.Stsfld : OpCodes.Stfld, fieldInfo );
             return this;
         }
         #endregion
 
         #region Emit Wrappers
-
         /// <summary>
         /// Calls ILGenerator.Emit(<see cref="OpCodes.Add"/>) that
         /// adds two values and pushes the result onto the evaluation stack.
@@ -268,7 +282,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper add
         {
-            get { _ilGenerator.Emit(OpCodes.Add); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Add );
+                return this;
+            }
         }
 
         /// <summary>
@@ -279,7 +297,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper add_ovf
         {
-            get { _ilGenerator.Emit(OpCodes.Add_Ovf); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Add_Ovf );
+                return this;
+            }
         }
 
         /// <summary>
@@ -290,7 +312,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper add_ovf_un
         {
-            get { _ilGenerator.Emit(OpCodes.Add_Ovf_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Add_Ovf_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -301,7 +327,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper and
         {
-            get { _ilGenerator.Emit(OpCodes.And); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.And );
+                return this;
+            }
         }
 
         /// <summary>
@@ -312,7 +342,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper arglist
         {
-            get { _ilGenerator.Emit(OpCodes.Arglist); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Arglist );
+                return this;
+            }
         }
 
         /// <summary>
@@ -322,9 +356,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Beq">OpCodes.Beq</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper beq(Label label)
+        public EmitHelper beq( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Beq, label); return this;
+            _ilGenerator.Emit( OpCodes.Beq, label );
+            return this;
         }
 
         /// <summary>
@@ -334,9 +369,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Beq_S">OpCodes.Beq_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper beq_s(Label label)
+        public EmitHelper beq_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Beq_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Beq_S, label );
+            return this;
         }
 
         /// <summary>
@@ -346,9 +382,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Bge">OpCodes.Bge</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper bge(Label label)
+        public EmitHelper bge( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Bge, label); return this;
+            _ilGenerator.Emit( OpCodes.Bge, label );
+            return this;
         }
 
         /// <summary>
@@ -359,9 +396,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Bge_S">OpCodes.Bge_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper bge_s(Label label)
+        public EmitHelper bge_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Bge_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Bge_S, label );
+            return this;
         }
 
         /// <summary>
@@ -372,9 +410,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Bge_Un">OpCodes.Bge_Un</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper bge_un(Label label)
+        public EmitHelper bge_un( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Bge_Un, label); return this;
+            _ilGenerator.Emit( OpCodes.Bge_Un, label );
+            return this;
         }
 
         /// <summary>
@@ -385,9 +424,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Bge_Un_S">OpCodes.Bge_Un_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper bge_un_s(Label label)
+        public EmitHelper bge_un_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Bge_Un_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Bge_Un_S, label );
+            return this;
         }
 
         /// <summary>
@@ -397,9 +437,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Bgt">OpCodes.Bgt</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper bgt(Label label)
+        public EmitHelper bgt( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Bgt, label); return this;
+            _ilGenerator.Emit( OpCodes.Bgt, label );
+            return this;
         }
 
         /// <summary>
@@ -409,9 +450,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Bgt_S">OpCodes.Bgt_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper bgt_s(Label label)
+        public EmitHelper bgt_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Bgt_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Bgt_S, label );
+            return this;
         }
 
         /// <summary>
@@ -422,9 +464,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Bgt_Un">OpCodes.Bgt_Un</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper bgt_un(Label label)
+        public EmitHelper bgt_un( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Bgt_Un, label); return this;
+            _ilGenerator.Emit( OpCodes.Bgt_Un, label );
+            return this;
         }
 
         /// <summary>
@@ -435,9 +478,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Bgt_Un_S">OpCodes.Bgt_Un_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper bgt_un_s(Label label)
+        public EmitHelper bgt_un_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Bgt_Un_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Bgt_Un_S, label );
+            return this;
         }
 
         /// <summary>
@@ -447,9 +491,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Ble">OpCodes.Ble</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper ble(Label label)
+        public EmitHelper ble( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Ble, label); return this;
+            _ilGenerator.Emit( OpCodes.Ble, label );
+            return this;
         }
 
         /// <summary>
@@ -459,9 +504,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Ble_S">OpCodes.Ble_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper ble_s(Label label)
+        public EmitHelper ble_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Ble_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Ble_S, label );
+            return this;
         }
 
         /// <summary>
@@ -472,9 +518,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Ble_Un">OpCodes.Ble_Un</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper ble_un(Label label)
+        public EmitHelper ble_un( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Ble_Un, label); return this;
+            _ilGenerator.Emit( OpCodes.Ble_Un, label );
+            return this;
         }
 
         /// <summary>
@@ -485,9 +532,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Ble_Un_S">OpCodes.Ble_Un_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper ble_un_s(Label label)
+        public EmitHelper ble_un_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Ble_Un_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Ble_Un_S, label );
+            return this;
         }
 
         /// <summary>
@@ -497,9 +545,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Blt">OpCodes.Blt</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper blt(Label label)
+        public EmitHelper blt( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Blt, label); return this;
+            _ilGenerator.Emit( OpCodes.Blt, label );
+            return this;
         }
 
         /// <summary>
@@ -509,9 +558,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Blt_S">OpCodes.Blt_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper blt_s(Label label)
+        public EmitHelper blt_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Blt_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Blt_S, label );
+            return this;
         }
 
         /// <summary>
@@ -522,9 +572,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Blt_Un">OpCodes.Blt_Un</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper blt_un(Label label)
+        public EmitHelper blt_un( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Blt_Un, label); return this;
+            _ilGenerator.Emit( OpCodes.Blt_Un, label );
+            return this;
         }
 
         /// <summary>
@@ -535,9 +586,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Blt_Un_S">OpCodes.Blt_Un_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper blt_un_s(Label label)
+        public EmitHelper blt_un_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Blt_Un_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Blt_Un_S, label );
+            return this;
         }
 
         /// <summary>
@@ -547,9 +599,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Bne_Un">OpCodes.Bne_Un</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper bne_un(Label label)
+        public EmitHelper bne_un( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Bne_Un, label); return this;
+            _ilGenerator.Emit( OpCodes.Bne_Un, label );
+            return this;
         }
 
         /// <summary>
@@ -560,9 +613,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Bne_Un_S">OpCodes.Bne_Un_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper bne_un_s(Label label)
+        public EmitHelper bne_un_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Bne_Un_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Bne_Un_S, label );
+            return this;
         }
 
         /// <summary>
@@ -572,9 +626,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Box">OpCodes.Box</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper box(Type type)
+        public EmitHelper box( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Box, type); return this;
+            _ilGenerator.Emit( OpCodes.Box, type );
+            return this;
         }
 
         /// <summary>
@@ -583,11 +638,14 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Box">OpCodes.Box</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper boxIfValueType(Type type)
+        public EmitHelper boxIfValueType( Type type )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
-            return type.IsValueType ? box(type) : this;
+            return type.IsValueType ? box( type ) : this;
         }
 
         /// <summary>
@@ -597,9 +655,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Br">OpCodes.Br</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper br(Label label)
+        public EmitHelper br( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Br, label); return this;
+            _ilGenerator.Emit( OpCodes.Br, label );
+            return this;
         }
 
         /// <summary>
@@ -610,7 +669,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper @break
         {
-            get { _ilGenerator.Emit(OpCodes.Break); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Break );
+                return this;
+            }
         }
 
         /// <summary>
@@ -620,9 +683,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Brfalse">OpCodes.Brfalse</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper brfalse(Label label)
+        public EmitHelper brfalse( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Brfalse, label); return this;
+            _ilGenerator.Emit( OpCodes.Brfalse, label );
+            return this;
         }
 
         /// <summary>
@@ -632,9 +696,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Brfalse_S">OpCodes.Brfalse_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper brfalse_s(Label label)
+        public EmitHelper brfalse_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Brfalse_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Brfalse_S, label );
+            return this;
         }
 
         /// <summary>
@@ -644,9 +709,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Brtrue">OpCodes.Brtrue</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper brtrue(Label label)
+        public EmitHelper brtrue( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Brtrue, label); return this;
+            _ilGenerator.Emit( OpCodes.Brtrue, label );
+            return this;
         }
 
         /// <summary>
@@ -656,9 +722,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Brtrue_S">OpCodes.Brtrue_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper brtrue_s(Label label)
+        public EmitHelper brtrue_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Brtrue_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Brtrue_S, label );
+            return this;
         }
 
         /// <summary>
@@ -668,9 +735,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Br_S">OpCodes.Br_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper br_s(Label label)
+        public EmitHelper br_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Br_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Br_S, label );
+            return this;
         }
 
         /// <summary>
@@ -680,9 +748,10 @@ namespace Fasterflect.Emitter
         /// <param name="methodInfo">The method to be called.</param>
         /// <seealso cref="OpCodes.Call">OpCodes.Call</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,MethodInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper call(MethodInfo methodInfo)
+        public EmitHelper call( MethodInfo methodInfo )
         {
-            _ilGenerator.Emit(OpCodes.Call, methodInfo); return this;
+            _ilGenerator.Emit( OpCodes.Call, methodInfo );
+            return this;
         }
 
         /// <summary>
@@ -692,9 +761,10 @@ namespace Fasterflect.Emitter
         /// <param name="constructorInfo">The constructor to be called.</param>
         /// <seealso cref="OpCodes.Call">OpCodes.Call</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,MethodInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper call(ConstructorInfo constructorInfo)
+        public EmitHelper call( ConstructorInfo constructorInfo )
         {
-            _ilGenerator.Emit(OpCodes.Call, constructorInfo); return this;
+            _ilGenerator.Emit( OpCodes.Call, constructorInfo );
+            return this;
         }
 
         /// <summary>
@@ -705,9 +775,10 @@ namespace Fasterflect.Emitter
         /// <param name="optionalParameterTypes">The types of the optional arguments if the method is a varargs method.</param>
         /// <seealso cref="OpCodes.Call">OpCodes.Call</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.EmitCall(OpCode,MethodInfo,Type[])">ILGenerator.EmitCall</seealso>
-        public EmitHelper call(MethodInfo methodInfo, Type[] optionalParameterTypes)
+        public EmitHelper call( MethodInfo methodInfo, Type[] optionalParameterTypes )
         {
-            _ilGenerator.EmitCall(OpCodes.Call, methodInfo, optionalParameterTypes); return this;
+            _ilGenerator.EmitCall( OpCodes.Call, methodInfo, optionalParameterTypes );
+            return this;
         }
 
         /// <summary>
@@ -719,16 +790,21 @@ namespace Fasterflect.Emitter
         /// <param name="optionalParameterTypes">The types of the optional arguments if the method is a varargs method.</param>
         /// <seealso cref="OpCodes.Call">OpCodes.Call</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.EmitCall(OpCode,MethodInfo,Type[])">ILGenerator.EmitCall</seealso>
-        public EmitHelper call(Type type, string methodName, params Type[] optionalParameterTypes)
+        public EmitHelper call( Type type, string methodName, params Type[] optionalParameterTypes )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
-            MethodInfo methodInfo = type.GetMethod(methodName, optionalParameterTypes);
+            MethodInfo methodInfo = type.GetMethod( methodName, optionalParameterTypes );
 
-            if (methodInfo == null)
-                throw CreateNoSuchMethodException(type, methodName);
+            if( methodInfo == null )
+            {
+                throw CreateNoSuchMethodException( type, methodName );
+            }
 
-            return call(methodInfo);
+            return call( methodInfo );
         }
 
         /// <summary>
@@ -737,21 +813,27 @@ namespace Fasterflect.Emitter
         /// </summary>
         /// <param name="type">A Type</param>
         /// <param name="methodName">The name of the method to be called.</param>
-        /// <param name="flags">A bitmask comprised of one or more <see cref="BindingFlags"/> 
+        /// <param name="bindingFlags">A bitmask comprised of one or more <see cref="BindingFlags"/> 
         /// that specify how the search is conducted.</param>
         /// <param name="optionalParameterTypes">The types of the optional arguments if the method is a varargs method.</param>
         /// <seealso cref="OpCodes.Call">OpCodes.Call</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.EmitCall(OpCode,MethodInfo,Type[])">ILGenerator.EmitCall</seealso>
-        public EmitHelper call(Type type, string methodName, BindingFlags flags, params Type[] optionalParameterTypes)
+        public EmitHelper call( Type type, string methodName, BindingFlags bindingFlags,
+                                params Type[] optionalParameterTypes )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
-            MethodInfo methodInfo = type.GetMethod(methodName, flags, null, optionalParameterTypes, null);
+            MethodInfo methodInfo = type.GetMethod( methodName, bindingFlags, null, optionalParameterTypes, null );
 
-            if (methodInfo == null)
-                throw CreateNoSuchMethodException(type, methodName);
+            if( methodInfo == null )
+            {
+                throw CreateNoSuchMethodException( type, methodName );
+            }
 
-            return call(methodInfo);
+            return call( methodInfo );
         }
 
         /// <summary>
@@ -764,9 +846,10 @@ namespace Fasterflect.Emitter
         /// <param name="parameterTypes">The types of the required arguments to the instruction.</param>
         /// <seealso cref="OpCodes.Calli">OpCodes.Calli</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.EmitCalli(OpCode,CallingConvention,Type,Type[])">ILGenerator.EmitCalli</seealso>
-        public EmitHelper calli(CallingConvention unmanagedCallConv, Type returnType, Type[] parameterTypes)
+        public EmitHelper calli( CallingConvention unmanagedCallConv, Type returnType, Type[] parameterTypes )
         {
-            _ilGenerator.EmitCalli(OpCodes.Calli, unmanagedCallConv, returnType, parameterTypes); return this;
+            _ilGenerator.EmitCalli( OpCodes.Calli, unmanagedCallConv, returnType, parameterTypes );
+            return this;
         }
 
         /// <summary>
@@ -780,9 +863,10 @@ namespace Fasterflect.Emitter
         /// <param name="optionalParameterTypes">The types of the optional arguments for vararg calls.</param>
         /// <seealso cref="OpCodes.Calli">OpCodes.Calli</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.EmitCalli(OpCode,CallingConventions,Type,Type[],Type[])">ILGenerator.EmitCalli</seealso>
-        public EmitHelper calli(CallingConventions callingConvention, Type returnType, Type[] parameterTypes, Type[] optionalParameterTypes)
+        public EmitHelper calli( CallingConventions callingConvention, Type returnType, Type[] parameterTypes,
+                                 Type[] optionalParameterTypes )
         {
-            _ilGenerator.EmitCalli(OpCodes.Calli, callingConvention, returnType, parameterTypes, optionalParameterTypes);
+            _ilGenerator.EmitCalli( OpCodes.Calli, callingConvention, returnType, parameterTypes, optionalParameterTypes );
             return this;
         }
 
@@ -793,9 +877,10 @@ namespace Fasterflect.Emitter
         /// <param name="methodInfo">The method to be called.</param>
         /// <seealso cref="OpCodes.Callvirt">OpCodes.Callvirt</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,MethodInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper callvirt(MethodInfo methodInfo)
+        public EmitHelper callvirt( MethodInfo methodInfo )
         {
-            _ilGenerator.Emit(OpCodes.Callvirt, methodInfo); return this;
+            _ilGenerator.Emit( OpCodes.Callvirt, methodInfo );
+            return this;
         }
 
         /// <summary>
@@ -806,9 +891,10 @@ namespace Fasterflect.Emitter
         /// <param name="optionalParameterTypes">The types of the optional arguments if the method is a varargs method.</param>
         /// <seealso cref="OpCodes.Callvirt">OpCodes.Callvirt</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.EmitCall(OpCode,MethodInfo,Type[])">ILGenerator.EmitCall</seealso>
-        public EmitHelper callvirt(MethodInfo methodInfo, Type[] optionalParameterTypes)
+        public EmitHelper callvirt( MethodInfo methodInfo, Type[] optionalParameterTypes )
         {
-            _ilGenerator.EmitCall(OpCodes.Callvirt, methodInfo, optionalParameterTypes); return this;
+            _ilGenerator.EmitCall( OpCodes.Callvirt, methodInfo, optionalParameterTypes );
+            return this;
         }
 
         /// <summary>
@@ -820,16 +906,21 @@ namespace Fasterflect.Emitter
         /// <param name="optionalParameterTypes">The types of the optional arguments if the method is a varargs method.</param>
         /// <seealso cref="OpCodes.Callvirt">OpCodes.Callvirt</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.EmitCall(OpCode,MethodInfo,Type[])">ILGenerator.EmitCall</seealso>
-        public EmitHelper callvirt(Type type, string methodName, params Type[] optionalParameterTypes)
+        public EmitHelper callvirt( Type type, string methodName, params Type[] optionalParameterTypes )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
-            MethodInfo methodInfo = type.GetMethod(methodName, optionalParameterTypes);
+            MethodInfo methodInfo = type.GetMethod( methodName, optionalParameterTypes );
 
-            if (methodInfo == null)
-                throw CreateNoSuchMethodException(type, methodName);
+            if( methodInfo == null )
+            {
+                throw CreateNoSuchMethodException( type, methodName );
+            }
 
-            return callvirt(methodInfo);
+            return callvirt( methodInfo );
         }
 
         /// <summary>
@@ -838,22 +929,27 @@ namespace Fasterflect.Emitter
         /// </summary>
         /// <param name="methodName">The method to be called.</param>
         /// <param name="type">The declaring type of the method.</param>
-        /// <param name="flags">A bitmask comprised of one or more <see cref="BindingFlags"/> 
+        /// <param name="bindingFlags">A bitmask comprised of one or more <see cref="BindingFlags"/> 
         /// that specify how the search is conducted.</param>
         /// <param name="optionalParameterTypes">The types of the optional arguments if the method is a varargs method.</param>
         /// <seealso cref="OpCodes.Callvirt">OpCodes.Callvirt</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.EmitCall(OpCode,MethodInfo,Type[])">ILGenerator.EmitCall</seealso>
-        public EmitHelper callvirt(Type type, string methodName, BindingFlags flags, params Type[] optionalParameterTypes)
+        public EmitHelper callvirt( Type type, string methodName, BindingFlags bindingFlags,
+                                    params Type[] optionalParameterTypes )
         {
             MethodInfo methodInfo =
-                optionalParameterTypes == null ?
-                    type.GetMethod(methodName, flags) :
-                    type.GetMethod(methodName, flags, null, optionalParameterTypes, null);
+                optionalParameterTypes == null
+                    ?
+                        type.GetMethod( methodName, bindingFlags )
+                    :
+                        type.GetMethod( methodName, bindingFlags, null, optionalParameterTypes, null );
 
-            if (methodInfo == null)
-                throw CreateNoSuchMethodException(type, methodName);
+            if( methodInfo == null )
+            {
+                throw CreateNoSuchMethodException( type, methodName );
+            }
 
-            return callvirt(methodInfo, null);
+            return callvirt( methodInfo, null );
         }
 
         /// <summary>
@@ -862,13 +958,13 @@ namespace Fasterflect.Emitter
         /// </summary>
         /// <param name="methodName">The method to be called.</param>
         /// <param name="type">The declaring type of the method.</param>
-        /// <param name="flags">A bitmask comprised of one or more <see cref="BindingFlags"/> 
+        /// <param name="bindingFlags">A bitmask comprised of one or more <see cref="BindingFlags"/> 
         /// that specify how the search is conducted.</param>
         /// <seealso cref="OpCodes.Callvirt">OpCodes.Callvirt</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.EmitCall(OpCode,MethodInfo,Type[])">ILGenerator.EmitCall</seealso>
-        public EmitHelper callvirt(Type type, string methodName, BindingFlags flags)
+        public EmitHelper callvirt( Type type, string methodName, BindingFlags flags )
         {
-            return callvirt(type, methodName, flags, null);
+            return callvirt( type, methodName, flags, null );
         }
 
         /// <summary>
@@ -878,9 +974,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Castclass">OpCodes.Castclass</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper castclass(Type type)
+        public EmitHelper castclass( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Castclass, type); return this;
+            _ilGenerator.Emit( OpCodes.Castclass, type );
+            return this;
         }
 
         /// <summary>
@@ -888,11 +985,14 @@ namespace Fasterflect.Emitter
         /// or to unbox if the type is a value type.
         /// </summary>
         /// <param name="type">A Type</param>
-        public EmitHelper castType(Type type)
+        public EmitHelper castType( Type type )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
-            return type.IsValueType ? unbox_any(type) : castclass(type);
+            return type.IsValueType ? unbox_any( type ) : castclass( type );
         }
 
         /// <summary>
@@ -904,7 +1004,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ceq
         {
-            get { _ilGenerator.Emit(OpCodes.Ceq); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ceq );
+                return this;
+            }
         }
 
         /// <summary>
@@ -917,7 +1021,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper cgt
         {
-            get { _ilGenerator.Emit(OpCodes.Cgt); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Cgt );
+                return this;
+            }
         }
 
         /// <summary>
@@ -930,7 +1038,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper cgt_un
         {
-            get { _ilGenerator.Emit(OpCodes.Cgt_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Cgt_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -940,9 +1052,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Cgt_Un">OpCodes.Constrained</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
-        public EmitHelper constrained(Type type)
+        public EmitHelper constrained( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Constrained, type); return this;
+            _ilGenerator.Emit( OpCodes.Constrained, type );
+            return this;
         }
 
         /// <summary>
@@ -953,7 +1066,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ckfinite
         {
-            get { _ilGenerator.Emit(OpCodes.Ckfinite); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ckfinite );
+                return this;
+            }
         }
 
         /// <summary>
@@ -966,7 +1083,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper clt
         {
-            get { _ilGenerator.Emit(OpCodes.Clt); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Clt );
+                return this;
+            }
         }
 
         /// <summary>
@@ -979,7 +1100,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper clt_un
         {
-            get { _ilGenerator.Emit(OpCodes.Clt_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Clt_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -990,7 +1115,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_i
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_I); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_I );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1001,7 +1130,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_i1
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_I1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_I1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1012,7 +1145,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_i2
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_I2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_I2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1023,7 +1160,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_i4
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_I4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_I4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1034,53 +1175,79 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_i8
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_I8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_I8 );
+                return this;
+            }
         }
 
         /// <summary>
         /// Converts the value on top of the evaluation stack to the specified type.
         /// </summary>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
-        public EmitHelper conv(Type type)
+        public EmitHelper conv( Type type )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
-            switch (Type.GetTypeCode(type))
+            switch( Type.GetTypeCode( type ) )
             {
                 case TypeCode.Boolean:
-                case TypeCode.SByte: conv_i1.end(); break;
-                case TypeCode.Int16: conv_i2.end(); break;
-                case TypeCode.Int32: conv_i4.end(); break;
-                case TypeCode.Int64: conv_i8.end(); break;
+                case TypeCode.SByte:
+                    conv_i1.end();
+                    break;
+                case TypeCode.Int16:
+                    conv_i2.end();
+                    break;
+                case TypeCode.Int32:
+                    conv_i4.end();
+                    break;
+                case TypeCode.Int64:
+                    conv_i8.end();
+                    break;
 
-                case TypeCode.Byte: conv_u1.end(); break;
+                case TypeCode.Byte:
+                    conv_u1.end();
+                    break;
                 case TypeCode.Char:
-                case TypeCode.UInt16: conv_u2.end(); break;
-                case TypeCode.UInt32: conv_u4.end(); break;
-                case TypeCode.UInt64: conv_u8.end(); break;
+                case TypeCode.UInt16:
+                    conv_u2.end();
+                    break;
+                case TypeCode.UInt32:
+                    conv_u4.end();
+                    break;
+                case TypeCode.UInt64:
+                    conv_u8.end();
+                    break;
 
-                case TypeCode.Single: conv_r4.end(); break;
-                case TypeCode.Double: conv_r8.end(); break;
+                case TypeCode.Single:
+                    conv_r4.end();
+                    break;
+                case TypeCode.Double:
+                    conv_r8.end();
+                    break;
 
                 default:
+                {
+                    if( type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) )
                     {
-                        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        ConstructorInfo ci = type.GetConstructor( type.GetGenericArguments() );
+                        if( ci != null )
                         {
-                            ConstructorInfo ci = type.GetConstructor(type.GetGenericArguments());
-                            if (ci != null)
-                            {
-                                newobj(ci);
-                                break;
-                            }
+                            newobj( ci );
+                            break;
                         }
-
-                        throw CreateNotExpectedTypeException(type);
                     }
+
+                    throw CreateNotExpectedTypeException( type );
+                }
             }
 
             return this;
         }
-
 
         /// <summary>
         /// Calls ILGenerator.Emit(<see cref="OpCodes.Conv_Ovf_I"/>) that
@@ -1091,7 +1258,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_i
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_I); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_I );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1103,7 +1274,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_i1
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_I1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_I1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1115,7 +1290,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_i1_un
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_I1_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_I1_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1127,7 +1306,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_i2
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_I2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_I2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1139,7 +1322,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_i2_un
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_I2_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_I2_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1150,7 +1337,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_i4
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_I2_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_I2_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1161,7 +1352,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_i4_un
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_I4_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_I4_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1173,7 +1368,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_i8
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_I8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_I8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1184,7 +1383,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_i8_un
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_I8_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_I8_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1196,7 +1399,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_i_un
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_I_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_I_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1208,7 +1415,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_u
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_U); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_U );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1220,7 +1431,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_u1
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_U1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_U1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1232,7 +1447,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_u1_un
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_U1_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_U1_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1244,7 +1463,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_u2
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_U2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_U2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1256,7 +1479,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_u2_un
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_U2_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_U2_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1267,7 +1494,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_u4
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_U4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_U4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1278,7 +1509,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_u4_un
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_U4_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_U4_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1289,7 +1524,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_u8
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_U8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_U8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1300,7 +1539,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_u8_un
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_U8_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_U8_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1312,7 +1555,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_ovf_u_un
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_Ovf_U_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_Ovf_U_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1323,7 +1570,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_r4
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_R4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_R4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1334,7 +1585,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_r8
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_R8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_R8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1345,7 +1600,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_r_un
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_R_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_R_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1356,7 +1615,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_u
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_U); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_U );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1367,7 +1630,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_u1
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_U1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_U1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1378,7 +1645,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_u2
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_U2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_U2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1389,7 +1660,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_u4
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_U4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_U4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1400,7 +1675,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper conv_u8
         {
-            get { _ilGenerator.Emit(OpCodes.Conv_U8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Conv_U8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1411,7 +1690,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper cpblk
         {
-            get { _ilGenerator.Emit(OpCodes.Cpblk); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Cpblk );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1422,9 +1705,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Cpobj">OpCodes.Cpobj</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper cpobj(Type type)
+        public EmitHelper cpobj( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Cpobj, type); return this;
+            _ilGenerator.Emit( OpCodes.Cpobj, type );
+            return this;
         }
 
         /// <summary>
@@ -1436,7 +1720,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper div
         {
-            get { _ilGenerator.Emit(OpCodes.Div); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Div );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1447,7 +1735,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper div_un
         {
-            get { _ilGenerator.Emit(OpCodes.Div_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Div_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1458,7 +1750,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper dup
         {
-            get { _ilGenerator.Emit(OpCodes.Dup); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Dup );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1470,7 +1766,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper endfilter
         {
-            get { _ilGenerator.Emit(OpCodes.Endfilter); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Endfilter );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1482,7 +1782,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper endfinally
         {
-            get { _ilGenerator.Emit(OpCodes.Endfinally); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Endfinally );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1493,7 +1797,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper initblk
         {
-            get { _ilGenerator.Emit(OpCodes.Initblk); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Initblk );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1504,9 +1812,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Initobj">OpCodes.Initobj</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper initobj(Type type)
+        public EmitHelper initobj( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Initobj, type); return this;
+            _ilGenerator.Emit( OpCodes.Initobj, type );
+            return this;
         }
 
         /// <summary>
@@ -1516,9 +1825,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Isinst">OpCodes.Isinst</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper isinst(Type type)
+        public EmitHelper isinst( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Isinst, type); return this;
+            _ilGenerator.Emit( OpCodes.Isinst, type );
+            return this;
         }
 
         /// <summary>
@@ -1528,9 +1838,10 @@ namespace Fasterflect.Emitter
         /// <param name="methodInfo">The method to be jumped.</param>
         /// <seealso cref="OpCodes.Jmp">OpCodes.Jmp</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,MethodInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper jmp(MethodInfo methodInfo)
+        public EmitHelper jmp( MethodInfo methodInfo )
         {
-            _ilGenerator.Emit(OpCodes.Jmp, methodInfo); return this;
+            _ilGenerator.Emit( OpCodes.Jmp, methodInfo );
+            return this;
         }
 
         /// <summary>
@@ -1540,9 +1851,10 @@ namespace Fasterflect.Emitter
         /// <param name="index">Index of the argument that is pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Ldarg">OpCodes.Ldarg</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,short)">ILGenerator.Emit</seealso>
-        public EmitHelper ldarg(short index)
+        public EmitHelper ldarg( short index )
         {
-            _ilGenerator.Emit(OpCodes.Ldarg, index); return this;
+            _ilGenerator.Emit( OpCodes.Ldarg, index );
+            return this;
         }
 
         /// <summary>
@@ -1553,19 +1865,35 @@ namespace Fasterflect.Emitter
         /// <param name="index">Index of the argument that is pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Ldarg">OpCodes.Ldarg</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,short)">ILGenerator.Emit</seealso>
-        public EmitHelper ldarg(int index)
+        public EmitHelper ldarg( int index )
         {
-            switch (index)
+            switch( index )
             {
-                case 0: ldarg_0.end(); break;
-                case 1: ldarg_1.end(); break;
-                case 2: ldarg_2.end(); break;
-                case 3: ldarg_3.end(); break;
+                case 0:
+                    ldarg_0.end();
+                    break;
+                case 1:
+                    ldarg_1.end();
+                    break;
+                case 2:
+                    ldarg_2.end();
+                    break;
+                case 3:
+                    ldarg_3.end();
+                    break;
                 default:
-                    if (index <= byte.MaxValue) ldarg_s((byte)index);
-                    else if (index <= short.MaxValue) ldarg((short)index);
+                    if( index <= byte.MaxValue )
+                    {
+                        ldarg_s( (byte) index );
+                    }
+                    else if( index <= short.MaxValue )
+                    {
+                        ldarg( (short) index );
+                    }
                     else
-                        throw new ArgumentOutOfRangeException("index");
+                    {
+                        throw new ArgumentOutOfRangeException( "index" );
+                    }
 
                     break;
             }
@@ -1580,9 +1908,10 @@ namespace Fasterflect.Emitter
         /// <param name="index">Index of the address addr of the argument that is pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Ldarga">OpCodes.Ldarga</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,short)">ILGenerator.Emit</seealso>
-        public EmitHelper ldarga(short index)
+        public EmitHelper ldarga( short index )
         {
-            _ilGenerator.Emit(OpCodes.Ldarga, index); return this;
+            _ilGenerator.Emit( OpCodes.Ldarga, index );
+            return this;
         }
 
         /// <summary>
@@ -1592,21 +1921,30 @@ namespace Fasterflect.Emitter
         /// <param name="index">Index of the address addr of the argument that is pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Ldarga_S">OpCodes.Ldarga_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,byte)">ILGenerator.Emit</seealso>
-        public EmitHelper ldarga_s(byte index)
+        public EmitHelper ldarga_s( byte index )
         {
-            _ilGenerator.Emit(OpCodes.Ldarga_S, index); return this;
+            _ilGenerator.Emit( OpCodes.Ldarga_S, index );
+            return this;
         }
 
         /// <summary>
         /// Load an argument address onto the evaluation stack.
         /// </summary>
         /// <param name="index">Index of the address addr of the argument that is pushed onto the stack.</param>
-        public EmitHelper ldarga(int index)
+        public EmitHelper ldarga( int index )
         {
-            if (index <= byte.MaxValue) ldarga_s((byte)index);
-            else if (index <= short.MaxValue) ldarga((short)index);
+            if( index <= byte.MaxValue )
+            {
+                ldarga_s( (byte) index );
+            }
+            else if( index <= short.MaxValue )
+            {
+                ldarga( (short) index );
+            }
             else
-                throw new ArgumentOutOfRangeException("index");
+            {
+                throw new ArgumentOutOfRangeException( "index" );
+            }
 
             return this;
         }
@@ -1619,7 +1957,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldarg_0
         {
-            get { _ilGenerator.Emit(OpCodes.Ldarg_0); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldarg_0 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1630,7 +1972,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldarg_1
         {
-            get { _ilGenerator.Emit(OpCodes.Ldarg_1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldarg_1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1641,7 +1987,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldarg_2
         {
-            get { _ilGenerator.Emit(OpCodes.Ldarg_2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldarg_2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1652,7 +2002,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldarg_3
         {
-            get { _ilGenerator.Emit(OpCodes.Ldarg_3); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldarg_3 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1662,9 +2016,10 @@ namespace Fasterflect.Emitter
         /// <param name="index">Index of the argument value that is pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Ldarg_S">OpCodes.Ldarg_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,byte)">ILGenerator.Emit</seealso>
-        public EmitHelper ldarg_s(byte index)
+        public EmitHelper ldarg_s( byte index )
         {
-            _ilGenerator.Emit(OpCodes.Ldarg_S, index); return this;
+            _ilGenerator.Emit( OpCodes.Ldarg_S, index );
+            return this;
         }
 
         /// <summary>
@@ -1675,9 +2030,10 @@ namespace Fasterflect.Emitter
         /// <seealso cref="OpCodes.Ldc_I4">OpCodes.Ldc_I4_0</seealso>
         /// <seealso cref="OpCodes.Ldc_I4">OpCodes.Ldc_I4_1</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,int)">ILGenerator.Emit</seealso>
-        public EmitHelper ldc_bool(bool b)
+        public EmitHelper ldc_bool( bool b )
         {
-            _ilGenerator.Emit(b ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0); return this;
+            _ilGenerator.Emit( b ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0 );
+            return this;
         }
 
         /// <summary>
@@ -1687,9 +2043,10 @@ namespace Fasterflect.Emitter
         /// <param name="num">The value pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Ldc_I4">OpCodes.Ldc_I4</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,int)">ILGenerator.Emit</seealso>
-        public EmitHelper ldc_i4(int num)
+        public EmitHelper ldc_i4( int num )
         {
-            _ilGenerator.Emit(OpCodes.Ldc_I4, num); return this;
+            _ilGenerator.Emit( OpCodes.Ldc_I4, num );
+            return this;
         }
 
         /// <summary>
@@ -1700,7 +2057,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldc_i4_0
         {
-            get { _ilGenerator.Emit(OpCodes.Ldc_I4_0); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldc_I4_0 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1711,7 +2072,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldc_i4_1
         {
-            get { _ilGenerator.Emit(OpCodes.Ldc_I4_1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldc_I4_1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1722,7 +2087,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldc_i4_2
         {
-            get { _ilGenerator.Emit(OpCodes.Ldc_I4_2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldc_I4_2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1733,7 +2102,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldc_i4_3
         {
-            get { _ilGenerator.Emit(OpCodes.Ldc_I4_3); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldc_I4_3 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1744,7 +2117,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldc_i4_4
         {
-            get { _ilGenerator.Emit(OpCodes.Ldc_I4_4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldc_I4_4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1755,7 +2132,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldc_i4_5
         {
-            get { _ilGenerator.Emit(OpCodes.Ldc_I4_5); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldc_I4_5 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1766,7 +2147,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldc_i4_6
         {
-            get { _ilGenerator.Emit(OpCodes.Ldc_I4_6); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldc_I4_6 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1777,7 +2162,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldc_i4_7
         {
-            get { _ilGenerator.Emit(OpCodes.Ldc_I4_7); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldc_I4_7 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1788,7 +2177,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldc_i4_8
         {
-            get { _ilGenerator.Emit(OpCodes.Ldc_I4_8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldc_I4_8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1799,7 +2192,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldc_i4_m1
         {
-            get { _ilGenerator.Emit(OpCodes.Ldc_I4_M1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldc_I4_M1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1807,25 +2204,49 @@ namespace Fasterflect.Emitter
         /// pushes the integer value of -1 onto the evaluation stack as an int32.
         /// </summary>
         /// <seealso cref="ldc_i4"/>
-        public EmitHelper ldc_i4_(int num)
+        public EmitHelper ldc_i4_( int num )
         {
-            switch (num)
+            switch( num )
             {
-                case -1: ldc_i4_m1.end(); break;
-                case 0: ldc_i4_0.end(); break;
-                case 1: ldc_i4_1.end(); break;
-                case 2: ldc_i4_2.end(); break;
-                case 3: ldc_i4_3.end(); break;
-                case 4: ldc_i4_4.end(); break;
-                case 5: ldc_i4_5.end(); break;
-                case 6: ldc_i4_6.end(); break;
-                case 7: ldc_i4_7.end(); break;
-                case 8: ldc_i4_8.end(); break;
+                case -1:
+                    ldc_i4_m1.end();
+                    break;
+                case 0:
+                    ldc_i4_0.end();
+                    break;
+                case 1:
+                    ldc_i4_1.end();
+                    break;
+                case 2:
+                    ldc_i4_2.end();
+                    break;
+                case 3:
+                    ldc_i4_3.end();
+                    break;
+                case 4:
+                    ldc_i4_4.end();
+                    break;
+                case 5:
+                    ldc_i4_5.end();
+                    break;
+                case 6:
+                    ldc_i4_6.end();
+                    break;
+                case 7:
+                    ldc_i4_7.end();
+                    break;
+                case 8:
+                    ldc_i4_8.end();
+                    break;
                 default:
-                    if (num >= sbyte.MinValue && num <= sbyte.MaxValue)
-                        ldc_i4_s((sbyte)num);
+                    if( num >= sbyte.MinValue && num <= sbyte.MaxValue )
+                    {
+                        ldc_i4_s( (sbyte) num );
+                    }
                     else
-                        ldc_i4(num);
+                    {
+                        ldc_i4( num );
+                    }
 
                     break;
             }
@@ -1840,10 +2261,10 @@ namespace Fasterflect.Emitter
         /// <param name="num">The value pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Ldc_I4_S">OpCodes.Ldc_I4_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,byte)">ILGenerator.Emit</seealso>
-        [CLSCompliant(false)]
-        public EmitHelper ldc_i4_s(sbyte num)
+        public EmitHelper ldc_i4_s( sbyte num )
         {
-            _ilGenerator.Emit(OpCodes.Ldc_I4_S, num); return this;
+            _ilGenerator.Emit( OpCodes.Ldc_I4_S, num );
+            return this;
         }
 
         /// <summary>
@@ -1853,9 +2274,10 @@ namespace Fasterflect.Emitter
         /// <param name="num">The value pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Ldc_I8">OpCodes.Ldc_I8</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,long)">ILGenerator.Emit</seealso>
-        public EmitHelper ldc_i8(long num)
+        public EmitHelper ldc_i8( long num )
         {
-            _ilGenerator.Emit(OpCodes.Ldc_I8, num); return this;
+            _ilGenerator.Emit( OpCodes.Ldc_I8, num );
+            return this;
         }
 
         /// <summary>
@@ -1865,9 +2287,10 @@ namespace Fasterflect.Emitter
         /// <param name="num">The value pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Ldc_R4">OpCodes.Ldc_R4</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,float)">ILGenerator.Emit</seealso>
-        public EmitHelper ldc_r4(float num)
+        public EmitHelper ldc_r4( float num )
         {
-            _ilGenerator.Emit(OpCodes.Ldc_R4, num); return this;
+            _ilGenerator.Emit( OpCodes.Ldc_R4, num );
+            return this;
         }
 
         /// <summary>
@@ -1877,9 +2300,10 @@ namespace Fasterflect.Emitter
         /// <param name="num">The value pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Ldc_R8">OpCodes.Ldc_R8</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,double)">ILGenerator.Emit</seealso>
-        public EmitHelper ldc_r8(double num)
+        public EmitHelper ldc_r8( double num )
         {
-            _ilGenerator.Emit(OpCodes.Ldc_R8, num); return this;
+            _ilGenerator.Emit( OpCodes.Ldc_R8, num );
+            return this;
         }
 
         /// <summary>
@@ -1890,9 +2314,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Ldelema">OpCodes.Ldelema</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper ldelema(Type type)
+        public EmitHelper ldelema( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Ldelema, type); return this;
+            _ilGenerator.Emit( OpCodes.Ldelema, type );
+            return this;
         }
 
         /// <summary>
@@ -1904,7 +2329,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldelem_i
         {
-            get { _ilGenerator.Emit(OpCodes.Ldelem_I); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldelem_I );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1915,7 +2344,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldelem_i1
         {
-            get { _ilGenerator.Emit(OpCodes.Ldelem_I1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldelem_I1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1926,7 +2359,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldelem_i2
         {
-            get { _ilGenerator.Emit(OpCodes.Ldelem_I2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldelem_I2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1937,7 +2374,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldelem_i4
         {
-            get { _ilGenerator.Emit(OpCodes.Ldelem_I4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldelem_I4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1948,7 +2389,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldelem_i8
         {
-            get { _ilGenerator.Emit(OpCodes.Ldelem_I8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldelem_I8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1959,7 +2404,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldelem_r4
         {
-            get { _ilGenerator.Emit(OpCodes.Ldelem_R4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldelem_R4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1970,7 +2419,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldelem_r8
         {
-            get { _ilGenerator.Emit(OpCodes.Ldelem_R8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldelem_R8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1982,7 +2435,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldelem_ref
         {
-            get { _ilGenerator.Emit(OpCodes.Ldelem_Ref); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldelem_Ref );
+                return this;
+            }
         }
 
         /// <summary>
@@ -1993,7 +2450,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldelem_u1
         {
-            get { _ilGenerator.Emit(OpCodes.Ldelem_U1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldelem_U1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2005,7 +2466,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldelem_u2
         {
-            get { _ilGenerator.Emit(OpCodes.Ldelem_U2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldelem_U2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2017,7 +2482,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldelem_u4
         {
-            get { _ilGenerator.Emit(OpCodes.Ldelem_U4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldelem_U4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2027,9 +2496,10 @@ namespace Fasterflect.Emitter
         /// <param name="fieldInfo">A <see cref="FieldInfo"/> representing a field.</param>
         /// <seealso cref="OpCodes.Ldfld">OpCodes.Ldfld</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,FieldInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper ldfld(FieldInfo fieldInfo)
+        public EmitHelper ldfld( FieldInfo fieldInfo )
         {
-            _ilGenerator.Emit(OpCodes.Ldfld, fieldInfo); return this;
+            _ilGenerator.Emit( OpCodes.Ldfld, fieldInfo );
+            return this;
         }
 
         /// <summary>
@@ -2039,9 +2509,10 @@ namespace Fasterflect.Emitter
         /// <param name="fieldInfo">A <see cref="FieldInfo"/> representing a field.</param>
         /// <seealso cref="OpCodes.Ldflda">OpCodes.Ldflda</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,FieldInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper ldflda(FieldInfo fieldInfo)
+        public EmitHelper ldflda( FieldInfo fieldInfo )
         {
-            _ilGenerator.Emit(OpCodes.Ldflda, fieldInfo); return this;
+            _ilGenerator.Emit( OpCodes.Ldflda, fieldInfo );
+            return this;
         }
 
         /// <summary>
@@ -2052,9 +2523,10 @@ namespace Fasterflect.Emitter
         /// <param name="methodInfo">The method to be called.</param>
         /// <seealso cref="OpCodes.Ldftn">OpCodes.Ldftn</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,MethodInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper ldftn(MethodInfo methodInfo)
+        public EmitHelper ldftn( MethodInfo methodInfo )
         {
-            _ilGenerator.Emit(OpCodes.Ldftn, methodInfo); return this;
+            _ilGenerator.Emit( OpCodes.Ldftn, methodInfo );
+            return this;
         }
 
         /// <summary>
@@ -2065,7 +2537,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldind_i
         {
-            get { _ilGenerator.Emit(OpCodes.Ldind_I); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldind_I );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2076,7 +2552,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldind_i1
         {
-            get { _ilGenerator.Emit(OpCodes.Ldind_I1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldind_I1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2087,7 +2567,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldind_i2
         {
-            get { _ilGenerator.Emit(OpCodes.Ldind_I2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldind_I2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2098,7 +2582,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldind_i4
         {
-            get { _ilGenerator.Emit(OpCodes.Ldind_I4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldind_I4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2109,7 +2597,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldind_i8
         {
-            get { _ilGenerator.Emit(OpCodes.Ldind_I8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldind_I8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2120,7 +2612,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldind_r4
         {
-            get { _ilGenerator.Emit(OpCodes.Ldind_R4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldind_R4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2131,7 +2627,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldind_r8
         {
-            get { _ilGenerator.Emit(OpCodes.Ldind_R8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldind_R8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2142,7 +2642,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldind_ref
         {
-            get { _ilGenerator.Emit(OpCodes.Ldind_Ref); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldind_Ref );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2153,7 +2657,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldind_u1
         {
-            get { _ilGenerator.Emit(OpCodes.Ldind_U1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldind_U1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2164,7 +2672,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldind_u2
         {
-            get { _ilGenerator.Emit(OpCodes.Ldind_U2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldind_U2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2175,43 +2687,68 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldind_u4
         {
-            get { _ilGenerator.Emit(OpCodes.Ldind_U4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldind_U4 );
+                return this;
+            }
         }
 
         /// <summary>
         /// Loads a value of the type from a supplied address.
         /// </summary>
         /// <param name="type">A Type.</param>
-        public EmitHelper ldind(Type type)
+        public EmitHelper ldind( Type type )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
-            switch (Type.GetTypeCode(type))
+            switch( Type.GetTypeCode( type ) )
             {
                 case TypeCode.Boolean:
                 case TypeCode.Byte:
-                case TypeCode.SByte: ldind_i1.end(); break;
+                case TypeCode.SByte:
+                    ldind_i1.end();
+                    break;
 
                 case TypeCode.Char:
                 case TypeCode.Int16:
-                case TypeCode.UInt16: ldind_i2.end(); break;
+                case TypeCode.UInt16:
+                    ldind_i2.end();
+                    break;
 
                 case TypeCode.Int32:
-                case TypeCode.UInt32: ldind_i4.end(); break;
+                case TypeCode.UInt32:
+                    ldind_i4.end();
+                    break;
 
                 case TypeCode.Int64:
-                case TypeCode.UInt64: ldind_i8.end(); break;
+                case TypeCode.UInt64:
+                    ldind_i8.end();
+                    break;
 
-                case TypeCode.Single: ldind_r4.end(); break;
-                case TypeCode.Double: ldind_r8.end(); break;
+                case TypeCode.Single:
+                    ldind_r4.end();
+                    break;
+                case TypeCode.Double:
+                    ldind_r8.end();
+                    break;
 
                 default:
-                    if (type.IsClass)
+                    if( type.IsClass )
+                    {
                         ldind_ref.end();
-                    else if (type.IsValueType)
-                        stobj(type);
+                    }
+                    else if( type.IsValueType )
+                    {
+                        stobj( type );
+                    }
                     else
-                        throw CreateNotExpectedTypeException(type);
+                    {
+                        throw CreateNotExpectedTypeException( type );
+                    }
                     break;
             }
 
@@ -2226,7 +2763,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldlen
         {
-            get { _ilGenerator.Emit(OpCodes.Ldlen); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldlen );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2236,9 +2777,10 @@ namespace Fasterflect.Emitter
         /// <param name="index">Index of the local variable value pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Ldloc">OpCodes.Ldloc</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,short)">ILGenerator.Emit</seealso>
-        public EmitHelper ldloc(short index)
+        public EmitHelper ldloc( short index )
         {
-            _ilGenerator.Emit(OpCodes.Ldloc, index); return this;
+            _ilGenerator.Emit( OpCodes.Ldloc, index );
+            return this;
         }
 
         /// <summary>
@@ -2248,9 +2790,10 @@ namespace Fasterflect.Emitter
         /// <param name="localBuilder">Local variable builder.</param>
         /// <seealso cref="OpCodes.Ldloc">OpCodes.Ldloc</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,short)">ILGenerator.Emit</seealso>
-        public EmitHelper ldloc(LocalBuilder localBuilder)
+        public EmitHelper ldloc( LocalBuilder localBuilder )
         {
-            _ilGenerator.Emit(OpCodes.Ldloc, localBuilder); return this;
+            _ilGenerator.Emit( OpCodes.Ldloc, localBuilder );
+            return this;
         }
 
         /// <summary>
@@ -2260,9 +2803,10 @@ namespace Fasterflect.Emitter
         /// <param name="index">Index of the local variable.</param>
         /// <seealso cref="OpCodes.Ldloca">OpCodes.Ldloca</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,short)">ILGenerator.Emit</seealso>
-        public EmitHelper ldloca(short index)
+        public EmitHelper ldloca( short index )
         {
-            _ilGenerator.Emit(OpCodes.Ldloca, index); return this;
+            _ilGenerator.Emit( OpCodes.Ldloca, index );
+            return this;
         }
 
         /// <summary>
@@ -2272,9 +2816,10 @@ namespace Fasterflect.Emitter
         /// <param name="index">Index of the local variable.</param>
         /// <seealso cref="OpCodes.Ldloca_S">OpCodes.Ldloca_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,byte)">ILGenerator.Emit</seealso>
-        public EmitHelper ldloca_s(byte index)
+        public EmitHelper ldloca_s( byte index )
         {
-            _ilGenerator.Emit(OpCodes.Ldloca_S, index); return this;
+            _ilGenerator.Emit( OpCodes.Ldloca_S, index );
+            return this;
         }
 
         /// <summary>
@@ -2284,9 +2829,10 @@ namespace Fasterflect.Emitter
         /// <param name="local">A <see cref="LocalBuilder"/> representing the local variable.</param>
         /// <seealso cref="OpCodes.Ldloca">OpCodes.Ldloca</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,short)">ILGenerator.Emit</seealso>
-        public EmitHelper ldloca(LocalBuilder local)
+        public EmitHelper ldloca( LocalBuilder local )
         {
-            _ilGenerator.Emit(OpCodes.Ldloca, local); return this;
+            _ilGenerator.Emit( OpCodes.Ldloca, local );
+            return this;
         }
 
         /// <summary>
@@ -2297,7 +2843,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldloc_0
         {
-            get { _ilGenerator.Emit(OpCodes.Ldloc_0); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldloc_0 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2308,7 +2858,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldloc_1
         {
-            get { _ilGenerator.Emit(OpCodes.Ldloc_1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldloc_1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2319,7 +2873,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldloc_2
         {
-            get { _ilGenerator.Emit(OpCodes.Ldloc_2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldloc_2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2330,7 +2888,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldloc_3
         {
-            get { _ilGenerator.Emit(OpCodes.Ldloc_3); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldloc_3 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2340,9 +2902,10 @@ namespace Fasterflect.Emitter
         /// <param name="index">Index of the local variable.</param>
         /// <seealso cref="OpCodes.Ldloc_S">OpCodes.Ldloc_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,byte)">ILGenerator.Emit</seealso>
-        public EmitHelper ldloc_s(byte index)
+        public EmitHelper ldloc_s( byte index )
         {
-            _ilGenerator.Emit(OpCodes.Ldloca_S, index); return this;
+            _ilGenerator.Emit( OpCodes.Ldloca_S, index );
+            return this;
         }
 
         /// <summary>
@@ -2353,7 +2916,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ldnull
         {
-            get { _ilGenerator.Emit(OpCodes.Ldnull); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Ldnull );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2363,9 +2930,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Ldobj">OpCodes.Ldobj</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper ldobj(Type type)
+        public EmitHelper ldobj( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Ldobj, type); return this;
+            _ilGenerator.Emit( OpCodes.Ldobj, type );
+            return this;
         }
 
         /// <summary>
@@ -2375,9 +2943,10 @@ namespace Fasterflect.Emitter
         /// <param name="fieldInfo">A <see cref="FieldInfo"/> representing a field.</param>
         /// <seealso cref="OpCodes.Ldsfld">OpCodes.Ldsfld</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,FieldInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper ldsfld(FieldInfo fieldInfo)
+        public EmitHelper ldsfld( FieldInfo fieldInfo )
         {
-            _ilGenerator.Emit(OpCodes.Ldsfld, fieldInfo); return this;
+            _ilGenerator.Emit( OpCodes.Ldsfld, fieldInfo );
+            return this;
         }
 
         /// <summary>
@@ -2387,9 +2956,10 @@ namespace Fasterflect.Emitter
         /// <param name="fieldInfo">A <see cref="FieldInfo"/> representing a field.</param>
         /// <seealso cref="OpCodes.Ldsflda">OpCodes.Ldsflda</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,FieldInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper ldsflda(FieldInfo fieldInfo)
+        public EmitHelper ldsflda( FieldInfo fieldInfo )
         {
-            _ilGenerator.Emit(OpCodes.Ldsflda, fieldInfo); return this;
+            _ilGenerator.Emit( OpCodes.Ldsflda, fieldInfo );
+            return this;
         }
 
         /// <summary>
@@ -2399,9 +2969,9 @@ namespace Fasterflect.Emitter
         /// <param name="str">The String to be emitted.</param>
         /// <seealso cref="ldstr"/>
         /// <seealso cref="ldnull"/>
-        public EmitHelper ldstrEx(string str)
+        public EmitHelper ldstrEx( string str )
         {
-            return str == null ? ldnull : ldstr(str);
+            return str == null ? ldnull : ldstr( str );
         }
 
         /// <summary>
@@ -2411,9 +2981,10 @@ namespace Fasterflect.Emitter
         /// <param name="str">The String to be emitted.</param>
         /// <seealso cref="OpCodes.Ldstr">OpCodes.Ldstr</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,FieldInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper ldstr(string str)
+        public EmitHelper ldstr( string str )
         {
-            _ilGenerator.Emit(OpCodes.Ldstr, str); return this;
+            _ilGenerator.Emit( OpCodes.Ldstr, str );
+            return this;
         }
 
         /// <summary>
@@ -2423,9 +2994,10 @@ namespace Fasterflect.Emitter
         /// <param name="methodInfo">The method to be called.</param>
         /// <seealso cref="OpCodes.Ldtoken">OpCodes.Ldtoken</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,MethodInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper ldtoken(MethodInfo methodInfo)
+        public EmitHelper ldtoken( MethodInfo methodInfo )
         {
-            _ilGenerator.Emit(OpCodes.Ldtoken, methodInfo); return this;
+            _ilGenerator.Emit( OpCodes.Ldtoken, methodInfo );
+            return this;
         }
 
         /// <summary>
@@ -2436,9 +3008,10 @@ namespace Fasterflect.Emitter
         /// <param name="fieldInfo">A <see cref="FieldInfo"/> representing a field.</param>
         /// <seealso cref="OpCodes.Ldtoken">OpCodes.Ldtoken</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,FieldInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper ldtoken(FieldInfo fieldInfo)
+        public EmitHelper ldtoken( FieldInfo fieldInfo )
         {
-            _ilGenerator.Emit(OpCodes.Ldtoken, fieldInfo); return this;
+            _ilGenerator.Emit( OpCodes.Ldtoken, fieldInfo );
+            return this;
         }
 
         /// <summary>
@@ -2448,9 +3021,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Ldtoken">OpCodes.Ldtoken</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper ldtoken(Type type)
+        public EmitHelper ldtoken( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Ldtoken, type); return this;
+            _ilGenerator.Emit( OpCodes.Ldtoken, type );
+            return this;
         }
 
         /// <summary>
@@ -2461,9 +3035,10 @@ namespace Fasterflect.Emitter
         /// <param name="methodInfo">The method to be called.</param>
         /// <seealso cref="OpCodes.Ldvirtftn">OpCodes.Ldvirtftn</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,MethodInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper ldvirtftn(MethodInfo methodInfo)
+        public EmitHelper ldvirtftn( MethodInfo methodInfo )
         {
-            _ilGenerator.Emit(OpCodes.Ldvirtftn, methodInfo); return this;
+            _ilGenerator.Emit( OpCodes.Ldvirtftn, methodInfo );
+            return this;
         }
 
         /// <summary>
@@ -2473,9 +3048,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label.</param>
         /// <seealso cref="OpCodes.Leave">OpCodes.Leave</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper leave(Label label)
+        public EmitHelper leave( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Leave, label); return this;
+            _ilGenerator.Emit( OpCodes.Leave, label );
+            return this;
         }
 
         /// <summary>
@@ -2485,9 +3061,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label.</param>
         /// <seealso cref="OpCodes.Leave_S">OpCodes.Leave_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper leave_s(Label label)
+        public EmitHelper leave_s( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Leave_S, label); return this;
+            _ilGenerator.Emit( OpCodes.Leave_S, label );
+            return this;
         }
 
         /// <summary>
@@ -2499,7 +3076,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper localloc
         {
-            get { _ilGenerator.Emit(OpCodes.Localloc); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Localloc );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2509,9 +3090,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Mkrefany">OpCodes.Mkrefany</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper mkrefany(Type type)
+        public EmitHelper mkrefany( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Mkrefany, type); return this;
+            _ilGenerator.Emit( OpCodes.Mkrefany, type );
+            return this;
         }
 
         /// <summary>
@@ -2523,7 +3105,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper mul
         {
-            get { _ilGenerator.Emit(OpCodes.Mul); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Mul );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2535,7 +3121,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper mul_ovf
         {
-            get { _ilGenerator.Emit(OpCodes.Mul_Ovf); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Mul_Ovf );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2547,7 +3137,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper mul_ovf_un
         {
-            get { _ilGenerator.Emit(OpCodes.Mul_Ovf_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Mul_Ovf_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2558,7 +3152,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper neg
         {
-            get { _ilGenerator.Emit(OpCodes.Neg); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Neg );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2569,9 +3167,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Newarr">OpCodes.Newarr</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper newarr(Type type)
+        public EmitHelper newarr( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Newarr, type); return this;
+            _ilGenerator.Emit( OpCodes.Newarr, type );
+            return this;
         }
 
         /// <summary>
@@ -2582,9 +3181,10 @@ namespace Fasterflect.Emitter
         /// <param name="constructorInfo">A <see cref="ConstructorInfo"/> representing a constructor.</param>
         /// <seealso cref="OpCodes.Newobj">OpCodes.Newobj</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,ConstructorInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper newobj(ConstructorInfo constructorInfo)
+        public EmitHelper newobj( ConstructorInfo constructorInfo )
         {
-            _ilGenerator.Emit(OpCodes.Newobj, constructorInfo); return this;
+            _ilGenerator.Emit( OpCodes.Newobj, constructorInfo );
+            return this;
         }
 
         /// <summary>
@@ -2597,13 +3197,16 @@ namespace Fasterflect.Emitter
         /// the number, order, and type of the parameters for the desired constructor.
         /// -or- An empty array of System.Type objects, to get a constructor that takes
         /// no parameters. Such an empty array is provided by the static field System.Type.EmptyTypes.</param>
-        public EmitHelper newobj(Type type, params Type[] parameters)
+        public EmitHelper newobj( Type type, params Type[] parameters )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
-            ConstructorInfo ci = type.GetConstructor(parameters);
+            ConstructorInfo ci = type.GetConstructor( parameters );
 
-            return newobj(ci);
+            return newobj( ci );
         }
 
         /// <summary>
@@ -2615,7 +3218,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper nop
         {
-            get { _ilGenerator.Emit(OpCodes.Nop); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Nop );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2627,7 +3234,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper not
         {
-            get { _ilGenerator.Emit(OpCodes.Not); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Not );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2639,7 +3250,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper or
         {
-            get { _ilGenerator.Emit(OpCodes.Or); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Or );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2650,7 +3265,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper pop
         {
-            get { _ilGenerator.Emit(OpCodes.Pop); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Pop );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2663,7 +3282,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper @readonly
         {
-            get { _ilGenerator.Emit(OpCodes.Readonly); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Readonly );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2674,7 +3297,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper refanytype
         {
-            get { _ilGenerator.Emit(OpCodes.Refanytype); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Refanytype );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2684,9 +3311,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Refanyval">OpCodes.Refanyval</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper refanyval(Type type)
+        public EmitHelper refanyval( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Refanyval, type); return this;
+            _ilGenerator.Emit( OpCodes.Refanyval, type );
+            return this;
         }
 
         /// <summary>
@@ -2697,7 +3325,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper rem
         {
-            get { _ilGenerator.Emit(OpCodes.Rem); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Rem );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2708,7 +3340,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper rem_un
         {
-            get { _ilGenerator.Emit(OpCodes.Rem_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Rem_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2720,7 +3356,8 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper ret()
         {
-            _ilGenerator.Emit(OpCodes.Ret); return this;
+            _ilGenerator.Emit( OpCodes.Ret );
+            return this;
         }
 
         /// <summary>
@@ -2731,7 +3368,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper rethrow
         {
-            get { _ilGenerator.Emit(OpCodes.Rethrow); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Rethrow );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2743,7 +3384,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper shl
         {
-            get { _ilGenerator.Emit(OpCodes.Shl); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Shl );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2755,7 +3400,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper shr
         {
-            get { _ilGenerator.Emit(OpCodes.Shr); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Shr );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2767,7 +3416,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper shr_un
         {
-            get { _ilGenerator.Emit(OpCodes.Shr_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Shr_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2777,9 +3430,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Sizeof">OpCodes.Sizeof</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper @sizeof(Type type)
+        public EmitHelper @sizeof( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Sizeof, type); return this;
+            _ilGenerator.Emit( OpCodes.Sizeof, type );
+            return this;
         }
 
         /// <summary>
@@ -2789,9 +3443,10 @@ namespace Fasterflect.Emitter
         /// <param name="index">Slot index.</param>
         /// <seealso cref="OpCodes.Starg">OpCodes.Starg</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,short)">ILGenerator.Emit</seealso>
-        public EmitHelper starg(short index)
+        public EmitHelper starg( short index )
         {
-            _ilGenerator.Emit(OpCodes.Starg, index); return this;
+            _ilGenerator.Emit( OpCodes.Starg, index );
+            return this;
         }
 
         /// <summary>
@@ -2802,9 +3457,10 @@ namespace Fasterflect.Emitter
         /// <param name="index">Slot index.</param>
         /// <seealso cref="OpCodes.Starg_S">OpCodes.Starg_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,byte)">ILGenerator.Emit</seealso>
-        public EmitHelper starg_s(byte index)
+        public EmitHelper starg_s( byte index )
         {
-            _ilGenerator.Emit(OpCodes.Starg_S, index); return this;
+            _ilGenerator.Emit( OpCodes.Starg_S, index );
+            return this;
         }
 
         /// <summary>
@@ -2813,12 +3469,20 @@ namespace Fasterflect.Emitter
         /// <param name="index">Slot index.</param>
         /// <seealso cref="OpCodes.Starg">OpCodes.Starg</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,short)">ILGenerator.Emit</seealso>
-        public EmitHelper starg(int index)
+        public EmitHelper starg( int index )
         {
-            if (index < byte.MaxValue) starg_s((byte)index);
-            else if (index < short.MaxValue) starg((short)index);
+            if( index < byte.MaxValue )
+            {
+                starg_s( (byte) index );
+            }
+            else if( index < short.MaxValue )
+            {
+                starg( (short) index );
+            }
             else
-                throw new ArgumentOutOfRangeException("index");
+            {
+                throw new ArgumentOutOfRangeException( "index" );
+            }
 
             return this;
         }
@@ -2832,7 +3496,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stelem_i
         {
-            get { _ilGenerator.Emit(OpCodes.Stelem_I); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stelem_I );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2843,7 +3511,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stelem_i1
         {
-            get { _ilGenerator.Emit(OpCodes.Stelem_I1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stelem_I1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2854,7 +3526,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stelem_i2
         {
-            get { _ilGenerator.Emit(OpCodes.Stelem_I2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stelem_I2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2865,7 +3541,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stelem_i4
         {
-            get { _ilGenerator.Emit(OpCodes.Stelem_I4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stelem_I4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2876,7 +3556,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stelem_i8
         {
-            get { _ilGenerator.Emit(OpCodes.Stelem_I8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stelem_I8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2887,7 +3571,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stelem_r4
         {
-            get { _ilGenerator.Emit(OpCodes.Stelem_R4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stelem_R4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2898,7 +3586,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stelem_r8
         {
-            get { _ilGenerator.Emit(OpCodes.Stelem_R8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stelem_R8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2910,7 +3602,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stelem_ref
         {
-            get { _ilGenerator.Emit(OpCodes.Stelem_Ref); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stelem_Ref );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2920,9 +3616,10 @@ namespace Fasterflect.Emitter
         /// <param name="fieldInfo">A <see cref="FieldInfo"/> representing a field.</param>
         /// <seealso cref="OpCodes.Stfld">OpCodes.Stfld</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,FieldInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper stfld(FieldInfo fieldInfo)
+        public EmitHelper stfld( FieldInfo fieldInfo )
         {
-            _ilGenerator.Emit(OpCodes.Stfld, fieldInfo); return this;
+            _ilGenerator.Emit( OpCodes.Stfld, fieldInfo );
+            return this;
         }
 
         /// <summary>
@@ -2933,7 +3630,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stind_i
         {
-            get { _ilGenerator.Emit(OpCodes.Stind_I); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stind_I );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2944,7 +3645,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stind_i1
         {
-            get { _ilGenerator.Emit(OpCodes.Stind_I1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stind_I1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2955,7 +3660,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stind_i2
         {
-            get { _ilGenerator.Emit(OpCodes.Stind_I2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stind_I2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2966,7 +3675,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stind_i4
         {
-            get { _ilGenerator.Emit(OpCodes.Stind_I4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stind_I4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2977,7 +3690,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stind_i8
         {
-            get { _ilGenerator.Emit(OpCodes.Stind_I8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stind_I8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2988,7 +3705,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stind_r4
         {
-            get { _ilGenerator.Emit(OpCodes.Stind_R4); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stind_R4 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -2999,7 +3720,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stind_r8
         {
-            get { _ilGenerator.Emit(OpCodes.Stind_R8); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stind_R8 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -3010,43 +3735,68 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stind_ref
         {
-            get { _ilGenerator.Emit(OpCodes.Stind_Ref); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stind_Ref );
+                return this;
+            }
         }
 
         /// <summary>
         /// Stores a value of the type at a supplied address.
         /// </summary>
         /// <param name="type">A Type.</param>
-        public EmitHelper stind(Type type)
+        public EmitHelper stind( Type type )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
-            switch (Type.GetTypeCode(type))
+            switch( Type.GetTypeCode( type ) )
             {
                 case TypeCode.Boolean:
                 case TypeCode.Byte:
-                case TypeCode.SByte: stind_i1.end(); break;
+                case TypeCode.SByte:
+                    stind_i1.end();
+                    break;
 
                 case TypeCode.Char:
                 case TypeCode.Int16:
-                case TypeCode.UInt16: stind_i2.end(); break;
+                case TypeCode.UInt16:
+                    stind_i2.end();
+                    break;
 
                 case TypeCode.Int32:
-                case TypeCode.UInt32: stind_i4.end(); break;
+                case TypeCode.UInt32:
+                    stind_i4.end();
+                    break;
 
                 case TypeCode.Int64:
-                case TypeCode.UInt64: stind_i8.end(); break;
+                case TypeCode.UInt64:
+                    stind_i8.end();
+                    break;
 
-                case TypeCode.Single: stind_r4.end(); break;
-                case TypeCode.Double: stind_r8.end(); break;
+                case TypeCode.Single:
+                    stind_r4.end();
+                    break;
+                case TypeCode.Double:
+                    stind_r8.end();
+                    break;
 
                 default:
-                    if (type.IsClass)
+                    if( type.IsClass )
+                    {
                         stind_ref.end();
-                    else if (type.IsValueType)
-                        stobj(type);
+                    }
+                    else if( type.IsValueType )
+                    {
+                        stobj( type );
+                    }
                     else
-                        throw CreateNotExpectedTypeException(type);
+                    {
+                        throw CreateNotExpectedTypeException( type );
+                    }
                     break;
             }
 
@@ -3061,9 +3811,10 @@ namespace Fasterflect.Emitter
         /// <param name="local">A local variable.</param>
         /// <seealso cref="OpCodes.Stloc">OpCodes.Stloc</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,LocalBuilder)">ILGenerator.Emit</seealso>
-        public EmitHelper stloc(LocalBuilder local)
+        public EmitHelper stloc( LocalBuilder local )
         {
-            _ilGenerator.Emit(OpCodes.Stloc, local); return this;
+            _ilGenerator.Emit( OpCodes.Stloc, local );
+            return this;
         }
 
         /// <summary>
@@ -3074,12 +3825,14 @@ namespace Fasterflect.Emitter
         /// <param name="index">A local variable index.</param>
         /// <seealso cref="OpCodes.Stloc">OpCodes.Stloc</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,short)">ILGenerator.Emit</seealso>
-        public EmitHelper stloc(short index)
+        public EmitHelper stloc( short index )
         {
-            if (index >= byte.MinValue && index <= byte.MaxValue)
-                return stloc_s((byte)index);
+            if( index >= byte.MinValue && index <= byte.MaxValue )
+            {
+                return stloc_s( (byte) index );
+            }
 
-            _ilGenerator.Emit(OpCodes.Stloc, index);
+            _ilGenerator.Emit( OpCodes.Stloc, index );
             return this;
         }
 
@@ -3092,7 +3845,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stloc_0
         {
-            get { _ilGenerator.Emit(OpCodes.Stloc_0); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stloc_0 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -3104,7 +3861,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stloc_1
         {
-            get { _ilGenerator.Emit(OpCodes.Stloc_1); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stloc_1 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -3116,7 +3877,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stloc_2
         {
-            get { _ilGenerator.Emit(OpCodes.Stloc_2); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stloc_2 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -3128,7 +3893,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper stloc_3
         {
-            get { _ilGenerator.Emit(OpCodes.Stloc_3); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Stloc_3 );
+                return this;
+            }
         }
 
         /// <summary>
@@ -3139,9 +3908,10 @@ namespace Fasterflect.Emitter
         /// <param name="local">A local variable.</param>
         /// <seealso cref="OpCodes.Stloc_S">OpCodes.Stloc_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,LocalBuilder)">ILGenerator.Emit</seealso>
-        public EmitHelper stloc_s(LocalBuilder local)
+        public EmitHelper stloc_s( LocalBuilder local )
         {
-            _ilGenerator.Emit(OpCodes.Stloc_S, local); return this;
+            _ilGenerator.Emit( OpCodes.Stloc_S, local );
+            return this;
         }
 
         /// <summary>
@@ -3152,17 +3922,26 @@ namespace Fasterflect.Emitter
         /// <param name="index">A local variable index.</param>
         /// <seealso cref="OpCodes.Stloc_S">OpCodes.Stloc_S</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,short)">ILGenerator.Emit</seealso>
-        public EmitHelper stloc_s(byte index)
+        public EmitHelper stloc_s( byte index )
         {
-            switch (index)
+            switch( index )
             {
-                case 0: stloc_0.end(); break;
-                case 1: stloc_1.end(); break;
-                case 2: stloc_2.end(); break;
-                case 3: stloc_3.end(); break;
+                case 0:
+                    stloc_0.end();
+                    break;
+                case 1:
+                    stloc_1.end();
+                    break;
+                case 2:
+                    stloc_2.end();
+                    break;
+                case 3:
+                    stloc_3.end();
+                    break;
 
                 default:
-                    _ilGenerator.Emit(OpCodes.Stloc_S, index); break;
+                    _ilGenerator.Emit( OpCodes.Stloc_S, index );
+                    break;
             }
 
             return this;
@@ -3175,9 +3954,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Stobj">OpCodes.Stobj</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper stobj(Type type)
+        public EmitHelper stobj( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Stobj, type); return this;
+            _ilGenerator.Emit( OpCodes.Stobj, type );
+            return this;
         }
 
         /// <summary>
@@ -3187,9 +3967,10 @@ namespace Fasterflect.Emitter
         /// <param name="fieldInfo">A <see cref="FieldInfo"/> representing a field.</param>
         /// <seealso cref="OpCodes.Stsfld">OpCodes.Stsfld</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,FieldInfo)">ILGenerator.Emit</seealso>
-        public EmitHelper stsfld(FieldInfo fieldInfo)
+        public EmitHelper stsfld( FieldInfo fieldInfo )
         {
-            _ilGenerator.Emit(OpCodes.Stsfld, fieldInfo); return this;
+            _ilGenerator.Emit( OpCodes.Stsfld, fieldInfo );
+            return this;
         }
 
         /// <summary>
@@ -3200,7 +3981,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper sub
         {
-            get { _ilGenerator.Emit(OpCodes.Sub); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Sub );
+                return this;
+            }
         }
 
         /// <summary>
@@ -3212,7 +3997,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper sub_ovf
         {
-            get { _ilGenerator.Emit(OpCodes.Sub_Ovf); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Sub_Ovf );
+                return this;
+            }
         }
 
         /// <summary>
@@ -3224,7 +4013,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper sub_ovf_un
         {
-            get { _ilGenerator.Emit(OpCodes.Sub_Ovf_Un); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Sub_Ovf_Un );
+                return this;
+            }
         }
 
         /// <summary>
@@ -3234,9 +4027,10 @@ namespace Fasterflect.Emitter
         /// <param name="labels">The array of label objects to which to branch from this location.</param>
         /// <seealso cref="OpCodes.Switch">OpCodes.Switch</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label[])">ILGenerator.Emit</seealso>
-        public EmitHelper @switch(Label[] labels)
+        public EmitHelper @switch( Label[] labels )
         {
-            _ilGenerator.Emit(OpCodes.Switch, labels); return this;
+            _ilGenerator.Emit( OpCodes.Switch, labels );
+            return this;
         }
 
         /// <summary>
@@ -3248,7 +4042,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper tailcall
         {
-            get { _ilGenerator.Emit(OpCodes.Tailcall); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Tailcall );
+                return this;
+            }
         }
 
         /// <summary>
@@ -3259,7 +4057,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper @throw
         {
-            get { _ilGenerator.Emit(OpCodes.Throw); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Throw );
+                return this;
+            }
         }
 
         /// <summary>
@@ -3271,9 +4073,10 @@ namespace Fasterflect.Emitter
         /// <param name="label">The label to branch from this location.</param>
         /// <seealso cref="OpCodes.Unaligned">OpCodes.Unaligned</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Label)">ILGenerator.Emit</seealso>
-        public EmitHelper unaligned(Label label)
+        public EmitHelper unaligned( Label label )
         {
-            _ilGenerator.Emit(OpCodes.Unaligned, label); return this;
+            _ilGenerator.Emit( OpCodes.Unaligned, label );
+            return this;
         }
 
         /// <summary>
@@ -3285,9 +4088,10 @@ namespace Fasterflect.Emitter
         /// <param name="addr">An address is pushed onto the stack.</param>
         /// <seealso cref="OpCodes.Unaligned">OpCodes.Unaligned</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,long)">ILGenerator.Emit</seealso>
-        public EmitHelper unaligned(long addr)
+        public EmitHelper unaligned( long addr )
         {
-            _ilGenerator.Emit(OpCodes.Unaligned, addr); return this;
+            _ilGenerator.Emit( OpCodes.Unaligned, addr );
+            return this;
         }
 
         /// <summary>
@@ -3297,9 +4101,10 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Unbox">OpCodes.Unbox</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper unbox(Type type)
+        public EmitHelper unbox( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Unbox, type); return this;
+            _ilGenerator.Emit( OpCodes.Unbox, type );
+            return this;
         }
 
         /// <summary>
@@ -3309,9 +4114,9 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Unbox_Any">OpCodes.Unbox_Any</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper unbox_any(Type type)
+        public EmitHelper unbox_any( Type type )
         {
-            _ilGenerator.Emit(OpCodes.Unbox_Any, type);
+            _ilGenerator.Emit( OpCodes.Unbox_Any, type );
             return this;
         }
 
@@ -3321,11 +4126,14 @@ namespace Fasterflect.Emitter
         /// <param name="type">A Type</param>
         /// <seealso cref="OpCodes.Unbox_Any">OpCodes.Unbox</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode,Type)">ILGenerator.Emit</seealso>
-        public EmitHelper unboxIfValueType(Type type)
+        public EmitHelper unboxIfValueType( Type type )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
-            return type.IsValueType ? unbox_any(type) : this;
+            return type.IsValueType ? unbox_any( type ) : this;
         }
 
         /// <summary>
@@ -3338,7 +4146,11 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper @volatile
         {
-            get { _ilGenerator.Emit(OpCodes.Volatile); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Volatile );
+                return this;
+            }
         }
 
         /// <summary>
@@ -3350,28 +4162,34 @@ namespace Fasterflect.Emitter
         /// <seealso cref="System.Reflection.Emit.ILGenerator.Emit(OpCode)">ILGenerator.Emit</seealso>
         public EmitHelper xor
         {
-            get { _ilGenerator.Emit(OpCodes.Xor); return this; }
+            get
+            {
+                _ilGenerator.Emit( OpCodes.Xor );
+                return this;
+            }
         }
 
         /// <summary>
         /// Ends sequence of property calls.
         /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
+        [SuppressMessage( "Microsoft.Performance", "CA1822:MarkMembersAsStatic" )]
         public void end()
         {
         }
-
         #endregion
 
         /// <summary>
         /// Loads default value of given type onto the evaluation stack.
         /// </summary>
         /// <param name="type">A Type</param>
-        public EmitHelper LoadInitValue(Type type)
+        public EmitHelper LoadInitValue( Type type )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
-            switch (Type.GetTypeCode(type))
+            switch( Type.GetTypeCode( type ) )
             {
                 case TypeCode.Boolean:
                 case TypeCode.Char:
@@ -3391,18 +4209,22 @@ namespace Fasterflect.Emitter
 
                 case TypeCode.Single:
                 case TypeCode.Double:
-                    ldc_r4(0).end();
+                    ldc_r4( 0 ).end();
                     break;
 
                 case TypeCode.String:
-                    ldsfld(typeof(string).GetField("Empty"));
+                    ldsfld( typeof(string).GetField( "Empty" ) );
                     break;
 
                 default:
-                    if (type.IsClass || type.IsInterface)
+                    if( type.IsClass || type.IsInterface )
+                    {
                         ldnull.end();
+                    }
                     else
-                        throw CreateNotExpectedTypeException(type);
+                    {
+                        throw CreateNotExpectedTypeException( type );
+                    }
                     break;
             }
 
@@ -3414,29 +4236,59 @@ namespace Fasterflect.Emitter
         /// </summary>
         /// <param name="o">Any object instance or null reference.</param>
         /// <returns>True is a value was loaded, otherwise false.</returns>
-        public bool LoadWellKnownValue(object o)
+        public bool LoadWellKnownValue( object o )
         {
-            if (o == null)
+            if( o == null )
+            {
                 ldnull.end();
+            }
             else
-                switch (Type.GetTypeCode(o.GetType()))
+            {
+                switch( Type.GetTypeCode( o.GetType() ) )
                 {
-                    case TypeCode.Boolean: ldc_bool((Boolean)o); break;
-                    case TypeCode.Char: ldc_i4_((Char)o); break;
-                    case TypeCode.Single: ldc_r4((Single)o); break;
-                    case TypeCode.Double: ldc_r8((Double)o); break;
-                    case TypeCode.String: ldstr((String)o); break;
-                    case TypeCode.SByte: ldc_i4_((SByte)o); break;
-                    case TypeCode.Int16: ldc_i4_((Int16)o); break;
-                    case TypeCode.Int32: ldc_i4_((Int32)o); break;
-                    case TypeCode.Int64: ldc_i8((Int64)o); break;
-                    case TypeCode.Byte: ldc_i4_((Byte)o); break;
-                    case TypeCode.UInt16: ldc_i4_((UInt16)o); break;
-                    case TypeCode.UInt32: ldc_i4_(unchecked((Int32)(UInt32)o)); break;
-                    case TypeCode.UInt64: ldc_i8(unchecked((Int64)(UInt64)o)); break;
+                    case TypeCode.Boolean:
+                        ldc_bool( (Boolean) o );
+                        break;
+                    case TypeCode.Char:
+                        ldc_i4_( (Char) o );
+                        break;
+                    case TypeCode.Single:
+                        ldc_r4( (Single) o );
+                        break;
+                    case TypeCode.Double:
+                        ldc_r8( (Double) o );
+                        break;
+                    case TypeCode.String:
+                        ldstr( (String) o );
+                        break;
+                    case TypeCode.SByte:
+                        ldc_i4_( (SByte) o );
+                        break;
+                    case TypeCode.Int16:
+                        ldc_i4_( (Int16) o );
+                        break;
+                    case TypeCode.Int32:
+                        ldc_i4_( (Int32) o );
+                        break;
+                    case TypeCode.Int64:
+                        ldc_i8( (Int64) o );
+                        break;
+                    case TypeCode.Byte:
+                        ldc_i4_( (Byte) o );
+                        break;
+                    case TypeCode.UInt16:
+                        ldc_i4_( (UInt16) o );
+                        break;
+                    case TypeCode.UInt32:
+                        ldc_i4_( unchecked((Int32) (UInt32) o) );
+                        break;
+                    case TypeCode.UInt64:
+                        ldc_i8( unchecked((Int64) (UInt64) o) );
+                        break;
                     default:
                         return false;
                 }
+            }
 
             return true;
         }
@@ -3445,38 +4297,47 @@ namespace Fasterflect.Emitter
         /// Initialize local variable with some default value.
         /// </summary>
         /// <param name="localBuilder">A method local variable.</param>
-        public EmitHelper Init(LocalBuilder localBuilder)
+        public EmitHelper Init( LocalBuilder localBuilder )
         {
-            if (localBuilder == null) throw new ArgumentNullException("localBuilder");
+            if( localBuilder == null )
+            {
+                throw new ArgumentNullException( "localBuilder" );
+            }
 
             Type type = localBuilder.LocalType;
 
-            if (type.IsEnum)
-                type = Enum.GetUnderlyingType(type);
+            if( type.IsEnum )
+            {
+                type = Enum.GetUnderlyingType( type );
+            }
 
-            return type.IsValueType && type.IsPrimitive == false ?
-                ldloca(localBuilder).initobj(type) :
-                LoadInitValue(type).stloc(localBuilder);
+            return type.IsValueType && type.IsPrimitive == false
+                       ?
+                           ldloca( localBuilder ).initobj( type )
+                       :
+                           LoadInitValue( type ).stloc( localBuilder );
         }
 
         /// <summary>
         /// Loads a type instance at runtime.
         /// </summary>
         /// <param name="type">A type</param>
-        public EmitHelper LoadType(Type type)
+        public EmitHelper LoadType( Type type )
         {
-            return type == null ?
-                ldnull :
-                ldtoken(type).call(typeof(Type), "GetTypeFromHandle", typeof(RuntimeTypeHandle));
+            return type == null
+                       ?
+                           ldnull
+                       :
+                           ldtoken( type ).call( typeof(Type), "GetTypeFromHandle", typeof(RuntimeTypeHandle) );
         }
 
         /// <summary>
         /// Loads a field instance at runtime.
         /// </summary>
         /// <param name="fieldInfo">A <see cref="FieldInfo"/> representing a field.</param>
-        public EmitHelper LoadField(FieldInfo fieldInfo)
+        public EmitHelper LoadField( FieldInfo fieldInfo )
         {
-            return fieldInfo.IsStatic ? ldsfld(fieldInfo) : ldarg_0.ldfld(fieldInfo);
+            return fieldInfo.IsStatic ? ldsfld( fieldInfo ) : ldarg_0.ldfld( fieldInfo );
         }
 
         /// <summary>
@@ -3484,44 +4345,51 @@ namespace Fasterflect.Emitter
         /// or unbox a boxed value type.
         /// </summary>
         /// <param name="type">A type</param>
-        public EmitHelper CastFromObject(Type type)
+        public EmitHelper CastFromObject( Type type )
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if( type == null )
+            {
+                throw new ArgumentNullException( "type" );
+            }
 
             return
-                type == typeof(object) ? this :
-                (type.IsValueType ? unbox_any(type) :
-                    castclass(type));
+                type == typeof(object)
+                    ? this
+                    :
+                        (type.IsValueType
+                             ? unbox_any( type )
+                             :
+                                 castclass( type ));
         }
 
         /// <summary>
         /// Increase max stack size by specified delta.
         /// </summary>
         /// <param name="size">Number of bytes to enlarge max stack size.</param>
-        public void AddMaxStackSize(int size)
+        public void AddMaxStackSize( int size )
         {
             // m_maxStackSize isn't public so we need some hacking here.
             //
             FieldInfo fi = _ilGenerator.GetType().GetField(
-                "m_maxStackSize", BindingFlags.Instance | BindingFlags.NonPublic);
+                "m_maxStackSize", BindingFlags.Instance | BindingFlags.NonPublic );
 
-            if (fi != null)
+            if( fi != null )
             {
-                size += (int)fi.GetValue(_ilGenerator);
-                fi.SetValue(_ilGenerator, size);
+                size += (int) fi.GetValue( _ilGenerator );
+                fi.SetValue( _ilGenerator, size );
             }
         }
 
-        private static Exception CreateNoSuchMethodException(Type type, string methodName)
+        private static Exception CreateNoSuchMethodException( Type type, string methodName )
         {
             return new InvalidOperationException(
-                string.Format("Method {1} cannot be found in type {0}", type.FullName, methodName));
+                string.Format( "Method {1} cannot be found in type {0}", type.FullName, methodName ) );
         }
 
-        private static Exception CreateNotExpectedTypeException(Type type)
+        private static Exception CreateNotExpectedTypeException( Type type )
         {
             return new ArgumentException(
-                string.Format("Type {0} is not expected in this context", type.FullName));
+                string.Format( "Type {0} is not expected in this context", type.FullName ) );
         }
     }
 }

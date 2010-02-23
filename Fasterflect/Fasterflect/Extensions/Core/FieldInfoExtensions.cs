@@ -1,5 +1,4 @@
 ﻿#region License
-
 // Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,7 +14,6 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System.Reflection;
@@ -28,32 +26,32 @@ namespace Fasterflect
         /// <summary>
         /// Sets the static field identified by <paramref name="fieldInfo"/> with <paramref name="value" />.
         /// </summary>
-        public static void Set(this FieldInfo fieldInfo, object value)
+        public static void Set( this FieldInfo fieldInfo, object value )
         {
-            fieldInfo.DelegateForSetStaticFieldValue()(value);
+            fieldInfo.DelegateForSetStaticFieldValue()( value );
         }
 
         /// <summary>
-        /// Sets the instance field identified by <paramref name="fieldInfo"/> of <paramref name="target"/>
+        /// Sets the instance field identified by <paramref name="fieldInfo"/> of the given <paramref name="target"/>
         /// with <paramref name="value" />.
         /// </summary>
-        public static void Set(this FieldInfo fieldInfo, object target, object value)
+        public static void Set( this FieldInfo fieldInfo, object target, object value )
         {
-            fieldInfo.DelegateForSetFieldValue()(target, value);
+            fieldInfo.DelegateForSetFieldValue()( target, value );
         }
 
         /// <summary>
         /// Gets the value of the static field identified by <paramref name="fieldInfo"/>.
         /// </summary>
-        public static object Get(this FieldInfo fieldInfo)
+        public static object Get( this FieldInfo fieldInfo )
         {
             return fieldInfo.DelegateForGetStaticFieldValue()();
         }
 
         /// <summary>
-        /// Gets the value of the instance field identified by <paramref name="fieldInfo"/> of <paramref name="target"/>.
+        /// Gets the value of the instance field identified by <paramref name="fieldInfo"/> of the given <paramref name="target"/>.
         /// </summary>
-        public static object Get(this FieldInfo fieldInfo, object target)
+        public static object Get( this FieldInfo fieldInfo, object target )
         {
             return fieldInfo.DelegateForGetFieldValue()( target );
         }
@@ -61,33 +59,33 @@ namespace Fasterflect
         /// <summary>
         /// Creates a delegate which can set the value of the static field identified by <paramref name="fieldInfo"/>.
         /// </summary>
-        public static StaticMemberSetter DelegateForSetStaticFieldValue(this FieldInfo fieldInfo)
+        public static StaticMemberSetter DelegateForSetStaticFieldValue( this FieldInfo fieldInfo )
         {
-            return (StaticMemberSetter)new MemberSetEmitter(fieldInfo, true).GetDelegate();
+            return (StaticMemberSetter) new MemberSetEmitter( fieldInfo, Flags.AllStatic ).GetDelegate();
         }
 
         /// <summary>
         /// Creates a delegate which can set the value of the instance field identified by <paramref name="fieldInfo"/>.
         /// </summary>
-        public static MemberSetter DelegateForSetFieldValue(this FieldInfo fieldInfo)
+        public static MemberSetter DelegateForSetFieldValue( this FieldInfo fieldInfo )
         {
-            return (MemberSetter)new MemberSetEmitter(fieldInfo, false).GetDelegate();
+            return (MemberSetter) new MemberSetEmitter( fieldInfo, Flags.AllInstance ).GetDelegate();
         }
 
         /// <summary>
         /// Creates a delegate which can get the value of the static field identified by <paramref name="fieldInfo"/>.
         /// </summary>
-        public static StaticMemberGetter DelegateForGetStaticFieldValue(this FieldInfo fieldInfo)
+        public static StaticMemberGetter DelegateForGetStaticFieldValue( this FieldInfo fieldInfo )
         {
-            return (StaticMemberGetter)new MemberGetEmitter(fieldInfo, true).GetDelegate();
+            return (StaticMemberGetter) new MemberGetEmitter( fieldInfo, Flags.AllStatic ).GetDelegate();
         }
 
         /// <summary>
         /// Creates a delegate which can set the value of the static field identified by <paramref name="fieldInfo"/>.
         /// </summary>
-        public static MemberGetter DelegateForGetFieldValue(this FieldInfo fieldInfo)
+        public static MemberGetter DelegateForGetFieldValue( this FieldInfo fieldInfo )
         {
-            return (MemberGetter)new MemberGetEmitter(fieldInfo, false).GetDelegate();
+            return (MemberGetter) new MemberGetEmitter( fieldInfo, Flags.AllInstance ).GetDelegate();
         }
     }
 }

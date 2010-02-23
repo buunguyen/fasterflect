@@ -95,12 +95,6 @@ namespace FasterflectTest.Invocation
         }
 
         [TestMethod]
-        public void TestInvokeCtorWithNullParameterTypesAndValidParameterList()
-        {
-            RunWith( type => type.CreateInstance( new Type[ 0 ], null, 10 ) );
-        }
-
-        [TestMethod]
         public void TestInvokeCtorWithNullParametersTheRightWay()
         {
             RunWith( type =>

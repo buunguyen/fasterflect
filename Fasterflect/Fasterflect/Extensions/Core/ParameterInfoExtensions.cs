@@ -1,5 +1,4 @@
 #region License
-
 // Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,7 +14,6 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System;
@@ -47,7 +45,9 @@ namespace Fasterflect
         /// is null an exception will be thrown.</returns>
         public static bool HasName( this ParameterInfo parameter, string name )
         {
-            string parameterName = parameter.Name.Length > 0 && parameter.Name[ 0 ] == '_' ? parameter.Name.Substring( 1 ) : parameter.Name;
+            string parameterName = parameter.Name.Length > 0 && parameter.Name[ 0 ] == '_'
+                                       ? parameter.Name.Substring( 1 )
+                                       : parameter.Name;
             name = name.Length > 0 && name[ 0 ] == '_' ? name.Substring( 1 ) : name;
             return parameterName.Equals( name, StringComparison.OrdinalIgnoreCase );
         }

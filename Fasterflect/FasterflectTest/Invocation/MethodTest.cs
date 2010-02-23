@@ -76,7 +76,7 @@ namespace FasterflectTest.Invocation
         {
 			var employee = EmployeeType.CreateInstance();
             var currentMeters = (double) employee.GetFieldValue( "metersTravelled" );
-            employee.Invoke( Flags.InstanceCriteria | Flags.TrimExplicitlyImplemented, "Swim", 100d );
+            employee.Invoke("Swim", Flags.InstanceCriteria | Flags.TrimExplicitlyImplemented, 100d);
             VerifyFields( employee, new { metersTravelled = currentMeters + 100 } );
         }
 

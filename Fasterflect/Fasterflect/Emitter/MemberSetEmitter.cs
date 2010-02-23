@@ -26,20 +26,19 @@ namespace Fasterflect.Emitter
 {
     internal class MemberSetEmitter : BaseEmitter
     {
-        public MemberSetEmitter(MemberInfo memberInfo, bool isStatic)
-            : this(memberInfo.DeclaringType, null, memberInfo.MemberType, memberInfo.Name, isStatic, memberInfo)
+        public MemberSetEmitter(MemberInfo memberInfo, Flags bindingFlags)
+            : this(memberInfo.DeclaringType, bindingFlags, memberInfo.MemberType, memberInfo.Name, memberInfo)
         {
         }
 
-		public MemberSetEmitter(Type targetType, Flags flags, MemberTypes memberType, string fieldOrProperty, bool isStatic)
-            : this(targetType, flags, memberType, fieldOrProperty, isStatic, null)
+		public MemberSetEmitter(Type targetType, Flags bindingFlags, MemberTypes memberType, string fieldOrProperty)
+            : this(targetType, bindingFlags, memberType, fieldOrProperty, null)
 		{
 		}
 
-        private MemberSetEmitter(Type targetType, Flags? flags, MemberTypes memberType, string fieldOrProperty, bool isStatic, MemberInfo memberInfo)
+        private MemberSetEmitter(Type targetType, Flags bindingFlags, MemberTypes memberType, string fieldOrProperty, MemberInfo memberInfo)
         {
-            callInfo = new CallInfo(targetType, flags, memberType, fieldOrProperty,
-                                    Constants.ArrayOfObjectType, isStatic, memberInfo);
+            callInfo = new CallInfo(targetType, bindingFlags, memberType, fieldOrProperty, Constants.ArrayOfObjectType, memberInfo);
         }
 
         protected internal override DynamicMethod CreateDynamicMethod()

@@ -1,5 +1,4 @@
 ﻿#region License
-
 // Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,7 +14,6 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System;
@@ -29,7 +27,7 @@ namespace Fasterflect
         /// <summary>
         /// Invokes the constructor <paramref name="ctorInfo"/> with no argument.
         /// </summary>
-        public static object CreateInstance(this ConstructorInfo ctorInfo)
+        public static object CreateInstance( this ConstructorInfo ctorInfo )
         {
             return ctorInfo.DelegateForCreateInstance()();
         }
@@ -37,17 +35,17 @@ namespace Fasterflect
         /// <summary>
         /// Invokes the constructor <paramref name="ctorInfo"/> with <paramref name="parameters"/> as arguments.
         /// </summary>
-        public static object CreateInstance(this ConstructorInfo ctorInfo, params object[] parameters)
+        public static object CreateInstance( this ConstructorInfo ctorInfo, params object[] parameters )
         {
-            return ctorInfo.DelegateForCreateInstance()(parameters);
+            return ctorInfo.DelegateForCreateInstance()( parameters );
         }
 
         /// <summary>
         /// Creates a delegate which can create instance based on the constructor <paramref name="ctorInfo"/>.
         /// </summary>
-        public static ConstructorInvoker DelegateForCreateInstance(this ConstructorInfo ctorInfo)
+        public static ConstructorInvoker DelegateForCreateInstance( this ConstructorInfo ctorInfo )
         {
-            return (ConstructorInvoker)new CtorInvocationEmitter(ctorInfo).GetDelegate();
+            return (ConstructorInvoker) new CtorInvocationEmitter( ctorInfo, Flags.AllInstance ).GetDelegate();
         }
     }
 }
