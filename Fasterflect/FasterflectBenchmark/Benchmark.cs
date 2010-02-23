@@ -86,7 +86,6 @@ namespace FasterflectBenchmark
 		}
 		#endregion
 
-		//private static readonly int[] Iterations = new[] { 20000 };
 		private static readonly int[] Iterations = new[] { 20000, 2000000 };
 		private static readonly object[] NoArgArray = new object[0];
 		private static readonly object[] ArgArray = new object[] {10};
@@ -97,9 +96,9 @@ namespace FasterflectBenchmark
 
 		public static void Main(string[] args)
 		{
-			//RunDictionaryBenchmark();
-			//RunHashCodeBenchmark();
-			//RunLookupBenchmark();
+			RunDictionaryBenchmark();
+			RunHashCodeBenchmark();
+			RunLookupBenchmark();
 			RunTryCreateInstanceBenchmark();
 			RunConstructorBenchmark();
 			RunFieldBenchmark();

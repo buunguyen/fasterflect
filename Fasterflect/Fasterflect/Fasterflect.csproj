@@ -79,17 +79,6 @@
     <Compile Include="Caching\Cache.cs" />
     <Compile Include="Extensions\Core\ParameterInfoExtensions.cs" />
     <Compile Include="Extensions\Internal\MemberFilter.cs" />
-    <Compile Include="Selectors\NameMatch.cs" />
-    <Compile Include="Selectors\ExcludeBackingMembers.cs" />
-    <Compile Include="Selectors\Core\SelectorBase.cs" />
-    <Compile Include="Selectors\PartialNameMatch.cs" />
-    <Compile Include="Selectors\ExcludeExplicitlyImplemented.cs" />
-    <Compile Include="Selectors\ExactParameterMatch.cs" />
-    <Compile Include="Selectors\ParameterMatch.cs" />
-    <Compile Include="Selectors\Core\SelectorFactory.cs" />
-    <Compile Include="Selectors\Interfaces\IMemberSelector.cs" />
-    <Compile Include="Selectors\Interfaces\IMethodSelector.cs" />
-    <Compile Include="Selectors\Interfaces\ISelector.cs" />
     <Compile Include="Emitter\CloneEmitter.cs" />
     <Compile Include="Emitter\EmitHelper.cs" />
     <Compile Include="Extensions\Core\ConstructorInfoExtensions.cs" />
