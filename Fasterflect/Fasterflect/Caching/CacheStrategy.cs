@@ -23,7 +23,7 @@ namespace Fasterflect.Caching
 	/// <summary>
 	/// An enumeration of the supported caching strategies.
 	/// </summary>
-	public enum CacheStrategy
+	internal enum CacheStrategy
 	{
 		/// <summary>
 		/// This value indicates that caching is disabled.

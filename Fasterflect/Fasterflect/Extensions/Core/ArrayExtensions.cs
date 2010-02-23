@@ -1,5 +1,4 @@
 #region License
-
 // Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,7 +14,6 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System;
@@ -44,7 +42,7 @@ namespace Fasterflect
         /// </summary>
         public static object GetElement( this object array, long index )
         {
-            return ((Array)array).GetValue( index );
+            return ((Array) array).GetValue( index );
         }
 
         /// <summary>

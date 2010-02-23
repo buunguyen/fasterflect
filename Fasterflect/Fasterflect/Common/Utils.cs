@@ -66,17 +66,5 @@ namespace Fasterflect
 				action( element );
 			}
 		}
-
-		public static bool IsReservedName( this string name )
-		{
-			name = name.ToLowerInvariant();
-			return name == ".ctor" || name == ".cctor";
-		}
-
-		public static string TrimExplicitlyImplementedName( this string name )
-		{
-			int index = name.IsReservedName() ? -1 : name.LastIndexOf( '.' ) + 1;
-			return index > 0 ? name.Substring( index ) : name;
-		}
 	}
 }

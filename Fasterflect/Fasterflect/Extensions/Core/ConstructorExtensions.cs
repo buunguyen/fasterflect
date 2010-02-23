@@ -1,5 +1,4 @@
 #region License
-
 // Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,7 +14,6 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System;
@@ -33,15 +31,15 @@ namespace Fasterflect
     /// </summary>
     public static class ConstructorExtensions
     {
-		/// <summary>
-		/// This field is used to cache information on objects used as parameters for object construction, which
-		/// improves performance for subsequent instantiations of the same type using a compatible source type.
-		/// </summary>
-		private static readonly Cache<Type, SourceInfo> sourceInfoCache = new Cache<Type, SourceInfo>();
-
-		#region Constructor Invocation (CreateInstance)
         /// <summary>
-        /// Invokes the no-arg constructor on type <paramref name="targetType"/>.
+        /// This field is used to cache information on objects used as parameters for object construction, which
+        /// improves performance for subsequent instantiations of the same type using a compatible source type.
+        /// </summary>
+        private static readonly Cache<Type, SourceInfo> sourceInfoCache = new Cache<Type, SourceInfo>();
+
+        #region Constructor Invocation (CreateInstance)
+        /// <summary>
+        /// Invokes the no-arg constructor on the given <paramref name="targetType"/>.
         /// </summary>
         public static object CreateInstance( this Type targetType )
         {
@@ -50,80 +48,98 @@ namespace Fasterflect
 
         /// <summary>
         /// Invokes a constructor whose parameter types are inferred from <paramref name="parameters" /> 
-        /// on the type <paramref name="targetType"/> with <paramref name="parameters" /> being the arguments.
+        /// on the given <paramref name="targetType"/> with <paramref name="parameters" /> being the arguments.
         /// </summary>
+        /// <remarks>
+        /// All elements of <paramref name="parameters"/> must not be <c>null</c>.  Otherwise, 
+        /// <see cref="NullReferenceException"/> is thrown.  If you are not sure as to whether
+        /// any element is <c>null</c> or not, use the overload that accepts <c>paramTypes</c> array.
+        /// </remarks>
+        /// <seealso cref="CreateInstance(Type, Type[], object[])"/>
         public static object CreateInstance( this Type targetType, params object[] parameters )
         {
             return DelegateForCreateInstance( targetType, parameters.GetTypeArray() )( parameters );
         }
 
         /// <summary>
-        /// Invokes a constructor whose parameter types are <paramref name="paramTypes" /> 
-        /// on the type <paramref name="targetType"/> with <paramref name="parameters" /> being the arguments.
+        /// Invokes a constructor having parameter types specified by <paramref name="parameterTypes" /> 
+        /// on the the given <paramref name="targetType"/> with <paramref name="parameters" /> being the arguments.
         /// </summary>
-        public static object CreateInstance( this Type targetType, Type[] paramTypes, params object[] parameters )
+        public static object CreateInstance( this Type targetType, Type[] parameterTypes, params object[] parameters )
         {
-            return DelegateForCreateInstance( targetType, paramTypes )( parameters );
+            return DelegateForCreateInstance( targetType, parameterTypes )( parameters );
         }
 
         /// <summary>
-        /// Invokes the no-arg constructor on type <paramref name="targetType"/>.
+        /// Invokes the no-arg constructor matching <paramref name="bindingFlags"/> on the given <paramref name="targetType"/>.
         /// </summary>
-        public static object CreateInstance(this Type targetType, Flags flags)
+        public static object CreateInstance( this Type targetType, Flags bindingFlags )
         {
-            return DelegateForCreateInstance( targetType, flags )();
+            return DelegateForCreateInstance( targetType, bindingFlags )();
         }
 
         /// <summary>
-        /// Invokes a constructor whose parameter types are inferred from <paramref name="parameters" /> 
-        /// on the type <paramref name="targetType"/> with <paramref name="parameters" /> being the arguments.
+        /// Invokes a constructor whose parameter types are inferred from <paramref name="parameters" /> and
+        /// matching <paramref name="bindingFlags"/> on the given <paramref name="targetType"/> 
+        /// with <paramref name="parameters" /> being the arguments.
         /// </summary>
-        public static object CreateInstance(this Type targetType, Flags flags, params object[] parameters)
+        /// <remarks>
+        /// All elements of <paramref name="parameters"/> must not be <c>null</c>.  Otherwise, 
+        /// <see cref="NullReferenceException"/> is thrown.  If you are not sure as to whether
+        /// any element is <c>null</c> or not, use the overload that accepts <c>paramTypes</c> array.
+        /// </remarks>
+        /// <seealso cref="CreateInstance(Type, Flags, Type[], object[])"/>
+        public static object CreateInstance( this Type targetType, Flags bindingFlags, params object[] parameters )
         {
-            return DelegateForCreateInstance( targetType, flags, parameters.GetTypeArray() )( parameters );
+            return DelegateForCreateInstance( targetType, bindingFlags, parameters.GetTypeArray() )( parameters );
         }
 
         /// <summary>
-        /// Invokes a constructor whose parameter types are <paramref name="paramTypes" /> 
-        /// on the type <paramref name="targetType"/> with <paramref name="parameters" /> being the arguments.
+        /// Invokes a constructor whose parameter types are <paramref name="parameterTypes" /> and
+        /// matching <paramref name="bindingFlags"/> on the given <paramref name="targetType"/> 
+        /// with <paramref name="parameters" /> being the arguments.
         /// </summary>
-        public static object CreateInstance(this Type targetType, Flags flags, Type[] paramTypes, params object[] parameters)
+        public static object CreateInstance( this Type targetType, Flags bindingFlags, Type[] parameterTypes,
+                                             params object[] parameters )
         {
-            return DelegateForCreateInstance( targetType, flags, paramTypes )( parameters );
+            return DelegateForCreateInstance( targetType, bindingFlags, parameterTypes )( parameters );
         }
 
         /// <summary>
-        /// Creates a delegate which can invoke the no-arg constructor on type <paramref name="targetType"/>.
+        /// Creates a delegate which can invoke the no-arg constructor on the given <paramref name="targetType"/>.
         /// </summary>
-        public static ConstructorInvoker DelegateForCreateInstance(this Type targetType)
+        public static ConstructorInvoker DelegateForCreateInstance( this Type targetType )
         {
-            return DelegateForCreateInstance(targetType, Type.EmptyTypes);
+            return DelegateForCreateInstance( targetType, Type.EmptyTypes );
         }
 
         /// <summary>
-        /// Creates a delegate which can invoke the constructor whose parameter types are <paramref name="paramTypes" />
-        /// on the type <paramref name="targetType"/>. 
+        /// Creates a delegate which can invoke the constructor whose parameter types are <paramref name="parameterTypes" />
+        /// on the given <paramref name="targetType"/>. 
         /// </summary>
-        public static ConstructorInvoker DelegateForCreateInstance(this Type targetType, params Type[] paramTypes)
+        public static ConstructorInvoker DelegateForCreateInstance( this Type targetType, params Type[] parameterTypes )
         {
-            return DelegateForCreateInstance(targetType, Flags.InstanceCriteria, paramTypes);
+            return DelegateForCreateInstance( targetType, Flags.AllInstance, parameterTypes );
         }
 
         /// <summary>
-        /// Creates a delegate which can invoke the no-arg constructor on type <paramref name="targetType"/>.
+        /// Creates a delegate which can invoke the no-arg constructor matching <paramref name="bindingFlags"/>
+        /// on the given <paramref name="targetType"/>.
         /// </summary>
-        public static ConstructorInvoker DelegateForCreateInstance(this Type targetType, Flags flags)
+        public static ConstructorInvoker DelegateForCreateInstance( this Type targetType, Flags bindingFlags )
         {
-            return DelegateForCreateInstance(targetType, flags, Type.EmptyTypes);
+            return DelegateForCreateInstance( targetType, bindingFlags, Type.EmptyTypes );
         }
 
         /// <summary>
-        /// Creates a delegate which can invoke the constructor whose parameter types are <paramref name="paramTypes" />
-        /// on the type <paramref name="targetType"/>. 
+        /// Creates a delegate which can invoke the constructor whose parameter types are <paramref name="parameterTypes" />
+        /// and matching <paramref name="bindingFlags"/> on the given <paramref name="targetType"/>. 
         /// </summary>
-        public static ConstructorInvoker DelegateForCreateInstance(this Type targetType, Flags flags, params Type[] paramTypes)
+        public static ConstructorInvoker DelegateForCreateInstance( this Type targetType, Flags bindingFlags,
+                                                                    params Type[] parameterTypes )
         {
-            return (ConstructorInvoker) new CtorInvocationEmitter( targetType, flags, paramTypes ).GetDelegate();
+            return
+                (ConstructorInvoker) new CtorInvocationEmitter( targetType, bindingFlags, parameterTypes ).GetDelegate();
         }
         #endregion
 
@@ -229,16 +245,16 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find the constructor matching the given <paramref name="flags"/> and corresponding to the 
+        /// Find the constructor matching the given <paramref name="bindingFlags"/> and corresponding to the 
         /// supplied <paramref name="parameterTypes"/> on the given <paramref name="type"/>.
         /// </summary>
         /// <param name="type">The type to reflect on.</param>
-        /// <param name="flags">The search criteria to use when reflecting.</param>
+        /// <param name="bindingFlags">The search criteria to use when reflecting.</param>
         /// <param name="parameterTypes">The types of the constructor parameters in order.</param>
         /// <returns>The matching constructor or null if no match was found.</returns>
-        public static ConstructorInfo Constructor( this Type type, Flags flags, params Type[] parameterTypes )
+        public static ConstructorInfo Constructor( this Type type, Flags bindingFlags, params Type[] parameterTypes )
         {
-            return type.GetConstructor( flags, null, parameterTypes, null );
+            return type.GetConstructor( bindingFlags, null, parameterTypes, null );
         }
         #endregion
 
@@ -254,16 +270,16 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find all constructors matching the given <paramref name="flags"/> (and that are not abstract)
+        /// Find all constructors matching the given <paramref name="bindingFlags"/> (and that are not abstract)
         /// on the given <paramref name="type"/>.
         /// </summary>
         /// <param name="type">The type to reflect on.</param>
-        /// <param name="flags">The search criteria to use when reflecting.</param>
+        /// <param name="bindingFlags">The search criteria to use when reflecting.</param>
         /// <returns>A list of matching constructors. This value will never be null.</returns>
-        public static IList<ConstructorInfo> Constructors( this Type type, Flags flags )
+        public static IList<ConstructorInfo> Constructors( this Type type, Flags bindingFlags )
         {
-            return type.GetConstructors( flags ); //.Where( ci => !ci.IsAbstract ).ToList();
+            return type.GetConstructors( bindingFlags ); //.Where( ci => !ci.IsAbstract ).ToList();
         }
         #endregion
-   }
+    }
 }

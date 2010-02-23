@@ -26,19 +26,19 @@ namespace Fasterflect.Emitter
 {
 	internal class MethodInvocationEmitter : InvocationEmitter
     {
-        public MethodInvocationEmitter(MethodInfo methodInfo, bool isStatic)
-            : this(methodInfo.DeclaringType, null, methodInfo.Name, methodInfo.GetParameters().GetTypeArray(), isStatic, methodInfo)
+        public MethodInvocationEmitter(MethodInfo methodInfo, Flags bindingFlags)
+            : this(methodInfo.DeclaringType, bindingFlags, methodInfo.Name, methodInfo.GetParameters().GetTypeArray(), methodInfo)
         {
         }
 
-        public MethodInvocationEmitter(Type targetType, Flags flags, string name, Type[] paramTypes, bool isStatic)
-            : this(targetType, flags, name, paramTypes, isStatic, null)
+        public MethodInvocationEmitter(Type targetType, Flags bindingFlags, string name, Type[] parameterTypes)
+            : this(targetType, bindingFlags, name, parameterTypes, null)
 		{
 		}
 
-        private MethodInvocationEmitter(Type targetType, Flags? flags, string name, Type[] paramTypes, bool isStatic, MemberInfo methodInfo)
+        private MethodInvocationEmitter(Type targetType, Flags bindingFlags, string name, Type[] parameterTypes, MemberInfo methodInfo)
         {
-            callInfo = new CallInfo(targetType, flags, MemberTypes.Method, name, paramTypes, isStatic, methodInfo);
+            callInfo = new CallInfo(targetType, bindingFlags, MemberTypes.Method, name, parameterTypes, methodInfo);
         }
 
         
