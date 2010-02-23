@@ -47,24 +47,22 @@ namespace Fasterflect
 			{
 				flagNames[ new Flags( (long) flag ) ] = flag.ToString();
 			}
-			flagNames[ NameMatch ] = "NameMatch"; // new Flags( 1L << 32 );
-			flagNames[ PartialNameMatch ] = "PartialNameMatch"; // new Flags( 1L << 33 );
-	        flagNames[ TrimExplicitlyImplemented ] = "TrimExplicitlyImplemented"; // new Flags( 1L << 34 );
-	        flagNames[ ExcludeExplicitlyImplemented ] = "ExcludeExplicitlyImplemented"; // = new Flags( 1L << 35 );
-	        flagNames[ ParameterMatch ] = "ParameterMatch"; // = new Flags( 1L << 36 );
-	        //flagNames[ ExactParameterMatch ] = "ExactParameterMatch"; // = new Flags( 1L << 37 );
-	        flagNames[ ExcludeBackingMembers ] = "ExcludeBackingMembers"; // = new Flags( 1L << 38 );
+			flagNames[ PartialNameMatch ] = "PartialNameMatch"; // new Flags( 1L << 32 );
+	        flagNames[ TrimExplicitlyImplemented ] = "TrimExplicitlyImplemented"; // new Flags( 1L << 33 );
+	        flagNames[ ExcludeExplicitlyImplemented ] = "ExcludeExplicitlyImplemented"; // = new Flags( 1L << 34 );
+	        flagNames[ ExcludeBackingMembers ] = "ExcludeBackingMembers"; // = new Flags( 1L << 35 );
 
-	        flagNames[ VisibilityMatch ] = "VisibilityMatch"; // = new Flags( 1L << 55 );
-	        flagNames[ Private ] = "Private"; //   = new Flags( 1L << 56 );
-	        flagNames[ Protected ] = "Protected"; // = new Flags( 1L << 57 );
-	        flagNames[ Internal ] = "Internal"; //  = new Flags( 1L << 58 );
+			// not yet supported:
+			//flagNames[ VisibilityMatch ] = "VisibilityMatch"; // = new Flags( 1L << 55 );
+			//flagNames[ Private ] = "Private"; //   = new Flags( 1L << 56 );
+			//flagNames[ Protected ] = "Protected"; // = new Flags( 1L << 57 );
+			//flagNames[ Internal ] = "Internal"; //  = new Flags( 1L << 58 );
 
-	        flagNames[ ModifierMatch ] = "ModifierMatch"; // = new Flags( 1L << 59 );
-			flagNames[ Abstract ] = "Abstract"; //  = new Flags( 1L << 60 );
-	        flagNames[ Virtual ] = "Virtual"; //   = new Flags( 1L << 61 );
-	        flagNames[ Override ] = "Override"; //  = new Flags( 1L << 62 );
-	        flagNames[ New ] = "New"; //      = new Flags( 1L << 63 );
+			//flagNames[ ModifierMatch ] = "ModifierMatch"; // = new Flags( 1L << 59 );
+			//flagNames[ Abstract ] = "Abstract"; //  = new Flags( 1L << 60 );
+			//flagNames[ Virtual ] = "Virtual"; //   = new Flags( 1L << 61 );
+			//flagNames[ Override ] = "Override"; //  = new Flags( 1L << 62 );
+			//flagNames[ New ] = "New"; //      = new Flags( 1L << 63 );
 		}
 		#endregion
 
@@ -81,15 +79,6 @@ namespace Fasterflect
 		#endregion
 
         #region FasterflectFlags
-
-        /// <summary>
-        /// If this option is specified the search for a named member will perform an exact match on the
-        /// full member name. If <see href="TrimExplicitlyImplemented"/> is specified the trimmed name is
-        /// used instead of the original member name. If <see href="IgnoreCase"/> is specified the 
-        /// comparison uses <see href="StringComparison.InvariantCultureIgnoreCase"/> and otherwise
-        /// uses <see href="StringComparison.InvariantCulture"/>.
-        /// </summary>
-        public static readonly Flags NameMatch = new Flags( 1L << 32 );
         /// <summary>
         /// If this option is specified the search for a named member will perform a partial match instead
         /// of an exact match. If <see href="TrimExplicitlyImplemented"/> is specified the trimmed name is
@@ -97,58 +86,51 @@ namespace Fasterflect
         /// comparison uses <see href="StringComparison.InvariantCultureIgnoreCase"/> and otherwise
         /// uses <see href="StringComparison.InvariantCulture"/>.
         /// </summary>
-        public static readonly Flags PartialNameMatch = new Flags( 1L << 33 );
+        public static readonly Flags PartialNameMatch = new Flags( 1L << 32 );
         /// <summary>
         /// If this option is specified the search for a named member will strip off the namespace and
         /// interface name from explicitly implemented interface members before applying any comparison
         /// operations.
         /// </summary>
-        public static readonly Flags TrimExplicitlyImplemented = new Flags( 1L << 34 );
+        public static readonly Flags TrimExplicitlyImplemented = new Flags( 1L << 33 );
         /// <summary>
         /// If this option is specified the search for members will exclude explicitly implemented
         /// interface members.
         /// </summary>
-        public static readonly Flags ExcludeExplicitlyImplemented = new Flags( 1L << 35 );
-        /// <summary>
-        /// If this option is specified the parameter types are verified for assignment compatibility
-        /// with the supplied parameter types. Note that this allows for covariance but not for 
-        /// implicit conversion of primitive types. This options is set automatically when applicable.   
-        /// </summary>
-        public static readonly Flags ParameterMatch = new Flags( 1L << 36 );
-		/// <summary>
-		/// If this option is specified the parameter types must match exactly rather than by
-		/// assignment compatibility. 
-		/// </summary>
-		//public static readonly Flags ExactParameterMatch = new Flags( 1L << 37 );
+        public static readonly Flags ExcludeExplicitlyImplemented = new Flags( 1L << 34 );
         /// <summary>
         /// If this option is specified all members that are backers for another member, such as backing
         /// fields for automatic properties or get/set methods for properties, will be excluded from the 
         /// result.
         /// </summary>
-        public static readonly Flags ExcludeBackingMembers = new Flags( 1L << 38 );
-        /// <summary>
-        /// If this option is specified only members with one (or more) of the specified visibility 
-        /// flags will be included in the result.
-        /// </summary>
-        public static readonly Flags VisibilityMatch = new Flags( 1L << 55 );
-		/// <summary>
-		/// Visibility flags
-		/// </summary>
-        public static readonly Flags Private   = new Flags( 1L << 56 );
-        public static readonly Flags Protected = new Flags( 1L << 57 );
-        public static readonly Flags Internal  = new Flags( 1L << 58 );
-        /// <summary>
-        /// If this option is specified only members with one (or more) of the specified modifier 
-        /// flags will be included in the result.
-        /// </summary>
-        public static readonly Flags ModifierMatch = new Flags( 1L << 59 );
-		/// <summary>
-        /// Modifier flags
-        /// </summary>
-		public static readonly Flags Abstract  = new Flags( 1L << 60 );
-        public static readonly Flags Virtual   = new Flags( 1L << 61 );
-        public static readonly Flags Override  = new Flags( 1L << 62 );
-        public static readonly Flags New       = new Flags( 1L << 63 );
+        public static readonly Flags ExcludeBackingMembers = new Flags( 1L << 35 );
+
+		#region For The Future
+		///// <summary>
+		///// If this option is specified only members with one (or more) of the specified visibility 
+		///// flags will be included in the result.
+		///// </summary>
+		//public static readonly Flags VisibilityMatch = new Flags( 1L << 55 );
+		///// <summary>
+		///// Visibility flags
+		///// </summary>
+		//public static readonly Flags Private   = new Flags( 1L << 56 );
+		//public static readonly Flags Protected = new Flags( 1L << 57 );
+		//public static readonly Flags Internal  = new Flags( 1L << 58 );
+
+		///// <summary>
+		///// If this option is specified only members with one (or more) of the specified modifier 
+		///// flags will be included in the result.
+		///// </summary>
+		//public static readonly Flags ModifierMatch = new Flags( 1L << 59 );
+		///// <summary>
+		///// Modifier flags
+		///// </summary>
+		//public static readonly Flags Abstract  = new Flags( 1L << 60 );
+		//public static readonly Flags Virtual   = new Flags( 1L << 61 );
+		//public static readonly Flags Override  = new Flags( 1L << 62 );
+		//public static readonly Flags New       = new Flags( 1L << 63 );
+ 		#endregion
  		#endregion
 
 		#region Common Selections

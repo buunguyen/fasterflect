@@ -106,7 +106,7 @@ namespace Fasterflect
         /// </summary>
         public static ConstructorInvoker DelegateForCreateInstance(this Type targetType, params Type[] paramTypes)
         {
-            return DelegateForCreateInstance(targetType, Flags.InstanceCriteria | Flags.ParameterMatch, paramTypes);
+            return DelegateForCreateInstance(targetType, Flags.InstanceCriteria, paramTypes);
         }
 
         /// <summary>

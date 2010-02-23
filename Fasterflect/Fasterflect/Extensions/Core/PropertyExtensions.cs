@@ -24,7 +24,6 @@ using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
 using Fasterflect.Internal;
-using Fasterflect.Selectors.Core;
 
 namespace Fasterflect
 {
