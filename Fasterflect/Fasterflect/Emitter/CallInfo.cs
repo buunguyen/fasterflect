@@ -40,11 +40,11 @@ namespace Fasterflect.Emitter
 	    public CallInfo(Type targetType, Flags? flags, MemberTypes memberTypes, string name, Type[] paramTypes, bool isStatic, MemberInfo memberInfo)
 		{
             TargetType = targetType;
-	        Flags = flags == null ? Flags.None : flags.Value;
+	        Flags = flags == null ? Flags.Default : flags.Value;
 	        Flags = Flags | (isStatic ? Flags.Static : Flags.Instance);
 			MemberTypes = memberTypes;
 			Name = name;
-			ParamTypes = paramTypes == null || paramTypes.Length == 0 ? Type.EmptyTypes : paramTypes;
+	    	ParamTypes = paramTypes ?? Type.EmptyTypes; // paramTypes == null || paramTypes.Length == 0 ? Type.EmptyTypes : paramTypes;
 	        MemberInfo = memberInfo;
 		}
 
@@ -103,16 +103,39 @@ namespace Fasterflect.Emitter
             return true;
 	    }
 
-	    public override int GetHashCode()
-	    {
-            int result = TargetType.GetHashCode();
-            result = (result * 31) ^ Name.GetHashCode();
-            result = (result * 31) ^ Flags.GetHashCode();
-            result = (result * 31) ^ MemberTypes.GetHashCode();
-            for (int i = 0; i < ParamTypes.Length; i++ )
-                result = (result * 31) ^ ParamTypes[i].GetHashCode();
-            result = (result * 31) ^ (MemberInfo == null ? 0 : MemberInfo.GetHashCode());
-            return result;
-	    }
+		// 100%
+		//public override int GetHashCode()
+		//{
+		//    int result = TargetType.GetHashCode();
+		//    result = (result * 31) ^ Name.GetHashCode();
+		//    result = (result * 31) ^ Flags.GetHashCode();
+		//    result = (result * 31) ^ MemberTypes.GetHashCode();
+		//    for (int i = 0; i < ParamTypes.Length; i++ )
+		//        result = (result * 31) ^ ParamTypes[i].GetHashCode();
+		//    result = (result * 31) ^ (MemberInfo == null ? 0 : MemberInfo.GetHashCode());
+		//    return result;
+		//}
+
+		// 60%
+		//public override int GetHashCode()
+		//{
+		//    int hash = TargetType.GetHashCode() * (int) MemberTypes * Name.GetHashCode() * Flags.GetHashCode();
+		//    if( MemberInfo != null )
+		//        hash *= MemberInfo.GetHashCode();
+		//    for( int i = 0; i < ParamTypes.Length; i++ )
+		//        hash *= ParamTypes[i].GetHashCode();
+		//    return hash;
+		//}
+	
+		// 55%
+		public override int GetHashCode()
+		{
+		    int hash = TargetType.GetHashCode() + (int) MemberTypes * Name.GetHashCode() + Flags.GetHashCode();
+		    if( MemberInfo != null )
+		        hash += MemberInfo.GetHashCode();
+		    for( int i = 0; i < ParamTypes.Length; i++ )
+		        hash += ParamTypes[i].GetHashCode();
+		    return hash;
+		}
 	}
 }

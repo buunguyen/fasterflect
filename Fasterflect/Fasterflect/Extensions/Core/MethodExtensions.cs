@@ -24,6 +24,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
+using Fasterflect.Internal;
 using Fasterflect.Selectors.Core;
 
 namespace Fasterflect
@@ -280,7 +281,7 @@ namespace Fasterflect
         /// due to method overloading the first found match will be returned.</returns>
         public static MethodInfo Method( this Type type, string name )
         {
-        	return type.Method( name, Flags.InstanceCriteria, null, null );
+        	return type.Method( name, Flags.InstanceCriteria, null );
         }
 
         /// <summary>
@@ -299,7 +300,7 @@ namespace Fasterflect
         /// due to method overloading the first found match will be returned.</returns>
         public static MethodInfo Method( this Type type, string name, Flags flags )
         {
-        	return type.Method( name, flags, null, null );
+        	return type.Method( name, flags, null );
         }
 
         /// <summary>
@@ -317,17 +318,29 @@ namespace Fasterflect
         /// <param name="paramTypes">If this parameter is supplied then only methods with the same parameter signature
         /// will be included in the result. The default behavior is to check only for assignment compatibility,
         /// but this can be changed to exact matching by passing <see href="Flags.ExactParameterMatch"/>.</param>
-        /// <param name="returnType">If this parameter is supplied then only methods with the same return type signature
-        /// will be included in the result. The default behavior is to check only for assignment compatibility, but this 
-        /// can be changed to exact matching by passing <see href="Flags.ExactParameterMatch"/>.
-        /// </param>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
         /// due to method overloading the first found match will be returned.</returns>
-		public static MethodInfo Method( this Type type, string name, Flags flags, Type[] paramTypes, Type returnType )
+		public static MethodInfo Method( this Type type, string name, Flags flags, Type[] paramTypes )
         {
-			if( string.IsNullOrEmpty( name ) )
-				throw new ArgumentException( "You must supply a valid name to search for.", "name" );
-        	return type.Methods( flags, paramTypes, returnType, name ).FirstOrDefault();
+			// we need to check all methods to do partial name matches
+			if( flags.IsAnySet( Flags.PartialNameMatch | Flags.TrimExplicitlyImplemented ) )
+				return type.Methods( paramTypes, flags, name ).FirstOrDefault();
+
+        	bool hasTypes = paramTypes != null;
+       		var result = hasTypes ? type.GetMethod( name, flags, null, paramTypes, null ) : type.GetMethod( name, flags );
+			if( result == null && flags.IsNotSet( Flags.DeclaredOnly ) )
+			{ 
+				if( type.BaseType != typeof(object) && type.BaseType != null )
+        			return type.BaseType.Method( name, flags, paramTypes );
+			}
+			bool hasSpecialFlags = flags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+			if( hasSpecialFlags )
+			{
+				IList<MethodInfo> methods = new List<MethodInfo> { result };
+				methods = methods.Filter( flags );
+				return methods.Count > 0 ? methods[ 0 ] : null;
+			}
+			return result;
         }
         #endregion
 
@@ -339,7 +352,7 @@ namespace Fasterflect
         /// <returns>A list of all matching methods. This value will never be null.</returns>
         public static IList<MethodInfo> Methods( this Type type )
         {
-            return type.Methods( Flags.InstanceCriteria, null, (Type) null, null );
+            return type.Methods( null, Flags.InstanceCriteria, null );
         }
 
         /// <summary>
@@ -351,7 +364,7 @@ namespace Fasterflect
         /// <returns>A list of all matching methods. This value will never be null.</returns>
         public static IList<MethodInfo> Methods( this Type type, Flags flags )
         {
-            return type.Methods( flags, null, (Type) null, null );
+            return type.Methods( null, flags, null );
         }
 
         /// <summary>
@@ -367,7 +380,7 @@ namespace Fasterflect
         /// <returns>A list of all matching methods. This value will never be null.</returns>
 		public static IList<MethodInfo> Methods( this Type type, params string[] names )
 		{
-		    return type.Methods( Flags.InstanceCriteria, null, null, names );
+		    return type.Methods( null, Flags.InstanceCriteria, names );
 		}
 
         /// <summary>
@@ -385,38 +398,63 @@ namespace Fasterflect
         /// <returns>A list of all matching methods. This value will never be null.</returns>
         public static IList<MethodInfo> Methods( this Type type, Flags flags, params string[] names )
         {
-            return type.Methods( flags, null, null, names );
+            return type.Methods( null, flags, names );
         }
 
         /// <summary>
         /// Find all methods on the given <paramref name="type"/> that match the given lookup criteria and values.
         /// </summary>
         /// <param name="type">The type on which to reflect.</param>
-        /// <param name="flags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
-        /// the search behavior and result filtering.</param>
         /// <param name="paramTypes">If this parameter is supplied then only methods with the same parameter signature
         /// will be included in the result. The default behavior is to check only for assignment compatibility,
         /// but this can be changed to exact matching by passing <see href="Flags.ExactParameterMatch"/>.</param>
-        /// <param name="returnType">If this parameter is supplied then only methods with the same return type signature
-        /// will be included in the result. The default behavior is to check only for assignment compatibility, but this 
-        /// can be changed to exact matching by passing <see href="Flags.ExactParameterMatch"/>.
-        /// </param>
+        /// <param name="flags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
+        /// the search behavior and result filtering.</param>
         /// <param name="names">If this parameter is supplied then only methods whose name matches one of the supplied
         /// names will be included in the result. The default behavior is to check for an exact, case-sensitive match.
         /// Pass <see href="Flags.ExplicitNameMatch"/> to include explicitly implemented interface members, 
         /// <see href="Flags.PartialNameMatch"/> to locate by substring, and <see href="Flags.IgnoreCase"/> to 
         /// ignore case.</param>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> Methods( this Type type, Flags flags, Type[] paramTypes, Type returnType, params string[] names )
+        public static IList<MethodInfo> Methods( this Type type, Type[] paramTypes, Flags flags, params string[] names )
         {
-        	//flags = flags ?? Flags.Default;
-        	flags = Flags.SetIf( flags, Flags.ParameterMatch, paramTypes != null );
-        	flags = Flags.ClearIf( flags, Flags.ExactParameterMatch, paramTypes == null );
-        	var methods = type.Members( MemberTypes.Method, flags, names ).Cast<MethodInfo>().ToList();
+			if( type == null || type == typeof(object) ) { return new MethodInfo[ 0 ]; }
 
-			var selectors = SelectorFactory.GetMethodSelectors( flags );
-			return methods.Where( m => selectors.All( s => s.IsMatch( m, flags, paramTypes, returnType ) ) ).ToList();
-        }
+			bool recurse = flags.IsNotSet( Flags.DeclaredOnly );
+			bool hasNames = names != null && names.Length > 0;
+			bool hasTypes = paramTypes != null;
+			bool hasSpecialFlags = flags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+        	
+			if( ! recurse && ! hasNames && ! hasTypes && ! hasSpecialFlags )
+				return type.GetMethods( flags ) ?? new MethodInfo[ 0 ];
+
+			var methods = GetMethods( type, flags );
+			methods = hasNames ? methods.Filter( flags, names ) : methods;
+			methods = hasTypes ? methods.Filter( flags, paramTypes ) : methods;
+			methods = hasSpecialFlags ? methods.Filter( flags ) : methods;
+        	return methods;
+		}
+
+        private static IList<MethodInfo> GetMethods( Type type, Flags flags )
+        {
+			bool recurse = flags.IsNotSet( Flags.DeclaredOnly );
+
+			if( ! recurse )
+				return type.GetMethods( flags ) ?? new MethodInfo[ 0 ];
+
+			flags |= Flags.DeclaredOnly;
+			flags &= ~BindingFlags.FlattenHierarchy;
+
+        	var methods = new List<MethodInfo>();
+			methods.AddRange( type.GetMethods( flags ) );
+			Type baseType = type.BaseType;
+			while( baseType != null && baseType != typeof(object) )
+			{
+				methods.AddRange( baseType.GetMethods( flags ) );
+			    baseType = baseType.BaseType;
+			}
+			return methods;
+		}
         #endregion
     }
 }

@@ -86,6 +86,7 @@ namespace FasterflectBenchmark
 		}
 		#endregion
 
+		//private static readonly int[] Iterations = new[] { 20000 };
 		private static readonly int[] Iterations = new[] { 20000, 2000000 };
 		private static readonly object[] NoArgArray = new object[0];
 		private static readonly object[] ArgArray = new object[] {10};
@@ -96,18 +97,19 @@ namespace FasterflectBenchmark
 
 		public static void Main(string[] args)
 		{
-            //RunDictionaryBenchmark();
-            //RunHashCodeBenchmark();
-            //RunTryCreateInstanceBenchmark();
-            RunConstructorBenchmark();
-            RunFieldBenchmark();
-            RunStaticFieldBenchmark();
-            RunPropertyBenchmark();
-            RunStaticPropertyBenchmark();
-            RunMethodInvocationBenchmark();
-            RunStaticMethodInvocationBenchmark();
-            RunIndexerBenchmark();
-            RunArrayBenchmark();
+			//RunDictionaryBenchmark();
+			//RunHashCodeBenchmark();
+			//RunLookupBenchmark();
+			RunTryCreateInstanceBenchmark();
+			RunConstructorBenchmark();
+			RunFieldBenchmark();
+			RunStaticFieldBenchmark();
+			RunPropertyBenchmark();
+			RunStaticPropertyBenchmark();
+			RunMethodInvocationBenchmark();
+			RunStaticMethodInvocationBenchmark();
+			RunIndexerBenchmark();
+			RunArrayBenchmark();
 		}
 
 	    #region Internal Testing
@@ -157,6 +159,57 @@ namespace FasterflectBenchmark
 									{"new SourceInfo anon", () => new SourceInfo( new { ID=42, Name="Test" }.GetType() ) },
 			                	};
 			Execute("HashCode Benchmark", initMap, actionMap);
+		}
+		#endregion
+
+		#region Fasterflect Lookup
+		private static void RunLookupBenchmark()
+		{
+			var defaultFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+			var declaredOnlyFlags = defaultFlags | BindingFlags.DeclaredOnly;
+			var initMap = new Dictionary<string, Action>
+          	{
+            	{"Init Flags", () => { var f = Flags.None; } },
+          	};
+			var actionMap = new Dictionary<string, Action>
+        	{
+				{"--- Fields", () => {} },
+				{"Reflection GetField", () => typeof(Person).GetField( "name", defaultFlags ) },
+				{"Fasterflect Field", () => typeof(Person).Field("name", declaredOnlyFlags ) },
+				{"Reflection GetFields", () => typeof(Person).GetFields( defaultFlags ) },
+				{"Fasterflect Fields", () => typeof(Person).Fields( declaredOnlyFlags ) },
+				{"Fasterflect Fields+1", () => typeof(Person).Fields( declaredOnlyFlags, "Name" ) },
+				{"Fasterflect Fields+5", () => typeof(Person).Fields( declaredOnlyFlags, "Name", "A", "B", "C", "D" ) },
+				{"--- Properties", () => {} },
+				{"Reflection GetProperty", () => typeof(Person).GetProperty( "Name", defaultFlags ) },
+				{"Fasterflect Property", () => typeof(Person).Property( "Name", declaredOnlyFlags ) },
+				{"Reflection GetProperties", () => typeof(Person).GetProperties( defaultFlags ) },
+				{"Fasterflect Properties", () => typeof(Person).Properties( declaredOnlyFlags ) },
+				{"Fasterflect Properties+1", () => typeof(Person).Properties( declaredOnlyFlags, "Name" ) },
+				{"Fasterflect Properties+5", () => typeof(Person).Properties( declaredOnlyFlags, "Name", "A", "B", "C", "D" ) },
+				{"--- Members", () => {} },
+				{"Reflection GetMember", () => typeof(Person).GetMember( "name", defaultFlags ) },
+				{"Fasterflect Member", () => typeof(Person).Member("name", declaredOnlyFlags ) },
+				{"Reflection GetMembers", () => typeof(Person).GetMembers( defaultFlags ) },
+				{"Fasterflect Members", () => typeof(Person).Members( MemberTypes.All, declaredOnlyFlags ) },
+				{"Fasterflect Members+1", () => typeof(Person).Members( MemberTypes.All, declaredOnlyFlags, "Name" ) },
+				{"Fasterflect Members+5", () => typeof(Person).Members( MemberTypes.All, declaredOnlyFlags, "Name", "A", "B", "C", "D" ) },
+				{"--- Methods", () => {} },
+				{"Reflection GetMethod", () => typeof(Person).GetMethod( "Walk", defaultFlags, null, new [] { typeof(int) }, null ) },
+				{"Fasterflect Method", () => typeof(Person).Method( "Walk", declaredOnlyFlags, new [] { typeof(int) } ) },
+				{"Reflection GetMethods", () => typeof(Person).GetMethods( defaultFlags ) },
+				{"Fasterflect Methods", () => typeof(Person).Methods( declaredOnlyFlags ) },
+				{"Fasterflect Methods+1", () => typeof(Person).Methods( new [] { typeof(int) }, declaredOnlyFlags ) },
+				{"Fasterflect Methods+2", () => typeof(Person).Methods( new [] { typeof(int), typeof(string) }, declaredOnlyFlags ) },
+				{"Fasterflect Methods+1+1", () => typeof(Person).Methods( new [] { typeof(int) }, declaredOnlyFlags, "Walk" ) },
+				{"Fasterflect Members M", () => typeof(Person).Members( MemberTypes.Method, declaredOnlyFlags ) },
+				{"--- Constructors", () => {} },
+				{"Reflection GetConstructor", () => typeof(Person).GetConstructor( defaultFlags, null, CallingConventions.Standard, Type.EmptyTypes, null ) },
+				{"Fasterflect Constructor", () => typeof(Person).Constructor( declaredOnlyFlags, Type.EmptyTypes ) },
+				{"Reflection GetConstructors", () => typeof(Person).GetConstructors( defaultFlags ) },
+				{"Fasterflect Constructors", () => typeof(Person).Constructors( declaredOnlyFlags ) },
+        	};
+			Execute("Lookup Benchmark", initMap, actionMap);
 		}
 		#endregion
 

@@ -262,7 +262,7 @@ namespace Fasterflect
         /// <returns>A list of matching constructors. This value will never be null.</returns>
         public static IList<ConstructorInfo> Constructors( this Type type, Flags flags )
         {
-            return type.GetConstructors( flags ).Where( ci => !ci.IsAbstract ).ToList();
+            return type.GetConstructors( flags ); //.Where( ci => !ci.IsAbstract ).ToList();
         }
         #endregion
    }

@@ -90,25 +90,25 @@ namespace FasterflectTest.Lookup
 			// Flags.ParameterMatch should be applied automatically if parameter types are supplied
         	Flags flags = Flags.InstanceCriteria;
 
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new Type[] {}, null ) );
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(object) }, null ) );
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, null, null ) ); // should ignore flag when null is passed
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Animal) }, null ) );
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Mammal) }, null ) );
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Lion) }, null ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new Type[] {} ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(object) } ) );
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, null ) ); // should ignore flag when null is passed
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Animal) } ) );
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Mammal) } ) );
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Lion) } ) );
         }
 
         [TestMethod]
-		public void TestFindMethodInstanceWithExactParameterMatch()
+		public void TestFindMethodInstanceWithExactBinding()
         {
-        	Flags flags = Flags.InstanceCriteria | Flags.ExactParameterMatch;
+        	Flags flags = Flags.InstanceCriteria | Flags.ExactBinding;
 
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new Type[] {}, null ) );
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(object) }, null ) );
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, null, null ) ); // should ignore flag when null is passed
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Animal) }, null ) );
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Mammal) }, null ) );
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Lion) }, null ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new Type[] {} ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(object) } ) );
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, null ) ); // should ignore flag when null is passed
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Animal) } ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Mammal) } ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Lion) } ) );
         }
 
         [TestMethod]

@@ -78,6 +78,7 @@
     <Compile Include="Caching\CacheStrategy.cs" />
     <Compile Include="Caching\Cache.cs" />
     <Compile Include="Extensions\Core\ParameterInfoExtensions.cs" />
+    <Compile Include="Extensions\Internal\MemberFilter.cs" />
     <Compile Include="Selectors\NameMatch.cs" />
     <Compile Include="Selectors\ExcludeBackingMembers.cs" />
     <Compile Include="Selectors\Core\SelectorBase.cs" />
