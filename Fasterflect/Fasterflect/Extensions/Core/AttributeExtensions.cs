@@ -78,7 +78,7 @@ namespace Fasterflect
         public static Attribute Attribute( this Enum source, Type attributeType )
         {
             Type type = source.GetType();
-            MemberInfo info = type.Member( source.ToString(), Flags.StaticCriteria | Flags.DeclaredOnly );
+            MemberInfo info = type.Member( source.ToString(), Flags.StaticAnyVisibility | Flags.DeclaredOnly );
             return info.Attribute( attributeType );
         }
         #endregion
@@ -93,21 +93,9 @@ namespace Fasterflect
         public static IList<Attribute> Attributes( this ICustomAttributeProvider source, params Type[] attributeTypes )
         {
             return source.GetCustomAttributes( true ).Cast<Attribute>().Where( attr => attributeTypes.Length == 0 ||
-                                                                                       attributeTypes.Any( at =>
-                                                                                                           {
-                                                                                                               Type type
-                                                                                                                   =
-                                                                                                                   attr.
-                                                                                                                       GetType
-                                                                                                                       ();
-                                                                                                               return
-                                                                                                                   at ==
-                                                                                                                   type ||
-                                                                                                                   at.
-                                                                                                                       IsSubclassOf
-                                                                                                                       ( type );
-                                                                                                           } ) ).ToList();
-        }
+			                                                                         attributeTypes.Any( at => { Type type = attr.GetType();
+			                                                                                                     return at == type || at.IsSubclassOf(type); } ) ).ToList();
+		}
 
         /// <summary>
         /// Gets all <see href="Attribute"/>s of type <typeparamref name="T"/> associated with the <paramref name="source"/>.
@@ -138,7 +126,7 @@ namespace Fasterflect
         public static IList<Attribute> Attributes( this Enum source, params Type[] attributeTypes )
         {
             Type type = source.GetType();
-            MemberInfo info = type.Member( source.ToString(), Flags.StaticCriteria | Flags.DeclaredOnly );
+            MemberInfo info = type.Member( source.ToString(), Flags.StaticAnyVisibility | Flags.DeclaredOnly );
             return info.Attributes( attributeTypes );
         }
         #endregion
@@ -219,7 +207,7 @@ namespace Fasterflect
         /// <returns>A list of all matching members. This value will never be null.</returns>
         public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes ) where T : Attribute
         {
-            return type.MembersWith( memberTypes, Flags.InstanceCriteria, typeof(T) );
+            return type.MembersWith( memberTypes, Flags.InstanceAnyVisibility, typeof(T) );
         }
 
         /// <summary>
@@ -246,7 +234,7 @@ namespace Fasterflect
         public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes,
                                                      params Type[] attributeTypes )
         {
-            return type.MembersWith( memberTypes, Flags.InstanceCriteria, attributeTypes );
+            return type.MembersWith( memberTypes, Flags.InstanceAnyVisibility, attributeTypes );
         }
 
         /// <summary>

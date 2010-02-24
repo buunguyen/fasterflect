@@ -102,8 +102,7 @@ namespace Fasterflect
         public static object Invoke( this Type targetType, string methodName, Flags bindingFlags,
                                      params object[] parameters )
         {
-            return
-                DelegateForStaticInvoke( targetType, methodName, bindingFlags, parameters.GetTypeArray() )( parameters );
+            return DelegateForStaticInvoke( targetType, methodName, bindingFlags, parameters.GetTypeArray() )( parameters );
         }
 
         /// <summary>
@@ -135,7 +134,7 @@ namespace Fasterflect
         public static StaticMethodInvoker DelegateForStaticInvoke( this Type targetType, string methodName,
                                                                    params Type[] parameterTypes )
         {
-            return DelegateForStaticInvoke( targetType, methodName, Flags.AllStatic, parameterTypes );
+            return DelegateForStaticInvoke( targetType, methodName, Flags.StaticAnyVisibility, parameterTypes );
         }
 
         /// <summary>
@@ -230,10 +229,8 @@ namespace Fasterflect
         public static object Invoke( this object target, string methodName, Flags bindingFlags,
                                      params object[] parameters )
         {
-            return
-                DelegateForInvoke( target.GetTypeAdjusted(), methodName, bindingFlags, parameters.GetTypeArray() )(
-                    target,
-                    parameters );
+            return DelegateForInvoke( target.GetTypeAdjusted(), methodName, bindingFlags, parameters.GetTypeArray() )(
+            						  target, parameters );
         }
 
         /// <summary>
@@ -266,7 +263,7 @@ namespace Fasterflect
         public static MethodInvoker DelegateForInvoke( this Type targetType, string methodName,
                                                        params Type[] parameterTypes )
         {
-            return DelegateForInvoke( targetType, methodName, Flags.AllInstance, parameterTypes );
+            return DelegateForInvoke( targetType, methodName, Flags.InstanceAnyVisibility, parameterTypes );
         }
 
         /// <summary>
@@ -286,8 +283,7 @@ namespace Fasterflect
         public static MethodInvoker DelegateForInvoke( this Type targetType, string methodName, Flags bindingFlags,
                                                        params Type[] parameterTypes )
         {
-            return
-                (MethodInvoker)
+            return (MethodInvoker)
                 new MethodInvocationEmitter( targetType, bindingFlags, methodName, parameterTypes ).GetDelegate();
         }
         #endregion
@@ -308,7 +304,7 @@ namespace Fasterflect
         /// due to method overloading the first found match will be returned.</returns>
         public static MethodInfo Method( this Type type, string name )
         {
-            return type.Method( name, Flags.InstanceCriteria, null );
+            return type.Method( name, Flags.InstanceAnyVisibility, null );
         }
 
         /// <summary>
@@ -386,7 +382,7 @@ namespace Fasterflect
         /// <returns>A list of all matching methods. This value will never be null.</returns>
         public static IList<MethodInfo> Methods( this Type type )
         {
-            return type.Methods( null, Flags.InstanceCriteria, null );
+            return type.Methods( null, Flags.InstanceAnyVisibility, null );
         }
 
         /// <summary>
@@ -414,7 +410,7 @@ namespace Fasterflect
         /// <returns>A list of all matching methods. This value will never be null.</returns>
         public static IList<MethodInfo> Methods( this Type type, params string[] names )
         {
-            return type.Methods( null, Flags.InstanceCriteria, names );
+            return type.Methods( null, Flags.InstanceAnyVisibility, names );
         }
 
         /// <summary>

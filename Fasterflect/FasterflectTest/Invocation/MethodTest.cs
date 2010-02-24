@@ -45,7 +45,7 @@ namespace FasterflectTest.Invocation
             RunWith( ( object person ) =>
                {
                    var elements = new[] { 1d, 2d, 3d, 4d, 5d };
-                   var methodInfo = person.UnwrapIfWrapped().GetType().Method( "Walk", Flags.InstanceCriteria, new [] { typeof(int) } );
+                   var methodInfo = person.UnwrapIfWrapped().GetType().Method( "Walk", Flags.InstanceAnyVisibility, new [] { typeof(int) } );
                    elements.ForEach( element => methodInfo.Invoke( person, element ) );
                    Assert.AreEqual( elements.Sum(), person.GetFieldValue( "metersTravelled" ) );
                } );
@@ -76,7 +76,7 @@ namespace FasterflectTest.Invocation
         {
 			var employee = EmployeeType.CreateInstance();
             var currentMeters = (double) employee.GetFieldValue( "metersTravelled" );
-            employee.Invoke("Swim", Flags.InstanceCriteria | Flags.TrimExplicitlyImplemented, 100d);
+            employee.Invoke("Swim", Flags.InstanceAnyVisibility | Flags.TrimExplicitlyImplemented, 100d);
             VerifyFields( employee, new { metersTravelled = currentMeters + 100 } );
         }
 
@@ -106,7 +106,7 @@ namespace FasterflectTest.Invocation
                {
                    var totalPeopleCreated = (int) type.GetFieldValue( "totalPeopleCreated" );
                    Assert.AreEqual( totalPeopleCreated,
-                                    type.Method( "GetTotalPeopleCreated", Flags.StaticCriteria ).Invoke() );
+                                    type.Method( "GetTotalPeopleCreated", Flags.StaticAnyVisibility ).Invoke() );
                } );
         }
 

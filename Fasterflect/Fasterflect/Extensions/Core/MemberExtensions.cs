@@ -39,7 +39,7 @@ namespace Fasterflect
         /// <returns>A single MemberInfo instance of the first found match or null if no match was found.</returns>
         public static MemberInfo Member( this Type type, string name )
         {
-            return type.Members( MemberTypes.All, Flags.InstanceCriteria, name ).FirstOrDefault();
+            return type.Members( MemberTypes.All, Flags.InstanceAnyVisibility, name ).FirstOrDefault();
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Fasterflect
         /// <returns>A list of all matching members on the type. This value will never be null.</returns>
         public static IList<MemberInfo> FieldsAndProperties( this Type type )
         {
-            return type.Members( MemberTypes.Field | MemberTypes.Property, Flags.InstanceCriteria, null );
+            return type.Members( MemberTypes.Field | MemberTypes.Property, Flags.InstanceAnyVisibility, null );
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Fasterflect
         /// <returns>A list of all matching members on the type. This value will never be null.</returns>
         public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes )
         {
-            return type.Members( memberTypes, Flags.InstanceCriteria, null );
+            return type.Members( memberTypes, Flags.InstanceAnyVisibility, null );
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace Fasterflect
         #region TryGetValue
         public static object TryGetValue( this object source, string name )
         {
-            return TryGetValue( source, name, Flags.InstanceCriteria );
+            return TryGetValue( source, name, Flags.InstanceAnyVisibility );
         }
 
         public static object TryGetValue( this object source, string name, Flags bindingFlags )
@@ -200,7 +200,7 @@ namespace Fasterflect
         #region TrySetValue
         public static bool TrySetValue( this object source, string name, object value )
         {
-            return TrySetValue( source, name, value, Flags.InstanceCriteria );
+            return TrySetValue( source, name, value, Flags.InstanceAnyVisibility );
         }
 
         public static bool TrySetValue( this object source, string name, object value, Flags bindingFlags )

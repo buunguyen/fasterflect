@@ -205,7 +205,7 @@ namespace FasterflectTest.Lookup
         public void TestFindMembersWith_InstanceFieldShouldIncludeInheritedPrivateField()
         {
             Type type = typeof(Lion);
-            IList<MemberInfo> members = type.MembersWith( MemberTypes.Field, Flags.InstanceCriteria, typeof(CodeAttribute) );
+            IList<MemberInfo> members = type.MembersWith( MemberTypes.Field, Flags.InstanceAnyVisibility, typeof(CodeAttribute) );
             Assert.IsNotNull( members );
             Assert.AreEqual( 2, members.Count );
             Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "id" ) );
@@ -221,7 +221,7 @@ namespace FasterflectTest.Lookup
         public void TestFindMembersWith_InstanceFieldShouldIncludeInheritedPrivateField_Generic()
         {
             Type type = typeof(Lion);
-            IList<MemberInfo> members = type.MembersWith<CodeAttribute>( MemberTypes.Field, Flags.InstanceCriteria );
+            IList<MemberInfo> members = type.MembersWith<CodeAttribute>( MemberTypes.Field, Flags.InstanceAnyVisibility );
             Assert.IsNotNull( members );
             Assert.AreEqual( 2, members.Count );
             Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "id" ) );
@@ -244,7 +244,7 @@ namespace FasterflectTest.Lookup
         [TestMethod]
         public void TestFindMembersAndAttributes()
         {
-            var members = typeof(Lion).MembersAndAttributes( MemberTypes.Field, Flags.InstanceCriteria, typeof(CodeAttribute) );
+            var members = typeof(Lion).MembersAndAttributes( MemberTypes.Field, Flags.InstanceAnyVisibility, typeof(CodeAttribute) );
             Assert.IsNotNull( members );
             Assert.AreEqual( 2, members.Count );
             foreach( var item in members )
@@ -263,13 +263,13 @@ namespace FasterflectTest.Lookup
         public void TestFindSpecificAttributeOnField()
         {
             // declared field
-            FieldInfo field = typeof(Lion).Field( "lastMealTime", Flags.InstanceCriteria | Flags.DeclaredOnly );
+            FieldInfo field = typeof(Lion).Field( "lastMealTime", Flags.InstanceAnyVisibility | Flags.DeclaredOnly );
             Assert.IsNotNull( field );
             Assert.IsNotNull( field.Attribute<CodeAttribute>() );
             // inherited field
-            field = typeof(Lion).Field( "birthDay", Flags.InstanceCriteria );
+            field = typeof(Lion).Field( "birthDay", Flags.InstanceAnyVisibility );
             Assert.IsNotNull( field );
-            field = typeof(Lion).Field( "birthDay", Flags.InstanceCriteria );
+            field = typeof(Lion).Field( "birthDay", Flags.InstanceAnyVisibility );
             Assert.IsNotNull( field );
             Assert.IsNull( field.Attribute<CodeAttribute>() );
             Assert.IsNotNull( field.Attribute<DefaultValueAttribute>() );

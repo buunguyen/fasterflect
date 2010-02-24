@@ -29,7 +29,7 @@ namespace Fasterflect
         /// </summary>
         public static object Get( this MemberInfo memberInfo )
         {
-            var @delegate = (StaticMemberGetter) new MemberGetEmitter( memberInfo, Flags.AllStatic ).GetDelegate();
+            var @delegate = (StaticMemberGetter) new MemberGetEmitter( memberInfo, Flags.StaticAnyVisibility ).GetDelegate();
             return @delegate();
         }
 
@@ -38,7 +38,7 @@ namespace Fasterflect
         /// </summary>
         public static void Set( this MemberInfo memberInfo, object value )
         {
-            var @delegate = (StaticMemberSetter) new MemberSetEmitter( memberInfo, Flags.AllStatic ).GetDelegate();
+            var @delegate = (StaticMemberSetter) new MemberSetEmitter( memberInfo, Flags.StaticAnyVisibility ).GetDelegate();
             @delegate( value );
         }
 
@@ -48,7 +48,7 @@ namespace Fasterflect
         /// </summary>
         public static object Get( this MemberInfo memberInfo, object target )
         {
-            var @delegate = (MemberGetter) new MemberGetEmitter( memberInfo, Flags.AllInstance ).GetDelegate();
+            var @delegate = (MemberGetter) new MemberGetEmitter( memberInfo, Flags.InstanceAnyVisibility ).GetDelegate();
             return @delegate( target );
         }
 
@@ -58,7 +58,7 @@ namespace Fasterflect
         /// </summary>
         public static void Set( this MemberInfo memberInfo, object target, object value )
         {
-            var @delegate = (MemberSetter) new MemberSetEmitter( memberInfo, Flags.AllInstance ).GetDelegate();
+            var @delegate = (MemberSetter) new MemberSetEmitter( memberInfo, Flags.InstanceAnyVisibility ).GetDelegate();
             @delegate( target, value );
         }
 

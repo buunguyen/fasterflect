@@ -151,7 +151,7 @@ namespace Fasterflect.ObjectConstruction
 		#region Anonymous Type Helper (ExtractParameterInfo)
 		internal void ExtractParameterInfo( Type type )
 		{
-            IList<MemberInfo> members = type.Members(MemberTypes.Field | MemberTypes.Property, Flags.InstanceCriteria);
+            IList<MemberInfo> members = type.Members(MemberTypes.Field | MemberTypes.Property, Flags.InstanceAnyVisibility);
 			var names = new List<string>(members.Count);
 			var types = new List<Type>(members.Count);
 			var kinds = new List<bool>(members.Count);

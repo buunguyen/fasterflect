@@ -61,7 +61,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberSetter DelegateForSetStaticFieldValue( this FieldInfo fieldInfo )
         {
-            return (StaticMemberSetter) new MemberSetEmitter( fieldInfo, Flags.AllStatic ).GetDelegate();
+            return (StaticMemberSetter) new MemberSetEmitter( fieldInfo, Flags.StaticAnyVisibility ).GetDelegate();
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberSetter DelegateForSetFieldValue( this FieldInfo fieldInfo )
         {
-            return (MemberSetter) new MemberSetEmitter( fieldInfo, Flags.AllInstance ).GetDelegate();
+            return (MemberSetter) new MemberSetEmitter( fieldInfo, Flags.InstanceAnyVisibility ).GetDelegate();
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberGetter DelegateForGetStaticFieldValue( this FieldInfo fieldInfo )
         {
-            return (StaticMemberGetter) new MemberGetEmitter( fieldInfo, Flags.AllStatic ).GetDelegate();
+            return (StaticMemberGetter) new MemberGetEmitter( fieldInfo, Flags.StaticAnyVisibility ).GetDelegate();
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberGetter DelegateForGetFieldValue( this FieldInfo fieldInfo )
         {
-            return (MemberGetter) new MemberGetEmitter( fieldInfo, Flags.AllInstance ).GetDelegate();
+            return (MemberGetter) new MemberGetEmitter( fieldInfo, Flags.InstanceAnyVisibility ).GetDelegate();
         }
     }
 }
