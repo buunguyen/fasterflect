@@ -81,6 +81,7 @@
   <ItemGroup>
     <Compile Include="Caching\CacheStrategy.cs" />
     <Compile Include="Caching\Cache.cs" />
+    <Compile Include="Extensions\Core\AssemblyExtensions.cs" />
     <Compile Include="Extensions\Core\ParameterInfoExtensions.cs" />
     <Compile Include="Extensions\Internal\MemberFilter.cs" />
     <Compile Include="Emitter\CloneEmitter.cs" />

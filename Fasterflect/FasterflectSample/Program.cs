@@ -25,10 +25,13 @@ using Fasterflect;
 
 namespace FasterflectSample
 {
-    class Program
+	class Program
     {
         static void Main()
         {
+        	Console.WriteLine( AssemblyInfoWriter.ListExtensions( typeof(Flags).Assembly ) );
+
+
             // Load a type reflectively, just to look like real-life scenario
             var types = new[]
                             {
@@ -206,4 +209,5 @@ namespace FasterflectSample
             Console.WriteLine("Ok!");
         }
     }
+
 }
