@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyInfoWriter.cs" />
     <Compile Include="PersonStruct.cs" />
     <Compile Include="PersonClass.cs" />
     <Compile Include="Program.cs" />
