@@ -62,7 +62,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberSetter DelegateForSetStaticPropertyValue( this PropertyInfo propInfo )
         {
-            return (StaticMemberSetter) new MemberSetEmitter( propInfo, Flags.AllStatic ).GetDelegate();
+            return (StaticMemberSetter) new MemberSetEmitter( propInfo, Flags.StaticAnyVisibility ).GetDelegate();
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberSetter DelegateForSetPropertyValue( this PropertyInfo propInfo )
         {
-            return (MemberSetter) new MemberSetEmitter( propInfo, Flags.AllInstance ).GetDelegate();
+            return (MemberSetter) new MemberSetEmitter( propInfo, Flags.InstanceAnyVisibility ).GetDelegate();
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberGetter DelegateForGetStaticPropertyValue( this PropertyInfo propInfo )
         {
-            return (StaticMemberGetter) new MemberGetEmitter( propInfo, Flags.AllStatic ).GetDelegate();
+            return (StaticMemberGetter) new MemberGetEmitter( propInfo, Flags.StaticAnyVisibility ).GetDelegate();
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberGetter DelegateForGetPropertyValue( this PropertyInfo propInfo )
         {
-            return (MemberGetter) new MemberGetEmitter( propInfo, Flags.AllInstance ).GetDelegate();
+            return (MemberGetter) new MemberGetEmitter( propInfo, Flags.InstanceAnyVisibility ).GetDelegate();
         }
     }
 }

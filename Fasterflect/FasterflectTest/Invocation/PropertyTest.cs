@@ -54,7 +54,7 @@ namespace FasterflectTest.Invocation
         {
             RunWith( ( Type type ) =>
                {
-                   var propInfo = type.Property( "TotalPeopleCreated", Flags.StaticCriteria );
+                   var propInfo = type.Property( "TotalPeopleCreated", Flags.StaticAnyVisibility );
                    var totalPeopleCreated = (int) propInfo.Get() + 1;
                    propInfo.Set( totalPeopleCreated );
                    VerifyProperties( type, new { totalPeopleCreated } );

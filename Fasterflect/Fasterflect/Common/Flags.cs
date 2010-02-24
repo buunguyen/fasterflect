@@ -47,26 +47,26 @@ namespace Fasterflect
 			{
 				flagNames[ new Flags( (long) flag ) ] = flag.ToString();
 			}
-			flagNames[ PartialNameMatch ] = "PartialNameMatch"; // new BindingFlags( 1L << 32 );
-	        flagNames[ TrimExplicitlyImplemented ] = "TrimExplicitlyImplemented"; // new BindingFlags( 1L << 33 );
-	        flagNames[ ExcludeExplicitlyImplemented ] = "ExcludeExplicitlyImplemented"; // = new BindingFlags( 1L << 34 );
-	        flagNames[ ExcludeBackingMembers ] = "ExcludeBackingMembers"; // = new BindingFlags( 1L << 35 );
+			flagNames[ PartialNameMatch ] = "PartialNameMatch"; // new Flags( 1L << 32 );
+	        flagNames[ TrimExplicitlyImplemented ] = "TrimExplicitlyImplemented"; // new Flags( 1L << 33 );
+	        flagNames[ ExcludeExplicitlyImplemented ] = "ExcludeExplicitlyImplemented"; // = new Flags( 1L << 34 );
+	        flagNames[ ExcludeBackingMembers ] = "ExcludeBackingMembers"; // = new Flags( 1L << 35 );
 
 			// not yet supported:
-			//flagNames[ VisibilityMatch ] = "VisibilityMatch"; // = new BindingFlags( 1L << 55 );
-			//flagNames[ Private ] = "Private"; //   = new BindingFlags( 1L << 56 );
-			//flagNames[ Protected ] = "Protected"; // = new BindingFlags( 1L << 57 );
-			//flagNames[ Internal ] = "Internal"; //  = new BindingFlags( 1L << 58 );
+			//flagNames[ VisibilityMatch ] = "VisibilityMatch"; // = new Flags( 1L << 55 );
+			//flagNames[ Private ] = "Private"; //   = new Flags( 1L << 56 );
+			//flagNames[ Protected ] = "Protected"; // = new Flags( 1L << 57 );
+			//flagNames[ Internal ] = "Internal"; //  = new Flags( 1L << 58 );
 
-			//flagNames[ ModifierMatch ] = "ModifierMatch"; // = new BindingFlags( 1L << 59 );
-			//flagNames[ Abstract ] = "Abstract"; //  = new BindingFlags( 1L << 60 );
-			//flagNames[ Virtual ] = "Virtual"; //   = new BindingFlags( 1L << 61 );
-			//flagNames[ Override ] = "Override"; //  = new BindingFlags( 1L << 62 );
-			//flagNames[ New ] = "New"; //      = new BindingFlags( 1L << 63 );
+			//flagNames[ ModifierMatch ] = "ModifierMatch"; // = new Flags( 1L << 59 );
+			//flagNames[ Abstract ] = "Abstract"; //  = new Flags( 1L << 60 );
+			//flagNames[ Virtual ] = "Virtual"; //   = new Flags( 1L << 61 );
+			//flagNames[ Override ] = "Override"; //  = new Flags( 1L << 62 );
+			//flagNames[ New ] = "New"; //      = new Flags( 1L << 63 );
 		}
 		#endregion
 
-		#region BindingFlags Selectors
+		#region Flags Selectors
 		#region BindingFlags
 		public static readonly Flags None = new Flags( (long)BindingFlags.Default );
         public static readonly Flags IgnoreCase = new Flags((long)BindingFlags.IgnoreCase);
@@ -110,58 +110,54 @@ namespace Fasterflect
 		///// If this option is specified only members with one (or more) of the specified visibility 
 		///// flags will be included in the result.
 		///// </summary>
-		//public static readonly BindingFlags VisibilityMatch = new BindingFlags( 1L << 55 );
+		//public static readonly Flags VisibilityMatch = new Flags( 1L << 55 );
 		///// <summary>
 		///// Visibility flags
 		///// </summary>
-		//public static readonly BindingFlags Private   = new BindingFlags( 1L << 56 );
-		//public static readonly BindingFlags Protected = new BindingFlags( 1L << 57 );
-		//public static readonly BindingFlags Internal  = new BindingFlags( 1L << 58 );
+		//public static readonly Flags Private   = new Flags( 1L << 56 );
+		//public static readonly Flags Protected = new Flags( 1L << 57 );
+		//public static readonly Flags Internal  = new Flags( 1L << 58 );
 
 		///// <summary>
 		///// If this option is specified only members with one (or more) of the specified modifier 
 		///// flags will be included in the result.
 		///// </summary>
-		//public static readonly BindingFlags ModifierMatch = new BindingFlags( 1L << 59 );
+		//public static readonly Flags ModifierMatch = new Flags( 1L << 59 );
 		///// <summary>
 		///// Modifier flags
 		///// </summary>
-		//public static readonly BindingFlags Abstract  = new BindingFlags( 1L << 60 );
-		//public static readonly BindingFlags Virtual   = new BindingFlags( 1L << 61 );
-		//public static readonly BindingFlags Override  = new BindingFlags( 1L << 62 );
-		//public static readonly BindingFlags New       = new BindingFlags( 1L << 63 );
+		//public static readonly Flags Abstract  = new Flags( 1L << 60 );
+		//public static readonly Flags Virtual   = new Flags( 1L << 61 );
+		//public static readonly Flags Override  = new Flags( 1L << 62 );
+		//public static readonly Flags New       = new Flags( 1L << 63 );
  		#endregion
  		#endregion
 
 		#region Common Selections
-		public static readonly Flags Default = Public | NonPublic;
-		public static readonly Flags AllInstance = Default | Instance;
-		public static readonly Flags AllStatic = Default | Static;
-		public static readonly Flags DeclaredInstance = Instance | DeclaredOnly;
-		public static readonly Flags DeclaredStatic = Static | DeclaredOnly;
-		public static readonly Flags All = AllInstance | AllStatic;
-		#endregion
-
-		#region Temporary selections for compatibility with old BindingFlags
 		/// <summary>
-        /// Search criteria encompassing all public and non-public members.
+        /// Search criteria encompassing all public and non-public members, including base members.
         /// </summary>
-        public static readonly Flags DefaultCriteria = Public | NonPublic;
-
+		public static readonly Flags AnyVisibility = Public | NonPublic;
         /// <summary>
-        /// Search criteria encompassing all public and non-public instance members.
+        /// Search criteria encompassing all public and non-public instance members, including base members.
         /// </summary>
-        public static readonly Flags InstanceCriteria = DefaultCriteria | Instance;
-
+		public static readonly Flags InstanceAnyVisibility = AnyVisibility | Instance;
         /// <summary>
-        /// Search criteria encompassing all public and non-public static members, including those of parent classes.
+        /// Search criteria encompassing all public and non-public static members, including base members.
         /// </summary>
-        public static readonly Flags StaticCriteria = DefaultCriteria | Static;
-
+		public static readonly Flags StaticAnyVisibility = AnyVisibility | Static;
         /// <summary>
-        /// Search criteria encompassing all members, including those of parent classes.
+        /// Search criteria encompassing all public and non-public instance members, excluding base members.
         /// </summary>
-        public static readonly Flags AllCriteria = InstanceCriteria | StaticCriteria;
+		public static readonly Flags InstanceAnyDeclaredOnly = InstanceAnyVisibility | DeclaredOnly;
+        /// <summary>
+        /// Search criteria encompassing all public and non-public static members, excluding base members.
+        /// </summary>
+		public static readonly Flags StaticAnyDeclaredOnly = StaticAnyVisibility | DeclaredOnly;
+        /// <summary>
+        /// Search criteria encompassing all members, including base members.
+        /// </summary>
+		public static readonly Flags StaticInstanceAnyVisibility = InstanceAnyVisibility | Static;
 		#endregion
 		#endregion
 

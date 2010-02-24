@@ -54,7 +54,7 @@ namespace FasterflectTest.Invocation
         {
             RunWith( ( Type type ) =>
                {
-                   var fieldInfo = type.Field( "totalPeopleCreated", Flags.StaticCriteria );
+                   var fieldInfo = type.Field( "totalPeopleCreated", Flags.StaticAnyVisibility );
                    var totalPeopleCreated = (int) fieldInfo.Get() + 1;
                    fieldInfo.Set( totalPeopleCreated );
                    VerifyFields( type, new { totalPeopleCreated } );

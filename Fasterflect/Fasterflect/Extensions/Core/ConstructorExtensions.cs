@@ -119,7 +119,7 @@ namespace Fasterflect
         /// </summary>
         public static ConstructorInvoker DelegateForCreateInstance( this Type targetType, params Type[] parameterTypes )
         {
-            return DelegateForCreateInstance( targetType, Flags.AllInstance, parameterTypes );
+            return DelegateForCreateInstance( targetType, Flags.InstanceAnyVisibility, parameterTypes );
         }
 
         /// <summary>
@@ -138,8 +138,7 @@ namespace Fasterflect
         public static ConstructorInvoker DelegateForCreateInstance( this Type targetType, Flags bindingFlags,
                                                                     params Type[] parameterTypes )
         {
-            return
-                (ConstructorInvoker) new CtorInvocationEmitter( targetType, bindingFlags, parameterTypes ).GetDelegate();
+            return (ConstructorInvoker) new CtorInvocationEmitter( targetType, bindingFlags, parameterTypes ).GetDelegate();
         }
         #endregion
 
@@ -241,7 +240,7 @@ namespace Fasterflect
         /// <returns>The matching constructor or null if no match was found.</returns>
         public static ConstructorInfo Constructor( this Type type, params Type[] parameterTypes )
         {
-            return type.Constructor( Flags.InstanceCriteria, parameterTypes );
+            return type.Constructor( Flags.InstanceAnyVisibility, parameterTypes );
         }
 
         /// <summary>
@@ -266,7 +265,7 @@ namespace Fasterflect
         /// <returns>A list of matching constructors. This value will never be null.</returns>
         public static IList<ConstructorInfo> Constructors( this Type type )
         {
-            return type.Constructors( Flags.InstanceCriteria );
+            return type.Constructors( Flags.InstanceAnyVisibility );
         }
 
         /// <summary>

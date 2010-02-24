@@ -117,7 +117,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberSetter DelegateForSetStaticFieldValue( this Type targetType, string fieldName )
         {
-            return DelegateForSetStaticFieldValue( targetType, fieldName, Flags.AllStatic );
+            return DelegateForSetStaticFieldValue( targetType, fieldName, Flags.StaticAnyVisibility );
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberSetter DelegateForSetFieldValue( this Type targetType, string fieldName )
         {
-            return DelegateForSetFieldValue( targetType, fieldName, Flags.AllInstance );
+            return DelegateForSetFieldValue( targetType, fieldName, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberGetter DelegateForGetStaticFieldValue( this Type targetType, string fieldName )
         {
-            return DelegateForGetStaticFieldValue( targetType, fieldName, Flags.AllStatic );
+            return DelegateForGetStaticFieldValue( targetType, fieldName, Flags.StaticAnyVisibility );
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberGetter DelegateForGetFieldValue( this Type targetType, string fieldName )
         {
-            return DelegateForGetFieldValue( targetType, fieldName, Flags.AllInstance );
+            return DelegateForGetFieldValue( targetType, fieldName, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
@@ -154,8 +154,7 @@ namespace Fasterflect
         public static StaticMemberSetter DelegateForSetStaticFieldValue( this Type targetType, string fieldName,
                                                                          Flags bindingFlags )
         {
-            return
-                (StaticMemberSetter)
+            return (StaticMemberSetter)
                 new MemberSetEmitter( targetType, bindingFlags, MemberTypes.Field, fieldName ).GetDelegate();
         }
 
@@ -165,8 +164,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberSetter DelegateForSetFieldValue( this Type targetType, string fieldName, Flags bindingFlags )
         {
-            return
-                (MemberSetter)
+            return (MemberSetter)
                 new MemberSetEmitter( targetType, bindingFlags, MemberTypes.Field, fieldName ).GetDelegate();
         }
 
@@ -188,8 +186,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberGetter DelegateForGetFieldValue( this Type targetType, string fieldName, Flags bindingFlags )
         {
-            return
-                (MemberGetter)
+            return (MemberGetter)
                 new MemberGetEmitter( targetType, bindingFlags, MemberTypes.Field, fieldName ).GetDelegate();
         }
         #endregion
@@ -269,7 +266,7 @@ namespace Fasterflect
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
         public static FieldInfo Field( this Type type, string name )
         {
-            return type.Field( name, Flags.InstanceCriteria );
+            return type.Field( name, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
@@ -313,7 +310,7 @@ namespace Fasterflect
         /// <returns>A list of all instance fields on the type. This value will never be null.</returns>
         public static IList<FieldInfo> Fields( this Type type )
         {
-            return type.Fields( Flags.InstanceCriteria );
+            return type.Fields( Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
@@ -373,7 +370,7 @@ namespace Fasterflect
         #region TryGetValue
         public static object TryGetFieldValue( this object source, string name )
         {
-            return TryGetFieldValue( source, name, Flags.InstanceCriteria );
+            return TryGetFieldValue( source, name, Flags.InstanceAnyVisibility );
         }
 
         public static object TryGetFieldValue( this object source, string name, Flags bindingFlags )
@@ -387,7 +384,7 @@ namespace Fasterflect
         #region TrySetValue
         public static bool TrySetFieldValue( this object source, string name, object value )
         {
-            return TrySetFieldValue( source, name, value, Flags.InstanceCriteria );
+            return TrySetFieldValue( source, name, value, Flags.InstanceAnyVisibility );
         }
 
         public static bool TrySetFieldValue( this object source, string name, object value, Flags bindingFlags )

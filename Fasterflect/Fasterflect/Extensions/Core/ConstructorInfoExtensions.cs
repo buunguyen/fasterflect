@@ -45,7 +45,7 @@ namespace Fasterflect
         /// </summary>
         public static ConstructorInvoker DelegateForCreateInstance( this ConstructorInfo ctorInfo )
         {
-            return (ConstructorInvoker) new CtorInvocationEmitter( ctorInfo, Flags.AllInstance ).GetDelegate();
+            return (ConstructorInvoker) new CtorInvocationEmitter( ctorInfo, Flags.InstanceAnyVisibility ).GetDelegate();
         }
     }
 }

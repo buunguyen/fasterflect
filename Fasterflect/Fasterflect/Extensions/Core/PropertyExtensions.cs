@@ -115,7 +115,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberSetter DelegateForSetStaticPropertyValue( this Type targetType, string propertyName )
         {
-            return DelegateForSetStaticPropertyValue( targetType, propertyName, Flags.AllStatic );
+            return DelegateForSetStaticPropertyValue( targetType, propertyName, Flags.StaticAnyVisibility );
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberSetter DelegateForSetPropertyValue( this Type targetType, string propertyName )
         {
-            return DelegateForSetPropertyValue( targetType, propertyName, Flags.AllInstance );
+            return DelegateForSetPropertyValue( targetType, propertyName, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMemberGetter DelegateForGetStaticPropertyValue( this Type targetType, string propertyName )
         {
-            return DelegateForGetStaticPropertyValue( targetType, propertyName, Flags.AllStatic );
+            return DelegateForGetStaticPropertyValue( targetType, propertyName, Flags.StaticAnyVisibility );
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberGetter DelegateForGetPropertyValue( this Type targetType, string propertyName )
         {
-            return DelegateForGetPropertyValue( targetType, propertyName, Flags.AllInstance );
+            return DelegateForGetPropertyValue( targetType, propertyName, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
@@ -152,8 +152,7 @@ namespace Fasterflect
         public static StaticMemberSetter DelegateForSetStaticPropertyValue( this Type targetType, string propertyName,
                                                                             Flags bindingFlags )
         {
-            return
-                (StaticMemberSetter)
+            return (StaticMemberSetter)
                 new MemberSetEmitter( targetType, bindingFlags, MemberTypes.Property, propertyName ).GetDelegate();
         }
 
@@ -164,8 +163,7 @@ namespace Fasterflect
         public static MemberSetter DelegateForSetPropertyValue( this Type targetType, string propertyName,
                                                                 Flags bindingFlags )
         {
-            return
-                (MemberSetter)
+            return (MemberSetter)
                 new MemberSetEmitter( targetType, bindingFlags, MemberTypes.Property, propertyName ).GetDelegate();
         }
 
@@ -176,8 +174,7 @@ namespace Fasterflect
         public static StaticMemberGetter DelegateForGetStaticPropertyValue( this Type targetType, string propertyName,
                                                                             Flags bindingFlags )
         {
-            return
-                (StaticMemberGetter)
+            return (StaticMemberGetter)
                 new MemberGetEmitter( targetType, bindingFlags, MemberTypes.Property, propertyName ).GetDelegate();
         }
 
@@ -188,8 +185,7 @@ namespace Fasterflect
         public static MemberGetter DelegateForGetPropertyValue( this Type targetType, string propertyName,
                                                                 Flags bindingFlags )
         {
-            return
-                (MemberGetter)
+            return (MemberGetter)
                 new MemberGetEmitter( targetType, bindingFlags, MemberTypes.Property, propertyName ).GetDelegate();
         }
         #endregion
@@ -421,7 +417,7 @@ namespace Fasterflect
         /// </example>
         public static MethodInvoker DelegateForSetIndexer( this Type targetType, params Type[] parameterTypes )
         {
-            return DelegateForSetIndexer( targetType, Flags.AllInstance, parameterTypes );
+            return DelegateForSetIndexer( targetType, Flags.InstanceAnyVisibility, parameterTypes );
         }
 
         /// <summary>
@@ -432,7 +428,7 @@ namespace Fasterflect
         /// <returns>The delegate which can get the value of an indexer.</returns>
         public static MethodInvoker DelegateForGetIndexer( this Type targetType, params Type[] parameterTypes )
         {
-            return DelegateForGetIndexer( targetType, Flags.AllInstance, parameterTypes );
+            return DelegateForGetIndexer( targetType, Flags.InstanceAnyVisibility, parameterTypes );
         }
 
         /// <summary>
@@ -453,8 +449,7 @@ namespace Fasterflect
         public static MethodInvoker DelegateForSetIndexer( this Type targetType, Flags bindingFlags,
                                                            params Type[] parameterTypes )
         {
-            return
-                (MethodInvoker)
+            return (MethodInvoker)
                 new MethodInvocationEmitter( targetType, bindingFlags, Constants.IndexerSetterName, parameterTypes ).
                     GetDelegate();
         }
@@ -469,8 +464,7 @@ namespace Fasterflect
         public static MethodInvoker DelegateForGetIndexer( this Type targetType, Flags bindingFlags,
                                                            params Type[] parameterTypes )
         {
-            return
-                (MethodInvoker)
+            return (MethodInvoker)
                 new MethodInvocationEmitter( targetType, bindingFlags, Constants.IndexerGetterName, parameterTypes ).
                     GetDelegate();
         }
@@ -485,7 +479,7 @@ namespace Fasterflect
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
         public static PropertyInfo Property( this Type type, string name )
         {
-            return type.Property( name, Flags.InstanceCriteria );
+            return type.Property( name, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
@@ -528,7 +522,7 @@ namespace Fasterflect
         /// <returns>A list of all instance properties on the type. This value will never be null.</returns>
         public static IList<PropertyInfo> Properties( this Type type )
         {
-            return type.Properties( Flags.InstanceCriteria );
+            return type.Properties( Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
@@ -544,7 +538,7 @@ namespace Fasterflect
         /// This value will never be null.</returns>
         public static IList<PropertyInfo> Properties( this Type type, params string[] names )
         {
-            return type.Properties( Flags.InstanceCriteria, names );
+            return type.Properties( Flags.InstanceAnyVisibility, names );
         }
 
         /// <summary>
@@ -631,7 +625,7 @@ namespace Fasterflect
         #region TryGetValue
         public static object TryGetPropertyValue( this object source, string name )
         {
-            return TryGetPropertyValue( source, name, Flags.InstanceCriteria );
+            return TryGetPropertyValue( source, name, Flags.InstanceAnyVisibility );
         }
 
         public static object TryGetPropertyValue( this object source, string name, Flags bindingFlags )
@@ -645,7 +639,7 @@ namespace Fasterflect
         #region TrySetValue
         public static bool TrySetPropertyValue( this object source, string name, object value )
         {
-            return TrySetPropertyValue( source, name, value, Flags.InstanceCriteria );
+            return TrySetPropertyValue( source, name, value, Flags.InstanceAnyVisibility );
         }
 
         public static bool TrySetPropertyValue( this object source, string name, object value, Flags bindingFlags )

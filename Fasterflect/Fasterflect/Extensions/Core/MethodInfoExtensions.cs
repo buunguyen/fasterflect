@@ -73,7 +73,7 @@ namespace Fasterflect
         /// </summary>
         public static StaticMethodInvoker DelegateForStaticInvoke( this MethodInfo methodInfo )
         {
-            return (StaticMethodInvoker) new MethodInvocationEmitter( methodInfo, Flags.AllStatic ).GetDelegate();
+            return (StaticMethodInvoker) new MethodInvocationEmitter( methodInfo, Flags.StaticAnyVisibility ).GetDelegate();
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Fasterflect
         /// </summary>
         public static MethodInvoker DelegateForInvoke( this MethodInfo methodInfo )
         {
-            return (MethodInvoker) new MethodInvocationEmitter( methodInfo, Flags.AllInstance ).GetDelegate();
+            return (MethodInvoker) new MethodInvocationEmitter( methodInfo, Flags.InstanceAnyVisibility ).GetDelegate();
         }
         #endregion
 

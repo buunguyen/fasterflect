@@ -32,7 +32,7 @@ namespace FasterflectTest.Invocation
         {
             RunWith((Type type) =>
                {
-                   var memberInfo = type.Member("TotalPeopleCreated", Flags.StaticCriteria);
+                   var memberInfo = type.Member("TotalPeopleCreated", Flags.StaticAnyVisibility);
                    var totalPeopleCreated = (int)memberInfo.Get() + 1;
                    memberInfo.Set(totalPeopleCreated);
                    VerifyProperties(type, new { totalPeopleCreated });

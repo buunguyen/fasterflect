@@ -47,7 +47,7 @@ namespace Fasterflect
         private static T DeepClone<T>( this T source, Dictionary<object, object> map ) where T : class, new()
         {
             Type type = source.GetType();
-            IList<FieldInfo> fields = type.Fields( Flags.AllCriteria );
+            IList<FieldInfo> fields = type.Fields( Flags.StaticInstanceAnyVisibility );
             var clone = type.CreateInstance() as T;
             map = map ?? new Dictionary<object, object>();
             map[ source ] = clone;
@@ -81,7 +81,7 @@ namespace Fasterflect
         /// </summary>
         public static void CopyFields( this object source, object target )
         {
-            source.CopyFields( target, Flags.InstanceCriteria );
+            source.CopyFields( target, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
@@ -95,8 +95,7 @@ namespace Fasterflect
             {
                 throw new ArgumentException( "Unable to copy to or from null instance." );
             }
-            var copier =
-                (MemberCopier)
+            var copier = (MemberCopier)
                 new CloneEmitter( source.GetType(), target.GetType(), bindingFlags, MemberTypes.Field ).GetDelegate();
             copier( source, target );
         }
@@ -110,7 +109,7 @@ namespace Fasterflect
         /// </summary>
         public static void CopyProperties( this object source, object target )
         {
-            source.CopyProperties( target, Flags.InstanceCriteria );
+            source.CopyProperties( target, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
@@ -124,8 +123,7 @@ namespace Fasterflect
             {
                 throw new ArgumentException( "Unable to copy to or from null instance." );
             }
-            var copier =
-                (MemberCopier)
+            var copier = (MemberCopier)
                 new CloneEmitter( source.GetType(), target.GetType(), bindingFlags, MemberTypes.Property ).GetDelegate();
             copier( source, target );
         }

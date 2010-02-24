@@ -123,7 +123,7 @@ namespace FasterflectBenchmark
 			stringList.ForEach( s => stringCache.Insert( s, s, CacheStrategy.Permanent ) );
 			
 			string key = stringList[ index ];
-			var callInfo = new CallInfo( TargetType, Flags.AllInstance, MemberTypes.Field, "name", Constants.ArrayOfObjectType, null );
+			var callInfo = new CallInfo( TargetType, Flags.InstanceAnyVisibility, MemberTypes.Field, "name", Constants.ArrayOfObjectType, null );
 
 			var initMap = new Dictionary<string, Action> {};
 			var actionMap = new Dictionary<string, Action>
@@ -140,8 +140,8 @@ namespace FasterflectBenchmark
 
 		private static void RunHashCodeBenchmark()
 		{
-			var callInfo = new CallInfo( TargetType, Flags.AllInstance, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, null );
-            var callInfoOther = new CallInfo(typeof(CallInfo), Flags.AllInstance, MemberTypes.Field, "other", new[] { typeof(string) }, null);
+			var callInfo = new CallInfo( TargetType, Flags.InstanceAnyVisibility, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, null );
+            var callInfoOther = new CallInfo(typeof(CallInfo), Flags.InstanceAnyVisibility, MemberTypes.Field, "other", new[] { typeof(string) }, null);
 			var sourceInfo = new SourceInfo( new { ID=42, Name="Test" }.GetType() );
 			var sourceInfoOther = new SourceInfo( new { id=42, Name="Test" }.GetType() );
 
@@ -154,7 +154,7 @@ namespace FasterflectBenchmark
 			                		{"SourceInfo Equals Other", () => sourceInfo.Equals( sourceInfoOther ) },
 			                		{"string GetHashCode", () => "foo".GetHashCode() },
 			                		{"string Equals", () => "foo".Equals( "bar" ) },
-									{"new CallInfo", () => new CallInfo(TargetType, Flags.AllInstance, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, null) },
+									{"new CallInfo", () => new CallInfo(TargetType, Flags.InstanceAnyVisibility, MemberTypes.Field, "name", new [] { typeof(int), typeof(string) }, null) },
 									{"new SourceInfo", () => new SourceInfo( TargetType, new [] { "ID", "Name" }, new [] { typeof(int), typeof(string) } ) },
 									{"new SourceInfo anon", () => new SourceInfo( new { ID=42, Name="Test" }.GetType() ) },
 			                	};
