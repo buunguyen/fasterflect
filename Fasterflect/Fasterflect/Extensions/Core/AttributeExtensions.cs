@@ -173,30 +173,6 @@ namespace Fasterflect
         }
         #endregion
 
-        #region TypesWith Lookup
-        /// <summary>
-        /// Gets all types in the given <paramref name="assembly"/> that are decorated with an
-        /// <see href="Attribute"/> of the given <paramref name="attributeType"/>.
-        /// </summary>
-        /// <returns>A list of all matching types. This value will never be null.</returns>
-        public static IList<Type> TypesWith( this Assembly assembly, Type attributeType )
-        {
-            var query = from t in assembly.GetTypes()
-                        where t.HasAttribute( attributeType )
-                        select t;
-            return query.ToList();
-        }
-
-        /// <summary>
-        /// Gets all types in the given <paramref name="assembly"/> that are decorated with an
-        /// <see href="Attribute"/> of the given type <typeparamref name="T"/>.
-        /// </summary>
-        /// <returns>A list of all matching types. This value will never be null.</returns>
-        public static IList<Type> TypesWith<T>( this Assembly assembly ) where T : Attribute
-        {
-            return assembly.TypesWith( typeof(T) );
-        }
-        #endregion
 
         #region MembersWith Lookup
         /// <summary>

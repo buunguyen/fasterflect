@@ -32,24 +32,28 @@ namespace Fasterflect
     public static class AssemblyExtensions
     {
         #region Types
-		/// <summary>
-		/// Find all types in the given <paramref name="assembly"/>.
-		/// </summary>
-		/// <param name="assembly">The assembly in which to look for types.</param>
-		/// <returns>A list of all matching types. This method never returns null.</returns>
-        public static IList<Type> Types( this Assembly assembly )
+        /// <summary>
+        /// Find all types in the given <paramref name="assembly"/> matching the optional list 
+        /// <paramref name="names"/>.
+        /// </summary>
+        /// <param name="assembly">The assembly in which to look for types.</param>
+        /// <param name="names">An optional list of names against which to filter the result.  If this is
+        /// <c>null</c> or left empty, all types are returned.</param>
+        /// <returns>A list of all matching types. This method never returns null.</returns>
+        public static IList<Type> Types(this Assembly assembly, params string[] names)
         {
-            return assembly.Types( Flags.None, null );
+            return assembly.Types(Flags.None, names);
         }
 
 		/// <summary>
 		/// Find all types in the given <paramref name="assembly"/> matching the specified
-		/// <paramref name="bindingFlags"/> and <paramref name="names"/>.
+		/// <paramref name="bindingFlags"/> and the optional list <paramref name="names"/>.
 		/// </summary>
 		/// <param name="assembly">The assembly in which to look for types.</param>
 		/// <param name="bindingFlags">The <see cref="BindingFlags"/> used to filter the result. Only
-		/// the Flags.PartialNameMatch option will filter the result set. </param>
-		/// <param name="names">An optional list of names against which to filter the result.</param>
+        /// the Flags.PartialNameMatch option will filter the result set. </param>
+        /// <param name="names">An optional list of names against which to filter the result.  If this is
+        /// <c>null</c> or left empty, all types are returned.</param>
 		/// <returns>A list of all matching types. This method never returns null.</returns>
 		public static IList<Type> Types( this Assembly assembly, Flags bindingFlags, params string[] names )
         {
@@ -59,6 +63,31 @@ namespace Fasterflect
 			bool partialNameMatch = bindingFlags.IsSet( Flags.PartialNameMatch );
 
 			return hasNames ? types.Where( t => names.Any( n => partialNameMatch ? t.Name.Contains( n ) : t.Name == n ) ).ToArray() : types;
+        }
+        #endregion
+
+        #region TypesWith Lookup
+        /// <summary>
+        /// Gets all types in the given <paramref name="assembly"/> that are decorated with an
+        /// <see href="Attribute"/> of the given <paramref name="attributeType"/>.
+        /// </summary>
+        /// <returns>A list of all matching types. This value will never be null.</returns>
+        public static IList<Type> TypesWith(this Assembly assembly, Type attributeType)
+        {
+            var query = from t in assembly.GetTypes()
+                        where t.HasAttribute(attributeType)
+                        select t;
+            return query.ToArray();
+        }
+
+        /// <summary>
+        /// Gets all types in the given <paramref name="assembly"/> that are decorated with an
+        /// <see href="Attribute"/> of the given type <typeparamref name="T"/>.
+        /// </summary>
+        /// <returns>A list of all matching types. This value will never be null.</returns>
+        public static IList<Type> TypesWith<T>(this Assembly assembly) where T : Attribute
+        {
+            return assembly.TypesWith(typeof(T));
         }
         #endregion
     }
