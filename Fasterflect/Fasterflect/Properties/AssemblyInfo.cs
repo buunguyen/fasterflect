@@ -2,18 +2,17 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Security;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
 [assembly: AssemblyTitle("Fasterflect")]
-[assembly: AssemblyDescription("Fast & Simple Reflection Invocation Library")]
+[assembly: AssemblyDescription("Fast & Simple .NET Reflection Library")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Buu Nguyen")]
+[assembly: AssemblyCompany("Buu Nguyen & Morten Mertner")]
 [assembly: AssemblyProduct("Fasterflect")]
-[assembly: AssemblyCopyright("Copyright © Buu Nguyen 2009")]
+[assembly: AssemblyCopyright("Copyright © Buu Nguyen & Morten Mertner 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
@@ -39,8 +38,8 @@ using System.Security;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("1.1.*")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("2.0.*")]
+[assembly: AssemblyFileVersion("2.0.0.0")]
 [assembly: InternalsVisibleTo("FasterflectBenchmark")]
 [assembly: InternalsVisibleTo("FasterflectSample")]
 [assembly: InternalsVisibleTo("FasterflectTest")]
