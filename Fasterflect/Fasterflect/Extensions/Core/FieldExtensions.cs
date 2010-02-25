@@ -412,7 +412,7 @@ namespace Fasterflect
         {
             try
             {
-                source.SetFieldValue(name, bindingFlags);
+                source.SetFieldValue(name, bindingFlags, value );
                 return true;
             }
             catch( MissingFieldException )

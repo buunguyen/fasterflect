@@ -52,10 +52,10 @@ namespace Fasterflect
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this MethodInfo methodInfo, object target )
-        {
-            return methodInfo.DelegateForInvoke()( target );
-        }
+        //public static object Invoke( this MethodInfo methodInfo, object target )
+        //{
+        //    return methodInfo.DelegateForInvoke()( target );
+        //}
 
         /// <summary>
         /// Invokes the instance method identified by <paramref name="methodInfo"/> on the object

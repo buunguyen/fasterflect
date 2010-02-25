@@ -578,7 +578,7 @@ namespace Fasterflect
 
             if( ! recurse && ! hasNames && ! hasSpecialFlags )
             {
-                return type.GetProperties( bindingFlags ) ?? new PropertyInfo[0];
+                return type.GetProperties( bindingFlags ) ?? Constants.EmptyPropertyInfoArray;
             }
 
             var properties = GetProperties( type, bindingFlags );
@@ -593,7 +593,7 @@ namespace Fasterflect
 
             if( ! recurse )
             {
-                return type.GetProperties( bindingFlags ) ?? new PropertyInfo[0];
+                return type.GetProperties( bindingFlags ) ?? Constants.EmptyPropertyInfoArray;
             }
 
             bindingFlags |= Flags.DeclaredOnly;
@@ -669,7 +669,7 @@ namespace Fasterflect
         {
             try
             {
-                source.SetPropertyValue( name, bindingFlags );
+                source.SetPropertyValue( name, bindingFlags, value );
                 return true;
             }
             catch (MissingMemberException)
