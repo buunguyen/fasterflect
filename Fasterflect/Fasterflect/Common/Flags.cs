@@ -1,5 +1,4 @@
 ﻿#region License
-
 // Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,7 +14,6 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System;
@@ -26,57 +24,58 @@ using System.Text;
 
 namespace Fasterflect
 {
-	/// <summary>
-	/// This class encapsulates common <see cref="BindingFlags"/> combinations and provides various
-	/// additional Fasterflect-specific flags to further tailor the lookup experience.
-	/// </summary>
-	public struct Flags
-	{
-		private readonly long flags;
-		private static readonly Dictionary<Flags,string> flagNames = new Dictionary<Flags, string>( 64 );
+    /// <summary>
+    /// This class encapsulates common <see cref="BindingFlags"/> combinations and provides various
+    /// additional Fasterflect-specific flags to further tailor the lookup experience.
+    /// </summary>
+    public struct Flags
+    {
+        private readonly long flags;
+        private static readonly Dictionary<Flags, string> flagNames = new Dictionary<Flags, string>( 64 );
 
-		#region Constructors
-		private Flags( long flags )
-		{
-			this.flags = flags;
-		}
+        #region Constructors
+        private Flags( long flags )
+        {
+            this.flags = flags;
+        }
 
-		static Flags()
-		{
-			foreach( BindingFlags flag in Enum.GetValues( typeof(BindingFlags) ) )
-			{
-				flagNames[ new Flags( (long) flag ) ] = flag.ToString();
-			}
-			flagNames[ PartialNameMatch ] = "PartialNameMatch"; // new Flags( 1L << 32 );
-	        flagNames[ TrimExplicitlyImplemented ] = "TrimExplicitlyImplemented"; // new Flags( 1L << 33 );
-	        flagNames[ ExcludeExplicitlyImplemented ] = "ExcludeExplicitlyImplemented"; // = new Flags( 1L << 34 );
-	        flagNames[ ExcludeBackingMembers ] = "ExcludeBackingMembers"; // = new Flags( 1L << 35 );
+        static Flags()
+        {
+            foreach( BindingFlags flag in Enum.GetValues( typeof(BindingFlags) ) )
+            {
+                flagNames[ new Flags( (long) flag ) ] = flag.ToString();
+            }
+            flagNames[ PartialNameMatch ] = "PartialNameMatch"; // new Flags( 1L << 32 );
+            flagNames[ TrimExplicitlyImplemented ] = "TrimExplicitlyImplemented"; // new Flags( 1L << 33 );
+            flagNames[ ExcludeExplicitlyImplemented ] = "ExcludeExplicitlyImplemented"; // = new Flags( 1L << 34 );
+            flagNames[ ExcludeBackingMembers ] = "ExcludeBackingMembers"; // = new Flags( 1L << 35 );
 
-			// not yet supported:
-			//flagNames[ VisibilityMatch ] = "VisibilityMatch"; // = new Flags( 1L << 55 );
-			//flagNames[ Private ] = "Private"; //   = new Flags( 1L << 56 );
-			//flagNames[ Protected ] = "Protected"; // = new Flags( 1L << 57 );
-			//flagNames[ Internal ] = "Internal"; //  = new Flags( 1L << 58 );
+            // not yet supported:
+            //flagNames[ VisibilityMatch ] = "VisibilityMatch"; // = new Flags( 1L << 55 );
+            //flagNames[ Private ] = "Private"; //   = new Flags( 1L << 56 );
+            //flagNames[ Protected ] = "Protected"; // = new Flags( 1L << 57 );
+            //flagNames[ Internal ] = "Internal"; //  = new Flags( 1L << 58 );
 
-			//flagNames[ ModifierMatch ] = "ModifierMatch"; // = new Flags( 1L << 59 );
-			//flagNames[ Abstract ] = "Abstract"; //  = new Flags( 1L << 60 );
-			//flagNames[ Virtual ] = "Virtual"; //   = new Flags( 1L << 61 );
-			//flagNames[ Override ] = "Override"; //  = new Flags( 1L << 62 );
-			//flagNames[ New ] = "New"; //      = new Flags( 1L << 63 );
-		}
-		#endregion
+            //flagNames[ ModifierMatch ] = "ModifierMatch"; // = new Flags( 1L << 59 );
+            //flagNames[ Abstract ] = "Abstract"; //  = new Flags( 1L << 60 );
+            //flagNames[ Virtual ] = "Virtual"; //   = new Flags( 1L << 61 );
+            //flagNames[ Override ] = "Override"; //  = new Flags( 1L << 62 );
+            //flagNames[ New ] = "New"; //      = new Flags( 1L << 63 );
+        }
+        #endregion
 
-		#region Flags Selectors
-		#region BindingFlags
-		public static readonly Flags None = new Flags( (long)BindingFlags.Default );
-        public static readonly Flags IgnoreCase = new Flags((long)BindingFlags.IgnoreCase);
-        public static readonly Flags DeclaredOnly = new Flags((long)BindingFlags.DeclaredOnly);
-        public static readonly Flags ExactBinding = new Flags((long)BindingFlags.ExactBinding);
-        public static readonly Flags Public = new Flags((long)BindingFlags.Public);
-        public static readonly Flags NonPublic = new Flags((long)BindingFlags.NonPublic);
-        public static readonly Flags Instance = new Flags((long)BindingFlags.Instance);
-        public static readonly Flags Static = new Flags((long)BindingFlags.Static);
-		#endregion
+        #region Flags Selectors
+
+        #region BindingFlags
+        public static readonly Flags None = new Flags( (long) BindingFlags.Default );
+        public static readonly Flags IgnoreCase = new Flags( (long) BindingFlags.IgnoreCase );
+        public static readonly Flags DeclaredOnly = new Flags( (long) BindingFlags.DeclaredOnly );
+        public static readonly Flags ExactBinding = new Flags( (long) BindingFlags.ExactBinding );
+        public static readonly Flags Public = new Flags( (long) BindingFlags.Public );
+        public static readonly Flags NonPublic = new Flags( (long) BindingFlags.NonPublic );
+        public static readonly Flags Instance = new Flags( (long) BindingFlags.Instance );
+        public static readonly Flags Static = new Flags( (long) BindingFlags.Static );
+        #endregion
 
         #region FasterflectFlags
         /// <summary>
@@ -87,17 +86,20 @@ namespace Fasterflect
         /// uses <see href="StringComparison.InvariantCulture"/>.
         /// </summary>
         public static readonly Flags PartialNameMatch = new Flags( 1L << 32 );
+
         /// <summary>
         /// If this option is specified the search for a named member will strip off the namespace and
         /// interface name from explicitly implemented interface members before applying any comparison
         /// operations.
         /// </summary>
         public static readonly Flags TrimExplicitlyImplemented = new Flags( 1L << 33 );
+
         /// <summary>
         /// If this option is specified the search for members will exclude explicitly implemented
         /// interface members.
         /// </summary>
         public static readonly Flags ExcludeExplicitlyImplemented = new Flags( 1L << 34 );
+
         /// <summary>
         /// If this option is specified all members that are backers for another member, such as backing
         /// fields for automatic properties or get/set methods for properties, will be excluded from the 
@@ -105,170 +107,188 @@ namespace Fasterflect
         /// </summary>
         public static readonly Flags ExcludeBackingMembers = new Flags( 1L << 35 );
 
-		#region For The Future
-		///// <summary>
-		///// If this option is specified only members with one (or more) of the specified visibility 
-		///// flags will be included in the result.
-		///// </summary>
-		//public static readonly Flags VisibilityMatch = new Flags( 1L << 55 );
-		///// <summary>
-		///// Visibility flags
-		///// </summary>
-		//public static readonly Flags Private   = new Flags( 1L << 56 );
-		//public static readonly Flags Protected = new Flags( 1L << 57 );
-		//public static readonly Flags Internal  = new Flags( 1L << 58 );
+        #region For The Future
+        ///// <summary>
+        ///// If this option is specified only members with one (or more) of the specified visibility 
+        ///// flags will be included in the result.
+        ///// </summary>
+        //public static readonly Flags VisibilityMatch = new Flags( 1L << 55 );
+        ///// <summary>
+        ///// Visibility flags
+        ///// </summary>
+        //public static readonly Flags Private   = new Flags( 1L << 56 );
+        //public static readonly Flags Protected = new Flags( 1L << 57 );
+        //public static readonly Flags Internal  = new Flags( 1L << 58 );
 
-		///// <summary>
-		///// If this option is specified only members with one (or more) of the specified modifier 
-		///// flags will be included in the result.
-		///// </summary>
-		//public static readonly Flags ModifierMatch = new Flags( 1L << 59 );
-		///// <summary>
-		///// Modifier flags
-		///// </summary>
-		//public static readonly Flags Abstract  = new Flags( 1L << 60 );
-		//public static readonly Flags Virtual   = new Flags( 1L << 61 );
-		//public static readonly Flags Override  = new Flags( 1L << 62 );
-		//public static readonly Flags New       = new Flags( 1L << 63 );
- 		#endregion
- 		#endregion
+        ///// <summary>
+        ///// If this option is specified only members with one (or more) of the specified modifier 
+        ///// flags will be included in the result.
+        ///// </summary>
+        //public static readonly Flags ModifierMatch = new Flags( 1L << 59 );
+        ///// <summary>
+        ///// Modifier flags
+        ///// </summary>
+        //public static readonly Flags Abstract  = new Flags( 1L << 60 );
+        //public static readonly Flags Virtual   = new Flags( 1L << 61 );
+        //public static readonly Flags Override  = new Flags( 1L << 62 );
+        //public static readonly Flags New       = new Flags( 1L << 63 );
+        #endregion
 
-		#region Common Selections
-		/// <summary>
+        #endregion
+
+        #region Common Selections
+        /// <summary>
         /// Search criteria encompassing all public and non-public members, including base members.
         /// </summary>
-		public static readonly Flags AnyVisibility = Public | NonPublic;
+        public static readonly Flags AnyVisibility = Public | NonPublic;
+
         /// <summary>
         /// Search criteria encompassing all public and non-public instance members, including base members.
         /// </summary>
-		public static readonly Flags InstanceAnyVisibility = AnyVisibility | Instance;
+        public static readonly Flags InstanceAnyVisibility = AnyVisibility | Instance;
+
         /// <summary>
         /// Search criteria encompassing all public and non-public static members, including base members.
         /// </summary>
-		public static readonly Flags StaticAnyVisibility = AnyVisibility | Static;
+        public static readonly Flags StaticAnyVisibility = AnyVisibility | Static;
+
         /// <summary>
         /// Search criteria encompassing all public and non-public instance members, excluding base members.
         /// </summary>
-		public static readonly Flags InstanceAnyDeclaredOnly = InstanceAnyVisibility | DeclaredOnly;
+        public static readonly Flags InstanceAnyDeclaredOnly = InstanceAnyVisibility | DeclaredOnly;
+
         /// <summary>
         /// Search criteria encompassing all public and non-public static members, excluding base members.
         /// </summary>
-		public static readonly Flags StaticAnyDeclaredOnly = StaticAnyVisibility | DeclaredOnly;
+        public static readonly Flags StaticAnyDeclaredOnly = StaticAnyVisibility | DeclaredOnly;
+
         /// <summary>
         /// Search criteria encompassing all members, including base members.
         /// </summary>
-		public static readonly Flags StaticInstanceAnyVisibility = InstanceAnyVisibility | Static;
-		#endregion
-		#endregion
+        public static readonly Flags StaticInstanceAnyVisibility = InstanceAnyVisibility | Static;
+        #endregion
 
-		#region Helper Methods
-		public bool IsSet( BindingFlags mask )
-		{
-			return ((BindingFlags)flags & mask) == mask;
-		}
-		public bool IsSet( Flags mask )
-		{
-			return (flags & mask) == mask;
-		}
-		public bool IsAnySet( BindingFlags mask )
-		{
-			return ((BindingFlags)flags & mask) != 0;
-		}
-		public bool IsAnySet( Flags mask )
-		{
-			return (flags & mask) != 0;
-		}
-		public bool IsNotSet( BindingFlags mask )
-		{
-			return ((BindingFlags)flags & mask) == 0;
-		}
-		public bool IsNotSet( Flags mask )
-		{
-			return (flags & mask) == 0;
-		}
+        #endregion
 
-		public static Flags SetIf( Flags flags, Flags mask, bool condition )
-		{
-			return condition ? flags | mask : flags;
-		}
-		public static Flags SetOnlyIf( Flags flags, Flags mask, bool condition )
-		{
-			return condition ? flags | mask : (Flags)(flags & ~mask);
-		}
-		public static Flags ClearIf( Flags flags, Flags mask, bool condition )
-		{
-			return condition ? (Flags)(flags & ~mask) : flags;
-		}
-		#endregion
+        #region Helper Methods
+        public bool IsSet( BindingFlags mask )
+        {
+            return ((BindingFlags) flags & mask) == mask;
+        }
 
-		#region Equals
-		public override bool Equals( object obj )
-		{
-			return obj != null && obj.GetType() == typeof(Flags) && flags == ((Flags) obj).flags;
-		}
+        public bool IsSet( Flags mask )
+        {
+            return (flags & mask) == mask;
+        }
 
-		public override int GetHashCode()
-		{
-			return flags.GetHashCode();
-		}
-		#endregion
+        public bool IsAnySet( BindingFlags mask )
+        {
+            return ((BindingFlags) flags & mask) != 0;
+        }
 
-		#region Operators
-		public static Flags operator -( Flags f1, Flags f2 )
-		{
-			return new Flags( f1.flags & ~f2.flags );
-		}
+        public bool IsAnySet( Flags mask )
+        {
+            return (flags & mask) != 0;
+        }
 
-		public static Flags operator |( Flags f1, Flags f2 )
-		{
-			return new Flags( f1.flags | f2.flags );
-		}
+        public bool IsNotSet( BindingFlags mask )
+        {
+            return ((BindingFlags) flags & mask) == 0;
+        }
 
-		public static Flags operator &( Flags f1, Flags f2 )
-		{
-			return new Flags( f1.flags & f2.flags );
-		}
+        public bool IsNotSet( Flags mask )
+        {
+            return (flags & mask) == 0;
+        }
 
-		public static bool operator ==( Flags f1, Flags f2 )
-		{
-			return f1.flags == f2.flags;
-		}
+        public static Flags SetIf( Flags flags, Flags mask, bool condition )
+        {
+            return condition ? flags | mask : flags;
+        }
 
-		public static bool operator !=( Flags f1, Flags f2 )
-		{
-			return f1.flags != f2.flags;
-		}
-		#endregion
+        public static Flags SetOnlyIf( Flags flags, Flags mask, bool condition )
+        {
+            return condition ? flags | mask : (Flags) (flags & ~mask);
+        }
 
-		#region Conversion Operators
-		public static implicit operator Flags( BindingFlags m )
-		{
-			return new Flags( (long)m );
-		}
-		public static explicit operator Flags( long m )
-		{
-			return new Flags( m );
-		}
-		public static implicit operator BindingFlags( Flags m )
-		{
-			return (BindingFlags) m.flags;
-		}
-        public static implicit operator long(Flags m)
-		{
-			return m.flags;
-		}
-		#endregion
+        public static Flags ClearIf( Flags flags, Flags mask, bool condition )
+        {
+            return condition ? (Flags) (flags & ~mask) : flags;
+        }
+        #endregion
 
-		#region ToString
-		public override string ToString()
-		{
-		    Flags @this = this;
-		    var names = flagNames.Where( kvp => @this.IsSet( kvp.Key ) ).Select( kvp => kvp.Value ).OrderBy( n => n ).ToList();
-			int index = 0;
-			var sb = new StringBuilder();
-			names.ForEach( n => sb.AppendFormat( "{0}{1}", n, ++index < names.Count ? " | " : "" ) );
-			return sb.ToString();
-		}
-		#endregion
-	}
+        #region Equals
+        public override bool Equals( object obj )
+        {
+            return obj != null && obj.GetType() == typeof(Flags) && flags == ((Flags) obj).flags;
+        }
+
+        public override int GetHashCode()
+        {
+            return flags.GetHashCode();
+        }
+        #endregion
+
+        #region Operators
+        public static Flags operator -( Flags f1, Flags f2 )
+        {
+            return new Flags( f1.flags & ~f2.flags );
+        }
+
+        public static Flags operator |( Flags f1, Flags f2 )
+        {
+            return new Flags( f1.flags | f2.flags );
+        }
+
+        public static Flags operator &( Flags f1, Flags f2 )
+        {
+            return new Flags( f1.flags & f2.flags );
+        }
+
+        public static bool operator ==( Flags f1, Flags f2 )
+        {
+            return f1.flags == f2.flags;
+        }
+
+        public static bool operator !=( Flags f1, Flags f2 )
+        {
+            return f1.flags != f2.flags;
+        }
+        #endregion
+
+        #region Conversion Operators
+        public static implicit operator Flags( BindingFlags m )
+        {
+            return new Flags( (long) m );
+        }
+
+        public static explicit operator Flags( long m )
+        {
+            return new Flags( m );
+        }
+
+        public static implicit operator BindingFlags( Flags m )
+        {
+            return (BindingFlags) m.flags;
+        }
+
+        public static implicit operator long( Flags m )
+        {
+            return m.flags;
+        }
+        #endregion
+
+        #region ToString
+        public override string ToString()
+        {
+            Flags @this = this;
+            var names =
+                flagNames.Where( kvp => @this.IsSet( kvp.Key ) ).Select( kvp => kvp.Value ).OrderBy( n => n ).ToList();
+            int index = 0;
+            var sb = new StringBuilder();
+            names.ForEach( n => sb.AppendFormat( "{0}{1}", n, ++index < names.Count ? " | " : "" ) );
+            return sb.ToString();
+        }
+        #endregion
+    }
 }

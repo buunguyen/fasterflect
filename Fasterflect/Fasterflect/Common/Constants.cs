@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.Reflection;
 using Fasterflect.Emitter;
 
 namespace Fasterflect
@@ -36,5 +37,6 @@ namespace Fasterflect
         public static readonly Type[] ArrayOfObjectType = new[] { typeof(object) };
         public static readonly object[] EmptyObjectArray = new object[0];
         public static readonly string[] EmptyStringArray = new string[0];
+        public static readonly PropertyInfo[] EmptyPropertyInfoArray = new PropertyInfo[0];
     }
 }
