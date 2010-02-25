@@ -343,23 +343,23 @@ namespace Fasterflect
         /// but this can be changed to exact matching by passing <see href="Flags.ExactParameterMatch"/>.</param>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
         /// due to method overloading the first found match will be returned.</returns>
-        public static MethodInfo Method(this Type type, string name, Flags bindingFlags, Type[] parameterTypes)
+        public static MethodInfo Method( this Type type, string name, Flags bindingFlags, Type[] parameterTypes )
         {
             // we need to check all methods to do partial name matches
             if( bindingFlags.IsAnySet( Flags.PartialNameMatch | Flags.TrimExplicitlyImplemented ) )
             {
-                return type.Methods(parameterTypes, bindingFlags, name).FirstOrDefault();
+                return type.Methods( parameterTypes, bindingFlags, name ).FirstOrDefault();
             }
 
             bool hasTypes = parameterTypes != null;
             var result = hasTypes
-                             ? type.GetMethod(name, bindingFlags, null, parameterTypes, null)
+                             ? type.GetMethod( name, bindingFlags, null, parameterTypes, null )
                              : type.GetMethod( name, bindingFlags );
             if( result == null && bindingFlags.IsNotSet( Flags.DeclaredOnly ) )
             {
                 if( type.BaseType != typeof(object) && type.BaseType != null )
                 {
-                    return type.BaseType.Method(name, bindingFlags, parameterTypes);
+                    return type.BaseType.Method( name, bindingFlags, parameterTypes );
                 }
             }
             bool hasSpecialFlags =

@@ -118,8 +118,7 @@ namespace Fasterflect
 
         /// <summary>
         /// Find all members of the given <paramref name="memberTypes"/> on the given <paramref name="type"/> that 
-        /// match the specified <paramref name="bindingFlags"/>. If a value is supplied for the <paramref name="name"/>
-        /// parameter then filtering will be applied in accordance with the given <paramref name="bindingFlags"/>.
+        /// match the specified <paramref name="bindingFlags"/>.
         /// </summary>
         /// <returns>A list of all matching members on the type. This value will never be null.</returns>
         public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes, Flags bindingFlags )
@@ -184,11 +183,33 @@ namespace Fasterflect
         #region Member Combined
 
         #region TryGetValue
+		/// <summary>
+        /// Finds the first (public or non-public) instance member with the given <paramref name="name"/> on the given
+        /// <paramref name="source"/> object. Returns the value of the member if a match was found and null otherwise.
+		/// </summary>
+		/// <remarks>
+        /// When using this method it is not possible to distinguish between a missing member and a member whose value is null.
+		/// </remarks>
+		/// <param name="source">The source object on which to find the member</param>
+		/// <param name="name">The name of the member whose value should be retrieved</param>
+		/// <returns>The value of the member or null if no member was found</returns>
         public static object TryGetValue( this object source, string name )
         {
             return TryGetValue( source, name, Flags.InstanceAnyVisibility );
         }
 
+		/// <summary>
+        /// Find the first member with the given <paramref name="name"/> on the given <paramref name="source"/> object.
+        /// Returns the value of the member if a match was found and null otherwise.
+        /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
+		/// </summary>
+		/// <remarks>
+        /// When using this method it is not possible to distinguish between a missing member and a member whose value is null.
+		/// </remarks>
+		/// <param name="source">The source object on which to find the member</param>
+		/// <param name="name">The name of the member whose value should be retrieved</param>
+		/// <param name="bindingFlags">A combination of Flags that define the scope of the search</param>
+		/// <returns>The value of the member or null if no member was found</returns>
         public static object TryGetValue( this object source, string name, Flags bindingFlags )
         {
             Type type = source.GetType();
@@ -198,11 +219,30 @@ namespace Fasterflect
         #endregion
 
         #region TrySetValue
+		/// <summary>
+        /// Find the first (public or non-public) instance member with the given <paramref name="name"/> on the 
+        /// given <paramref name="source"/> object and assign it the given <paramref name="value"/>. Returns true 
+        /// if a value was assigned to a member and false otherwise.
+		/// </summary>
+		/// <param name="source">The source object on which to find the member</param>
+		/// <param name="name">The name of the member whose value should be retrieved</param>
+		/// <param name="value">The value that should be assigned to the member</param>
+		/// <returns>True if the value was assigned to a member and false otherwise</returns>
         public static bool TrySetValue( this object source, string name, object value )
         {
             return TrySetValue( source, name, value, Flags.InstanceAnyVisibility );
         }
 
+		/// <summary>
+        /// Find the first member with the given <paramref name="name"/> on the given <paramref name="source"/> object
+        /// and assign it the given <paramref name="value"/>. Returns true if a value was assigned to a member and false otherwise.
+        /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
+		/// </summary>
+		/// <param name="source">The source object on which to find the member</param>
+		/// <param name="name">The name of the member whose value should be retrieved</param>
+		/// <param name="value">The value that should be assigned to the member</param>
+		/// <param name="bindingFlags">A combination of Flags that define the scope of the search</param>
+		/// <returns>True if the value was assigned to a member and false otherwise</returns>
         public static bool TrySetValue( this object source, string name, object value, Flags bindingFlags )
         {
             Type type = source.GetType();

@@ -16,12 +16,14 @@
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
 #endregion
 
-using System;
 using System.Reflection;
 using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
+	/// <summary>
+    /// Extension methods for inspecting and working with properties.
+    /// </summary>
     public static class PropertyInfoExtensions
     {
         /// <summary>
