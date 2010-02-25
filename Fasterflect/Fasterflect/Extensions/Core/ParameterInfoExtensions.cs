@@ -23,7 +23,7 @@ using System.Reflection;
 namespace Fasterflect
 {
     /// <summary>
-    /// Extension methods for locating and inspecting method parameters.
+    /// Extension methods for inspecting and working with method parameters.
     /// </summary>
     public static class ParameterInfoExtensions
     {

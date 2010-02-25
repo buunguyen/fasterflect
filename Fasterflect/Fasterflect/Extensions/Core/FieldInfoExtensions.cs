@@ -21,6 +21,9 @@ using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
+	/// <summary>
+    /// Extension methods for inspecting and working with fields.
+    /// </summary>
     public static class FieldInfoExtensions
     {
         /// <summary>

@@ -277,7 +277,6 @@ namespace Fasterflect
         /// <summary>
         /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. This method 
         /// searches for public and non-public instance fields on both the type itself and all parent classes.
-        /// Use the <seealso href="FieldDeclared"/> method if you do not wish to search base types.  
         /// </summary>
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
         public static FieldInfo Field( this Type type, string name )
@@ -384,11 +383,33 @@ namespace Fasterflect
         #region Field Combined
 
         #region TryGetValue
-        public static object TryGetFieldValue( this object source, string name )
+		/// <summary>
+        /// Finds the first (public or non-public) instance field with the given <paramref name="name"/> on the given
+        /// <paramref name="source"/> object. Returns the value of the field if a match was found and null otherwise.
+		/// </summary>
+		/// <remarks>
+        /// When using this method it is not possible to distinguish between a missing field and a field whose value is null.
+		/// </remarks>
+		/// <param name="source">The source object on which to find the field</param>
+		/// <param name="name">The name of the field whose value should be retrieved</param>
+		/// <returns>The value of the field or null if no field was found</returns>
+		public static object TryGetFieldValue( this object source, string name )
         {
             return TryGetFieldValue( source, name, Flags.InstanceAnyVisibility );
         }
 
+		/// <summary>
+        /// Find the first field with the given <paramref name="name"/> on the given <paramref name="source"/> object.
+        /// Returns the value of the field if a match was found and null otherwise.
+        /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
+		/// </summary>
+		/// <remarks>
+        /// When using this method it is not possible to distinguish between a missing field and a field whose value is null.
+		/// </remarks>
+		/// <param name="source">The source object on which to find the field</param>
+		/// <param name="name">The name of the field whose value should be retrieved</param>
+		/// <param name="bindingFlags">A combination of Flags that define the scope of the search</param>
+		/// <returns>The value of the field or null if no field was found</returns>
         public static object TryGetFieldValue( this object source, string name, Flags bindingFlags )
         {
             try
@@ -403,11 +424,30 @@ namespace Fasterflect
         #endregion
 
         #region TrySetValue
+		/// <summary>
+        /// Find the first (public or non-public) instance field with the given <paramref name="name"/> on the 
+        /// given <paramref name="source"/> object and assign it the given <paramref name="value"/>. Returns true 
+        /// if a value was assigned to a field and false otherwise.
+		/// </summary>
+		/// <param name="source">The source object on which to find the field</param>
+		/// <param name="name">The name of the field whose value should be retrieved</param>
+		/// <param name="value">The value that should be assigned to the field</param>
+		/// <returns>True if the value was assigned to a field and false otherwise</returns>
         public static bool TrySetFieldValue( this object source, string name, object value )
         {
             return TrySetFieldValue( source, name, value, Flags.InstanceAnyVisibility );
         }
 
+		/// <summary>
+        /// Find the first field with the given <paramref name="name"/> on the given <paramref name="source"/> object
+        /// and assign it the given <paramref name="value"/>. Returns true if a value was assigned to a field and false otherwise.
+        /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
+		/// </summary>
+		/// <param name="source">The source object on which to find the field</param>
+		/// <param name="name">The name of the field whose value should be retrieved</param>
+		/// <param name="value">The value that should be assigned to the field</param>
+		/// <param name="bindingFlags">A combination of Flags that define the scope of the search</param>
+		/// <returns>True if the value was assigned to a field and false otherwise</returns>
         public static bool TrySetFieldValue( this object source, string name, object value, Flags bindingFlags )
         {
             try

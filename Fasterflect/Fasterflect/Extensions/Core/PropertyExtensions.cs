@@ -641,11 +641,33 @@ namespace Fasterflect
         #region Property Combined
 
         #region TryGetValue
+		/// <summary>
+        /// Finds the first (public or non-public) instance property with the given <paramref name="name"/> on the given
+        /// <paramref name="source"/> object. Returns the value of the property if a match was found and null otherwise.
+		/// </summary>
+		/// <remarks>
+        /// When using this method it is not possible to distinguish between a missing property and a property whose value is null.
+		/// </remarks>
+		/// <param name="source">The source object on which to find the property</param>
+		/// <param name="name">The name of the property whose value should be retrieved</param>
+		/// <returns>The value of the property or null if no property was found</returns>
         public static object TryGetPropertyValue( this object source, string name )
         {
             return TryGetPropertyValue( source, name, Flags.InstanceAnyVisibility );
         }
 
+		/// <summary>
+        /// Find the first property with the given <paramref name="name"/> on the given <paramref name="source"/> object.
+        /// Returns the value of the property if a match was found and null otherwise.
+        /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
+		/// </summary>
+		/// <remarks>
+        /// When using this method it is not possible to distinguish between a missing property and a property whose value is null.
+		/// </remarks>
+		/// <param name="source">The source object on which to find the property</param>
+		/// <param name="name">The name of the property whose value should be retrieved</param>
+		/// <param name="bindingFlags">A combination of Flags that define the scope of the search</param>
+		/// <returns>The value of the property or null if no property was found</returns>
         public static object TryGetPropertyValue( this object source, string name, Flags bindingFlags )
         {
             try
@@ -660,11 +682,30 @@ namespace Fasterflect
         #endregion
 
         #region TrySetValue
+		/// <summary>
+        /// Find the first (public or non-public) instance property with the given <paramref name="name"/> on the 
+        /// given <paramref name="source"/> object and assign it the given <paramref name="value"/>. Returns true 
+        /// if a value was assigned to a property and false otherwise.
+		/// </summary>
+		/// <param name="source">The source object on which to find the property</param>
+		/// <param name="name">The name of the property whose value should be retrieved</param>
+		/// <param name="value">The value that should be assigned to the property</param>
+		/// <returns>True if the value was assigned to a property and false otherwise</returns>
         public static bool TrySetPropertyValue( this object source, string name, object value )
         {
             return TrySetPropertyValue( source, name, value, Flags.InstanceAnyVisibility );
         }
 
+		/// <summary>
+        /// Find the first property with the given <paramref name="name"/> on the given <paramref name="source"/> object
+        /// and assign it the given <paramref name="value"/>. Returns true if a value was assigned to a property and false otherwise.
+        /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
+		/// </summary>
+		/// <param name="source">The source object on which to find the property</param>
+		/// <param name="name">The name of the property whose value should be retrieved</param>
+		/// <param name="value">The value that should be assigned to the property</param>
+		/// <param name="bindingFlags">A combination of Flags that define the scope of the search</param>
+		/// <returns>True if the value was assigned to a property and false otherwise</returns>
         public static bool TrySetPropertyValue( this object source, string name, object value, Flags bindingFlags )
         {
             try

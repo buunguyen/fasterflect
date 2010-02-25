@@ -248,7 +248,7 @@ namespace Fasterflect
         #region MembersAndAttributes Lookup
         /// <summary>
         /// Gets a dictionary with all members on the given <paramref name="type"/> and their associated attributes.
-        /// Only members of the given <paramref name="memberTypes"/> and matching <paramref name="bindingFlags"/> will
+        /// Only members of the given <paramref name="memberTypes"/> and matching <paramref name="flags"/> will
         /// be included in the result.
         /// The list of attributes associated with each member can optionally be filtered by supplying a list of
         /// <paramref name="attributeTypes"/>, in which case only members with at least one of these will be

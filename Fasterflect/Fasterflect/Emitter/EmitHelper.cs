@@ -962,9 +962,9 @@ namespace Fasterflect.Emitter
         /// that specify how the search is conducted.</param>
         /// <seealso cref="OpCodes.Callvirt">OpCodes.Callvirt</seealso>
         /// <seealso cref="System.Reflection.Emit.ILGenerator.EmitCall(OpCode,MethodInfo,Type[])">ILGenerator.EmitCall</seealso>
-        public EmitHelper callvirt( Type type, string methodName, BindingFlags flags )
+        public EmitHelper callvirt( Type type, string methodName, BindingFlags bindingFlags )
         {
-            return callvirt( type, methodName, flags, null );
+            return callvirt( type, methodName, bindingFlags, null );
         }
 
         /// <summary>

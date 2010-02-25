@@ -22,6 +22,9 @@ using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
+    /// <summary>
+    /// Extension methods for inspecting, invoking and working with methods.
+    /// </summary>
     public static class MethodInfoExtensions
     {
         #region Access
