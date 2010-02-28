@@ -49,12 +49,12 @@ namespace Fasterflect
             return methodInfo.DelegateForStaticInvoke()( parameters );
         }
 
-        /// <summary>
-        /// Invokes the instance method identified by <paramref name="methodInfo"/> on the object
-        /// <paramref name="target"/> with no argument.
-        /// </summary>
-        /// <returns>The return value of the method.</returns>
-        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
+		///// <summary>
+		///// Invokes the instance method identified by <paramref name="methodInfo"/> on the object
+		///// <paramref name="target"/> with no argument.
+		///// </summary>
+		///// <returns>The return value of the method.</returns>
+		///// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
         //public static object Invoke( this MethodInfo methodInfo, object target )
         //{
         //    return methodInfo.DelegateForInvoke()( target );
