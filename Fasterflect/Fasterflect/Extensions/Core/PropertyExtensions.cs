@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
-using Fasterflect.Internal;
 
 namespace Fasterflect
 {
@@ -490,9 +489,8 @@ namespace Fasterflect
 
         #region Property Lookup (Single)
         /// <summary>
-        /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>. This method 
+        /// Gets the property identified by <paramref name="name"/> on the given <paramref name="type"/>. This method 
         /// searches for public and non-public instance properties on both the type itself and all parent classes.
-        /// Use the <seealso href="PropertyDeclared"/> method if you do not wish to search base types.  
         /// </summary>
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
         public static PropertyInfo Property( this Type type, string name )
@@ -501,7 +499,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find the property identified by <paramref name="name"/> on the given <paramref name="type"/>. 
+        /// Gets the property identified by <paramref name="name"/> on the given <paramref name="type"/>. 
         /// Use the <paramref name="bindingFlags"/> parameter to define the scope of the search.
         /// </summary>
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
@@ -534,17 +532,7 @@ namespace Fasterflect
 
         #region Property Lookup (Multiple)
         /// <summary>
-        /// Find all public and non-public instance properties on the given <paramref name="type"/>,
-        /// including properties defined on base types.
-        /// </summary>
-        /// <returns>A list of all instance properties on the type. This value will never be null.</returns>
-        public static IList<PropertyInfo> Properties( this Type type )
-        {
-            return type.Properties( Flags.InstanceAnyVisibility );
-        }
-
-        /// <summary>
-        /// Find all public and non-public instance properties on the given <paramref name="type"/>,
+        /// Gets all public and non-public instance properties on the given <paramref name="type"/>,
         /// including properties defined on base types. The result can optionally be filtered by specifying
         /// a list of property names to include using the <paramref name="names"/> parameter.
         /// </summary>
@@ -560,7 +548,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find all properties on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>,
+        /// Gets all properties on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>,
         /// including properties defined on base types.
         /// </summary>
         /// <returns>A list of all matching properties on the type. This value will never be null.</returns>
@@ -609,40 +597,13 @@ namespace Fasterflect
             }
             return properties;
         }
-
-        /// <summary>
-        /// This method applies name filtering to a set of properties.
-        /// </summary>
-        private static IList<PropertyInfo> ApplyFilters( IList<PropertyInfo> members, Flags bindingFlags, string[] names )
-        {
-            var result = new List<PropertyInfo>( members.Count );
-            bool isPartial = bindingFlags.IsSet( Flags.PartialNameMatch );
-            bool trimExplicit = bindingFlags.IsSet( Flags.TrimExplicitlyImplemented );
-
-            for( int i = 0; i < members.Count; i++ )
-            {
-                var member = members[ i ];
-                for( int j = 0; j < names.Length; j++ )
-                {
-                    var name = names[ j ];
-                    var memberName = trimExplicit ? member.Name.TrimExplicitlyImplementedName() : member.Name;
-                    bool match = (isPartial && memberName.Contains( name )) || memberName == name;
-                    if( match )
-                    {
-                        result.Add( member );
-                        break;
-                    }
-                }
-            }
-            return members;
-        }
         #endregion
 
         #region Property Combined
 
         #region TryGetValue
 		/// <summary>
-        /// Finds the first (public or non-public) instance property with the given <paramref name="name"/> on the given
+        /// Gets the first (public or non-public) instance property with the given <paramref name="name"/> on the given
         /// <paramref name="source"/> object. Returns the value of the property if a match was found and null otherwise.
 		/// </summary>
 		/// <remarks>
@@ -657,7 +618,7 @@ namespace Fasterflect
         }
 
 		/// <summary>
-        /// Find the first property with the given <paramref name="name"/> on the given <paramref name="source"/> object.
+        /// Gets the first property with the given <paramref name="name"/> on the given <paramref name="source"/> object.
         /// Returns the value of the property if a match was found and null otherwise.
         /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
 		/// </summary>
@@ -683,8 +644,8 @@ namespace Fasterflect
 
         #region TrySetValue
 		/// <summary>
-        /// Find the first (public or non-public) instance property with the given <paramref name="name"/> on the 
-        /// given <paramref name="source"/> object and assign it the given <paramref name="value"/>. Returns true 
+        /// Sets the first (public or non-public) instance property with the given <paramref name="name"/> on the 
+        /// given <paramref name="source"/> object to the supplied <paramref name="value"/>. Returns true 
         /// if a value was assigned to a property and false otherwise.
 		/// </summary>
 		/// <param name="source">The source object on which to find the property</param>
@@ -697,8 +658,8 @@ namespace Fasterflect
         }
 
 		/// <summary>
-        /// Find the first property with the given <paramref name="name"/> on the given <paramref name="source"/> object
-        /// and assign it the given <paramref name="value"/>. Returns true if a value was assigned to a property and false otherwise.
+        /// Sets the first property with the given <paramref name="name"/> on the given <paramref name="source"/> object
+        /// to the supplied <paramref name="value"/>. Returns true if a value was assigned to a property and false otherwise.
         /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
 		/// </summary>
 		/// <param name="source">The source object on which to find the property</param>

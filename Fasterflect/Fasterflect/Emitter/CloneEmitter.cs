@@ -55,13 +55,6 @@ namespace Fasterflect.Emitter
             return action;
         }
 
-        public void TestTest( object s, object t )
-        {
-            FieldInfo sf = s.GetType().Field( "inputField" );
-            FieldInfo tf = s.GetType().Field( "targetField" );
-            tf.SetValue( t, sf.GetValue( s ) );
-        }
-
         protected internal Delegate CreateDelegate()
         {
             var name = string.Format( "Copy_{0}_to_{1}", sourceType.Name, targetType.Name );
@@ -103,8 +96,8 @@ namespace Fasterflect.Emitter
             var query = from s in sourceType.Fields( bindingFlags )
                         from t in targetType.Fields( bindingFlags )
                         where
-                            s.Name == t.Name && t.FieldType.IsAssignableFrom( s.FieldType ) && s.CanRead() &&
-                            t.CanWrite()
+                            s.Name == t.Name && t.FieldType.IsAssignableFrom( s.FieldType ) && s.IsReadable() &&
+                            t.IsWritable()
                         select new { Source = s, Target = t };
             return query.ToDictionary( k => k.Source, v => v.Target );
         }
@@ -115,8 +108,8 @@ namespace Fasterflect.Emitter
             var query = from s in sourceType.Properties( bindingFlags )
                         from t in targetType.Properties( bindingFlags )
                         where
-                            s.Name == t.Name && t.PropertyType.IsAssignableFrom( s.PropertyType ) && s.CanRead() &&
-                            t.CanWrite()
+                            s.Name == t.Name && t.PropertyType.IsAssignableFrom( s.PropertyType ) && s.IsReadable() &&
+                            t.IsWritable()
                         select new { Source = s, Target = t };
             return query.ToDictionary( k => k.Source, v => v.Target );
         }

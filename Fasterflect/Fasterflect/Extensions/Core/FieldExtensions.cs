@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
-using Fasterflect.Internal;
 
 namespace Fasterflect
 {
@@ -275,7 +274,7 @@ namespace Fasterflect
 
         #region Field Lookup (Single)
         /// <summary>
-        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. This method 
+        /// Gets the field identified by <paramref name="name"/> on the given <paramref name="type"/>. This method 
         /// searches for public and non-public instance fields on both the type itself and all parent classes.
         /// </summary>
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
@@ -285,7 +284,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find the field identified by <paramref name="name"/> on the given <paramref name="type"/>. 
+        /// Gets the field identified by <paramref name="name"/> on the given <paramref name="type"/>. 
         /// Use the <paramref name="bindingFlags"/> parameter to define the scope of the search.
         /// </summary>
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
@@ -319,19 +318,32 @@ namespace Fasterflect
 
         #region Field Lookup (Multiple)
         /// <summary>
-        /// Find all public and non-public instance fields on the given <paramref name="type"/>,
+        /// Gets all public and non-public instance fields on the given <paramref name="type"/>,
         /// including fields defined on base types.
         /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="names">The optional list of names against which to filter the result. If this parameter is
+		/// <c>null</c> or empty no name filtering will be applied. The default behavior is to check for an exact, 
+		/// case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> to include explicitly implemented 
+		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
+		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>A list of all instance fields on the type. This value will never be null.</returns>
-        public static IList<FieldInfo> Fields( this Type type )
+        public static IList<FieldInfo> Fields( this Type type, params string[] names )
         {
-            return type.Fields( Flags.InstanceAnyVisibility );
+            return type.Fields( Flags.InstanceAnyVisibility, names );
         }
 
         /// <summary>
-        /// Find all fields on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>,
-        /// including fields defined on base types.
+        /// Gets all fields on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>.
         /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
+        /// the search behavior and result filtering.</param>
+        /// <param name="names">The optional list of names against which to filter the result. If this parameter is
+		/// <c>null</c> or empty no name filtering will be applied. The default behavior is to check for an exact, 
+		/// case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> to include explicitly implemented 
+		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
+		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>A list of all matching fields on the type. This value will never be null.</returns>
         public static IList<FieldInfo> Fields( this Type type, Flags bindingFlags, params string[] names )
         {
@@ -384,7 +396,7 @@ namespace Fasterflect
 
         #region TryGetValue
 		/// <summary>
-        /// Finds the first (public or non-public) instance field with the given <paramref name="name"/> on the given
+        /// Gets the first (public or non-public) instance field with the given <paramref name="name"/> on the given
         /// <paramref name="source"/> object. Returns the value of the field if a match was found and null otherwise.
 		/// </summary>
 		/// <remarks>
@@ -399,7 +411,7 @@ namespace Fasterflect
         }
 
 		/// <summary>
-        /// Find the first field with the given <paramref name="name"/> on the given <paramref name="source"/> object.
+        /// Gets the first field with the given <paramref name="name"/> on the given <paramref name="source"/> object.
         /// Returns the value of the field if a match was found and null otherwise.
         /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
 		/// </summary>
@@ -425,9 +437,9 @@ namespace Fasterflect
 
         #region TrySetValue
 		/// <summary>
-        /// Find the first (public or non-public) instance field with the given <paramref name="name"/> on the 
-        /// given <paramref name="source"/> object and assign it the given <paramref name="value"/>. Returns true 
-        /// if a value was assigned to a field and false otherwise.
+        /// Sets the first (public or non-public) instance field with the given <paramref name="name"/> on the 
+        /// given <paramref name="source"/> object to supplied <paramref name="value"/>. Returns true if a value
+        /// was assigned to a field and false otherwise.
 		/// </summary>
 		/// <param name="source">The source object on which to find the field</param>
 		/// <param name="name">The name of the field whose value should be retrieved</param>
@@ -439,8 +451,8 @@ namespace Fasterflect
         }
 
 		/// <summary>
-        /// Find the first field with the given <paramref name="name"/> on the given <paramref name="source"/> object
-        /// and assign it the given <paramref name="value"/>. Returns true if a value was assigned to a field and false otherwise.
+        /// Sets the first field with the given <paramref name="name"/> on the given <paramref name="source"/> object
+        /// to the supplied <paramref name="value"/>. Returns true if a value was assigned to a field and false otherwise.
         /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
 		/// </summary>
 		/// <param name="source">The source object on which to find the field</param>

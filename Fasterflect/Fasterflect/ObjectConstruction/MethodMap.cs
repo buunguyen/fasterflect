@@ -172,7 +172,7 @@ namespace Fasterflect.ObjectConstruction
 				{
 					// check if we can use reflection to set some members
 					MemberInfo member = type.Property( paramName, Flags.InstanceAnyVisibility | Flags.IgnoreCase );
-					member = member != null && member.CanWrite() ? member : type.Field( paramName, Flags.InstanceAnyVisibility | Flags.IgnoreCase );
+					member = member != null && member.IsWritable() ? member : type.Field( paramName, Flags.InstanceAnyVisibility | Flags.IgnoreCase );
 					bool exists = member != null; 
 					Type memberType = member != null ? member.Type() : null;
 					bool compatible = exists && memberType.IsAssignableFrom( paramType );

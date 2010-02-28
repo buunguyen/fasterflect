@@ -90,7 +90,7 @@ namespace Fasterflect
 
         #region Method Parameter Lookup
         /// <summary>
-        /// Finds all parameters for the given <paramref name="method"/>.
+        /// Gets all parameters for the given <paramref name="method"/>.
         /// </summary>
         /// <returns>The list of parameters for the method. This value will never be null.</returns>
         public static IList<ParameterInfo> Parameters( this MethodBase method )

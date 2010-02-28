@@ -232,7 +232,7 @@ namespace Fasterflect
 
         #region Constructor Lookup (Single)
         /// <summary>
-        /// Find the constructor corresponding to the supplied <paramref name="parameterTypes"/> on the
+        /// Gets the constructor corresponding to the supplied <paramref name="parameterTypes"/> on the
         /// given <paramref name="type"/>.
         /// </summary>
         /// <param name="type">The type to reflect on.</param>
@@ -244,7 +244,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find the constructor matching the given <paramref name="bindingFlags"/> and corresponding to the 
+        /// Gets the constructor matching the given <paramref name="bindingFlags"/> and corresponding to the 
         /// supplied <paramref name="parameterTypes"/> on the given <paramref name="type"/>.
         /// </summary>
         /// <param name="type">The type to reflect on.</param>
@@ -259,7 +259,7 @@ namespace Fasterflect
 
         #region Constructor Lookup (Multiple)
         /// <summary>
-        /// Find all public and non-public constructors (that are not abstract) on the given <paramref name="type"/>.
+        /// Gets all public and non-public constructors (that are not abstract) on the given <paramref name="type"/>.
         /// </summary>
         /// <param name="type">The type to reflect on.</param>
         /// <returns>A list of matching constructors. This value will never be null.</returns>
@@ -269,7 +269,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find all constructors matching the given <paramref name="bindingFlags"/> (and that are not abstract)
+        /// Gets all constructors matching the given <paramref name="bindingFlags"/> (and that are not abstract)
         /// on the given <paramref name="type"/>.
         /// </summary>
         /// <param name="type">The type to reflect on.</param>
