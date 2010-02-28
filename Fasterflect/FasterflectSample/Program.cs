@@ -29,20 +29,24 @@ namespace FasterflectSample
     {
         static void Main()
         {
-        	Console.WriteLine( AssemblyInfoWriter.ListExtensions( typeof(Flags).Assembly ) );
+			Console.WriteLine( AssemblyInfoWriter.ListExtensionMethodsWhereParametersViolateConventions( typeof(Flags).Assembly ) );
+
+   			Console.WriteLine( AssemblyInfoWriter.ListExtensionMethodsWithSuperfluousOverloads( typeof(Flags).Assembly ) );
+
+			Console.WriteLine( AssemblyInfoWriter.ListExtensions( typeof(Flags).Assembly ) );
 
 
             // Load a type reflectively, just to look like real-life scenario
-            var types = new[]
-                            {
-                                Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonClass"),
-                                Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonStruct")
-                            };
-            Array.ForEach(types, type =>
-                                     {
-                                         ExecuteNormalApi(type);
-                                         ExecuteCacheApi(type);
-                                     });
+			var types = new[]
+			                {
+			                    Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonClass"),
+			                    Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonStruct")
+			                };
+			Array.ForEach(types, type =>
+			                         {
+			                             ExecuteNormalApi(type);
+			                             ExecuteCacheApi(type);
+			                         });
         }
 
         private static void ExecuteNormalApi(Type type)
@@ -75,13 +79,11 @@ namespace FasterflectSample
             AssertTrue(2 == (int)type.GetFieldValue("InstanceCount"));
 
             // Let's invoke Person.IncreaseCounter() static method to increase the counter
-            // In fact, let's chain the calls to increase 2 times
-            type.Invoke("IncreaseInstanceCount")
-                .Invoke("IncreaseInstanceCount");
-            AssertTrue(4 == (int)type.GetFieldValue("InstanceCount"));
+            type.Invoke("IncreaseInstanceCount");
+            AssertTrue(3 == (int)type.GetFieldValue("InstanceCount"));
 
             // Now, let's retrieve Person.InstanceCount via the static method GetInstanceCount
-            AssertTrue(4 == (int)type.Invoke("GetInstanceCount"));
+            AssertTrue(3 == (int)type.Invoke("GetInstanceCount"));
 
             // Invoke method receiving ref/out params, we need to put arguments in an array
             var arguments = new object[] { 1, 2 };
@@ -135,9 +137,9 @@ namespace FasterflectSample
             AssertTrue(4 == (int)obj.GetPropertyValue("Id"));
             AssertTrue("Nguyen" == obj.GetPropertyValue("Name").ToString());
 
-            // Let's have the folk walk 6 miles (and try chaining again)
-            obj.Invoke("Walk", 1).Invoke("Walk", 2).Invoke("Walk", 3);
-
+            // Let's have the folk walk 6 miles
+			obj.Invoke("Walk", 6);
+			
             // Double-check the current value of the milesTravelled field
             AssertTrue(6 == (int)obj.GetFieldValue("milesTraveled"));
 
