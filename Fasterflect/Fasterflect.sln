@@ -1,24 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fasterflect", "Fasterflect.csproj", "{FDF54936-A188-45B1-B482-632DA23DB0B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fasterflect", "Fasterflect\Fasterflect.csproj", "{FDF54936-A188-45B1-B482-632DA23DB0B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterflectBenchmark", "..\FasterflectBenchmark\FasterflectBenchmark.csproj", "{6AA6E3DF-285F-499A-B392-0B2510D0D497}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterflectBenchmark", "FasterflectBenchmark\FasterflectBenchmark.csproj", "{6AA6E3DF-285F-499A-B392-0B2510D0D497}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterflectTest", "..\FasterflectTest\FasterflectTest.csproj", "{5D173B59-4C94-433C-8068-464EBABDE593}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterflectTest", "FasterflectTest\FasterflectTest.csproj", "{5D173B59-4C94-433C-8068-464EBABDE593}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterflectSample", "..\FasterflectSample\FasterflectSample.csproj", "{4A6052E6-7583-40BA-9AF5-13EEAF419BF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterflectSample", "FasterflectSample\FasterflectSample.csproj", "{4A6052E6-7583-40BA-9AF5-13EEAF419BF0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{868A7FE8-4214-4A23-9C42-2BC087BCB5F7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{65C619B0-3B3E-4482-848C-1BC17CA71711}"
 	ProjectSection(SolutionItems) = preProject
-		CodeCoverage.testsettings = CodeCoverage.testsettings
-		Fasterflect.vsmdi = Fasterflect.vsmdi
+		Build\CodeCoverage.testsettings = Build\CodeCoverage.testsettings
+		Default.testsettings = Default.testsettings
 	EndProjectSection
 EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = Fasterflect.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -43,9 +40,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(SubversionScc) = preSolution
-		Svn-Managed = True
-		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 EndGlobal
