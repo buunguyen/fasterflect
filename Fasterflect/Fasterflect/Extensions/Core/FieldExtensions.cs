@@ -323,10 +323,8 @@ namespace Fasterflect
         /// </summary>
         /// <param name="type">The type on which to reflect.</param>
         /// <param name="names">The optional list of names against which to filter the result. If this parameter is
-		/// <c>null</c> or empty no name filtering will be applied. The default behavior is to check for an exact, 
-		/// case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> to include explicitly implemented 
-		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
-		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
+		/// <c>null</c> or empty no name filtering will be applied. This method will check for an exact, 
+		/// case-sensitive match.</param>
         /// <returns>A list of all instance fields on the type. This value will never be null.</returns>
         public static IList<FieldInfo> Fields( this Type type, params string[] names )
         {
@@ -341,7 +339,7 @@ namespace Fasterflect
         /// the search behavior and result filtering.</param>
         /// <param name="names">The optional list of names against which to filter the result. If this parameter is
 		/// <c>null</c> or empty no name filtering will be applied. The default behavior is to check for an exact, 
-		/// case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> to include explicitly implemented 
+		/// case-sensitive match. Pass <see href="Flags.ExcludeExplicitlyImplemented"/> to exclude explicitly implemented 
 		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
 		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>A list of all matching fields on the type. This value will never be null.</returns>
