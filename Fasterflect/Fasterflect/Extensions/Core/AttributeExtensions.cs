@@ -237,7 +237,7 @@ namespace Fasterflect
         #region MembersAndAttributes Lookup
         /// <summary>
         /// Gets a dictionary with all members on the given <paramref name="type"/> and their associated attributes.
-        /// Only members of the given <paramref name="memberTypes"/> and matching <paramref name="flags"/> will
+        /// Only members of the given <paramref name="memberTypes"/> and matching <paramref name="bindingFlags"/> will
         /// be included in the result.
         /// The list of attributes associated with each member can optionally be filtered by supplying a list of
         /// <paramref name="attributeTypes"/>, in which case only members with at least one of these will be
@@ -248,10 +248,10 @@ namespace Fasterflect
         /// never be null.</returns>
         public static IDictionary<MemberInfo, List<Attribute>> MembersAndAttributes( this Type type,
                                                                                      MemberTypes memberTypes,
-                                                                                     Flags flags,
+                                                                                     Flags bindingFlags,
                                                                                      params Type[] attributeTypes )
         {
-            var members = from m in type.Members( memberTypes, flags )
+            var members = from m in type.Members( memberTypes, bindingFlags )
                           let a = m.Attributes( attributeTypes )
                           where a.Count() > 0
                           select new { Member = m, Attributes = a.ToList() };
