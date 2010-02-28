@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Fasterflect.Internal;
 
 namespace Fasterflect
 {
@@ -32,9 +31,8 @@ namespace Fasterflect
     {
         #region Member Lookup (Single)
         /// <summary>
-        /// Find the member identified by <paramref name="name"/> on the given <paramref name="type"/>. This 
+        /// Gets the member identified by <paramref name="name"/> on the given <paramref name="type"/>. This 
         /// method searches for public and non-public instance fields on both the type itself and all parent classes.
-        /// Use the <see href="MemberDeclared"/> method if you do not wish to search base types.  
         /// </summary>
         /// <returns>A single MemberInfo instance of the first found match or null if no match was found.</returns>
         public static MemberInfo Member( this Type type, string name )
@@ -43,9 +41,8 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find the member identified by <paramref name="name"/> on the given <paramref name="type"/>. Use 
+        /// Gets the member identified by <paramref name="name"/> on the given <paramref name="type"/>. Use 
         /// the <paramref name="bindingFlags"/> parameter to define the scope of the search.
-        /// Use the <see href="MemberDeclared"/> method if you do not wish to search base types.  
         /// </summary>
         /// <returns>A single MemberInfo instance of the first found match or null if no match was found.</returns>
         public static MemberInfo Member( this Type type, string name, Flags bindingFlags )
@@ -75,7 +72,7 @@ namespace Fasterflect
 
         #region Member Lookup (FieldsAndProperties)
         /// <summary>
-        /// Find all public and non-public instance fields and properties on the given <paramref name="type"/>, 
+        /// Gets all public and non-public instance fields and properties on the given <paramref name="type"/>, 
         /// including members defined on base types.
         /// </summary>
         /// <returns>A list of all matching members on the type. This value will never be null.</returns>
@@ -85,7 +82,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find all public and non-public instance fields and properties on the given <paramref name="type"/> 
+        /// Gets all public and non-public instance fields and properties on the given <paramref name="type"/> 
         /// that match the specified <paramref name="bindingFlags"/>, including members defined on base types.
         /// </summary>
         /// <returns>A list of all matching members on the type. This value will never be null.</returns>
@@ -97,9 +94,12 @@ namespace Fasterflect
 
         #region Member Lookup (Multiple)
         /// <summary>
-        /// Find all public and non-public instance members of the given <paramref name="memberTypes"/> on 
+        /// Gets all public and non-public instance members of the given <paramref name="memberTypes"/> on 
         /// the given <paramref name="type"/>.
         /// </summary>
+        /// <returns>A list of all matching members on the type. This value will never be null.</returns>
+		/// <param name="type">The type to reflect on.</param>
+		/// <param name="memberTypes">The <see href="MemberTypes"/> to include in the result.</param>
         /// <returns>A list of all matching members on the type. This value will never be null.</returns>
         public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes )
         {
@@ -107,9 +107,13 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find all public and non-public instance members on the given <paramref name="type"/> that 
+        /// Gets all public and non-public instance members on the given <paramref name="type"/> that 
         /// match the specified <paramref name="bindingFlags"/>.
         /// </summary>
+        /// <returns>A list of all matching members on the type. This value will never be null.</returns>
+		/// <param name="type">The type to reflect on.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
+        /// the search behavior and result filtering.</param>
         /// <returns>A list of all matching members on the type. This value will never be null.</returns>
         public static IList<MemberInfo> Members( this Type type, Flags bindingFlags )
         {
@@ -117,20 +121,19 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find all members of the given <paramref name="memberTypes"/> on the given <paramref name="type"/> that 
-        /// match the specified <paramref name="bindingFlags"/>.
-        /// </summary>
-        /// <returns>A list of all matching members on the type. This value will never be null.</returns>
-        public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes, Flags bindingFlags )
-        {
-            return type.Members( memberTypes, bindingFlags, null );
-        }
-
-        /// <summary>
-        /// Find all members of the given <paramref name="memberTypes"/> on the given <paramref name="type"/> that 
+        /// Gets all members of the given <paramref name="memberTypes"/> on the given <paramref name="type"/> that 
         /// match the specified <paramref name="bindingFlags"/>. If values are supplied for the <paramref name="names"/>
         /// parameter then filtering will be applied in accordance with the given <paramref name="bindingFlags"/>.
         /// </summary>
+		/// <param name="type">The type to reflect on.</param>
+		/// <param name="memberTypes">The <see href="MemberTypes"/> to include in the result.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
+        /// the search behavior and result filtering.</param>
+        /// <param name="names">The optional list of names against which to filter the result. If this parameter is
+		/// <c>null</c> or empty no name filtering will be applied. The default behavior is to check for an exact, 
+		/// case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> to include explicitly implemented 
+		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
+		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>A list of all matching members on the type. This value will never be null.</returns>
         public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes, Flags bindingFlags,
                                                  params string[] names )
@@ -184,7 +187,7 @@ namespace Fasterflect
 
         #region TryGetValue
 		/// <summary>
-        /// Finds the first (public or non-public) instance member with the given <paramref name="name"/> on the given
+        /// Gets the first (public or non-public) instance member with the given <paramref name="name"/> on the given
         /// <paramref name="source"/> object. Returns the value of the member if a match was found and null otherwise.
 		/// </summary>
 		/// <remarks>
@@ -199,7 +202,7 @@ namespace Fasterflect
         }
 
 		/// <summary>
-        /// Find the first member with the given <paramref name="name"/> on the given <paramref name="source"/> object.
+        /// Gets the first member with the given <paramref name="name"/> on the given <paramref name="source"/> object.
         /// Returns the value of the member if a match was found and null otherwise.
         /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
 		/// </summary>
@@ -220,8 +223,8 @@ namespace Fasterflect
 
         #region TrySetValue
 		/// <summary>
-        /// Find the first (public or non-public) instance member with the given <paramref name="name"/> on the 
-        /// given <paramref name="source"/> object and assign it the given <paramref name="value"/>. Returns true 
+        /// Sets the first (public or non-public) instance member with the given <paramref name="name"/> on the 
+        /// given <paramref name="source"/> object to the supplied <paramref name="value"/>. Returns true 
         /// if a value was assigned to a member and false otherwise.
 		/// </summary>
 		/// <param name="source">The source object on which to find the member</param>
@@ -234,8 +237,8 @@ namespace Fasterflect
         }
 
 		/// <summary>
-        /// Find the first member with the given <paramref name="name"/> on the given <paramref name="source"/> object
-        /// and assign it the given <paramref name="value"/>. Returns true if a value was assigned to a member and false otherwise.
+        /// Sets the first member with the given <paramref name="name"/> on the given <paramref name="source"/> object
+        /// to the supplied <paramref name="value"/>. Returns true if a value was assigned to a member and false otherwise.
         /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
 		/// </summary>
 		/// <param name="source">The source object on which to find the member</param>

@@ -133,7 +133,7 @@ namespace Fasterflect
 
         #region HasAttribute Lookup (Presence Detection)
         /// <summary>
-        /// Find out whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
+        /// Determines whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
         /// of type <paramref name="attributeType"/>.
         /// </summary>
         /// <returns>True if the source element has the associated attribute, false otherwise.</returns>
@@ -143,7 +143,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find out whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
+        /// Determines whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
         /// of type <typeparamref name="T"/>.
         /// </summary>
         /// <returns>True if the source element has the associated attribute, false otherwise.</returns>
@@ -153,7 +153,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find out whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
+        /// Determines whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
         /// of any of the types given in <paramref name="attributeTypes"/>.
         /// </summary>
         /// <returns>True if the source element has at least one of the specified attribute types, false otherwise.</returns>
@@ -163,7 +163,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Find out whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
+        /// Determines whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
         /// of all of the types given in <paramref name="attributeTypes"/>.
         /// </summary>
         /// <returns>True if the source element has all of the specified attribute types, false otherwise.</returns>
@@ -176,14 +176,17 @@ namespace Fasterflect
 
         #region MembersWith Lookup
         /// <summary>
-        /// Gets all public and non-public instance members on the given <paramref name="type"/> that are 
-        /// decorated with an <see href="Attribute"/> of the given type <typeparamref name="T"/>. Only members
+        /// Gets all public and non-public instance members on the given <paramref name="type"/>. Only members
         /// of the given <paramref name="memberTypes"/> will be included in the result.
+        /// The resulting list of attributes can optionally be filtered by supplying a list
+        /// of <paramref name="attributeTypes"/>, in which case only members decorated with
+        /// at least one of these will be included.
         /// </summary>
         /// <returns>A list of all matching members. This value will never be null.</returns>
-        public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes ) where T : Attribute
+        public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes,
+                                                     params Type[] attributeTypes )
         {
-            return type.MembersWith( memberTypes, Flags.InstanceAnyVisibility, typeof(T) );
+            return type.MembersWith( memberTypes, Flags.InstanceAnyVisibility, attributeTypes );
         }
 
         /// <summary>
@@ -197,20 +200,6 @@ namespace Fasterflect
         public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes, Flags bindingFlags )
         {
             return type.MembersWith( memberTypes, bindingFlags, typeof(T) );
-        }
-
-        /// <summary>
-        /// Gets all public and non-public instance members on the given <paramref name="type"/>. Only members
-        /// of the given <paramref name="memberTypes"/> will be included in the result.
-        /// The resulting list of attributes can optionally be filtered by supplying a list
-        /// of <paramref name="attributeTypes"/>, in which case only members decorated with
-        /// at least one of these will be included.
-        /// </summary>
-        /// <returns>A list of all matching members. This value will never be null.</returns>
-        public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes,
-                                                     params Type[] attributeTypes )
-        {
-            return type.MembersWith( memberTypes, Flags.InstanceAnyVisibility, attributeTypes );
         }
 
         /// <summary>
@@ -255,7 +244,8 @@ namespace Fasterflect
         /// included in the result.
         /// </summary>
         /// <returns>An dictionary mapping all matching members to their associated attributes. This value
-        /// will never be null.</returns>
+        /// will never be null. The attribute list associated with each member in the dictionary will likewise
+        /// never be null.</returns>
         public static IDictionary<MemberInfo, List<Attribute>> MembersAndAttributes( this Type type,
                                                                                      MemberTypes memberTypes,
                                                                                      Flags flags,

@@ -50,7 +50,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Returns true if <paramref name="obj"/> is a wrapped object (instance of <see cref="ValueTypeHolder"/>).
+        /// Determines whether <paramref name="obj"/> is a wrapped object (instance of <see cref="ValueTypeHolder"/>).
         /// </summary>
         /// <param name="obj">The object to check.</param>
         /// <returns>Returns true if <paramref name="obj"/> is a wrapped object (instance of <see cref="ValueTypeHolder"/>).</returns>

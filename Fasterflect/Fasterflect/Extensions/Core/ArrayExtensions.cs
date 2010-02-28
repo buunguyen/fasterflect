@@ -38,7 +38,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Retrieves the element at position <paramref name="index"/> of <paramref name="array"/>.
+        /// Gets the element at position <paramref name="index"/> of <paramref name="array"/>.
         /// </summary>
         public static object GetElement( this object array, long index )
         {

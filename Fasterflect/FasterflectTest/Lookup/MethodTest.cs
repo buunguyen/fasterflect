@@ -25,7 +25,6 @@ using System.Reflection;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FasterflectTest.SampleModel.Animals;
-using Fasterflect.Internal;
 
 namespace FasterflectTest.Lookup
 {

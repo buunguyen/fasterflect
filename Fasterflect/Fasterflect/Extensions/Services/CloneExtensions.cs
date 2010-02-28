@@ -31,10 +31,9 @@ namespace Fasterflect
     {
         #region Clone Overloads
         /// <summary>
-        /// This method will produce a deep clone of the <paramref name="source"/> object.
-        /// Reference integrity is maintained and every unique object in the graph is
-        /// cloned only once.
-        /// Note that all objects in the graph must have a default constructor.
+        /// Produces a deep clone of the <paramref name="source"/> object. Reference integrity is maintained and
+        /// every unique object in the graph is cloned only once.
+        /// A current limitation of this method is that all objects in the graph must have a default constructor.
         /// </summary>
         /// <typeparam name="T">The type of the object to clone.</typeparam>
         /// <param name="source">The object to clone.</param>
@@ -76,8 +75,8 @@ namespace Fasterflect
 
         #region CopyFields
         /// <summary>
-        /// This method will copy all public and non-public instance fields, including those defined on
-        /// base classes, from the <paramref name="source"/> object to the <paramref name="target"/> object.
+        /// Copies all public and non-public instance fields, including those defined on base classes,
+        /// from the <paramref name="source"/> object to the <paramref name="target"/> object.
         /// </summary>
         public static void CopyFields( this object source, object target )
         {
@@ -85,7 +84,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// This method will copy all fields matching the specified <paramref name="bindingFlags"/>, including those 
+        /// Copies all fields matching the specified <paramref name="bindingFlags"/>, including those 
         /// defined on base classes, from the <paramref name="source"/> object to the <paramref name="target"/>
         /// object.
         /// </summary>
@@ -103,9 +102,8 @@ namespace Fasterflect
 
         #region CopyProperties
         /// <summary>
-        /// This method will shallowly copy all public and non-public instance properties, including
-        /// those defined on base classes, from the <paramref name="source"/> object to the
-        /// <paramref name="target"/> object.
+        /// Copies all public and non-public instance properties, including those defined on base classes,
+        /// from the <paramref name="source"/> object to the <paramref name="target"/> object.
         /// </summary>
         public static void CopyProperties( this object source, object target )
         {
@@ -113,9 +111,8 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// This method will shallowly copy all properties matching the specified <paramref name="bindingFlags"/>, 
-        /// including those defined on base classes, from the <paramref name="source"/> object to the
-        /// <paramref name="target"/> object. 
+        /// Copies all properties matching the specified <paramref name="bindingFlags"/> from the 
+        /// <paramref name="source"/> object to the <paramref name="target"/> object. 
         /// </summary>
         public static void CopyProperties( this object source, object target, Flags bindingFlags )
         {
