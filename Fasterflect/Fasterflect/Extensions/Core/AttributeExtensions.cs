@@ -236,6 +236,24 @@ namespace Fasterflect
 
         #region MembersAndAttributes Lookup
         /// <summary>
+        /// Gets a dictionary with all public and non-public instance members on the given <paramref name="type"/> 
+        /// and their associated attributes. Only members of the given <paramref name="memberTypes"/> will
+        /// be included in the result.
+        /// The list of attributes associated with each member can optionally be filtered by supplying a list of
+        /// <paramref name="attributeTypes"/>, in which case only members with at least one of these will be
+        /// included in the result.
+        /// </summary>
+        /// <returns>An dictionary mapping all matching members to their associated attributes. This value
+        /// will never be null. The attribute list associated with each member in the dictionary will likewise
+        /// never be null.</returns>
+        public static IDictionary<MemberInfo, List<Attribute>> MembersAndAttributes( this Type type,
+                                                                                     MemberTypes memberTypes,
+                                                                                     params Type[] attributeTypes )
+        {
+        	return type.MembersAndAttributes( memberTypes, Flags.InstanceAnyVisibility, null );
+        }
+
+        /// <summary>
         /// Gets a dictionary with all members on the given <paramref name="type"/> and their associated attributes.
         /// Only members of the given <paramref name="memberTypes"/> and matching <paramref name="bindingFlags"/> will
         /// be included in the result.

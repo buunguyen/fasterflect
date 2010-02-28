@@ -94,6 +94,17 @@ namespace Fasterflect
 
         #region Member Lookup (Multiple)
         /// <summary>
+        /// Gets all public and non-public instance members on the given <paramref name="type"/>.
+        /// </summary>
+        /// <returns>A list of all members on the type. This value will never be null.</returns>
+		/// <param name="type">The type to reflect on.</param>
+        /// <returns>A list of all members on the type. This value will never be null.</returns>
+        public static IList<MemberInfo> Members( this Type type )
+        {
+            return type.Members( MemberTypes.All, Flags.InstanceAnyVisibility, null );
+        }
+
+        /// <summary>
         /// Gets all public and non-public instance members of the given <paramref name="memberTypes"/> on 
         /// the given <paramref name="type"/>.
         /// </summary>
@@ -121,9 +132,26 @@ namespace Fasterflect
         }
 
         /// <summary>
+        /// Gets all public and non-public instance members of the given <paramref name="memberTypes"/> on the 
+        /// given <paramref name="type"/>, optionally filtered by the supplied <paramref name="names"/> list.
+        /// </summary>
+		/// <param name="memberTypes">The <see href="MemberTypes"/> to include in the result.</param>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="names">The optional list of names against which to filter the result. If this parameter is
+		/// <c>null</c> or empty no name filtering will be applied. The default behavior is to check for an exact, 
+		/// case-sensitive match. Pass <see href="Flags.ExcludeExplicitlyImplemented"/> to exclude explicitly implemented 
+		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
+		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
+        /// <returns>A list of all matching members on the type. This value will never be null.</returns>
+        public static IList<MemberInfo> Members( this Type type, MemberTypes memberTypes, params string[] names )
+        {
+        	return type.Members( memberTypes, Flags.InstanceAnyVisibility, names );
+        }
+
+    	/// <summary>
         /// Gets all members of the given <paramref name="memberTypes"/> on the given <paramref name="type"/> that 
-        /// match the specified <paramref name="bindingFlags"/>. If values are supplied for the <paramref name="names"/>
-        /// parameter then filtering will be applied in accordance with the given <paramref name="bindingFlags"/>.
+        /// match the specified <paramref name="bindingFlags"/>, optionally filtered by the supplied <paramref name="names"/>
+        /// list (in accordance with the given <paramref name="bindingFlags"/>).
         /// </summary>
 		/// <param name="type">The type to reflect on.</param>
 		/// <param name="memberTypes">The <see href="MemberTypes"/> to include in the result.</param>
@@ -131,7 +159,7 @@ namespace Fasterflect
         /// the search behavior and result filtering.</param>
         /// <param name="names">The optional list of names against which to filter the result. If this parameter is
 		/// <c>null</c> or empty no name filtering will be applied. The default behavior is to check for an exact, 
-		/// case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> to include explicitly implemented 
+		/// case-sensitive match. Pass <see href="Flags.ExcludeExplicitlyImplemented"/> to exclude explicitly implemented 
 		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
 		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>A list of all matching members on the type. This value will never be null.</returns>
