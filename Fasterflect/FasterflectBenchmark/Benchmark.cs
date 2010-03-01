@@ -98,18 +98,18 @@ namespace FasterflectBenchmark
 		{
             //RunDictionaryBenchmark();
             //RunHashCodeBenchmark();
-            //RunLookupBenchmark();
-            //RunTryCreateInstanceBenchmark();
-            RunConstructorBenchmark();
-            RunFieldBenchmark();
-            RunStaticFieldBenchmark();
-            RunPropertyBenchmark();
-            RunStaticPropertyBenchmark();
-            RunMethodInvocationBenchmark();
-            RunStaticMethodInvocationBenchmark();
-            RunIndexerBenchmark();
-            RunArrayBenchmark();
-		    RunMetadataIntegrationBenchmark();
+            RunLookupBenchmark();
+            RunTryCreateInstanceBenchmark();
+			RunConstructorBenchmark();
+			RunFieldBenchmark();
+			RunStaticFieldBenchmark();
+			RunPropertyBenchmark();
+			RunStaticPropertyBenchmark();
+			RunMethodInvocationBenchmark();
+			RunStaticMethodInvocationBenchmark();
+			RunIndexerBenchmark();
+			RunArrayBenchmark();
+			RunMetadataIntegrationBenchmark();
 		}
 
 	    #region Internal Testing

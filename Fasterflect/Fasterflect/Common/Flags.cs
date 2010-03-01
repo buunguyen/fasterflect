@@ -117,8 +117,8 @@ namespace Fasterflect
 		/// If this option is specified the search for a named member will perform a partial match instead
 		/// of an exact match. If <see href="TrimExplicitlyImplemented"/> is specified the trimmed name is
 		/// used instead of the original member name. If <see href="IgnoreCase"/> is specified the 
-		/// comparison uses <see href="StringComparison.InvariantCultureIgnoreCase"/> and otherwise
-		/// uses <see href="StringComparison.InvariantCulture"/>.
+		/// comparison uses <see href="StringComparison.OrginalIgnoreCase"/> and otherwise
+		/// uses <see href="StringComparison.Ordinal"/>.
 		/// </summary>
 		public static readonly Flags PartialNameMatch = new Flags( 1L << 32 );
 
