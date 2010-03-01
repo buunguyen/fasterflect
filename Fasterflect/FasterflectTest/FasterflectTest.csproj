@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\BaseTest.cs" />
+    <Compile Include="Internal\FlagsTest.cs" />
     <Compile Include="Invocation\ArrayTest.cs" />
     <Compile Include="Invocation\BaseInvocationTest.cs" />
     <Compile Include="Invocation\ConstructorTest.cs" />
@@ -86,6 +87,8 @@
     <Compile Include="Lookup\AttributeTest.cs" />
     <Compile Include="Lookup\BaseLookupTest.cs" />
     <Compile Include="Lookup\ConstructorTest.cs" />
+    <Compile Include="Lookup\AssemblyTest.cs" />
+    <Compile Include="Lookup\ParameterTest.cs" />
     <Compile Include="Lookup\TryGetSetTest.cs" />
     <Compile Include="Lookup\MethodTest.cs" />
     <Compile Include="Lookup\PropertyTest.cs" />

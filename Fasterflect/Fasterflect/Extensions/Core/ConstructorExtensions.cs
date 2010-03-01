@@ -179,8 +179,9 @@ namespace Fasterflect
         /// <returns>An instance of type <paramref name="type"/>.</returns>
         public static object TryCreateInstance( this Type type, IDictionary<string, object> parameters )
         {
-            string[] names = parameters.Keys.ToArray();
-            object[] values = parameters.Values.ToArray();
+			bool hasParameters = parameters != null && parameters.Count > 0;
+            string[] names = hasParameters ? parameters.Keys.ToArray() : new string[ 0 ];
+            object[] values = hasParameters ? parameters.Values.ToArray() : new object[ 0 ];
             return type.TryCreateInstance( names, values );
         }
 
@@ -200,13 +201,19 @@ namespace Fasterflect
         /// <returns>An instance of type <paramref name="type"/>.</returns>
         public static object TryCreateInstance( this Type type, string[] parameterNames, object[] parameterValues )
         {
-            var parameterTypes = new Type[parameterValues.Length];
-            for( int i = 0; i < parameterNames.Length; i++ )
+        	var names = parameterNames ?? new string[ 0 ];
+			var values = parameterValues ?? new object[ 0 ];
+			if( names.Length != values.Length )
+			{
+				throw new ArgumentException( "Mismatching name and value arrays (must be of identical length)." );
+			}
+            var parameterTypes = new Type[ names.Length ];
+			for( int i = 0; i < names.Length; i++ )
             {
-                object value = parameterValues[ i ];
+                object value = values[ i ];
                 parameterTypes[ i ] = value != null ? value.GetType() : null;
             }
-            return type.TryCreateInstance( parameterNames, parameterTypes, parameterValues );
+            return type.TryCreateInstance( names, parameterTypes, values );
         }
 
         /// <summary>
@@ -225,8 +232,15 @@ namespace Fasterflect
         public static object TryCreateInstance( this Type type, string[] parameterNames, Type[] parameterTypes,
                                                 object[] parameterValues )
         {
-            MethodMap map = type.PrepareInvoke( parameterNames, parameterTypes, parameterValues );
-            return map.Invoke( parameterValues );
+        	var names = parameterNames ?? new string[ 0 ];
+        	var types = parameterTypes ?? new Type[ 0 ];
+			var values = parameterValues ?? new object[ 0 ];
+			if( names.Length != values.Length || names.Length != types.Length )
+			{
+				throw new ArgumentException( "Mismatching name, type and value arrays (must be of identical length)." );
+			}
+            MethodMap map = type.PrepareInvoke( names, types, values );
+            return map.Invoke( values );
         }
         #endregion
 

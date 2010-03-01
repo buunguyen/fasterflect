@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.ComponentModel;
 using FasterflectTest.SampleModel.Animals.Enumerations;
 using FasterflectTest.SampleModel.Animals.Interfaces;
 
@@ -42,7 +43,7 @@ namespace FasterflectTest.SampleModel.Animals
 		public virtual double SwimDistance { get; private set; } 
 
 		// ISlide
-		public override void Move( double distance )
+		public override void Move( [DefaultValue(100d)] double distance )
 		{
 			SlideDistance += distance;
 		}

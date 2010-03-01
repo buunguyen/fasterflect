@@ -161,5 +161,65 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 0, members.Count );
         }
 		#endregion
- 	}
+
+		#region Member Helpers (HasName, Type, IsReadable/IsWritable)
+		[TestMethod]
+		public void TestMemberHasName()
+        {
+			var member = typeof(Lion).Member( "lastMealTime" );
+			Assert.IsNotNull( member );
+			Assert.IsTrue( member.HasName( "lastMealTime" ) );
+			Assert.IsTrue( member.HasName( "_lastMealTime" ) );
+		}
+
+		[TestMethod]
+		public void TestMemberType()
+        {
+			var member = typeof(Lion).Member( "lastMealTime" );
+			Assert.IsNotNull( member );
+			Assert.AreEqual( typeof(DateTime), member.Type() );
+		}
+
+		[TestMethod]
+		public void TestMemberIsReadableIsWritable()
+        {
+			// normal instance field
+			var member = typeof(Lion).Member( "lastMealTime" );
+			Assert.IsNotNull( member );
+			Assert.IsTrue( member.IsReadable() );
+			Assert.IsTrue( member.IsWritable() );
+			// normal instance property
+			member = typeof(Lion).Member( "Name" );
+			Assert.IsNotNull( member );
+			Assert.IsTrue( member.IsReadable() );
+			Assert.IsTrue( member.IsWritable() );
+
+			// const field
+			member = typeof(Zoo).Member( "FirstId", Flags.StaticAnyVisibility );
+			Assert.IsNotNull( member );
+			Assert.IsTrue( member.IsReadable() );
+			Assert.IsFalse( member.IsWritable() );
+			// static field
+			member = typeof(Zoo).Member( "nextId", Flags.StaticAnyVisibility );
+			Assert.IsNotNull( member );
+			Assert.IsTrue( member.IsReadable() );
+			Assert.IsTrue( member.IsWritable() );
+			// readonly instance field
+			member = typeof(Zoo).Member( "name" );
+			Assert.IsNotNull( member );
+			Assert.IsTrue( member.IsReadable() );
+			Assert.IsFalse( member.IsWritable() );
+			// read-only instance property
+			member = typeof(Zoo).Member( "Name" );
+			Assert.IsNotNull( member );
+			Assert.IsTrue( member.IsReadable() );
+			Assert.IsFalse( member.IsWritable() );
+			// write-only instance property
+			member = typeof(Zoo).Member( "Alias" );
+			Assert.IsNotNull( member );
+			Assert.IsFalse( member.IsReadable() );
+			Assert.IsTrue( member.IsWritable() );
+		}
+		#endregion
+	}
 }

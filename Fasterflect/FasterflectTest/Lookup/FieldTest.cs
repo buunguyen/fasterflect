@@ -45,7 +45,7 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestFieldInstanceIgnoreCase()
         {
-        	BindingFlags flags = Flags.InstanceAnyVisibility | BindingFlags.IgnoreCase;
+        	Flags flags = Flags.InstanceAnyVisibility | Flags.IgnoreCase;
 
 			AnimalInstanceFieldNames.Select( s => s.ToUpper() ).Select( s => typeof(Animal).Field( s, flags ) ).ForEach( Assert.IsNotNull );
 			LionInstanceFieldNames.Select( s => s.ToUpper() ).Select( s => typeof(Lion).Field( s, flags ) ).ForEach( Assert.IsNotNull );
@@ -54,10 +54,40 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestFieldInstanceDeclaredOnly()
         {
-        	BindingFlags flags = Flags.InstanceAnyVisibility | BindingFlags.DeclaredOnly;
+        	Flags flags = Flags.InstanceAnyVisibility | Flags.DeclaredOnly;
 			
 			AnimalInstanceFieldNames.Select( s => typeof(Animal).Field( s, flags ) ).ForEach( Assert.IsNotNull );
 			LionDeclaredInstanceFieldNames.Select( s => typeof(Lion).Field( s, flags ) ).ForEach( Assert.IsNotNull );
+        }
+
+        [TestMethod]
+		public void TestFieldByPartialName()
+        {
+        	Flags flags = Flags.InstanceAnyVisibility | Flags.PartialNameMatch;
+
+        	var expectedName = AnimalInstanceFieldNames.Where( s => s.Contains( "i" ) ).First();
+			var field = typeof(Animal).Field( "i", flags );
+			Assert.IsNotNull( field );
+        	Assert.AreEqual( expectedName, field.Name );
+
+        	expectedName = AnimalInstanceFieldNames.Where( s => s.Contains( "bi" ) ).First();
+			field = typeof(Animal).Field( "bi", flags );
+			Assert.IsNotNull( field );
+        	Assert.AreEqual( expectedName, field.Name );
+        }
+
+        [TestMethod]
+		public void TestFieldWithPartialNameMatchAndExcludeBackingMembers()
+        {
+        	Flags flags = Flags.InstanceAnyVisibility | Flags.PartialNameMatch;
+
+			var expectedName = AnimalInstanceFieldNames.Where( s => s.Contains( "Movement" ) ).First();
+			var field = typeof(Animal).Field( "Movement", flags );
+			Assert.IsNotNull( field );
+        	Assert.AreEqual( expectedName, field.Name );
+
+			field = typeof(Animal).Field( "Movement", flags | Flags.ExcludeBackingMembers );
+			Assert.IsNull( field );
         }
 
         [TestMethod]
@@ -74,7 +104,7 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestFieldStaticDeclaredOnly()
         {
-        	BindingFlags flags = Flags.StaticAnyVisibility | BindingFlags.DeclaredOnly;
+        	Flags flags = Flags.StaticAnyVisibility | Flags.DeclaredOnly;
 			
 			AnimalStaticFieldNames.Select( s => typeof(Animal).Field( s, flags ) ).ForEach( Assert.IsNotNull );
 			AnimalStaticFieldNames.Select( s => typeof(Lion).Field( s, flags ) ).ForEach( Assert.IsNull );
@@ -104,18 +134,18 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestFieldsInstanceWithDeclaredOnlyFlag()
         {
-			IList<FieldInfo> fields = typeof(object).Fields( Flags.InstanceAnyVisibility | BindingFlags.DeclaredOnly );
+			IList<FieldInfo> fields = typeof(object).Fields( Flags.InstanceAnyVisibility | Flags.DeclaredOnly );
 			Assert.IsNotNull( fields );
 			Assert.AreEqual( 0, fields.Count );
 
-			fields = typeof(Animal).Fields( Flags.InstanceAnyVisibility | BindingFlags.DeclaredOnly );
+			fields = typeof(Animal).Fields( Flags.InstanceAnyVisibility | Flags.DeclaredOnly );
 			CollectionAssert.AreEquivalent( AnimalInstanceFieldNames, fields.Select( f => f.Name ).ToArray() );
 			CollectionAssert.AreEquivalent( AnimalInstanceFieldTypes, fields.Select( f => f.FieldType ).ToArray() );
 
-			fields = typeof(Mammal).Fields( Flags.InstanceAnyVisibility | BindingFlags.DeclaredOnly );
+			fields = typeof(Mammal).Fields( Flags.InstanceAnyVisibility | Flags.DeclaredOnly );
 			Assert.AreEqual( 0, fields.Count );
 
-			fields = typeof(Lion).Fields( Flags.InstanceAnyVisibility | BindingFlags.DeclaredOnly );
+			fields = typeof(Lion).Fields( Flags.InstanceAnyVisibility | Flags.DeclaredOnly );
 			CollectionAssert.AreEquivalent( LionDeclaredInstanceFieldNames, fields.Select( f => f.Name ).ToArray() );
 			CollectionAssert.AreEquivalent( LionDeclaredInstanceFieldTypes, fields.Select( f => f.FieldType ).ToArray() );
         }
@@ -139,18 +169,18 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestFieldsStaticWithDeclaredOnlyFlag()
         {
-			IList<FieldInfo> fields = typeof(object).Fields( Flags.StaticAnyVisibility | BindingFlags.DeclaredOnly );
+			IList<FieldInfo> fields = typeof(object).Fields( Flags.StaticAnyVisibility | Flags.DeclaredOnly );
 			Assert.IsNotNull( fields );
 			Assert.AreEqual( 0, fields.Count );
 
-			fields = typeof(Animal).Fields( Flags.StaticAnyVisibility | BindingFlags.DeclaredOnly );
+			fields = typeof(Animal).Fields( Flags.StaticAnyVisibility | Flags.DeclaredOnly );
 			CollectionAssert.AreEquivalent( AnimalStaticFieldNames, fields.Select( f => f.Name ).ToArray() );
 			CollectionAssert.AreEquivalent( AnimalStaticFieldTypes, fields.Select( f => f.FieldType ).ToArray() );
 
-			fields = typeof(Mammal).Fields( Flags.StaticAnyVisibility | BindingFlags.DeclaredOnly );
+			fields = typeof(Mammal).Fields( Flags.StaticAnyVisibility | Flags.DeclaredOnly );
 			Assert.AreEqual( 0, fields.Count );
 
-			fields = typeof(Lion).Fields( Flags.StaticAnyVisibility | BindingFlags.DeclaredOnly );
+			fields = typeof(Lion).Fields( Flags.StaticAnyVisibility | Flags.DeclaredOnly );
 			Assert.AreEqual( 0, fields.Count );
         }
 		#endregion

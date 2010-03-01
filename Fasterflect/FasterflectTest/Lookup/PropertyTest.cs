@@ -45,7 +45,7 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestPropertyInstanceIgnoreCase()
         {
-        	BindingFlags flags = Flags.InstanceAnyVisibility | BindingFlags.IgnoreCase;
+        	Flags flags = Flags.InstanceAnyVisibility | Flags.IgnoreCase;
 
 			AnimalInstancePropertyNames.Select( s => s.ToLower() ).Select( s => typeof(Animal).Property( s ) ).ForEach( Assert.IsNull );
 			AnimalInstancePropertyNames.Select( s => s.ToLower() ).Select( s => typeof(Animal).Property( s, flags ) ).ForEach( Assert.IsNotNull );
@@ -57,16 +57,50 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestPropertyInstanceDeclaredOnly()
         {
-        	BindingFlags flags = Flags.InstanceAnyVisibility | BindingFlags.DeclaredOnly;
+        	Flags flags = Flags.InstanceAnyVisibility | Flags.DeclaredOnly;
 			
 			AnimalInstancePropertyNames.Select( s => typeof(Animal).Property( s, flags ) ).ForEach( Assert.IsNotNull );
 			LionDeclaredInstancePropertyNames.Select( s => typeof(Lion).Property( s, flags ) ).ForEach( Assert.IsNotNull );
         }
 
         [TestMethod]
+		public void TestPropertyByPartialName()
+        {
+        	Flags flags = Flags.InstanceAnyVisibility | Flags.PartialNameMatch;
+
+        	var expectedName = AnimalInstancePropertyNames.Where( s => s.Contains( "C" ) ).First();
+			var property = typeof(Animal).Property( "C", flags );
+			Assert.IsNotNull( property );
+        	Assert.AreEqual( expectedName, property.Name );
+
+        	expectedName = AnimalInstancePropertyNames.Where( s => s.Contains( "B" ) ).First();
+			property = typeof(Animal).Property( "B", flags );
+			Assert.IsNotNull( property );
+        	Assert.AreEqual( expectedName, property.Name );
+        }
+
+        [TestMethod]
+		public void TestPropertyWithExcludeExplicitlyImplemented()
+        {
+        	Flags flags = Flags.InstanceAnyVisibility | Flags.ExcludeExplicitlyImplemented;
+
+			// using explicit name
+			var property = typeof(Giraffe).Property( "FasterflectTest.SampleModel.Animals.Interfaces.ISwim.SwimDistance" );
+			Assert.IsNotNull( property );
+			property = typeof(Giraffe).Property( "FasterflectTest.SampleModel.Animals.Interfaces.ISwim.SwimDistance", flags );
+			Assert.IsNull( property );
+
+			// using short name
+			property = typeof(Giraffe).Property( "SwimDistance", Flags.InstanceAnyVisibility | Flags.TrimExplicitlyImplemented );
+			Assert.IsNotNull( property );
+			property = typeof(Giraffe).Property( "SwimDistance", flags | Flags.TrimExplicitlyImplemented );
+			Assert.IsNull( property );
+        }
+
+        [TestMethod]
 		public void TestPropertyStatic()
         {
-        	BindingFlags flags = Flags.StaticAnyVisibility;
+        	Flags flags = Flags.StaticAnyVisibility;
 			
 			AnimalInstancePropertyNames.Select( s => typeof(Animal).Property( s, flags ) ).ForEach( Assert.IsNull );
 
@@ -77,7 +111,7 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestPropertyStaticDeclaredOnly()
         {
-        	BindingFlags flags = Flags.StaticAnyVisibility | BindingFlags.DeclaredOnly;
+        	Flags flags = Flags.StaticAnyVisibility | Flags.DeclaredOnly;
 			
 			AnimalStaticPropertyNames.Select( s => typeof(Animal).Property( s, flags ) ).ForEach( Assert.IsNotNull );
 			AnimalStaticPropertyNames.Select( s => typeof(Lion).Property( s, flags ) ).ForEach( Assert.IsNull );
@@ -107,18 +141,18 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestPropertiesInstanceWithDeclaredOnlyFlag()
         {
-			IList<PropertyInfo> properties = typeof(object).Properties( Flags.InstanceAnyVisibility | BindingFlags.DeclaredOnly );
+			IList<PropertyInfo> properties = typeof(object).Properties( Flags.InstanceAnyVisibility | Flags.DeclaredOnly );
 			Assert.IsNotNull( properties );
 			Assert.AreEqual( 0, properties.Count );
 
-			properties = typeof(Animal).Properties( Flags.InstanceAnyVisibility | BindingFlags.DeclaredOnly );
+			properties = typeof(Animal).Properties( Flags.InstanceAnyVisibility | Flags.DeclaredOnly );
 			CollectionAssert.AreEquivalent( AnimalInstancePropertyNames, properties.Select( p => p.Name ).ToArray() );
 			CollectionAssert.AreEquivalent( AnimalInstancePropertyTypes, properties.Select( p => p.PropertyType ).ToArray() );
 
-			properties = typeof(Mammal).Properties( Flags.InstanceAnyVisibility | BindingFlags.DeclaredOnly );
+			properties = typeof(Mammal).Properties( Flags.InstanceAnyVisibility | Flags.DeclaredOnly );
 			Assert.AreEqual( 0, properties.Count );
 
-			properties = typeof(Lion).Properties( Flags.InstanceAnyVisibility | BindingFlags.DeclaredOnly );
+			properties = typeof(Lion).Properties( Flags.InstanceAnyVisibility | Flags.DeclaredOnly );
 			CollectionAssert.AreEquivalent( LionDeclaredInstancePropertyNames, properties.Select( p => p.Name ).ToArray() );
 			CollectionAssert.AreEquivalent( LionDeclaredInstancePropertyTypes, properties.Select( p => p.PropertyType ).ToArray() );
         }
@@ -145,18 +179,18 @@ namespace FasterflectTest.Lookup
         [TestMethod]
 		public void TestPropertiesStaticWithDeclaredOnlyFlag()
         {
-			IList<PropertyInfo> properties = typeof(object).Properties( Flags.StaticAnyVisibility | BindingFlags.DeclaredOnly );
+			IList<PropertyInfo> properties = typeof(object).Properties( Flags.StaticAnyVisibility | Flags.DeclaredOnly );
 			Assert.IsNotNull( properties );
 			Assert.AreEqual( 0, properties.Count );
 
-			properties = typeof(Animal).Properties( Flags.StaticAnyVisibility | BindingFlags.DeclaredOnly );
+			properties = typeof(Animal).Properties( Flags.StaticAnyVisibility | Flags.DeclaredOnly );
 			CollectionAssert.AreEquivalent( AnimalStaticPropertyNames, properties.Select( p => p.Name ).ToArray() );
 			CollectionAssert.AreEquivalent( AnimalStaticPropertyTypes, properties.Select( p => p.PropertyType ).ToArray() );
 
-			properties = typeof(Mammal).Properties( Flags.StaticAnyVisibility | BindingFlags.DeclaredOnly );
+			properties = typeof(Mammal).Properties( Flags.StaticAnyVisibility | Flags.DeclaredOnly );
 			Assert.AreEqual( 0, properties.Count );
 
-			properties = typeof(Lion).Properties( Flags.StaticAnyVisibility | BindingFlags.DeclaredOnly );
+			properties = typeof(Lion).Properties( Flags.StaticAnyVisibility | Flags.DeclaredOnly );
 			Assert.AreEqual( 0, properties.Count );
         }
 		

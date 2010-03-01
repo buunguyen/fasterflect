@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Fasterflect
@@ -58,8 +59,8 @@ namespace Fasterflect
                     bool match = (isPartial && memberName.Contains( name )) || memberName.Equals( name, comparison );
                     if( match )
                     {
-                        result.Add( member );
-                        break;
+						result.Add( member );
+                    	break;
                     }
                 }
             }
@@ -82,7 +83,7 @@ namespace Fasterflect
                 var parameters = method.GetParameters();
                 if( parameters.Length != paramTypes.Length )
                 {
-                    break;
+                    continue;
                 }
                 bool match = true;
                 for( int j = 0; j < paramTypes.Length; j++ )
@@ -95,10 +96,10 @@ namespace Fasterflect
                         break;
                     }
                 }
-                if( match )
-                {
-                    result.Add( method );
-                }
+				if( match )
+				{
+	                result.Add( method );
+				}
             }
             return result;
         }
@@ -115,11 +116,11 @@ namespace Fasterflect
             {
                 var member = members[ i ];
                 bool match = (member.MemberType & memberTypes) == member.MemberType;
-                if( match )
+                if( ! match )
                 {
-                    result.Add( member );
-                    break;
+					continue;
                 }
+                result.Add( member );
             }
             return result;
         }
@@ -138,20 +139,47 @@ namespace Fasterflect
                 bool excludeBacking = bindingFlags.IsSet( Flags.ExcludeBackingMembers );
                 bool excludeExplicit = bindingFlags.IsSet( Flags.ExcludeExplicitlyImplemented );
 
-                bool match =
-                    ! (excludeBacking && (member.MemberType & MemberTypes.Field) == MemberTypes.Field &&
-                       member.Name[ 0 ] == '<');
-                match &=
-                    ! (excludeBacking && (member.MemberType & MemberTypes.Method) == MemberTypes.Method &&
-                       member.Name.Substring( 1, 3 ) == "et_");
-                match &= ! (excludeExplicit && member.Name.Contains( "." ));
-                if( match )
+            	bool exclude = false;
+				if( excludeBacking )
+				{
+					exclude |= member is FieldInfo && member.Name[ 0 ] == '<';
+					var method = member as MethodInfo;
+ 					if( method != null )
+ 					{
+ 						// filter out property backing methods
+						exclude |= member.Name.Substring( 1, 3 ) == "et_";
+						// filter out base implementations when an overrride exists
+						exclude |= result.ContainsOverride( method );
+ 					}
+				}
+                exclude |= excludeExplicit && member.Name.Contains( "." ) && ! member.Name.IsReservedName();
+                if( exclude )
                 {
-                    result.Add( member );
-                    break;
+					continue;
                 }
+                result.Add( member );
             }
             return result;
         }
+
+		private static bool ContainsOverride<T>( this IList<T> candidates, MethodInfo method ) where T : MemberInfo
+    	{
+			if( ! method.IsVirtual )
+				return false;
+   			var parameters = method.Parameters();
+			for( int i = 0; i < candidates.Count; i++ )
+			{
+				MethodInfo candidate = candidates[ i ] as MethodInfo;
+				if( candidate == null || ! candidate.IsVirtual || method.Name != candidate.Name )
+				{
+					continue;
+				}
+				if( parameters.Select( p => p.ParameterType ).SequenceEqual( candidate.Parameters().Select( p => p.ParameterType ) ) )
+				{
+					return true;
+				}
+			}
+			return false;
+    	}
     }
 }
