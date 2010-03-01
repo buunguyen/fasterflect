@@ -43,7 +43,10 @@ namespace Fasterflect
 		{
 			foreach( BindingFlags flag in Enum.GetValues( typeof(BindingFlags) ) )
 			{
-				flagNames[ new Flags( (long) flag ) ] = flag.ToString();
+				if( flag != BindingFlags.Default )
+				{
+					flagNames[ new Flags( (long) flag ) ] = flag.ToString();
+				}
 			}
 			flagNames[ PartialNameMatch ] = "PartialNameMatch"; // new Flags( 1L << 32 );
 			flagNames[ TrimExplicitlyImplemented ] = "TrimExplicitlyImplemented"; // new Flags( 1L << 33 );
@@ -384,8 +387,9 @@ namespace Fasterflect
 		public override string ToString()
 		{
 			Flags @this = this;
-			List<string> names =
-				flagNames.Where( kvp => @this.IsSet( kvp.Key ) ).Select( kvp => kvp.Value ).OrderBy( n => n ).ToList();
+			List<string> names = flagNames.Where( kvp => @this.IsSet( kvp.Key ) )
+										  .Select( kvp => kvp.Value )
+										  .OrderBy( n => n ).ToList();
 			int index = 0;
 			var sb = new StringBuilder();
 			names.ForEach( n => sb.AppendFormat( "{0}{1}", n, ++index < names.Count ? " | " : "" ) );

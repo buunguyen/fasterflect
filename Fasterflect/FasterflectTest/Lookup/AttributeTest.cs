@@ -125,9 +125,17 @@ namespace FasterflectTest.Lookup
         #endregion
         #endregion
 
-        #region Types
-        #region Attribute<T>()
+        #region Find attributes on types
+        #region Attribute() and Attribute<T>()
         [TestMethod]
+        public void TestFindFirstAttributeOnType()
+        {
+            Attribute attr = typeof(Giraffe).Attribute();
+            Assert.IsNotNull( attr );
+			Assert.IsInstanceOfType( attr, typeof(ZoneAttribute) );
+        }
+
+		[TestMethod]
         public void TestFindSpecificAttributeOnType()
         {
             CodeAttribute code = typeof(Lion).Attribute<CodeAttribute>();
@@ -200,7 +208,59 @@ namespace FasterflectTest.Lookup
         }
         #endregion
 
+        #region FieldsAndPropertiesWith()
+        [TestMethod]
+        public void TestFindFieldsAndPropertiesWith_NoMatchShouldReturnEmptyList()
+        {
+            Type type = typeof(Lion);
+            IList<MemberInfo> members = type.FieldsAndPropertiesWith( Flags.InstanceAnyVisibility, typeof(ZoneAttribute) );
+            Assert.IsNotNull( members );
+            Assert.AreEqual( 0, members.Count );
+        }
+
+        [TestMethod]
+        public void TestFindFieldsAndPropertiesWith_InstanceFieldShouldIncludeInheritedPrivateField()
+        {
+            Type type = typeof(Lion);
+            IList<MemberInfo> members = type.FieldsAndPropertiesWith( Flags.InstanceAnyVisibility, typeof(DefaultValueAttribute) );
+            Assert.IsNotNull( members );
+            Assert.AreEqual( 2, members.Count );
+            Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "Name" ) );
+            Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "birthDay" ) );
+			
+            members = type.FieldsAndPropertiesWith( Flags.Instance | Flags.NonPublic, typeof(CodeAttribute) );
+            Assert.IsNotNull( members );
+            Assert.AreEqual( 2, members.Count );
+            Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "id" ) );
+            Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "lastMealTime" ) );
+        }
+
+        [TestMethod]
+        public void TestFinFieldsAndPropertiesWithWith_DefaultFlagsShouldBeInstanceAnyVisibility()
+        {
+            Type type = typeof(Lion);
+            IList<MemberInfo> members = type.FieldsAndPropertiesWith( typeof(DefaultValueAttribute) );
+            Assert.IsNotNull( members );
+            Assert.AreEqual( 2, members.Count );
+            Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "Name" ) );
+            Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "birthDay" ) );
+       }
+        #endregion
+
         #region MembersWith()
+        [TestMethod]
+        public void TestFindMembersWith_EmptyOrNullAttributeTypeListShouldReturnAll()
+        {
+            Type type = typeof(Lion);
+            IList<MemberInfo> members = type.MembersWith( MemberTypes.Field, Flags.InstanceAnyVisibility );
+            Assert.IsNotNull( members );
+            Assert.AreEqual( 7, members.Count );
+			
+            members = type.MembersWith( MemberTypes.Field, Flags.InstanceAnyVisibility, null );
+            Assert.IsNotNull( members );
+            Assert.AreEqual( 7, members.Count );
+        }
+
         [TestMethod]
         public void TestFindMembersWith_InstanceFieldShouldIncludeInheritedPrivateField()
         {
@@ -211,7 +271,7 @@ namespace FasterflectTest.Lookup
             Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "id" ) );
             Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "lastMealTime" ) );
 			
-            members = type.MembersWith( MemberTypes.Field, BindingFlags.NonPublic | BindingFlags.Instance, typeof(DefaultValueAttribute) );
+            members = type.MembersWith( MemberTypes.Field, Flags.NonPublic | Flags.Instance, typeof(DefaultValueAttribute) );
             Assert.IsNotNull( members );
             Assert.AreEqual( 1, members.Count );
             Assert.IsNotNull( members.FirstOrDefault( m => m.Name == "birthDay" ) );
@@ -229,7 +289,7 @@ namespace FasterflectTest.Lookup
         }
 
         [TestMethod]
-        public void TestFindMembersWith_DefaultBindingFlagsShouldBeInstanceCriteria()
+        public void TestFindMembersWith_DefaultFlagsShouldBeInstanceAnyVisibility()
         {
             Type type = typeof(Lion);
             IList<MemberInfo> members = type.MembersWith( MemberTypes.Field, typeof(CodeAttribute) );
@@ -254,10 +314,25 @@ namespace FasterflectTest.Lookup
                 Assert.IsTrue( item.Value[ 0 ] is CodeAttribute );
             }
         }
+
+        [TestMethod]
+        public void TestFindMembersAndAttributes_DefaultFlagsShouldBeInstanceAnyVisibility()
+        {
+            var expectedMembers = typeof(Lion).MembersAndAttributes( MemberTypes.Field, Flags.InstanceAnyVisibility, typeof(CodeAttribute) );
+            Assert.IsNotNull( expectedMembers );
+            Assert.AreEqual( 2, expectedMembers.Count );
+            var members = typeof(Lion).MembersAndAttributes( MemberTypes.Field, typeof(CodeAttribute) );
+            Assert.IsNotNull( expectedMembers );
+			foreach( var item in expectedMembers )
+            {
+                Assert.IsTrue( members.ContainsKey( item.Key ) );
+            	CollectionAssert.AreEquivalent( item.Value, members[ item.Key ] );
+            }
+        }
         #endregion
         #endregion
 
-        #region Members
+        #region Find attributes on members
         #region Attribute<T>()
         [TestMethod]
         public void TestFindSpecificAttributeOnField()
@@ -356,8 +431,57 @@ namespace FasterflectTest.Lookup
             Assert.AreEqual( 1, info.Attributes<CodeAttribute>().Count );
         }
         #endregion
+
+		#region HasAttribute and relatives
+        [TestMethod]
+        public void TestHasAttributeOnField()
+        {
+            FieldInfo info = typeof(Lion).Field( "lastMealTime" );
+            Assert.IsNotNull( info );
+            Assert.IsFalse( info.HasAttribute( typeof(DefaultValueAttribute) ) );
+            Assert.IsTrue( info.HasAttribute( typeof(CodeAttribute) ) );
+        }
+
+		[TestMethod]
+        public void TestHasAttributeOnField_Generic()
+        {
+            FieldInfo info = typeof(Lion).Field( "lastMealTime" );
+            Assert.IsNotNull( info );
+            Assert.IsFalse( info.HasAttribute<DefaultValueAttribute>() );
+            Assert.IsTrue( info.HasAttribute<CodeAttribute>() );
+        }
+
+		[TestMethod]
+        public void TestHasAnyAttribute()
+        {
+            FieldInfo field = typeof(Lion).Field( "lastMealTime" );
+            Assert.IsNotNull( field );
+            Assert.IsTrue( field.HasAnyAttribute( null ) );
+            Assert.IsTrue( field.HasAnyAttribute( typeof(CodeAttribute) ) );
+            Assert.IsFalse( field.HasAnyAttribute( typeof(DefaultValueAttribute) ) );
+            Assert.IsTrue( field.HasAnyAttribute( typeof(CodeAttribute), typeof(DefaultValueAttribute) ) );
+            
+			PropertyInfo property = typeof(Lion).Property( "Name" );
+            Assert.IsNotNull( property );
+            Assert.IsTrue( property.HasAnyAttribute( typeof(CodeAttribute), typeof(DefaultValueAttribute) ) );
+        }
+
+		[TestMethod]
+        public void TestHasAllAttributes()
+        {
+            FieldInfo field = typeof(Lion).Field( "lastMealTime" );
+            Assert.IsNotNull( field );
+            Assert.IsTrue( field.HasAllAttributes() );
+            Assert.IsTrue( field.HasAllAttributes( null ) );
+            Assert.IsFalse( field.HasAllAttributes( typeof(CodeAttribute), typeof(DefaultValueAttribute) ) );
+            
+			PropertyInfo property = typeof(Lion).Property( "Name" );
+            Assert.IsNotNull( property );
+            Assert.IsTrue( property.HasAllAttributes( typeof(CodeAttribute), typeof(DefaultValueAttribute) ) );
+        }
+		#endregion
         #endregion
-    }
+	}
 }
 
 

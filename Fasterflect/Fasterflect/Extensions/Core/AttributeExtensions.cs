@@ -92,9 +92,11 @@ namespace Fasterflect
         /// <returns>A list of the attributes found on the source element. This value will never be null.</returns>
         public static IList<Attribute> Attributes( this ICustomAttributeProvider source, params Type[] attributeTypes )
         {
-            return source.GetCustomAttributes( true ).Cast<Attribute>().Where( attr => attributeTypes.Length == 0 ||
-			                                                                         attributeTypes.Any( at => { Type type = attr.GetType();
-			                                                                                                     return at == type || at.IsSubclassOf(type); } ) ).ToList();
+			bool hasTypes = attributeTypes != null && attributeTypes.Length > 0;
+            return source.GetCustomAttributes( true ).Cast<Attribute>()
+				.Where( attr => ! hasTypes || 
+					    attributeTypes.Any( at => { Type type = attr.GetType();
+													return at == type || at.IsSubclassOf(type); } ) ).ToList();
 		}
 
         /// <summary>
@@ -156,6 +158,9 @@ namespace Fasterflect
         /// Determines whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
         /// of any of the types given in <paramref name="attributeTypes"/>.
         /// </summary>
+        /// <param name="source"></param>
+        /// <param name="attributeTypes">The list of attribute types to look for. If this list is <c>null</c> or
+        /// empty an <see href="ArgumentException"/> will be thrown.</param>
         /// <returns>True if the source element has at least one of the specified attribute types, false otherwise.</returns>
         public static bool HasAnyAttribute( this ICustomAttributeProvider source, params Type[] attributeTypes )
         {
@@ -169,68 +174,104 @@ namespace Fasterflect
         /// <returns>True if the source element has all of the specified attribute types, false otherwise.</returns>
         public static bool HasAllAttributes( this ICustomAttributeProvider source, params Type[] attributeTypes )
         {
-            return attributeTypes.Length == 0 || attributeTypes.All( at => source.HasAttribute( at ) );
+			bool hasTypes = attributeTypes != null && attributeTypes.Length > 0;
+            return ! hasTypes || attributeTypes.All( at => source.HasAttribute( at ) );
         }
         #endregion
 
-
         #region MembersWith Lookup
         /// <summary>
-        /// Gets all public and non-public instance members on the given <paramref name="type"/>. Only members
-        /// of the given <paramref name="memberTypes"/> will be included in the result.
-        /// The resulting list of attributes can optionally be filtered by supplying a list
-        /// of <paramref name="attributeTypes"/>, in which case only members decorated with
-        /// at least one of these will be included.
+        /// Gets all public and non-public instance members on the given <paramref name="type"/>.
+        /// The resulting list of members can optionally be filtered by supplying a list of 
+        /// <paramref name="attributeTypes"/>, in which case only members decorated with at least one of
+        /// these will be included.
         /// </summary>
-        /// <returns>A list of all matching members. This value will never be null.</returns>
-        public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes,
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="memberTypes">The <see href="MemberTypes"/> to include in the search.</param>
+        /// <param name="attributeTypes">The optional list of attribute types with which members should
+        /// be decorated. If this parameter is <c>null</c> or empty then all fields and properties
+        /// will be included in the result.</param>
+        /// <returns>A list of all matching members on the type. This value will never be null.</returns>
+		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes,
                                                      params Type[] attributeTypes )
         {
             return type.MembersWith( memberTypes, Flags.InstanceAnyVisibility, attributeTypes );
         }
 
         /// <summary>
-        /// Gets all members on the given <paramref name="type"/> that are decorated with an
-        /// <see href="Attribute"/> of the given type <typeparamref name="T"/>. Only members
-        /// of the given <paramref name="memberTypes"/> and matching <paramref name="bindingFlags"/>
-        /// will be included in the result. This method will include both
-        /// public and non-public, instance and static members in the result.
+        /// Gets all members of the given <paramref name="memberTypes"/> on the given <paramref name="type"/> 
+        /// that match the specified <paramref name="bindingFlags"/> and are decorated with an
+        /// <see href="Attribute"/> of the given type <typeparamref name="T"/>.
         /// </summary>
-        /// <returns>A list of all matching members. This value will never be null.</returns>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="memberTypes">The <see href="MemberTypes"/> to include in the search.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination 
+        /// used to define the search behavior and result filtering.</param>
+        /// <returns>A list of all matching members on the type. This value will never be null.</returns>
         public static IList<MemberInfo> MembersWith<T>( this Type type, MemberTypes memberTypes, Flags bindingFlags )
         {
             return type.MembersWith( memberTypes, bindingFlags, typeof(T) );
         }
 
         /// <summary>
-        /// Gets all members on the given <paramref name="type"/>. Only members of the given 
-        /// <paramref name="memberTypes"/> and matching <paramref name="bindingFlags"/> will be 
-        /// included in the result.
-        /// The resulting list of attributes can optionally be filtered by supplying a list
-        /// of <paramref name="attributeTypes"/>, in which case only members decorated with
-        /// at least one of these will be included.
+        /// Gets all members on the given <paramref name="type"/> that match the specified 
+        /// <paramref name="bindingFlags"/>.
+        /// The resulting list of members can optionally be filtered by supplying a list of 
+        /// <paramref name="attributeTypes"/>, in which case only members decorated with at least one of
+        /// these will be included.
         /// </summary>
-        /// <returns>A list of all matching members. This value will never be null.</returns>
-        public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes, Flags bindingFlags,
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="memberTypes">The <see href="MemberTypes"/> to include in the search.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination 
+        /// used to define the search behavior and result filtering.</param>
+        /// <param name="attributeTypes">The optional list of attribute types with which members should
+        /// be decorated. If this parameter is <c>null</c> or empty then all fields and properties
+        /// matching the given <paramref name="bindingFlags"/> will be included in the result.</param>
+        /// <returns>A list of all matching members on the type. This value will never be null.</returns>
+		public static IList<MemberInfo> MembersWith( this Type type, MemberTypes memberTypes, Flags bindingFlags,
                                                      params Type[] attributeTypes )
         {
+			bool hasTypes = attributeTypes != null && attributeTypes.Length > 0;
             var query = from m in type.Members( memberTypes, bindingFlags )
-                        where attributeTypes.Length == 0 || m.HasAnyAttribute( attributeTypes )
+                        where ! hasTypes || m.HasAnyAttribute( attributeTypes )
                         select m;
             return query.ToList();
         }
 
         /// <summary>
-        /// Gets all fields and properties on the given <paramref name="type"/>.
-        /// The resulting list of members can optionally be filtered by supplying a list
-        /// of <paramref name="attributeTypes"/>, in which case only members decorated with
-        /// at least one of these will be included. This method will include both
-        /// public and non-public, instance and static members in the result.
+        /// Gets all public and non-public instance fields and properties on the given <paramref name="type"/>.
+        /// The resulting list of members can optionally be filtered by supplying a list of 
+        /// <paramref name="attributeTypes"/>, in which case only members decorated with at least one of
+        /// these will be included.
         /// </summary>
-        /// <returns>A list of all matching members. This value will never be null.</returns>
-        public static IList<MemberInfo> FieldsAndPropertiesWith( this Type type, params Type[] attributeTypes )
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="attributeTypes">The optional list of attribute types with which members should
+        /// be decorated. If this parameter is <c>null</c> or empty then all fields and properties
+        /// will be included in the result.</param>
+        /// <returns>A list of all matching fields and properties on the type. This value will never be null.</returns>
+		public static IList<MemberInfo> FieldsAndPropertiesWith( this Type type, params Type[] attributeTypes )
         {
             return type.MembersWith( MemberTypes.Field | MemberTypes.Property, attributeTypes );
+        }
+		
+        /// <summary>
+        /// Gets all fields and properties on the given <paramref name="type"/> that match the specified 
+        /// <paramref name="bindingFlags"/>.
+        /// The resulting list of members can optionally be filtered by supplying a list of 
+        /// <paramref name="attributeTypes"/>, in which case only members decorated with at least one of
+        /// these will be included.
+        /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination 
+        /// used to define the search behavior and result filtering.</param>
+        /// <param name="attributeTypes">The optional list of attribute types with which members should
+        /// be decorated. If this parameter is <c>null</c> or empty then all fields and properties
+        /// matching the given <paramref name="bindingFlags"/> will be included in the result.</param>
+        /// <returns>A list of all matching fields and properties on the type. This value will never be null.</returns>
+		public static IList<MemberInfo> FieldsAndPropertiesWith( this Type type, Flags bindingFlags,
+																 params Type[] attributeTypes )
+        {
+            return type.MembersWith( MemberTypes.Field | MemberTypes.Property, bindingFlags, attributeTypes );
         }
         #endregion
 

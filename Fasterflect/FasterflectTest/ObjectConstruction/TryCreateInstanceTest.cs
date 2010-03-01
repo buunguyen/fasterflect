@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using Fasterflect;
 using Fasterflect.ObjectConstruction;
 using FasterflectTest.SampleModel.Animals;
@@ -35,6 +36,21 @@ namespace FasterflectTest.ObjectConstruction
 		{
 			Lion animal = typeof(Lion).TryCreateInstance( new { } ) as Lion;
 			Verify( animal, 1, Animal.LastID, "Simba", null );
+
+			animal = typeof(Lion).TryCreateInstance( null ) as Lion;
+			Verify( animal, 1, Animal.LastID, "Simba", null );
+			animal = typeof(Lion).TryCreateInstance( new Dictionary<string,object>() ) as Lion;
+			Verify( animal, 1, Animal.LastID, "Simba", null );
+
+			animal = typeof(Lion).TryCreateInstance( null, null ) as Lion;
+			Verify( animal, 1, Animal.LastID, "Simba", null );
+			animal = typeof(Lion).TryCreateInstance( new string[ 0 ], new object[ 0 ] ) as Lion;
+			Verify( animal, 1, Animal.LastID, "Simba", null );
+
+			animal = typeof(Lion).TryCreateInstance( null, null, null ) as Lion;
+			Verify( animal, 1, Animal.LastID, "Simba", null );
+			animal = typeof(Lion).TryCreateInstance( new string[ 0 ], new Type[ 0 ], new object[ 0 ] ) as Lion;
+			Verify( animal, 1, Animal.LastID, "Simba", null );
 		}
 
 		[TestMethod]
@@ -42,12 +58,30 @@ namespace FasterflectTest.ObjectConstruction
 		{
 			Lion animal = typeof(Lion).TryCreateInstance( new { Name = "Scar" } ) as Lion;
 			Verify( animal, 2, Animal.LastID, "Scar", null );
+
+			animal = typeof(Lion).TryCreateInstance( new Dictionary<string,object> { { "Name", "Scar" } } ) as Lion;
+			Verify( animal, 2, Animal.LastID, "Scar", null );
+
+			animal = typeof(Lion).TryCreateInstance( new [] { "Name" }, new object[] { "Scar" } ) as Lion;
+			Verify( animal, 2, Animal.LastID, "Scar", null );
+
+			animal = typeof(Lion).TryCreateInstance( new [] { "Name" }, new [] { typeof(string) }, new object[] { "Scar" } ) as Lion;
+			Verify( animal, 2, Animal.LastID, "Scar", null );
 		}
 
 		[TestMethod]
 		public void TestTryCreateInstanceWithMatchingSingleArgumentShouldInvokeConstructor3()
 		{
 			Lion animal = typeof(Lion).TryCreateInstance( new { Id = 42 } ) as Lion;
+			Verify( animal, 3, 42, "Simba", null );
+
+			animal = typeof(Lion).TryCreateInstance( new Dictionary<string,object> { { "Id", 42 } } ) as Lion;
+			Verify( animal, 3, 42, "Simba", null );
+
+			animal = typeof(Lion).TryCreateInstance( new [] { "Id" }, new object[] { 42 } ) as Lion;
+			Verify( animal, 3, 42, "Simba", null );
+
+			animal = typeof(Lion).TryCreateInstance( new [] { "Id" }, new [] { typeof(string) }, new object[] { 42 } ) as Lion;
 			Verify( animal, 3, 42, "Simba", null );
 		}
 

@@ -20,11 +20,12 @@
 
 using FasterflectTest.SampleModel.Animals.Attributes;
 using FasterflectTest.SampleModel.Animals.Enumerations;
+using FasterflectTest.SampleModel.Animals.Interfaces;
 
 namespace FasterflectTest.SampleModel.Animals
 {
 	[Zone(Zone.Savannah)]
-	internal class Giraffe : Mammal
+	internal class Giraffe : Mammal, ISwim
 	{
 		public Giraffe( int id, Climate climateRequirements, MovementCapabilities movementCapabilities ) : base( id, climateRequirements, movementCapabilities )
 		{
@@ -33,5 +34,17 @@ namespace FasterflectTest.SampleModel.Animals
 		public Giraffe( Climate climateRequirements, MovementCapabilities movementCapabilities ) : base( climateRequirements, movementCapabilities )
 		{
 		}
+
+		#region ISwim Members
+		double ISwim.SwimDistance
+		{
+			get { throw new System.NotImplementedException(); }
+		}
+
+		void ISwim.Move( double distance )
+		{
+			throw new System.NotImplementedException();
+		}
+		#endregion
 	}
 }
