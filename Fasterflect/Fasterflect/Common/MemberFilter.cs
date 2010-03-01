@@ -55,8 +55,8 @@ namespace Fasterflect
                 for( int j = 0; j < names.Length; j++ )
                 {
                     var name = names[ j ];
-                	var comparison = ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
-                    bool match = (isPartial && memberName.Contains( name )) || memberName.Equals( name, comparison );
+                	var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+                    bool match = isPartial ? memberName.Contains( name ) : memberName.Equals( name, comparison );
                     if( match )
                     {
 						result.Add( member );
