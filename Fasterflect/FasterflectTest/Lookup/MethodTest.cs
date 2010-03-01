@@ -86,12 +86,12 @@ namespace FasterflectTest.Lookup
 			Assert.IsNotNull( typeof(Snake).Method( "Bite", new [] { typeof(Lion) } ) );
 
 			Flags flags = Flags.InstanceAnyVisibility;
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new Type[] {} ) );
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(object) } ) );
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, null ) ); // should ignore flag when null is passed
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Animal) } ) );
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Mammal) } ) );
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Lion) } ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", new Type[] {}, flags ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", new [] { typeof(object) }, flags ) );
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", null, flags ) ); // should ignore flag when null is passed
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", new [] { typeof(Animal) }, flags ) );
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", new [] { typeof(Mammal) }, flags ) );
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", new [] { typeof(Lion) }, flags ) );
         }
 
         [TestMethod]
@@ -99,12 +99,12 @@ namespace FasterflectTest.Lookup
         {
         	Flags flags = Flags.InstanceAnyVisibility | Flags.ExactBinding;
 
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new Type[] {} ) );
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(object) } ) );
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, null ) ); // should ignore flag when null is passed
-			Assert.IsNotNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Animal) } ) );
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Mammal) } ) );
-			Assert.IsNull( typeof(Snake).Method( "Bite", flags, new [] { typeof(Lion) } ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", new Type[] {}, flags ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", new [] { typeof(object) }, flags ) );
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", null, flags ) ); // should ignore flag when null is passed
+			Assert.IsNotNull( typeof(Snake).Method( "Bite", new [] { typeof(Animal) }, flags ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", new [] { typeof(Mammal) }, flags ) );
+			Assert.IsNull( typeof(Snake).Method( "Bite", new [] { typeof(Lion) }, flags ) );
         }
 
         [TestMethod]

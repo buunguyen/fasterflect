@@ -45,7 +45,7 @@ namespace FasterflectTest.Invocation
             RunWith( ( object person ) =>
                {
                    var elements = new[] { 1d, 2d, 3d, 4d, 5d };
-                   var methodInfo = person.UnwrapIfWrapped().GetType().Method( "Walk", Flags.InstanceAnyVisibility, new [] { typeof(int) } );
+                   var methodInfo = person.UnwrapIfWrapped().GetType().Method( "Walk", new [] { typeof(int) }, Flags.InstanceAnyVisibility );
                    elements.ForEach( element => methodInfo.Invoke( person, element ) );
                    Assert.AreEqual( elements.Sum(), person.GetFieldValue( "metersTravelled" ) );
                } );

@@ -29,18 +29,8 @@ namespace Fasterflect
     {
         #region Access
         /// <summary>
-        /// Invokes the static method identified by <paramref name="methodInfo"/> with no argument.
-        /// </summary>
-        /// <returns>The return value of the method.</returns>
-        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this MethodInfo methodInfo )
-        {
-            return methodInfo.DelegateForStaticInvoke()();
-        }
-
-        /// <summary>
         /// Invokes the static method identified by <paramref name="methodInfo"/> with <paramref name="parameters"/>
-        /// as arguments.
+        /// as arguments.  Leave <paramref name="parameters"/> empty if the method has no argument.
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
@@ -49,20 +39,10 @@ namespace Fasterflect
             return methodInfo.DelegateForStaticInvoke()( parameters );
         }
 
-		///// <summary>
-		///// Invokes the instance method identified by <paramref name="methodInfo"/> on the object
-		///// <paramref name="target"/> with no argument.
-		///// </summary>
-		///// <returns>The return value of the method.</returns>
-		///// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        //public static object Invoke( this MethodInfo methodInfo, object target )
-        //{
-        //    return methodInfo.DelegateForInvoke()( target );
-        //}
-
         /// <summary>
         /// Invokes the instance method identified by <paramref name="methodInfo"/> on the object
         /// <paramref name="target"/> with <paramref name="parameters"/> as arguments.
+        /// Leave <paramref name="parameters"/> empty if the method has no argument.
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>

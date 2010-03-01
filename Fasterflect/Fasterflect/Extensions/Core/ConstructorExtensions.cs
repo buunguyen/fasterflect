@@ -39,16 +39,9 @@ namespace Fasterflect
 
         #region Constructor Invocation (CreateInstance)
         /// <summary>
-        /// Invokes the no-arg constructor on the given <paramref name="targetType"/>.
-        /// </summary>
-        public static object CreateInstance( this Type targetType )
-        {
-            return DelegateForCreateInstance( targetType )();
-        }
-
-        /// <summary>
         /// Invokes a constructor whose parameter types are inferred from <paramref name="parameters" /> 
         /// on the given <paramref name="targetType"/> with <paramref name="parameters" /> being the arguments.
+        /// Leave <paramref name="parameters"/> empty if the constructor has no argument.
         /// </summary>
         /// <remarks>
         /// All elements of <paramref name="parameters"/> must not be <c>null</c>.  Otherwise, 
@@ -71,24 +64,17 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Invokes the no-arg constructor matching <paramref name="bindingFlags"/> on the given <paramref name="targetType"/>.
-        /// </summary>
-        public static object CreateInstance( this Type targetType, Flags bindingFlags )
-        {
-            return DelegateForCreateInstance( targetType, bindingFlags )();
-        }
-
-        /// <summary>
         /// Invokes a constructor whose parameter types are inferred from <paramref name="parameters" /> and
         /// matching <paramref name="bindingFlags"/> on the given <paramref name="targetType"/> 
-        /// with <paramref name="parameters" /> being the arguments.
+        /// with <paramref name="parameters" /> being the arguments. 
+        /// Leave <paramref name="parameters"/> empty if the constructor has no argument.
         /// </summary>
         /// <remarks>
         /// All elements of <paramref name="parameters"/> must not be <c>null</c>.  Otherwise, 
         /// <see cref="NullReferenceException"/> is thrown.  If you are not sure as to whether
         /// any element is <c>null</c> or not, use the overload that accepts <c>paramTypes</c> array.
         /// </remarks>
-        /// <seealso cref="CreateInstance(Type, Flags, Type[], object[])"/>
+        /// <seealso cref="CreateInstance(System.Type,System.Type[],Fasterflect.Flags,object[])"/>
         public static object CreateInstance( this Type targetType, Flags bindingFlags, params object[] parameters )
         {
             return DelegateForCreateInstance( targetType, bindingFlags, parameters.GetTypeArray() )( parameters );
@@ -99,23 +85,15 @@ namespace Fasterflect
         /// matching <paramref name="bindingFlags"/> on the given <paramref name="targetType"/> 
         /// with <paramref name="parameters" /> being the arguments.
         /// </summary>
-        public static object CreateInstance( this Type targetType, Flags bindingFlags, Type[] parameterTypes,
-                                             params object[] parameters )
+        public static object CreateInstance( this Type targetType, Type[] parameterTypes, Flags bindingFlags, params object[] parameters )
         {
             return DelegateForCreateInstance( targetType, bindingFlags, parameterTypes )( parameters );
         }
 
         /// <summary>
-        /// Creates a delegate which can invoke the no-arg constructor on the given <paramref name="targetType"/>.
-        /// </summary>
-        public static ConstructorInvoker DelegateForCreateInstance( this Type targetType )
-        {
-            return DelegateForCreateInstance( targetType, Type.EmptyTypes );
-        }
-
-        /// <summary>
         /// Creates a delegate which can invoke the constructor whose parameter types are <paramref name="parameterTypes" />
-        /// on the given <paramref name="targetType"/>. 
+        /// on the given <paramref name="targetType"/>.  Leave <paramref name="parameterTypes"/> empty if the constructor
+        /// has no argument.
         /// </summary>
         public static ConstructorInvoker DelegateForCreateInstance( this Type targetType, params Type[] parameterTypes )
         {
@@ -123,17 +101,9 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Creates a delegate which can invoke the no-arg constructor matching <paramref name="bindingFlags"/>
-        /// on the given <paramref name="targetType"/>.
-        /// </summary>
-        public static ConstructorInvoker DelegateForCreateInstance( this Type targetType, Flags bindingFlags )
-        {
-            return DelegateForCreateInstance( targetType, bindingFlags, Type.EmptyTypes );
-        }
-
-        /// <summary>
         /// Creates a delegate which can invoke the constructor whose parameter types are <paramref name="parameterTypes" />
-        /// and matching <paramref name="bindingFlags"/> on the given <paramref name="targetType"/>. 
+        /// and matching <paramref name="bindingFlags"/> on the given <paramref name="targetType"/>.  
+        /// Leave <paramref name="parameterTypes"/> empty if the constructor has no argument. 
         /// </summary>
         public static ConstructorInvoker DelegateForCreateInstance( this Type targetType, Flags bindingFlags,
                                                                     params Type[] parameterTypes )
@@ -144,31 +114,31 @@ namespace Fasterflect
 
         #region Constructor Invocation (TryCreateInstance)
         /// <summary>
-        /// Creates an instance of the given <paramref name="type"/> using the public properties of the 
-        /// supplied <paramref name="source"/> object as input.
+        /// Creates an instance of the given <paramref name="targetType"/> using the public properties of the 
+        /// supplied <paramref name="sample"/> object as input.
         /// This method will try to determine the least-cost route to constructing the instance, which
         /// implies mapping as many properties as possible to constructor parameters. Remaining properties
         /// on the source are mapped to properties on the created instance or ignored if none matches.
         /// TryCreateInstance is very liberal and attempts to convert values that are not otherwise
         /// considered compatible, such as between strings and enums or numbers, Guids and byte[], etc.
         /// </summary>
-        /// <returns>An instance of type <paramref name="type"/>.</returns>
-        public static object TryCreateInstance( this Type type, object source )
+        /// <returns>An instance of targetType <paramref name="targetType"/>.</returns>
+        public static object TryCreateInstance( this Type targetType, object sample )
         {
-            Type sourceType = source.GetType();
+            Type sourceType = sample.GetType();
             SourceInfo sourceInfo = sourceInfoCache.Get( sourceType );
             if( sourceInfo == null )
             {
                 sourceInfo = new SourceInfo( sourceType );
                 sourceInfoCache.Insert( sourceType, sourceInfo );
             }
-            object[] paramValues = sourceInfo.GetParameterValues( source );
-            MethodMap map = type.PrepareInvoke( sourceInfo.ParamNames, sourceInfo.ParamTypes, paramValues );
+            object[] paramValues = sourceInfo.GetParameterValues( sample );
+            MethodMap map = targetType.PrepareInvoke( sourceInfo.ParamNames, sourceInfo.ParamTypes, paramValues );
             return map.Invoke( paramValues );
         }
 
         /// <summary>
-        /// Creates an instance of the given <paramref name="type"/> using the values in the supplied
+        /// Creates an instance of the given <paramref name="targetType"/> using the values in the supplied
         /// <paramref name="parameters"/> dictionary as input.
         /// This method will try to determine the least-cost route to constructing the instance, which
         /// implies mapping as many values as possible to constructor parameters. Remaining values
@@ -176,17 +146,17 @@ namespace Fasterflect
         /// TryCreateInstance is very liberal and attempts to convert values that are not otherwise
         /// considered compatible, such as between strings and enums or numbers, Guids and byte[], etc.
         /// </summary>
-        /// <returns>An instance of type <paramref name="type"/>.</returns>
-        public static object TryCreateInstance( this Type type, IDictionary<string, object> parameters )
+        /// <returns>An instance of targetType <paramref name="targetType"/>.</returns>
+        public static object TryCreateInstance( this Type targetType, IDictionary<string, object> parameters )
         {
 			bool hasParameters = parameters != null && parameters.Count > 0;
             string[] names = hasParameters ? parameters.Keys.ToArray() : new string[ 0 ];
             object[] values = hasParameters ? parameters.Values.ToArray() : new object[ 0 ];
-            return type.TryCreateInstance( names, values );
+            return targetType.TryCreateInstance( names, values );
         }
 
         /// <summary>
-        /// Creates an instance of the given <paramref name="type"/> using the supplied parameter information as input.
+        /// Creates an instance of the given <paramref name="targetType"/> using the supplied parameter information as input.
         /// Parameter types are inferred from the supplied <paramref name="parameterValues"/> and as such these
         /// should not be null.
         /// This method will try to determine the least-cost route to constructing the instance, which
@@ -195,11 +165,11 @@ namespace Fasterflect
         /// TryCreateInstance is very liberal and attempts to convert values that are not otherwise
         /// considered compatible, such as between strings and enums or numbers, Guids and byte[], etc.
         /// </summary>
-        /// <param name="type">The type of which an instance should be created.</param>
+        /// <param name="targetType">The targetType of which an instance should be created.</param>
         /// <param name="parameterNames">The names of the supplied parameters.</param>
         /// <param name="parameterValues">The values of the supplied parameters.</param>
-        /// <returns>An instance of type <paramref name="type"/>.</returns>
-        public static object TryCreateInstance( this Type type, string[] parameterNames, object[] parameterValues )
+        /// <returns>An instance of targetType <paramref name="targetType"/>.</returns>
+        public static object TryCreateInstance( this Type targetType, string[] parameterNames, object[] parameterValues )
         {
         	var names = parameterNames ?? new string[ 0 ];
 			var values = parameterValues ?? new object[ 0 ];
@@ -213,23 +183,23 @@ namespace Fasterflect
                 object value = values[ i ];
                 parameterTypes[ i ] = value != null ? value.GetType() : null;
             }
-            return type.TryCreateInstance( names, parameterTypes, values );
+            return targetType.TryCreateInstance( names, parameterTypes, values );
         }
 
         /// <summary>
-        /// Creates an instance of the given <paramref name="type"/> using the supplied parameter information as input.
+        /// Creates an instance of the given <paramref name="targetType"/> using the supplied parameter information as input.
         /// This method will try to determine the least-cost route to constructing the instance, which
         /// implies mapping as many properties as possible to constructor parameters. Remaining properties
         /// on the source are mapped to properties on the created instance or ignored if none matches.
         /// TryCreateInstance is very liberal and attempts to convert values that are not otherwise
         /// considered compatible, such as between strings and enums or numbers, Guids and byte[], etc.
         /// </summary>
-        /// <param name="type">The type of which an instance should be created.</param>
+        /// <param name="targetType">The targetType of which an instance should be created.</param>
         /// <param name="parameterNames">The names of the supplied parameters.</param>
         /// <param name="parameterTypes">The types of the supplied parameters.</param>
         /// <param name="parameterValues">The values of the supplied parameters.</param>
-        /// <returns>An instance of type <paramref name="type"/>.</returns>
-        public static object TryCreateInstance( this Type type, string[] parameterNames, Type[] parameterTypes,
+        /// <returns>An instance of targetType <paramref name="targetType"/>.</returns>
+        public static object TryCreateInstance( this Type targetType, string[] parameterNames, Type[] parameterTypes,
                                                 object[] parameterValues )
         {
         	var names = parameterNames ?? new string[ 0 ];
@@ -237,9 +207,9 @@ namespace Fasterflect
 			var values = parameterValues ?? new object[ 0 ];
 			if( names.Length != values.Length || names.Length != types.Length )
 			{
-				throw new ArgumentException( "Mismatching name, type and value arrays (must be of identical length)." );
+				throw new ArgumentException( "Mismatching name, targetType and value arrays (must be of identical length)." );
 			}
-            MethodMap map = type.PrepareInvoke( names, types, values );
+            MethodMap map = targetType.PrepareInvoke( names, types, values );
             return map.Invoke( values );
         }
         #endregion
@@ -247,51 +217,51 @@ namespace Fasterflect
         #region Constructor Lookup (Single)
         /// <summary>
         /// Gets the constructor corresponding to the supplied <paramref name="parameterTypes"/> on the
-        /// given <paramref name="type"/>.
+        /// given <paramref name="targetType"/>.
         /// </summary>
-        /// <param name="type">The type to reflect on.</param>
+        /// <param name="targetType">The type to reflect on.</param>
         /// <param name="parameterTypes">The types of the constructor parameters in order.</param>
         /// <returns>The matching constructor or null if no match was found.</returns>
-        public static ConstructorInfo Constructor( this Type type, params Type[] parameterTypes )
+        public static ConstructorInfo Constructor( this Type targetType, params Type[] parameterTypes )
         {
-            return type.Constructor( Flags.InstanceAnyVisibility, parameterTypes );
+            return targetType.Constructor( Flags.InstanceAnyVisibility, parameterTypes );
         }
 
         /// <summary>
         /// Gets the constructor matching the given <paramref name="bindingFlags"/> and corresponding to the 
-        /// supplied <paramref name="parameterTypes"/> on the given <paramref name="type"/>.
+        /// supplied <paramref name="parameterTypes"/> on the given <paramref name="targetType"/>.
         /// </summary>
-        /// <param name="type">The type to reflect on.</param>
+        /// <param name="targetType">The type to reflect on.</param>
         /// <param name="bindingFlags">The search criteria to use when reflecting.</param>
         /// <param name="parameterTypes">The types of the constructor parameters in order.</param>
         /// <returns>The matching constructor or null if no match was found.</returns>
-        public static ConstructorInfo Constructor( this Type type, Flags bindingFlags, params Type[] parameterTypes )
+        public static ConstructorInfo Constructor( this Type targetType, Flags bindingFlags, params Type[] parameterTypes )
         {
-            return type.GetConstructor( bindingFlags, null, parameterTypes, null );
+            return targetType.GetConstructor( bindingFlags, null, parameterTypes, null );
         }
         #endregion
 
         #region Constructor Lookup (Multiple)
         /// <summary>
-        /// Gets all public and non-public constructors (that are not abstract) on the given <paramref name="type"/>.
+        /// Gets all public and non-public constructors (that are not abstract) on the given <paramref name="targetType"/>.
         /// </summary>
-        /// <param name="type">The type to reflect on.</param>
+        /// <param name="targetType">The targetType to reflect on.</param>
         /// <returns>A list of matching constructors. This value will never be null.</returns>
-        public static IList<ConstructorInfo> Constructors( this Type type )
+        public static IList<ConstructorInfo> Constructors( this Type targetType )
         {
-            return type.Constructors( Flags.InstanceAnyVisibility );
+            return targetType.Constructors( Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
         /// Gets all constructors matching the given <paramref name="bindingFlags"/> (and that are not abstract)
-        /// on the given <paramref name="type"/>.
+        /// on the given <paramref name="targetType"/>.
         /// </summary>
-        /// <param name="type">The type to reflect on.</param>
+        /// <param name="targetType">The targetType to reflect on.</param>
         /// <param name="bindingFlags">The search criteria to use when reflecting.</param>
         /// <returns>A list of matching constructors. This value will never be null.</returns>
-        public static IList<ConstructorInfo> Constructors( this Type type, Flags bindingFlags )
+        public static IList<ConstructorInfo> Constructors( this Type targetType, Flags bindingFlags )
         {
-            return type.GetConstructors( bindingFlags ); //.Where( ci => !ci.IsAbstract ).ToList();
+            return targetType.GetConstructors( bindingFlags ); //.Where( ci => !ci.IsAbstract ).ToList();
         }
         #endregion
     }

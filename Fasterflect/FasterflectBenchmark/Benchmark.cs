@@ -196,7 +196,7 @@ namespace FasterflectBenchmark
 				{"Fasterflect Members+5", () => typeof(Person).Members( MemberTypes.All, declaredOnlyFlags, "Name", "A", "B", "C", "D" ) },
 				{"--- Methods", () => {} },
 				{"Reflection GetMethod", () => typeof(Person).GetMethod( "Walk", defaultFlags, null, new [] { typeof(int) }, null ) },
-				{"Fasterflect Method", () => typeof(Person).Method( "Walk", declaredOnlyFlags, new [] { typeof(int) } ) },
+				{"Fasterflect Method", () => typeof(Person).Method( "Walk", new [] { typeof(int) }, declaredOnlyFlags ) },
 				{"Reflection GetMethods", () => typeof(Person).GetMethods( defaultFlags ) },
 				{"Fasterflect Methods", () => typeof(Person).Methods( declaredOnlyFlags ) },
 				{"Fasterflect Methods+1", () => typeof(Person).Methods( new [] { typeof(int) }, declaredOnlyFlags ) },

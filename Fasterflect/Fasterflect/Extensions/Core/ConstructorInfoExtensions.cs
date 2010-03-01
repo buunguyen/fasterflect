@@ -28,15 +28,8 @@ namespace Fasterflect
     public static class ConstructorInfoExtensions
     {
         /// <summary>
-        /// Invokes the constructor <paramref name="ctorInfo"/> with no argument.
-        /// </summary>
-        public static object CreateInstance( this ConstructorInfo ctorInfo )
-        {
-            return ctorInfo.DelegateForCreateInstance()();
-        }
-
-        /// <summary>
         /// Invokes the constructor <paramref name="ctorInfo"/> with <paramref name="parameters"/> as arguments.
+        /// Leave <paramref name="parameters"/> empty if the constructor has no argument.
         /// </summary>
         public static object CreateInstance( this ConstructorInfo ctorInfo, params object[] parameters )
         {
