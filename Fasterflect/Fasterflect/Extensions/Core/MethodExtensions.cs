@@ -33,19 +33,9 @@ namespace Fasterflect
 
         #region Static Method Invocation
         /// <summary>
-        /// Invokes the static method specified by <paramref name="methodName"/> of the given
-        /// <paramref name="targetType"/>.
-        /// </summary>
-        /// <returns>The return value of the method.</returns>
-        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this Type targetType, string methodName )
-        {
-            return DelegateForStaticInvoke( targetType, methodName )();
-        }
-
-        /// <summary>
-        /// Invokes the static method specified by <paramref name="methodName"/> of the given
+        /// Invokes the static method specified by <paramref name="name"/> of the given
         /// <paramref name="targetType"/> using <paramref name="parameters"/> as arguments.
+        /// Leave <paramref name="parameters"/> empty if the method has no argument.
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
@@ -55,40 +45,30 @@ namespace Fasterflect
         /// any element is <c>null</c> or not, use the overload that accepts <c>paramTypes</c> array.
         /// </remarks>
         /// <seealso cref="Invoke(Type, string, Type[], object[])"/>
-        public static object Invoke( this Type targetType, string methodName, params object[] parameters )
+        public static object Invoke( this Type targetType, string name, params object[] parameters )
         {
-            return DelegateForStaticInvoke( targetType, methodName, parameters.GetTypeArray() )( parameters );
+            return DelegateForStaticInvoke( targetType, name, parameters.GetTypeArray() )( parameters );
         }
 
         /// <summary>
-        /// Invokes the static method specified by <paramref name="methodName"/> of the given
+        /// Invokes the static method specified by <paramref name="name"/> of the given
         /// <paramref name="targetType"/> using <paramref name="parameters"/> as arguments.
         /// Method parameter types are specified by <paramref name="parameterTypes"/>.
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this Type targetType, string methodName, Type[] parameterTypes,
+        public static object Invoke( this Type targetType, string name, Type[] parameterTypes,
                                      params object[] parameters )
         {
             return
-                DelegateForStaticInvoke( targetType, methodName, parameterTypes ?? parameters.GetTypeArray() )(
+                DelegateForStaticInvoke( targetType, name, parameterTypes ?? parameters.GetTypeArray() )(
                     parameters );
         }
 
         /// <summary>
-        /// Invokes the static method specified by <paramref name="methodName"/> matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="targetType"/>.
-        /// </summary>
-        /// <returns>The return value of the method.</returns>
-        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this Type targetType, string methodName, Flags bindingFlags )
-        {
-            return DelegateForStaticInvoke( targetType, methodName, bindingFlags, Type.EmptyTypes )();
-        }
-
-        /// <summary>
-        /// Invokes the static method specified by <paramref name="methodName"/> matching <paramref name="bindingFlags"/>
+        /// Invokes the static method specified by <paramref name="name"/> matching <paramref name="bindingFlags"/>
         /// of the given <paramref name="targetType"/> using <paramref name="parameters"/> as arguments.
+        /// Leave <paramref name="parameters"/> empty if the method has no argument.
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
@@ -97,83 +77,56 @@ namespace Fasterflect
         /// <see cref="NullReferenceException"/> is thrown.  If you are not sure as to whether
         /// any element is <c>null</c> or not, use the overload that accepts <c>paramTypes</c> array.
         /// </remarks>
-        /// <seealso cref="Invoke(Type, string, Flags, Type[], object[])"/>
-        public static object Invoke( this Type targetType, string methodName, Flags bindingFlags,
+        /// <seealso cref="Invoke(System.Type,string,System.Type[],Fasterflect.Flags,object[])"/>
+        public static object Invoke( this Type targetType, string name, Flags bindingFlags,
                                      params object[] parameters )
         {
-            return DelegateForStaticInvoke( targetType, methodName, bindingFlags, parameters.GetTypeArray() )( parameters );
+            return DelegateForStaticInvoke( targetType, name, bindingFlags, parameters.GetTypeArray() )( parameters );
         }
 
         /// <summary>
-        /// Invokes the static method specified by <paramref name="methodName"/> matching <paramref name="bindingFlags"/>
+        /// Invokes the static method specified by <paramref name="name"/> matching <paramref name="bindingFlags"/>
         /// of the given <paramref name="targetType"/> using <paramref name="parameters"/> as arguments.
         /// Method parameter types are specified by <paramref name="parameterTypes"/>.
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this Type targetType, string methodName, Flags bindingFlags, Type[] parameterTypes,
-                                     params object[] parameters )
+        public static object Invoke( this Type targetType, string name, Type[] parameterTypes, Flags bindingFlags, params object[] parameters )
         {
-            return DelegateForStaticInvoke( targetType, methodName, bindingFlags, parameterTypes )( parameters );
+            return DelegateForStaticInvoke( targetType, name, bindingFlags, parameterTypes )( parameters );
         }
 
         /// <summary>
-        /// Creates a delegate which can invoke the static method <paramref name="methodName"/> 
-        /// on the given <paramref name="targetType"/>.
-        /// </summary>
-        public static StaticMethodInvoker DelegateForStaticInvoke( this Type targetType, string methodName )
-        {
-            return DelegateForStaticInvoke( targetType, methodName, Type.EmptyTypes );
-        }
-
-        /// <summary>
-        /// Creates a delegate which can invoke the static method <paramref name="methodName"/> 
+        /// Creates a delegate which can invoke the static method <paramref name="name"/> 
         /// whose parameter types are specified by <paramref name="parameterTypes"/> on the given <paramref name="targetType"/>.
+        /// Leave <paramref name="parameterTypes"/> empty if the method has no argument.
         /// </summary>
-        public static StaticMethodInvoker DelegateForStaticInvoke( this Type targetType, string methodName,
+        public static StaticMethodInvoker DelegateForStaticInvoke( this Type targetType, string name,
                                                                    params Type[] parameterTypes )
         {
-            return DelegateForStaticInvoke( targetType, methodName, Flags.StaticAnyVisibility, parameterTypes );
+            return DelegateForStaticInvoke( targetType, name, Flags.StaticAnyVisibility, parameterTypes );
         }
 
         /// <summary>
-        /// Creates a delegate which can invoke the static method <paramref name="methodName"/>
-        /// matching <paramref name="bindingFlags"/> on the given <paramref name="targetType"/>.
+        /// Creates a delegate which can invoke the static method <paramref name="name"/> 
+        /// matching <paramref name="bindingFlags"/> whose parameter types are specified by <paramref name="parameterTypes"/> 
+        /// on the given <paramref name="targetType"/>. Leave <paramref name="parameterTypes"/> empty if the 
+        /// method has no argument.
         /// </summary>
-        public static StaticMethodInvoker DelegateForStaticInvoke( this Type targetType, string methodName,
-                                                                   Flags bindingFlags )
-        {
-            return DelegateForStaticInvoke( targetType, methodName, bindingFlags, Type.EmptyTypes );
-        }
-
-        /// <summary>
-        /// Creates a delegate which can invoke the static method <paramref name="methodName"/> 
-        /// matching <paramref name="bindingFlags"/> whose parameter types are specified by <paramref name="parameterTypes"/> on the given <paramref name="targetType"/>.
-        /// </summary>
-        public static StaticMethodInvoker DelegateForStaticInvoke( this Type targetType, string methodName,
+        public static StaticMethodInvoker DelegateForStaticInvoke( this Type targetType, string name,
                                                                    Flags bindingFlags,
                                                                    params Type[] parameterTypes )
         {
             return (StaticMethodInvoker)
-                   new MethodInvocationEmitter( targetType, bindingFlags, methodName, parameterTypes ).GetDelegate();
+                   new MethodInvocationEmitter( targetType, bindingFlags, name, parameterTypes ).GetDelegate();
         }
         #endregion
 
         #region Instance Method Invocation
         /// <summary>
-        /// Invokes the instance method specified by <paramref name="methodName"/> of the given
-        /// <paramref name="target"/>.
-        /// </summary>
-        /// <returns>The return value of the method.</returns>
-        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this object target, string methodName )
-        {
-            return DelegateForInvoke( target.GetTypeAdjusted(), methodName )( target );
-        }
-
-        /// <summary>
-        /// Invokes the instance method specified by <paramref name="methodName"/> of the given
+        /// Invokes the instance method specified by <paramref name="name"/> of the given
         /// <paramref name="target"/> using <paramref name="parameters"/> as arguments.
+        /// Leave <paramref name="parameters"/> empty if the method has no argument.
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
@@ -183,39 +136,29 @@ namespace Fasterflect
         /// any element is <c>null</c> or not, use the overload that accepts <c>paramTypes</c> array.
         /// </remarks>
         /// <seealso cref="Invoke(object, string, Type[], object[])"/>
-        public static object Invoke( this object target, string methodName, params object[] parameters )
+        public static object Invoke( this object target, string name, params object[] parameters )
         {
-            return DelegateForInvoke( target.GetTypeAdjusted(), methodName, parameters.GetTypeArray() )( target,
+            return DelegateForInvoke( target.GetTypeAdjusted(), name, parameters.GetTypeArray() )( target,
                                                                                                          parameters );
         }
 
         /// <summary>
-        /// Invokes the instance method specified by <paramref name="methodName"/> of the given
+        /// Invokes the instance method specified by <paramref name="name"/> of the given
         /// <paramref name="target"/> using <paramref name="parameters"/> as arguments.
         /// Method parameter types are specified by <paramref name="parameterTypes"/>.
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this object target, string methodName, Type[] parameterTypes,
+        public static object Invoke( this object target, string name, Type[] parameterTypes,
                                      params object[] parameters )
         {
-            return DelegateForInvoke( target.GetTypeAdjusted(), methodName, parameterTypes )( target, parameters );
+            return DelegateForInvoke( target.GetTypeAdjusted(), name, parameterTypes )( target, parameters );
         }
 
         /// <summary>
-        /// Invokes the instance method specified by <paramref name="methodName"/> matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="target"/>.
-        /// </summary>
-        /// <returns>The return value of the method.</returns>
-        /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this object target, string methodName, Flags bindingFlags )
-        {
-            return DelegateForInvoke( target.GetTypeAdjusted(), methodName, bindingFlags, Type.EmptyTypes )( target );
-        }
-
-        /// <summary>
-        /// Invokes the instance method specified by <paramref name="methodName"/> matching <paramref name="bindingFlags"/> 
+        /// Invokes the instance method specified by <paramref name="name"/> matching <paramref name="bindingFlags"/> 
         /// of the given <paramref name="target"/> using <paramref name="parameters"/> as arguments.
+        /// Leave <paramref name="parameters"/> empty if the method has no argument.
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
@@ -224,66 +167,49 @@ namespace Fasterflect
         /// <see cref="NullReferenceException"/> is thrown.  If you are not sure as to whether
         /// any element is <c>null</c> or not, use the overload that accepts <c>paramTypes</c> array.
         /// </remarks>
-        /// <seealso cref="Invoke(object, string, Flags, Type[], object[])"/>
-        public static object Invoke( this object target, string methodName, Flags bindingFlags,
+        /// <seealso cref="Invoke(object,string,System.Type[],Fasterflect.Flags,object[])"/>
+        public static object Invoke( this object target, string name, Flags bindingFlags,
                                      params object[] parameters )
         {
-            return DelegateForInvoke( target.GetTypeAdjusted(), methodName, bindingFlags, parameters.GetTypeArray() )(
+            return DelegateForInvoke( target.GetTypeAdjusted(), name, bindingFlags, parameters.GetTypeArray() )(
             						  target, parameters );
         }
 
         /// <summary>
-        /// Invokes the instance method specified by <paramref name="methodName"/> matching <paramref name="bindingFlags"/>
+        /// Invokes the instance method specified by <paramref name="name"/> matching <paramref name="bindingFlags"/>
         /// of the given <paramref name="target"/> using <paramref name="parameters"/> as arguments.
         /// Method parameter types are specified by <paramref name="parameterTypes"/>.
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this object target, string methodName, Flags bindingFlags, Type[] parameterTypes,
-                                     params object[] parameters )
+        public static object Invoke( this object target, string name, Type[] parameterTypes, Flags bindingFlags, params object[] parameters )
         {
-            return DelegateForInvoke( target.GetTypeAdjusted(), methodName, bindingFlags, parameterTypes )( target,
+            return DelegateForInvoke( target.GetTypeAdjusted(), name, bindingFlags, parameterTypes )( target,
                                                                                                             parameters );
         }
 
         /// <summary>
-        /// Creates a delegate which can invoke the instance method <paramref name="methodName"/> 
-        /// on the given <paramref name="targetType"/>.
-        /// </summary>
-        public static MethodInvoker DelegateForInvoke( this Type targetType, string methodName )
-        {
-            return DelegateForInvoke( targetType, methodName, Type.EmptyTypes );
-        }
-
-        /// <summary>
-        /// Creates a delegate which can invoke the instance method <paramref name="methodName"/> 
+        /// Creates a delegate which can invoke the instance method <paramref name="name"/> 
         /// whose parameter types are specified by <paramref name="parameterTypes"/> on the given <paramref name="targetType"/>.
+        /// Leave <paramref name="parameterTypes"/> empty if the method has no argument.
         /// </summary>
-        public static MethodInvoker DelegateForInvoke( this Type targetType, string methodName,
+        public static MethodInvoker DelegateForInvoke( this Type targetType, string name,
                                                        params Type[] parameterTypes )
         {
-            return DelegateForInvoke( targetType, methodName, Flags.InstanceAnyVisibility, parameterTypes );
+            return DelegateForInvoke( targetType, name, Flags.InstanceAnyVisibility, parameterTypes );
         }
 
         /// <summary>
-        /// Creates a delegate which can invoke the instance method <paramref name="methodName"/> 
-        /// matching <paramref name="bindingFlags"/> on the given <paramref name="targetType"/>.
-        /// </summary>
-        public static MethodInvoker DelegateForInvoke( this Type targetType, string methodName, Flags bindingFlags )
-        {
-            return DelegateForInvoke( targetType, methodName, bindingFlags, Type.EmptyTypes );
-        }
-
-        /// <summary>
-        /// Creates a delegate which can invoke the instance method <paramref name="methodName"/> 
+        /// Creates a delegate which can invoke the instance method <paramref name="name"/> 
         /// matching <paramref name="bindingFlags"/> whose parameter types are specified by 
         /// <paramref name="parameterTypes"/> on the given <paramref name="targetType"/>.
+        /// Leave <paramref name="parameterTypes"/> empty if the method has no argument.
         /// </summary>
-        public static MethodInvoker DelegateForInvoke( this Type targetType, string methodName, Flags bindingFlags,
+        public static MethodInvoker DelegateForInvoke( this Type targetType, string name, Flags bindingFlags,
                                                        params Type[] parameterTypes )
         {
             return (MethodInvoker)
-                new MethodInvocationEmitter( targetType, bindingFlags, methodName, parameterTypes ).GetDelegate();
+                new MethodInvocationEmitter( targetType, bindingFlags, name, parameterTypes ).GetDelegate();
         }
         #endregion
 
@@ -292,42 +218,42 @@ namespace Fasterflect
         #region Method Lookup (Single)
         /// <summary>
         /// Gets the public or non-public instance method with the given <paramref name="name"/> on the
-        /// given <paramref name="type"/>.
+        /// given <paramref name="targetType"/>.
         /// </summary>
-        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="targetType">The type on which to reflect.</param>
         /// <param name="name">The name of the method to search for. This argument must be supplied. The 
         /// default behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> 
         /// to include explicitly implemented interface members, <see href="Flags.PartialNameMatch"/> to locate
         /// by substring, and <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
         /// due to method overloading the first found match will be returned.</returns>
-        public static MethodInfo Method( this Type type, string name )
+        public static MethodInfo Method( this Type targetType, string name )
         {
-            return type.Method( name, Flags.InstanceAnyVisibility, null );
+            return targetType.Method( name, null, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
         /// Gets the public or non-public instance method with the given <paramref name="name"/> on the 
-        /// given <paramref name="type"/> where the parameter types correspond in order with the
+        /// given <paramref name="targetType"/> where the parameter types correspond in order with the
         /// supplied <paramref name="parameterTypes"/>.
         /// </summary>
-        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="targetType">The type on which to reflect.</param>
         /// <param name="name">The name of the method to search for. This argument must be supplied. The 
         /// default behavior is to check for an exact, case-sensitive match.</param>
         /// <param name="parameterTypes">If this parameter is not null then only methods with the same 
         /// parameter signature will be included in the result.</param>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
         /// due to method overloading the first found match will be returned.</returns>
-        public static MethodInfo Method( this Type type, string name, Type[] parameterTypes )
+        public static MethodInfo Method( this Type targetType, string name, Type[] parameterTypes )
         {
-        	return type.Method( name, Flags.InstanceAnyVisibility, parameterTypes );
+        	return targetType.Method( name, parameterTypes, Flags.InstanceAnyVisibility );
         }
 
     	/// <summary>
         /// Gets the method with the given <paramref name="name"/> and matching <paramref name="bindingFlags"/>
-        /// on the given <paramref name="type"/>.
+        /// on the given <paramref name="targetType"/>.
         /// </summary>
-        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="targetType">The type on which to reflect.</param>
         /// <param name="name">The name of the method to search for. This argument must be supplied. The 
         /// default behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> 
         /// to include explicitly implemented interface members, <see href="Flags.PartialNameMatch"/> to locate
@@ -336,45 +262,45 @@ namespace Fasterflect
         /// the search behavior and result filtering.</param>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
         /// due to method overloading the first found match will be returned.</returns>
-        public static MethodInfo Method( this Type type, string name, Flags bindingFlags )
+        public static MethodInfo Method( this Type targetType, string name, Flags bindingFlags )
         {
-            return type.Method( name, bindingFlags, null );
+            return targetType.Method( name, null, bindingFlags );
         }
 
         /// <summary>
         /// Gets the method with the given <paramref name="name"/> and matching <paramref name="bindingFlags"/>
-        /// on the given <paramref name="type"/> where the parameter types correspond in order with the
+        /// on the given <paramref name="targetType"/> where the parameter types correspond in order with the
         /// supplied <paramref name="parameterTypes"/>.
         /// </summary>
-        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="targetType">The type on which to reflect.</param>
         /// <param name="name">The name of the method to search for. This argument must be supplied. The 
-        /// default behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> 
-        /// to include explicitly implemented interface members, <see href="Flags.PartialNameMatch"/> to locate
-        /// by substring, and <see href="Flags.IgnoreCase"/> to ignore case.</param>
-        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
-        /// the search behavior and result filtering.</param>
+        ///   default behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.ExplicitNameMatch"/> 
+        ///   to include explicitly implemented interface members, <see href="Flags.PartialNameMatch"/> to locate
+        ///   by substring, and <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <param name="parameterTypes">If this parameter is supplied then only methods with the same parameter signature
-        /// will be included in the result. The default behavior is to check only for assignment compatibility,
-        /// but this can be changed to exact matching by passing <see href="Flags.ExactBinding"/>.</param>
+        ///   will be included in the result. The default behavior is to check only for assignment compatibility,
+        ///   but this can be changed to exact matching by passing <see href="Flags.ExactBinding"/>.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
+        ///   the search behavior and result filtering.</param>
         /// <returns>The specified method or null if no method was found. If there are multiple matches
         /// due to method overloading the first found match will be returned.</returns>
-        public static MethodInfo Method( this Type type, string name, Flags bindingFlags, Type[] parameterTypes )
+        public static MethodInfo Method( this Type targetType, string name, Type[] parameterTypes, Flags bindingFlags )
         {
             // we need to check all methods to do partial name matches
             if( bindingFlags.IsAnySet( Flags.PartialNameMatch | Flags.TrimExplicitlyImplemented ) )
             {
-                return type.Methods( parameterTypes, bindingFlags, name ).FirstOrDefault();
+                return targetType.Methods( parameterTypes, bindingFlags, name ).FirstOrDefault();
             }
 
             bool hasTypes = parameterTypes != null;
             var result = hasTypes
-                             ? type.GetMethod( name, bindingFlags, null, parameterTypes, null )
-                             : type.GetMethod( name, bindingFlags );
+                             ? targetType.GetMethod( name, bindingFlags, null, parameterTypes, null )
+                             : targetType.GetMethod( name, bindingFlags );
             if( result == null && bindingFlags.IsNotSet( Flags.DeclaredOnly ) )
             {
-                if( type.BaseType != typeof(object) && type.BaseType != null )
+                if( targetType.BaseType != typeof(object) && targetType.BaseType != null )
                 {
-                    return type.BaseType.Method( name, bindingFlags, parameterTypes );
+                    return targetType.BaseType.Method( name, parameterTypes, bindingFlags );
                 }
             }
             bool hasSpecialFlags =
@@ -391,26 +317,26 @@ namespace Fasterflect
 
         #region Method Lookup (Multiple)
         /// <summary>
-        /// Gets all public and non-public instance methods on the given <paramref name="type"/> that match the 
+        /// Gets all public and non-public instance methods on the given <paramref name="targetType"/> that match the 
         /// given <paramref name="names"/>.
         /// </summary>
-        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="targetType">The type on which to reflect.</param>
         /// <param name="names">The optional list of names against which to filter the result. If this parameter is
 		/// <c>null</c> or empty no name filtering will be applied. The default behavior is to check for an exact, 
 		/// case-sensitive match. Pass <see href="Flags.ExcludeExplicitlyImplemented"/> to exclude explicitly implemented 
 		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
 		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> Methods( this Type type, params string[] names )
+        public static IList<MethodInfo> Methods( this Type targetType, params string[] names )
         {
-            return type.Methods( null, Flags.InstanceAnyVisibility, names );
+            return targetType.Methods( null, Flags.InstanceAnyVisibility, names );
         }
 
         /// <summary>
-        /// Gets all public and non-public instance methods on the given <paramref name="type"/> that match the 
+        /// Gets all public and non-public instance methods on the given <paramref name="targetType"/> that match the 
         /// given <paramref name="names"/>.
         /// </summary>
-        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="targetType">The type on which to reflect.</param>
         /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
         /// the search behavior and result filtering.</param>
         /// <param name="names">The optional list of names against which to filter the result. If this parameter is
@@ -419,32 +345,32 @@ namespace Fasterflect
 		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
 		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> Methods( this Type type, Flags bindingFlags, params string[] names )
+        public static IList<MethodInfo> Methods( this Type targetType, Flags bindingFlags, params string[] names )
         {
-            return type.Methods( null, bindingFlags, names );
+            return targetType.Methods( null, bindingFlags, names );
         }
 
 
         /// <summary>
-        /// Gets all public and non-public instance methods on the given <paramref name="type"/> that match the given 
+        /// Gets all public and non-public instance methods on the given <paramref name="targetType"/> that match the given 
         ///  <paramref name="names"/>.
         /// </summary>
-        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="targetType">The type on which to reflect.</param>
         /// <param name="parameterTypes">If this parameter is supplied then only methods with the same parameter 
         /// signature will be included in the result.</param>
         /// <param name="names">The optional list of names against which to filter the result. If this parameter is
 		/// <c>null</c> or empty no name filtering will be applied. The default behavior is to check for an exact, 
 		/// case-sensitive match.</param>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> Methods( this Type type, Type[] parameterTypes, params string[] names )
+        public static IList<MethodInfo> Methods( this Type targetType, Type[] parameterTypes, params string[] names )
         {
-        	return type.Methods( parameterTypes, Flags.InstanceAnyVisibility, names );
+        	return targetType.Methods( parameterTypes, Flags.InstanceAnyVisibility, names );
         }
 
     	/// <summary>
-        /// Gets all methods on the given <paramref name="type"/> that match the given lookup criteria and values.
+        /// Gets all methods on the given <paramref name="targetType"/> that match the given lookup criteria and values.
         /// </summary>
-        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="targetType">The type on which to reflect.</param>
         /// <param name="parameterTypes">If this parameter is supplied then only methods with the same parameter signature
         /// will be included in the result. The default behavior is to check only for assignment compatibility,
         /// but this can be changed to exact matching by passing <see href="Flags.ExactBinding"/>.</param>
@@ -456,10 +382,10 @@ namespace Fasterflect
 		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
 		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> Methods( this Type type, Type[] parameterTypes, Flags bindingFlags,
+        public static IList<MethodInfo> Methods( this Type targetType, Type[] parameterTypes, Flags bindingFlags,
                                                  params string[] names )
         {
-            if( type == null || type == typeof(object) )
+            if( targetType == null || targetType == typeof(object) )
             {
                 return new MethodInfo[0];
             }
@@ -472,31 +398,31 @@ namespace Fasterflect
 
             if( ! recurse && ! hasNames && ! hasTypes && ! hasSpecialFlags )
             {
-                return type.GetMethods( bindingFlags ) ?? new MethodInfo[0];
+                return targetType.GetMethods( bindingFlags ) ?? new MethodInfo[0];
             }
 
-            var methods = GetMethods( type, bindingFlags );
+            var methods = GetMethods( targetType, bindingFlags );
             methods = hasNames ? methods.Filter( bindingFlags, names ) : methods;
             methods = hasTypes ? methods.Filter( bindingFlags, parameterTypes ) : methods;
             methods = hasSpecialFlags ? methods.Filter( bindingFlags ) : methods;
             return methods;
         }
 
-        private static IList<MethodInfo> GetMethods( Type type, Flags bindingFlags )
+        private static IList<MethodInfo> GetMethods( Type targetType, Flags bindingFlags )
         {
             bool recurse = bindingFlags.IsNotSet( Flags.DeclaredOnly );
 
             if( ! recurse )
             {
-                return type.GetMethods( bindingFlags ) ?? new MethodInfo[0];
+                return targetType.GetMethods( bindingFlags ) ?? new MethodInfo[0];
             }
 
             bindingFlags |= Flags.DeclaredOnly;
             bindingFlags &= ~BindingFlags.FlattenHierarchy;
 
             var methods = new List<MethodInfo>();
-            methods.AddRange( type.GetMethods( bindingFlags ) );
-            Type baseType = type.BaseType;
+            methods.AddRange( targetType.GetMethods( bindingFlags ) );
+            Type baseType = targetType.BaseType;
             while( baseType != null && baseType != typeof(object) )
             {
                 methods.AddRange( baseType.GetMethods( bindingFlags ) );

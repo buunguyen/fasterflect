@@ -29,24 +29,24 @@ namespace FasterflectSample
     {
         static void Main()
         {
-			Console.WriteLine( AssemblyInfoWriter.ListExtensionMethodsWhereParametersViolateConventions( typeof(Flags).Assembly ) );
+			//Console.WriteLine( AssemblyInfoWriter.ListExtensionMethodsWhereParametersViolateConventions( typeof(Flags).Assembly ) );
 
    			Console.WriteLine( AssemblyInfoWriter.ListExtensionMethodsWithSuperfluousOverloads( typeof(Flags).Assembly ) );
 
-			Console.WriteLine( AssemblyInfoWriter.ListExtensions( typeof(Flags).Assembly ) );
+			//Console.WriteLine( AssemblyInfoWriter.ListExtensions( typeof(Flags).Assembly ) );
 
 
             // Load a type reflectively, just to look like real-life scenario
-			var types = new[]
-			                {
-			                    Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonClass"),
-			                    Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonStruct")
-			                };
-			Array.ForEach(types, type =>
-			                         {
-			                             ExecuteNormalApi(type);
-			                             ExecuteCacheApi(type);
-			                         });
+            //var types = new[]
+            //                {
+            //                    Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonClass"),
+            //                    Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonStruct")
+            //                };
+            //Array.ForEach(types, type =>
+            //                         {
+            //                             ExecuteNormalApi(type);
+            //                             ExecuteCacheApi(type);
+            //                         });
         }
 
         private static void ExecuteNormalApi(Type type)

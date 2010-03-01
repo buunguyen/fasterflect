@@ -31,161 +31,161 @@ namespace Fasterflect
     {
         #region Property Access
         /// <summary>
-        /// Sets the static property specified by <paramref name="propertyName"/> of the given <paramref name="targetType"/>
+        /// Sets the static property specified by <paramref name="name"/> of the given <paramref name="targetType"/>
         /// with the specified <paramref name="value" />.
         /// </summary>
         /// <returns><paramref name="targetType"/>.</returns>
-        public static Type SetPropertyValue( this Type targetType, string propertyName, object value )
+        public static Type SetPropertyValue( this Type targetType, string name, object value )
         {
-            DelegateForSetStaticPropertyValue( targetType, propertyName )( value );
+            DelegateForSetStaticPropertyValue( targetType, name )( value );
             return targetType;
         }
 
         /// <summary>
-        /// Sets the instance property specified by <paramref name="propertyName"/> of the given <paramref name="target"/>
+        /// Sets the instance property specified by <paramref name="name"/> of the given <paramref name="target"/>
         /// with the specified <paramref name="value" />.
         /// </summary>
         /// <returns><paramref name="target"/>.</returns>
-        public static object SetPropertyValue( this object target, string propertyName, object value )
+        public static object SetPropertyValue( this object target, string name, object value )
         {
-            DelegateForSetPropertyValue( target.GetTypeAdjusted(), propertyName )( target, value );
+            DelegateForSetPropertyValue( target.GetTypeAdjusted(), name )( target, value );
             return target;
         }
 
         /// <summary>
-        /// Gets the value of the static property specified by <paramref name="propertyName"/> of the given <paramref name="targetType"/>.
+        /// Gets the value of the static property specified by <paramref name="name"/> of the given <paramref name="targetType"/>.
         /// </summary>
-        public static object GetPropertyValue( this Type targetType, string propertyName )
+        public static object GetPropertyValue( this Type targetType, string name )
         {
-            return DelegateForGetStaticPropertyValue( targetType, propertyName )();
+            return DelegateForGetStaticPropertyValue( targetType, name )();
         }
 
         /// <summary>
-        /// Gets the value of the property specified by <paramref name="propertyName"/> of the given <paramref name="target"/>.
+        /// Gets the value of the property specified by <paramref name="name"/> of the given <paramref name="target"/>.
         /// </summary>
-        public static object GetPropertyValue( this object target, string propertyName )
+        public static object GetPropertyValue( this object target, string name )
         {
-            return DelegateForGetPropertyValue( target.GetTypeAdjusted(), propertyName )( target );
+            return DelegateForGetPropertyValue( target.GetTypeAdjusted(), name )( target );
         }
 
         /// <summary>
-        /// Sets the static property specified by <paramref name="propertyName"/> matching <paramref name="bindingFlags"/>
+        /// Sets the static property specified by <paramref name="name"/> matching <paramref name="bindingFlags"/>
         /// of the given <paramref name="targetType"/> with the specified <paramref name="value" />.
         /// </summary>
         /// <returns><paramref name="targetType"/>.</returns>
-        public static Type SetPropertyValue( this Type targetType, string propertyName, Flags bindingFlags, object value )
+        public static Type SetPropertyValue( this Type targetType, string name, object value, Flags bindingFlags )
         {
-            DelegateForSetStaticPropertyValue( targetType, propertyName, bindingFlags )( value );
+            DelegateForSetStaticPropertyValue( targetType, name, bindingFlags )( value );
             return targetType;
         }
 
         /// <summary>
-        /// Sets the instance property specified by <paramref name="propertyName"/> matching <paramref name="bindingFlags"/>
+        /// Sets the instance property specified by <paramref name="name"/> matching <paramref name="bindingFlags"/>
         /// of the given <paramref name="target"/> with the specified <paramref name="value" />.
         /// </summary>
         /// <returns><paramref name="target"/>.</returns>
-        public static object SetPropertyValue( this object target, string propertyName, Flags bindingFlags, object value )
+        public static object SetPropertyValue( this object target, string name, object value, Flags bindingFlags )
         {
-            DelegateForSetPropertyValue( target.GetTypeAdjusted(), propertyName, bindingFlags )( target, value );
+            DelegateForSetPropertyValue( target.GetTypeAdjusted(), name, bindingFlags )( target, value );
             return target;
         }
 
         /// <summary>
-        /// Gets the value of the static property specified by <paramref name="propertyName"/> matching <paramref name="bindingFlags"/>
+        /// Gets the value of the static property specified by <paramref name="name"/> matching <paramref name="bindingFlags"/>
         /// of the given <paramref name="targetType"/>.
         /// </summary>
-        public static object GetPropertyValue( this Type targetType, string propertyName, Flags bindingFlags )
+        public static object GetPropertyValue( this Type targetType, string name, Flags bindingFlags )
         {
-            return DelegateForGetStaticPropertyValue( targetType, propertyName, bindingFlags )();
+            return DelegateForGetStaticPropertyValue( targetType, name, bindingFlags )();
         }
 
         /// <summary>
-        /// Gets the value of the instance property specified by <paramref name="propertyName"/> matching <paramref name="bindingFlags"/>
+        /// Gets the value of the instance property specified by <paramref name="name"/> matching <paramref name="bindingFlags"/>
         /// of the given <paramref name="target"/>.
         /// </summary>
-        public static object GetPropertyValue( this object target, string propertyName, Flags bindingFlags )
+        public static object GetPropertyValue( this object target, string name, Flags bindingFlags )
         {
-            return DelegateForGetPropertyValue( target.GetTypeAdjusted(), propertyName, bindingFlags )( target );
+            return DelegateForGetPropertyValue( target.GetTypeAdjusted(), name, bindingFlags )( target );
         }
 
         /// <summary>
-        /// Creates a delegate which can set the value of the static property specified by <paramref name="propertyName"/>
+        /// Creates a delegate which can set the value of the static property specified by <paramref name="name"/>
         /// of the given <paramref name="targetType"/>.
         /// </summary>
-        public static StaticMemberSetter DelegateForSetStaticPropertyValue( this Type targetType, string propertyName )
+        public static StaticMemberSetter DelegateForSetStaticPropertyValue( this Type targetType, string name )
         {
-            return DelegateForSetStaticPropertyValue( targetType, propertyName, Flags.StaticAnyVisibility );
+            return DelegateForSetStaticPropertyValue( targetType, name, Flags.StaticAnyVisibility );
         }
 
         /// <summary>
-        /// Creates a delegate which can set the value of the instance property specified by <paramref name="propertyName"/>
+        /// Creates a delegate which can set the value of the instance property specified by <paramref name="name"/>
         /// of the given <paramref name="targetType"/>.
         /// </summary>
-        public static MemberSetter DelegateForSetPropertyValue( this Type targetType, string propertyName )
+        public static MemberSetter DelegateForSetPropertyValue( this Type targetType, string name )
         {
-            return DelegateForSetPropertyValue( targetType, propertyName, Flags.InstanceAnyVisibility );
+            return DelegateForSetPropertyValue( targetType, name, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
-        /// Creates a delegate which can get the value of the static property specified by <paramref name="propertyName"/>
+        /// Creates a delegate which can get the value of the static property specified by <paramref name="name"/>
         /// of the given <paramref name="targetType"/>.
         /// </summary>
-        public static StaticMemberGetter DelegateForGetStaticPropertyValue( this Type targetType, string propertyName )
+        public static StaticMemberGetter DelegateForGetStaticPropertyValue( this Type targetType, string name )
         {
-            return DelegateForGetStaticPropertyValue( targetType, propertyName, Flags.StaticAnyVisibility );
+            return DelegateForGetStaticPropertyValue( targetType, name, Flags.StaticAnyVisibility );
         }
 
         /// <summary>
-        /// Creates a delegate which can get the value of the instance property specified by <paramref name="propertyName"/>
+        /// Creates a delegate which can get the value of the instance property specified by <paramref name="name"/>
         /// of the given <paramref name="targetType"/>.
         /// </summary>
-        public static MemberGetter DelegateForGetPropertyValue( this Type targetType, string propertyName )
+        public static MemberGetter DelegateForGetPropertyValue( this Type targetType, string name )
         {
-            return DelegateForGetPropertyValue( targetType, propertyName, Flags.InstanceAnyVisibility );
+            return DelegateForGetPropertyValue( targetType, name, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
-        /// Creates a delegate which can set the value of the static property specified by <paramref name="propertyName"/>
+        /// Creates a delegate which can set the value of the static property specified by <paramref name="name"/>
         /// matching <paramref name="bindingFlags"/> of the given <paramref name="targetType"/>.
         /// </summary>
-        public static StaticMemberSetter DelegateForSetStaticPropertyValue( this Type targetType, string propertyName,
+        public static StaticMemberSetter DelegateForSetStaticPropertyValue( this Type targetType, string name,
                                                                             Flags bindingFlags )
         {
             return (StaticMemberSetter)
-                new MemberSetEmitter( targetType, bindingFlags, MemberTypes.Property, propertyName ).GetDelegate();
+                new MemberSetEmitter( targetType, bindingFlags, MemberTypes.Property, name ).GetDelegate();
         }
 
         /// <summary>
-        /// Creates a delegate which can set the value of the instance property specified by <paramref name="propertyName"/>
+        /// Creates a delegate which can set the value of the instance property specified by <paramref name="name"/>
         /// matching <paramref name="bindingFlags"/> of the given <paramref name="targetType"/>.
         /// </summary>
-        public static MemberSetter DelegateForSetPropertyValue( this Type targetType, string propertyName,
+        public static MemberSetter DelegateForSetPropertyValue( this Type targetType, string name,
                                                                 Flags bindingFlags )
         {
             return (MemberSetter)
-                new MemberSetEmitter( targetType, bindingFlags, MemberTypes.Property, propertyName ).GetDelegate();
+                new MemberSetEmitter( targetType, bindingFlags, MemberTypes.Property, name ).GetDelegate();
         }
 
         /// <summary>
-        /// Creates a delegate which can get the value of the static property specified by <paramref name="propertyName"/>
+        /// Creates a delegate which can get the value of the static property specified by <paramref name="name"/>
         /// matching <paramref name="bindingFlags"/> of the given <paramref name="targetType"/>.
         /// </summary>
-        public static StaticMemberGetter DelegateForGetStaticPropertyValue( this Type targetType, string propertyName,
+        public static StaticMemberGetter DelegateForGetStaticPropertyValue( this Type targetType, string name,
                                                                             Flags bindingFlags )
         {
             return (StaticMemberGetter)
-                new MemberGetEmitter( targetType, bindingFlags, MemberTypes.Property, propertyName ).GetDelegate();
+                new MemberGetEmitter( targetType, bindingFlags, MemberTypes.Property, name ).GetDelegate();
         }
 
         /// <summary>
-        /// Creates a delegate which can get the value of the instance property specified by <paramref name="propertyName"/>
+        /// Creates a delegate which can get the value of the instance property specified by <paramref name="name"/>
         /// matching <paramref name="bindingFlags"/> of the given <paramref name="targetType"/>.
         /// </summary>
-        public static MemberGetter DelegateForGetPropertyValue( this Type targetType, string propertyName,
+        public static MemberGetter DelegateForGetPropertyValue( this Type targetType, string name,
                                                                 Flags bindingFlags )
         {
             return (MemberGetter)
-                new MemberGetEmitter( targetType, bindingFlags, MemberTypes.Property, propertyName ).GetDelegate();
+                new MemberGetEmitter( targetType, bindingFlags, MemberTypes.Property, name ).GetDelegate();
         }
         #endregion
 
@@ -225,7 +225,7 @@ namespace Fasterflect
         public static Type SetProperties(this Type targetType, object sample, Flags bindingFlags, params string[] propertiesToInclude)
         {
             var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => targetType.SetPropertyValue(prop.Name, bindingFlags, prop.Get(sample)));
+            properties.ForEach(prop => targetType.SetPropertyValue(prop.Name, prop.Get(sample), bindingFlags ));
             return targetType;
         }
 
@@ -264,7 +264,7 @@ namespace Fasterflect
         public static object SetProperties(this object target, object sample, Flags bindingFlags, params string[] propertiesToInclude)
         {
             var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => target.SetPropertyValue(prop.Name, bindingFlags, prop.Get(sample)));
+            properties.ForEach(prop => target.SetPropertyValue(prop.Name, prop.Get(sample), bindingFlags ));
             return target;
         }
         #endregion
@@ -368,11 +368,11 @@ namespace Fasterflect
         /// Sets the value of the indexer matching <paramref name="bindingFlags"/> of the given <paramref name="target"/>
         /// </summary>
         /// <param name="target">The object whose indexer is to be set.</param>
-        /// <param name="bindingFlags">The binding flags used to lookup the indexer.</param>
         /// <param name="parameterTypes">The types of the indexer parameters (must be in the right order), plus
-        /// the type of the indexer.</param>
+        ///   the type of the indexer.</param>
+        /// <param name="bindingFlags">The binding flags used to lookup the indexer.</param>
         /// <param name="parameters">The list of the indexer parameters plus the value to be set to the indexer.
-        /// This list must match with the <paramref name="parameterTypes"/> list.</param>
+        ///   This list must match with the <paramref name="parameterTypes"/> list.</param>
         /// <returns>The object whose indexer is to be set.</returns>
         /// <example>
         /// If the indexer is of type <c>string</c> and accepts one parameter of type <c>int</c>, this 
@@ -381,8 +381,7 @@ namespace Fasterflect
         /// target.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
         /// </code>
         /// </example>
-        public static object SetIndexer( this object target, Flags bindingFlags, Type[] parameterTypes,
-                                         params object[] parameters )
+        public static object SetIndexer( this object target, Type[] parameterTypes, Flags bindingFlags, params object[] parameters )
         {
             DelegateForSetIndexer( target.GetTypeAdjusted(), bindingFlags, parameterTypes )( target, parameters );
             return target;
@@ -408,12 +407,11 @@ namespace Fasterflect
         /// Gets the value of the indexer matching <paramref name="bindingFlags"/> of the given <paramref name="target"/>
         /// </summary>
         /// <param name="target">The object whose indexer is to be retrieved.</param>
-        /// <param name="bindingFlags">The binding flags used to lookup the indexer.</param>
         /// <param name="parameterTypes">The types of the indexer parameters (must be in the right order).</param>
+        /// <param name="bindingFlags">The binding flags used to lookup the indexer.</param>
         /// <param name="parameters">The list of the indexer parameters.</param>
         /// <returns>The value returned by the indexer.</returns>
-        public static object GetIndexer( this object target, Flags bindingFlags, Type[] parameterTypes,
-                                         params object[] parameters )
+        public static object GetIndexer( this object target, Type[] parameterTypes, Flags bindingFlags, params object[] parameters )
         {
             return DelegateForGetIndexer( target.GetTypeAdjusted(), bindingFlags, parameterTypes )( target, parameters );
         }
@@ -489,34 +487,34 @@ namespace Fasterflect
 
         #region Property Lookup (Single)
         /// <summary>
-        /// Gets the property identified by <paramref name="name"/> on the given <paramref name="type"/>. This method 
+        /// Gets the property identified by <paramref name="name"/> on the given <paramref name="targetType"/>. This method 
         /// searches for public and non-public instance properties on both the type itself and all parent classes.
         /// </summary>
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
-        public static PropertyInfo Property( this Type type, string name )
+        public static PropertyInfo Property( this Type targetType, string name )
         {
-            return type.Property( name, Flags.InstanceAnyVisibility );
+            return targetType.Property( name, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
-        /// Gets the property identified by <paramref name="name"/> on the given <paramref name="type"/>. 
+        /// Gets the property identified by <paramref name="name"/> on the given <paramref name="targetType"/>. 
         /// Use the <paramref name="bindingFlags"/> parameter to define the scope of the search.
         /// </summary>
         /// <returns>A single PropertyInfo instance of the first found match or null if no match was found.</returns>
-        public static PropertyInfo Property( this Type type, string name, Flags bindingFlags )
+        public static PropertyInfo Property( this Type targetType, string name, Flags bindingFlags )
         {
             // we need to check all properties to do partial name matches
             if( bindingFlags.IsAnySet( Flags.PartialNameMatch | Flags.TrimExplicitlyImplemented ) )
             {
-                return type.Properties( bindingFlags, name ).FirstOrDefault();
+                return targetType.Properties( bindingFlags, name ).FirstOrDefault();
             }
 
-            var result = type.GetProperty( name, bindingFlags );
+            var result = targetType.GetProperty( name, bindingFlags );
             if( result == null && bindingFlags.IsNotSet( Flags.DeclaredOnly ) )
             {
-                if( type.BaseType != typeof(object) && type.BaseType != null )
+                if( targetType.BaseType != typeof(object) && targetType.BaseType != null )
                 {
-                    return type.BaseType.Property( name, bindingFlags );
+                    return targetType.BaseType.Property( name, bindingFlags );
                 }
             }
             bool hasSpecialFlags = bindingFlags.IsSet( Flags.ExcludeExplicitlyImplemented );
@@ -532,29 +530,29 @@ namespace Fasterflect
 
         #region Property Lookup (Multiple)
         /// <summary>
-        /// Gets all public and non-public instance properties on the given <paramref name="type"/>,
+        /// Gets all public and non-public instance properties on the given <paramref name="targetType"/>,
         /// including properties defined on base types. The result can optionally be filtered by specifying
         /// a list of property names to include using the <paramref name="names"/> parameter.
         /// </summary>
         /// <returns>A list of matching instance properties on the type.</returns>
-        /// <param name="type">The type whose public properties are to be retrieved.</param>
+        /// <param name="targetType">The type whose public properties are to be retrieved.</param>
         /// <param name="names">A list of names of properties to be retrieved. If this is <c>null</c>, 
         /// all properties are returned.</param>
         /// <returns>A list of all public properties on the type filted by <paramref name="names"/>.
         /// This value will never be null.</returns>
-        public static IList<PropertyInfo> Properties( this Type type, params string[] names )
+        public static IList<PropertyInfo> Properties( this Type targetType, params string[] names )
         {
-            return type.Properties( Flags.InstanceAnyVisibility, names );
+            return targetType.Properties( Flags.InstanceAnyVisibility, names );
         }
 
         /// <summary>
-        /// Gets all properties on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>,
+        /// Gets all properties on the given <paramref name="targetType"/> that match the specified <paramref name="bindingFlags"/>,
         /// including properties defined on base types.
         /// </summary>
         /// <returns>A list of all matching properties on the type. This value will never be null.</returns>
-        public static IList<PropertyInfo> Properties( this Type type, Flags bindingFlags, params string[] names )
+        public static IList<PropertyInfo> Properties( this Type targetType, Flags bindingFlags, params string[] names )
         {
-            if (type == null || type == Constants.ObjectType)
+            if (targetType == null || targetType == Constants.ObjectType)
             {
                 return Constants.EmptyPropertyInfoArray;
             }
@@ -566,10 +564,10 @@ namespace Fasterflect
 
             if( ! recurse && ! hasNames && ! hasSpecialFlags )
             {
-                return type.GetProperties( bindingFlags ) ?? Constants.EmptyPropertyInfoArray;
+                return targetType.GetProperties( bindingFlags ) ?? Constants.EmptyPropertyInfoArray;
             }
 
-            var properties = GetProperties( type, bindingFlags );
+            var properties = GetProperties( targetType, bindingFlags );
             properties = hasSpecialFlags ? properties.Filter( bindingFlags ) : properties;
             properties = hasNames ? properties.Filter( bindingFlags, names ) : properties;
             return properties;
@@ -604,36 +602,36 @@ namespace Fasterflect
         #region TryGetValue
 		/// <summary>
         /// Gets the first (public or non-public) instance property with the given <paramref name="name"/> on the given
-        /// <paramref name="source"/> object. Returns the value of the property if a match was found and null otherwise.
+        /// <paramref name="target"/> object. Returns the value of the property if a match was found and null otherwise.
 		/// </summary>
 		/// <remarks>
         /// When using this method it is not possible to distinguish between a missing property and a property whose value is null.
 		/// </remarks>
-		/// <param name="source">The source object on which to find the property</param>
+		/// <param name="target">The source object on which to find the property</param>
 		/// <param name="name">The name of the property whose value should be retrieved</param>
 		/// <returns>The value of the property or null if no property was found</returns>
-        public static object TryGetPropertyValue( this object source, string name )
+        public static object TryGetPropertyValue( this object target, string name )
         {
-            return TryGetPropertyValue( source, name, Flags.InstanceAnyVisibility );
+            return TryGetPropertyValue( target, name, Flags.InstanceAnyVisibility );
         }
 
 		/// <summary>
-        /// Gets the first property with the given <paramref name="name"/> on the given <paramref name="source"/> object.
+        /// Gets the first property with the given <paramref name="name"/> on the given <paramref name="target"/> object.
         /// Returns the value of the property if a match was found and null otherwise.
         /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
 		/// </summary>
 		/// <remarks>
         /// When using this method it is not possible to distinguish between a missing property and a property whose value is null.
 		/// </remarks>
-		/// <param name="source">The source object on which to find the property</param>
+		/// <param name="target">The source object on which to find the property</param>
 		/// <param name="name">The name of the property whose value should be retrieved</param>
 		/// <param name="bindingFlags">A combination of Flags that define the scope of the search</param>
 		/// <returns>The value of the property or null if no property was found</returns>
-        public static object TryGetPropertyValue( this object source, string name, Flags bindingFlags )
+        public static object TryGetPropertyValue( this object target, string name, Flags bindingFlags )
         {
             try
             {
-                return source.GetPropertyValue( name, bindingFlags );
+                return target.GetPropertyValue( name, bindingFlags );
             }
             catch( MissingMemberException )
             {
@@ -645,33 +643,33 @@ namespace Fasterflect
         #region TrySetValue
 		/// <summary>
         /// Sets the first (public or non-public) instance property with the given <paramref name="name"/> on the 
-        /// given <paramref name="source"/> object to the supplied <paramref name="value"/>. Returns true 
+        /// given <paramref name="target"/> object to the supplied <paramref name="value"/>. Returns true 
         /// if a value was assigned to a property and false otherwise.
 		/// </summary>
-		/// <param name="source">The source object on which to find the property</param>
+		/// <param name="target">The source object on which to find the property</param>
 		/// <param name="name">The name of the property whose value should be retrieved</param>
 		/// <param name="value">The value that should be assigned to the property</param>
 		/// <returns>True if the value was assigned to a property and false otherwise</returns>
-        public static bool TrySetPropertyValue( this object source, string name, object value )
+        public static bool TrySetPropertyValue( this object target, string name, object value )
         {
-            return TrySetPropertyValue( source, name, value, Flags.InstanceAnyVisibility );
+            return TrySetPropertyValue( target, name, value, Flags.InstanceAnyVisibility );
         }
 
 		/// <summary>
-        /// Sets the first property with the given <paramref name="name"/> on the given <paramref name="source"/> object
+        /// Sets the first property with the given <paramref name="name"/> on the given <paramref name="target"/> object
         /// to the supplied <paramref name="value"/>. Returns true if a value was assigned to a property and false otherwise.
         /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
 		/// </summary>
-		/// <param name="source">The source object on which to find the property</param>
+		/// <param name="target">The source object on which to find the property</param>
 		/// <param name="name">The name of the property whose value should be retrieved</param>
 		/// <param name="value">The value that should be assigned to the property</param>
 		/// <param name="bindingFlags">A combination of Flags that define the scope of the search</param>
 		/// <returns>True if the value was assigned to a property and false otherwise</returns>
-        public static bool TrySetPropertyValue( this object source, string name, object value, Flags bindingFlags )
+        public static bool TrySetPropertyValue( this object target, string name, object value, Flags bindingFlags )
         {
             try
             {
-                source.SetPropertyValue( name, bindingFlags, value );
+                target.SetPropertyValue( name, value, bindingFlags );
                 return true;
             }
             catch (MissingMemberException)
