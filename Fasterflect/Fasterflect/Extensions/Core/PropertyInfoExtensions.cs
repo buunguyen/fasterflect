@@ -35,12 +35,12 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Sets the instance property identified by <paramref name="propInfo"/> of the given <paramref name="target"/>
+        /// Sets the instance property identified by <paramref name="propInfo"/> of the given <paramref name="obj"/>
         /// with <paramref name="value" />.
         /// </summary>
-        public static void Set( this PropertyInfo propInfo, object target, object value )
+        public static void Set( this PropertyInfo propInfo, object obj, object value )
         {
-            propInfo.DelegateForSetPropertyValue()( target, value );
+            propInfo.DelegateForSetPropertyValue()( obj, value );
         }
 
         /// <summary>
@@ -52,11 +52,11 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Gets the value of the instance property identified by <paramref name="propInfo"/> of the given <paramref name="target"/>.
+        /// Gets the value of the instance property identified by <paramref name="propInfo"/> of the given <paramref name="obj"/>.
         /// </summary>
-        public static object Get( this PropertyInfo propInfo, object target )
+        public static object Get( this PropertyInfo propInfo, object obj )
         {
-            return propInfo.DelegateForGetPropertyValue()( target );
+            return propInfo.DelegateForGetPropertyValue()( obj );
         }
 
         /// <summary>

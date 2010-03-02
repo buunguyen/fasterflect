@@ -47,22 +47,22 @@ namespace Fasterflect
 
         /// <summary>
         /// Gets the instance field or property identified by <paramref name="memberInfo"/> on
-        /// the <paramref name="target"/>.
+        /// the <paramref name="obj"/>.
         /// </summary>
-        public static object Get( this MemberInfo memberInfo, object target )
+        public static object Get( this MemberInfo memberInfo, object obj )
         {
             var @delegate = (MemberGetter) new MemberGetEmitter( memberInfo, Flags.InstanceAnyVisibility ).GetDelegate();
-            return @delegate( target );
+            return @delegate( obj );
         }
 
         /// <summary>
         /// Sets the instance field or property identified by <paramref name="memberInfo"/> on
-        /// the <paramref name="target"/> object with <paramref name="value"/>.
+        /// the <paramref name="obj"/> object with <paramref name="value"/>.
         /// </summary>
-        public static void Set( this MemberInfo memberInfo, object target, object value )
+        public static void Set( this MemberInfo memberInfo, object obj, object value )
         {
             var @delegate = (MemberSetter) new MemberSetEmitter( memberInfo, Flags.InstanceAnyVisibility ).GetDelegate();
-            @delegate( target, value );
+            @delegate( obj, value );
         }
 
         #region MemberInfo Helpers
