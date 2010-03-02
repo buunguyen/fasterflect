@@ -33,240 +33,240 @@ namespace Fasterflect
 
         #region Single Access
         /// <summary>
-        /// Sets the static field specified by <paramref name="name"/> of the given <paramref name="targetType"/>
+        /// Sets the static field specified by <paramref name="name"/> of the given <paramref name="type"/>
         /// with the specified <paramref name="value" />.
         /// </summary>
-        /// <returns><paramref name="targetType"/>.</returns>
-        public static Type SetFieldValue( this Type targetType, string name, object value )
+        /// <returns><paramref name="type"/>.</returns>
+        public static Type SetFieldValue( this Type type, string name, object value )
         {
-            DelegateForSetStaticFieldValue( targetType, name )( value );
-            return targetType;
+            DelegateForSetStaticFieldValue( type, name )( value );
+            return type;
         }
 
         /// <summary>
-        /// Sets the instance field specified by <paramref name="name"/> of the given <paramref name="target"/>
+        /// Sets the instance field specified by <paramref name="name"/> of the given <paramref name="obj"/>
         /// with the specified <paramref name="value" />.
         /// </summary>
-        /// <returns><paramref name="target"/>.</returns>
-        public static object SetFieldValue( this object target, string name, object value )
+        /// <returns><paramref name="obj"/>.</returns>
+        public static object SetFieldValue( this object obj, string name, object value )
         {
-            DelegateForSetFieldValue( target.GetTypeAdjusted(), name )( target, value );
-            return target;
+            DelegateForSetFieldValue( obj.GetTypeAdjusted(), name )( obj, value );
+            return obj;
         }
 
         /// <summary>
-        /// Gets the value of the static field specified by <paramref name="name"/> of the given <paramref name="targetType"/>.
+        /// Gets the value of the static field specified by <paramref name="name"/> of the given <paramref name="type"/>.
         /// </summary>
-        public static object GetFieldValue( this Type targetType, string name )
+        public static object GetFieldValue( this Type type, string name )
         {
-            return DelegateForGetStaticFieldValue( targetType, name )();
+            return DelegateForGetStaticFieldValue( type, name )();
         }
 
         /// <summary>
-        /// Gets the value of the instance field specified by <paramref name="name"/> of the given <paramref name="target"/>.
+        /// Gets the value of the instance field specified by <paramref name="name"/> of the given <paramref name="obj"/>.
         /// </summary>
-        public static object GetFieldValue( this object target, string name )
+        public static object GetFieldValue( this object obj, string name )
         {
-            return DelegateForGetFieldValue( target.GetTypeAdjusted(), name )( target );
+            return DelegateForGetFieldValue( obj.GetTypeAdjusted(), name )( obj );
         }
 
         /// <summary>
         /// Sets the static field specified by <paramref name="name"/> and matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="targetType"/> with the specified <paramref name="value" />.
+        /// of the given <paramref name="type"/> with the specified <paramref name="value" />.
         /// </summary>
-        /// <returns><paramref name="targetType"/>.</returns>
-        public static Type SetFieldValue( this Type targetType, string name, object value, Flags bindingFlags )
+        /// <returns><paramref name="type"/>.</returns>
+        public static Type SetFieldValue( this Type type, string name, object value, Flags bindingFlags )
         {
-            DelegateForSetStaticFieldValue( targetType, name, bindingFlags )( value );
-            return targetType;
+            DelegateForSetStaticFieldValue( type, name, bindingFlags )( value );
+            return type;
         }
 
         /// <summary>
         /// Sets the instance field specified by <paramref name="name"/> and matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="target"/> with the specified <paramref name="value" />.
+        /// of the given <paramref name="obj"/> with the specified <paramref name="value" />.
         /// </summary>
-        /// <returns><paramref name="target"/>.</returns>
-        public static object SetFieldValue( this object target, string name, object value, Flags bindingFlags )
+        /// <returns><paramref name="obj"/>.</returns>
+        public static object SetFieldValue( this object obj, string name, object value, Flags bindingFlags )
         {
-            DelegateForSetFieldValue( target.GetTypeAdjusted(), name, bindingFlags )( target, value );
-            return target;
+            DelegateForSetFieldValue( obj.GetTypeAdjusted(), name, bindingFlags )( obj, value );
+            return obj;
         }
 
         /// <summary>
         /// Gets the value of the static field specified by <paramref name="name"/> and matching <paramref name="bindingFlags"/> 
-        /// of the given <paramref name="targetType"/>.
+        /// of the given <paramref name="type"/>.
         /// </summary>
-        public static object GetFieldValue( this Type targetType, string name, Flags bindingFlags )
+        public static object GetFieldValue( this Type type, string name, Flags bindingFlags )
         {
-            return DelegateForGetStaticFieldValue( targetType, name, bindingFlags )();
+            return DelegateForGetStaticFieldValue( type, name, bindingFlags )();
         }
 
         /// <summary>
         /// Gets the value of the instance field specified by <paramref name="name"/> and matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="target"/>.
+        /// of the given <paramref name="obj"/>.
         /// </summary>
-        public static object GetFieldValue( this object target, string name, Flags bindingFlags )
+        public static object GetFieldValue( this object obj, string name, Flags bindingFlags )
         {
-            return DelegateForGetFieldValue( target.GetTypeAdjusted(), name, bindingFlags )( target );
+            return DelegateForGetFieldValue( obj.GetTypeAdjusted(), name, bindingFlags )( obj );
         }
 
         /// <summary>
         /// Creates a delegate which can set the value of the static field specified by <paramref name="name"/> of 
-        /// the given <paramref name="targetType"/>.
+        /// the given <paramref name="type"/>.
         /// </summary>
-        public static StaticMemberSetter DelegateForSetStaticFieldValue( this Type targetType, string name )
+        public static StaticMemberSetter DelegateForSetStaticFieldValue( this Type type, string name )
         {
-            return DelegateForSetStaticFieldValue( targetType, name, Flags.StaticAnyVisibility );
+            return DelegateForSetStaticFieldValue( type, name, Flags.StaticAnyVisibility );
         }
 
         /// <summary>
         /// Creates a delegate which can set the value of the instance field specified by <paramref name="name"/> of 
-        /// the given <paramref name="targetType"/>.
+        /// the given <paramref name="type"/>.
         /// </summary>
-        public static MemberSetter DelegateForSetFieldValue( this Type targetType, string name )
+        public static MemberSetter DelegateForSetFieldValue( this Type type, string name )
         {
-            return DelegateForSetFieldValue( targetType, name, Flags.InstanceAnyVisibility );
+            return DelegateForSetFieldValue( type, name, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
         /// Creates a delegate which can get the value of the static field specified by <paramref name="name"/> of 
-        /// the given <paramref name="targetType"/>.
+        /// the given <paramref name="type"/>.
         /// </summary>
-        public static StaticMemberGetter DelegateForGetStaticFieldValue( this Type targetType, string name )
+        public static StaticMemberGetter DelegateForGetStaticFieldValue( this Type type, string name )
         {
-            return DelegateForGetStaticFieldValue( targetType, name, Flags.StaticAnyVisibility );
+            return DelegateForGetStaticFieldValue( type, name, Flags.StaticAnyVisibility );
         }
 
         /// <summary>
         /// Creates a delegate which can get the value of the instance field specified by <paramref name="name"/> of 
-        /// the given <paramref name="targetType"/>.
+        /// the given <paramref name="type"/>.
         /// </summary>
-        public static MemberGetter DelegateForGetFieldValue( this Type targetType, string name )
+        public static MemberGetter DelegateForGetFieldValue( this Type type, string name )
         {
-            return DelegateForGetFieldValue( targetType, name, Flags.InstanceAnyVisibility );
+            return DelegateForGetFieldValue( type, name, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
         /// Creates a delegate which can set the value of the static field specified by <paramref name="name"/> and 
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="targetType"/>.
+        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
         /// </summary>
-        public static StaticMemberSetter DelegateForSetStaticFieldValue( this Type targetType, string name,
+        public static StaticMemberSetter DelegateForSetStaticFieldValue( this Type type, string name,
                                                                          Flags bindingFlags )
         {
             return (StaticMemberSetter)
-                new MemberSetEmitter( targetType, bindingFlags, MemberTypes.Field, name ).GetDelegate();
+                new MemberSetEmitter( type, bindingFlags, MemberTypes.Field, name ).GetDelegate();
         }
 
         /// <summary>
         /// Creates a delegate which can set the value of the instance field specified by <paramref name="name"/> and
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="targetType"/>.
+        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
         /// </summary>
-        public static MemberSetter DelegateForSetFieldValue( this Type targetType, string name, Flags bindingFlags )
+        public static MemberSetter DelegateForSetFieldValue( this Type type, string name, Flags bindingFlags )
         {
             return (MemberSetter)
-                new MemberSetEmitter( targetType, bindingFlags, MemberTypes.Field, name ).GetDelegate();
+                new MemberSetEmitter( type, bindingFlags, MemberTypes.Field, name ).GetDelegate();
         }
 
         /// <summary>
         /// Creates a delegate which can get the value of the static field specified by <paramref name="name"/> and 
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="targetType"/>.
+        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
         /// </summary>
-        public static StaticMemberGetter DelegateForGetStaticFieldValue( this Type targetType, string name,
+        public static StaticMemberGetter DelegateForGetStaticFieldValue( this Type type, string name,
                                                                          Flags bindingFlags )
         {
             return
                 (StaticMemberGetter)
-                new MemberGetEmitter( targetType, bindingFlags, MemberTypes.Field, name ).GetDelegate();
+                new MemberGetEmitter( type, bindingFlags, MemberTypes.Field, name ).GetDelegate();
         }
 
         /// <summary>
         /// Creates a delegate which can get the value of the instance field specified by <paramref name="name"/> and
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="targetType"/>.
+        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
         /// </summary>
-        public static MemberGetter DelegateForGetFieldValue( this Type targetType, string name, Flags bindingFlags )
+        public static MemberGetter DelegateForGetFieldValue( this Type type, string name, Flags bindingFlags )
         {
             return (MemberGetter)
-                new MemberGetEmitter( targetType, bindingFlags, MemberTypes.Field, name ).GetDelegate();
+                new MemberGetEmitter( type, bindingFlags, MemberTypes.Field, name ).GetDelegate();
         }
         #endregion
 
         #region Batch Setters
         /// <summary>
-        /// Sets the public and non-public static fields of the given <paramref name="targetType"/> based on
+        /// Sets the public and non-public static fields of the given <paramref name="type"/> based on
         /// the public properties available in <paramref name="sample"/> filtered by 
         /// the optional list <paramref name="propertiesToInclude"/>. 
         /// </summary>
-        /// <param name="targetType">The type whose static fields are to be set.</param>
+        /// <param name="type">The type whose static fields are to be set.</param>
         /// <param name="sample">An object whose public properties will be used to set the 
-        /// static fields of the given <paramref name="targetType"/>.</param>
+        /// static fields of the given <paramref name="type"/>.</param>
         /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="targetType"/>.  If this is <c>null</c> or left empty, 
+        /// <paramref name="sample"/> to set <paramref name="type"/>.  If this is <c>null</c> or left empty, 
         /// all public properties of <paramref name="sample"/> are used.</param>
         /// <returns>The type whose static fields are to be set.</returns>
-        public static Type SetFields( this Type targetType, object sample, params string[] propertiesToInclude )
+        public static Type SetFields( this Type type, object sample, params string[] propertiesToInclude )
         {
             var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach( prop => targetType.SetFieldValue( prop.Name, prop.Get( sample ) ) );
-            return targetType;
+            properties.ForEach( prop => type.SetFieldValue( prop.Name, prop.Get( sample ) ) );
+            return type;
         }
 
         /// <summary>
-        /// Sets the static fields matching <paramref name="bindingFlags"/> of the given <paramref name="targetType"/> based on
+        /// Sets the static fields matching <paramref name="bindingFlags"/> of the given <paramref name="type"/> based on
         /// the public properties available in <paramref name="sample"/> filtered by 
         /// the optional list <paramref name="propertiesToInclude"/>. 
         /// </summary>
-        /// <param name="targetType">The type whose static fields are to be set.</param>
+        /// <param name="type">The type whose static fields are to be set.</param>
         /// <param name="sample">An object whose public properties will be used to set the 
-        /// static fields of the given <paramref name="targetType"/>.</param>
-        /// <param name="bindingFlags">The binding flag used to lookup the static fields of <paramref name="targetType"/>.</param>
+        /// static fields of the given <paramref name="type"/>.</param>
+        /// <param name="bindingFlags">The binding flag used to lookup the static fields of <paramref name="type"/>.</param>
         /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="targetType"/>.  If this is <c>null</c> or left empty, 
+        /// <paramref name="sample"/> to set <paramref name="type"/>.  If this is <c>null</c> or left empty, 
         /// all public properties of <paramref name="sample"/> are used.</param>
         /// <returns>The type whose static fields are to be set.</returns>
-        public static Type SetFields(this Type targetType, object sample, Flags bindingFlags, params string[] propertiesToInclude)
+        public static Type SetFields(this Type type, object sample, Flags bindingFlags, params string[] propertiesToInclude)
         {
             var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => targetType.SetFieldValue(prop.Name, prop.Get(sample), bindingFlags ));
-            return targetType;
+            properties.ForEach(prop => type.SetFieldValue(prop.Name, prop.Get(sample), bindingFlags ));
+            return type;
         }
 
         /// <summary>
-        /// Sets the public and non-public instance fields of the given <paramref name="target"/> based on
+        /// Sets the public and non-public instance fields of the given <paramref name="obj"/> based on
         /// the public properties available in <paramref name="sample"/> filtered by the optional list 
         /// <paramref name="propertiesToInclude"/>. 
         /// </summary>
-        /// <param name="target">The object whose instance fields are to be set.</param>
+        /// <param name="obj">The object whose instance fields are to be set.</param>
         /// <param name="sample">An object whose public properties will be used to set the 
-        /// instance fields of the given <paramref name="target"/>.</param>
+        /// instance fields of the given <paramref name="obj"/>.</param>
         /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="target"/>.  If this is <c>null</c> or left empty, 
+        /// <paramref name="sample"/> to set <paramref name="obj"/>.  If this is <c>null</c> or left empty, 
         /// all public properties of <paramref name="sample"/> are used.</param>
         /// <returns>The object whose instance fields are to be set.</returns>
-        public static object SetFields( this object target, object sample, params string[] propertiesToInclude )
+        public static object SetFields( this object obj, object sample, params string[] propertiesToInclude )
         {
             var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach( prop => target.SetFieldValue( prop.Name, prop.Get( sample ) ) );
-            return target;
+            properties.ForEach( prop => obj.SetFieldValue( prop.Name, prop.Get( sample ) ) );
+            return obj;
         }
 
         /// <summary>
-        /// Sets the instance fields matching <paramref name="bindingFlags"/> of the given <paramref name="target"/> based on
+        /// Sets the instance fields matching <paramref name="bindingFlags"/> of the given <paramref name="obj"/> based on
         /// the public properties available in <paramref name="sample"/> filtered by the optional list 
         /// <paramref name="propertiesToInclude"/>. 
         /// </summary>
-        /// <param name="target">The object whose instance fields are to be set.</param>
+        /// <param name="obj">The object whose instance fields are to be set.</param>
         /// <param name="sample">An object whose public properties will be used to set the 
-        /// instance fields of the given <paramref name="target"/>.</param>
-        /// <param name="bindingFlags">The binding flag used to lookup the instance fields of <paramref name="target"/>.</param>
+        /// instance fields of the given <paramref name="obj"/>.</param>
+        /// <param name="bindingFlags">The binding flag used to lookup the instance fields of <paramref name="obj"/>.</param>
         /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="target"/>.  If this is <c>null</c> or left empty, 
+        /// <paramref name="sample"/> to set <paramref name="obj"/>.  If this is <c>null</c> or left empty, 
         /// all public properties of <paramref name="sample"/> are used.</param>
         /// <returns>The object whose instance fields are to be set.</returns>
-        public static object SetFields(this object target, object sample, Flags bindingFlags, params string[] propertiesToInclude)
+        public static object SetFields(this object obj, object sample, Flags bindingFlags, params string[] propertiesToInclude)
         {
             var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => target.SetFieldValue(prop.Name, prop.Get(sample), bindingFlags ));
-            return target;
+            properties.ForEach(prop => obj.SetFieldValue(prop.Name, prop.Get(sample), bindingFlags ));
+            return obj;
         }
         #endregion
 
@@ -274,34 +274,34 @@ namespace Fasterflect
 
         #region Field Lookup (Single)
         /// <summary>
-        /// Gets the field identified by <paramref name="name"/> on the given <paramref name="targetType"/>. This method 
+        /// Gets the field identified by <paramref name="name"/> on the given <paramref name="type"/>. This method 
         /// searches for public and non-public instance fields on both the type itself and all parent classes.
         /// </summary>
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
-        public static FieldInfo Field( this Type targetType, string name )
+        public static FieldInfo Field( this Type type, string name )
         {
-            return targetType.Field( name, Flags.InstanceAnyVisibility );
+            return type.Field( name, Flags.InstanceAnyVisibility );
         }
 
         /// <summary>
-        /// Gets the field identified by <paramref name="name"/> on the given <paramref name="targetType"/>. 
+        /// Gets the field identified by <paramref name="name"/> on the given <paramref name="type"/>. 
         /// Use the <paramref name="bindingFlags"/> parameter to define the scope of the search.
         /// </summary>
         /// <returns>A single FieldInfo instance of the first found match or null if no match was found.</returns>
-        public static FieldInfo Field( this Type targetType, string name, Flags bindingFlags )
+        public static FieldInfo Field( this Type type, string name, Flags bindingFlags )
         {
             // we need to check all fields to do partial name matches
             if( bindingFlags.IsAnySet( Flags.PartialNameMatch | Flags.TrimExplicitlyImplemented ) )
             {
-                return targetType.Fields( bindingFlags, name ).FirstOrDefault();
+                return type.Fields( bindingFlags, name ).FirstOrDefault();
             }
 
-            var result = targetType.GetField( name, bindingFlags );
+            var result = type.GetField( name, bindingFlags );
             if( result == null && bindingFlags.IsNotSet( Flags.DeclaredOnly ) )
             {
-                if( targetType.BaseType != typeof(object) && targetType.BaseType != null )
+                if( type.BaseType != typeof(object) && type.BaseType != null )
                 {
-                    return targetType.BaseType.Field( name, bindingFlags );
+                    return type.BaseType.Field( name, bindingFlags );
                 }
             }
             bool hasSpecialFlags =
@@ -318,23 +318,23 @@ namespace Fasterflect
 
         #region Field Lookup (Multiple)
         /// <summary>
-        /// Gets all public and non-public instance fields on the given <paramref name="targetType"/>,
+        /// Gets all public and non-public instance fields on the given <paramref name="type"/>,
         /// including fields defined on base types.
         /// </summary>
-        /// <param name="targetType">The type on which to reflect.</param>
+        /// <param name="type">The type on which to reflect.</param>
         /// <param name="names">The optional list of names against which to filter the result. If this parameter is
 		/// <c>null</c> or empty no name filtering will be applied. This method will check for an exact, 
 		/// case-sensitive match.</param>
         /// <returns>A list of all instance fields on the type. This value will never be null.</returns>
-        public static IList<FieldInfo> Fields( this Type targetType, params string[] names )
+        public static IList<FieldInfo> Fields( this Type type, params string[] names )
         {
-            return targetType.Fields( Flags.InstanceAnyVisibility, names );
+            return type.Fields( Flags.InstanceAnyVisibility, names );
         }
 
         /// <summary>
-        /// Gets all fields on the given <paramref name="targetType"/> that match the specified <paramref name="bindingFlags"/>.
+        /// Gets all fields on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>.
         /// </summary>
-        /// <param name="targetType">The type on which to reflect.</param>
+        /// <param name="type">The type on which to reflect.</param>
         /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
         /// the search behavior and result filtering.</param>
         /// <param name="names">The optional list of names against which to filter the result. If this parameter is
@@ -343,9 +343,9 @@ namespace Fasterflect
 		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
 		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>A list of all matching fields on the type. This value will never be null.</returns>
-        public static IList<FieldInfo> Fields( this Type targetType, Flags bindingFlags, params string[] names )
+        public static IList<FieldInfo> Fields( this Type type, Flags bindingFlags, params string[] names )
         {
-            if( targetType == null || targetType == typeof(object) )
+            if( type == null || type == typeof(object) )
             {
                 return new FieldInfo[0];
             }
@@ -357,30 +357,30 @@ namespace Fasterflect
 
             if( ! recurse && ! hasNames && ! hasSpecialFlags )
             {
-                return targetType.GetFields( bindingFlags ) ?? new FieldInfo[0];
+                return type.GetFields( bindingFlags ) ?? new FieldInfo[0];
             }
 
-            var fields = GetFields( targetType, bindingFlags );
+            var fields = GetFields( type, bindingFlags );
             fields = hasSpecialFlags ? fields.Filter( bindingFlags ) : fields;
             fields = hasNames ? fields.Filter( bindingFlags, names ) : fields;
             return fields;
         }
 
-        private static IList<FieldInfo> GetFields( Type targetType, Flags bindingFlags )
+        private static IList<FieldInfo> GetFields( Type type, Flags bindingFlags )
         {
             bool recurse = bindingFlags.IsNotSet( Flags.DeclaredOnly );
 
             if( ! recurse )
             {
-                return targetType.GetFields( bindingFlags ) ?? new FieldInfo[0];
+                return type.GetFields( bindingFlags ) ?? new FieldInfo[0];
             }
 
             bindingFlags |= Flags.DeclaredOnly;
             bindingFlags &= ~BindingFlags.FlattenHierarchy;
 
             var fields = new List<FieldInfo>();
-            fields.AddRange( targetType.GetFields( bindingFlags ) );
-            Type baseType = targetType.BaseType;
+            fields.AddRange( type.GetFields( bindingFlags ) );
+            Type baseType = type.BaseType;
             while( baseType != null && baseType != typeof(object) )
             {
                 fields.AddRange( baseType.GetFields( bindingFlags ) );
@@ -395,36 +395,36 @@ namespace Fasterflect
         #region TryGetValue
 		/// <summary>
         /// Gets the first (public or non-public) instance field with the given <paramref name="name"/> on the given
-        /// <paramref name="target"/> object. Returns the value of the field if a match was found and null otherwise.
+        /// <paramref name="obj"/> object. Returns the value of the field if a match was found and null otherwise.
 		/// </summary>
 		/// <remarks>
         /// When using this method it is not possible to distinguish between a missing field and a field whose value is null.
 		/// </remarks>
-		/// <param name="target">The source object on which to find the field</param>
+		/// <param name="obj">The source object on which to find the field</param>
 		/// <param name="name">The name of the field whose value should be retrieved</param>
 		/// <returns>The value of the field or null if no field was found</returns>
-		public static object TryGetFieldValue( this object target, string name )
+		public static object TryGetFieldValue( this object obj, string name )
         {
-            return TryGetFieldValue( target, name, Flags.InstanceAnyVisibility );
+            return TryGetFieldValue( obj, name, Flags.InstanceAnyVisibility );
         }
 
 		/// <summary>
-        /// Gets the first field with the given <paramref name="name"/> on the given <paramref name="target"/> object.
+        /// Gets the first field with the given <paramref name="name"/> on the given <paramref name="obj"/> object.
         /// Returns the value of the field if a match was found and null otherwise.
         /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
 		/// </summary>
 		/// <remarks>
         /// When using this method it is not possible to distinguish between a missing field and a field whose value is null.
 		/// </remarks>
-		/// <param name="target">The source object on which to find the field</param>
+		/// <param name="obj">The source object on which to find the field</param>
 		/// <param name="name">The name of the field whose value should be retrieved</param>
 		/// <param name="bindingFlags">A combination of Flags that define the scope of the search</param>
 		/// <returns>The value of the field or null if no field was found</returns>
-        public static object TryGetFieldValue( this object target, string name, Flags bindingFlags )
+        public static object TryGetFieldValue( this object obj, string name, Flags bindingFlags )
         {
             try
             {
-                return target.GetFieldValue( name, bindingFlags );
+                return obj.GetFieldValue( name, bindingFlags );
             }
             catch( MissingFieldException )
             {
@@ -436,33 +436,33 @@ namespace Fasterflect
         #region TrySetValue
 		/// <summary>
         /// Sets the first (public or non-public) instance field with the given <paramref name="name"/> on the 
-        /// given <paramref name="target"/> object to supplied <paramref name="value"/>. Returns true if a value
+        /// given <paramref name="obj"/> object to supplied <paramref name="value"/>. Returns true if a value
         /// was assigned to a field and false otherwise.
 		/// </summary>
-		/// <param name="target">The source object on which to find the field</param>
+		/// <param name="obj">The source object on which to find the field</param>
 		/// <param name="name">The name of the field whose value should be retrieved</param>
 		/// <param name="value">The value that should be assigned to the field</param>
 		/// <returns>True if the value was assigned to a field and false otherwise</returns>
-        public static bool TrySetFieldValue( this object target, string name, object value )
+        public static bool TrySetFieldValue( this object obj, string name, object value )
         {
-            return TrySetFieldValue( target, name, value, Flags.InstanceAnyVisibility );
+            return TrySetFieldValue( obj, name, value, Flags.InstanceAnyVisibility );
         }
 
 		/// <summary>
-        /// Sets the first field with the given <paramref name="name"/> on the given <paramref name="target"/> object
+        /// Sets the first field with the given <paramref name="name"/> on the given <paramref name="obj"/> object
         /// to the supplied <paramref name="value"/>. Returns true if a value was assigned to a field and false otherwise.
         /// Use the <paramref name="bindingFlags"/> parameter to limit the scope of the search.
 		/// </summary>
-		/// <param name="target">The source object on which to find the field</param>
+		/// <param name="obj">The source object on which to find the field</param>
 		/// <param name="name">The name of the field whose value should be retrieved</param>
 		/// <param name="value">The value that should be assigned to the field</param>
 		/// <param name="bindingFlags">A combination of Flags that define the scope of the search</param>
 		/// <returns>True if the value was assigned to a field and false otherwise</returns>
-        public static bool TrySetFieldValue( this object target, string name, object value, Flags bindingFlags )
+        public static bool TrySetFieldValue( this object obj, string name, object value, Flags bindingFlags )
         {
             try
             {
-                target.SetFieldValue(name, value, bindingFlags );
+                obj.SetFieldValue(name, value, bindingFlags );
                 return true;
             }
             catch( MissingFieldException )

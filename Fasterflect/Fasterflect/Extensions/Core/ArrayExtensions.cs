@@ -46,15 +46,15 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Creates a delegate which can set element of the array type <paramref name="targetArrayType"/>.
+        /// Creates a delegate which can set element of <paramref name="arrayType"/>.
         /// </summary>
-        public static ArrayElementSetter DelegateForSetElement( this Type targetArrayType )
+        public static ArrayElementSetter DelegateForSetElement( this Type arrayType )
         {
-            return (ArrayElementSetter) new ArraySetEmitter( targetArrayType ).GetDelegate();
+            return (ArrayElementSetter) new ArraySetEmitter( arrayType ).GetDelegate();
         }
 
         /// <summary>
-        /// Creates a delegate which can retrieve element of the array type <paramref name="targetArrayType"/>.
+        /// Creates a delegate which can retrieve element of <paramref name="targetArrayType"/>.
         /// </summary>
         public static ArrayElementGetter DelegateForGetElement( this Type targetArrayType )
         {

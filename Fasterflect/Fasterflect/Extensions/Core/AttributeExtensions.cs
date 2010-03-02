@@ -30,152 +30,152 @@ namespace Fasterflect
     {
         #region Attribute Lookup (Single)
         /// <summary>
-        /// Gets the first <see href="Attribute"/> associated with the <paramref name="source"/>.
+        /// Gets the first <see href="Attribute"/> associated with the <paramref name="provider"/>.
         /// </summary>
         /// <returns>The first attribute found on the source element.</returns>
-        public static Attribute Attribute( this ICustomAttributeProvider source )
+        public static Attribute Attribute( this ICustomAttributeProvider provider )
         {
-            return source.Attributes().FirstOrDefault();
+            return provider.Attributes().FirstOrDefault();
         }
 
         /// <summary>
-        /// Gets the first <see href="Attribute"/> of type <paramref name="attributeType"/> associated with the <paramref name="source"/>.
+        /// Gets the first <see href="Attribute"/> of type <paramref name="attributeType"/> associated with the <paramref name="provider"/>.
         /// </summary>
         /// <returns>The first attribute found on the source element.</returns>
-        public static Attribute Attribute( this ICustomAttributeProvider source, Type attributeType )
+        public static Attribute Attribute( this ICustomAttributeProvider provider, Type attributeType )
         {
-            return source.Attributes( attributeType ).FirstOrDefault();
+            return provider.Attributes( attributeType ).FirstOrDefault();
         }
 
         /// <summary>
-        /// Gets the first <see href="Attribute"/> of type <typeparamref name="T"/> associated with the <paramref name="source"/>.
+        /// Gets the first <see href="Attribute"/> of type <typeparamref name="T"/> associated with the <paramref name="provider"/>.
         /// </summary>
         /// <returns>The first attribute found on the source element.</returns>
-        public static T Attribute<T>( this ICustomAttributeProvider source ) where T : Attribute
+        public static T Attribute<T>( this ICustomAttributeProvider provider ) where T : Attribute
         {
-            return source.Attributes<T>().FirstOrDefault();
+            return provider.Attributes<T>().FirstOrDefault();
         }
 
         /// <summary>
         /// Gets the first <see href="Attribute"/> of type <typeparamref name="T"/> associated with the 
-        /// enumeration value given in the <paramref name="source"/> parameter.
+        /// enumeration value given in the <paramref name="provider"/> parameter.
         /// </summary>
         /// <typeparam name="T">The attribute type to search for.</typeparam>
-        /// <param name="source">An enumeration value on which to search for the attribute.</param>
+        /// <param name="provider">An enumeration value on which to search for the attribute.</param>
         /// <returns>The first attribute found on the source.</returns>
-        public static T Attribute<T>( this Enum source ) where T : Attribute
+        public static T Attribute<T>( this Enum provider ) where T : Attribute
         {
-            return source.Attribute( typeof(T) ) as T;
+            return provider.Attribute( typeof(T) ) as T;
         }
 
         /// <summary>
         /// Gets the first <see href="Attribute"/> of type <paramref name="attributeType"/> associated with the 
-        /// enumeration value given in the <paramref name="source"/> parameter.
+        /// enumeration value given in the <paramref name="provider"/> parameter.
         /// </summary>
-        /// <param name="source">An enumeration value on which to search for the attribute.</param>
+        /// <param name="provider">An enumeration value on which to search for the attribute.</param>
         /// <param name="attributeType">The attribute type to search for.</param>
         /// <returns>The first attribute found on the source.</returns>
-        public static Attribute Attribute( this Enum source, Type attributeType )
+        public static Attribute Attribute( this Enum provider, Type attributeType )
         {
-            Type type = source.GetType();
-            MemberInfo info = type.Member( source.ToString(), Flags.StaticAnyVisibility | Flags.DeclaredOnly );
+            Type type = provider.GetType();
+            MemberInfo info = type.Member( provider.ToString(), Flags.StaticAnyVisibility | Flags.DeclaredOnly );
             return info.Attribute( attributeType );
         }
         #endregion
 
         #region Attribute Lookup (Multiple)
         /// <summary>
-        /// Gets the <see href="Attribute"/>s associated with the <paramref name="source"/>. The resulting
+        /// Gets the <see href="Attribute"/>s associated with the <paramref name="provider"/>. The resulting
         /// list of attributes can optionally be filtered by suppliying a list of <paramref name="attributeTypes"/>
         /// to include.
         /// </summary>
         /// <returns>A list of the attributes found on the source element. This value will never be null.</returns>
-        public static IList<Attribute> Attributes( this ICustomAttributeProvider source, params Type[] attributeTypes )
+        public static IList<Attribute> Attributes( this ICustomAttributeProvider provider, params Type[] attributeTypes )
         {
 			bool hasTypes = attributeTypes != null && attributeTypes.Length > 0;
-            return source.GetCustomAttributes( true ).Cast<Attribute>()
+            return provider.GetCustomAttributes( true ).Cast<Attribute>()
 				.Where( attr => ! hasTypes || 
 					    attributeTypes.Any( at => { Type type = attr.GetType();
 													return at == type || at.IsSubclassOf(type); } ) ).ToList();
 		}
 
         /// <summary>
-        /// Gets all <see href="Attribute"/>s of type <typeparamref name="T"/> associated with the <paramref name="source"/>.
+        /// Gets all <see href="Attribute"/>s of type <typeparamref name="T"/> associated with the <paramref name="provider"/>.
         /// </summary>
         /// <returns>A list of the attributes found on the source element. This value will never be null.</returns>
-        public static IList<T> Attributes<T>( this ICustomAttributeProvider source ) where T : Attribute
+        public static IList<T> Attributes<T>( this ICustomAttributeProvider provider ) where T : Attribute
         {
-            return source.GetCustomAttributes( typeof(T), true ).Cast<T>().ToList();
+            return provider.GetCustomAttributes( typeof(T), true ).Cast<T>().ToList();
         }
 
         /// <summary>
-        /// Gets the <see href="Attribute"/>s associated with the enumeration given in <paramref name="source"/>. 
+        /// Gets the <see href="Attribute"/>s associated with the enumeration given in <paramref name="provider"/>. 
         /// </summary>
         /// <typeparam name="T">The attribute type to search for.</typeparam>
-        /// <param name="source">An enumeration on which to search for attributes of the given type.</param>
+        /// <param name="provider">An enumeration on which to search for attributes of the given type.</param>
         /// <returns>A list of the attributes found on the supplied source. This value will never be null.</returns>
-        public static IList<T> Attributes<T>( this Enum source ) where T : Attribute
+        public static IList<T> Attributes<T>( this Enum provider ) where T : Attribute
         {
-            return source.Attributes( typeof(T) ).Cast<T>().ToList();
+            return provider.Attributes( typeof(T) ).Cast<T>().ToList();
         }
 
         /// <summary>
-        /// Gets the <see href="Attribute"/>s associated with the enumeration given in <paramref name="source"/>. 
+        /// Gets the <see href="Attribute"/>s associated with the enumeration given in <paramref name="provider"/>. 
         /// The resulting list of attributes can optionally be filtered by suppliying a list of <paramref name="attributeTypes"/>
         /// to include.
         /// </summary>
         /// <returns>A list of the attributes found on the supplied source. This value will never be null.</returns>
-        public static IList<Attribute> Attributes( this Enum source, params Type[] attributeTypes )
+        public static IList<Attribute> Attributes( this Enum provider, params Type[] attributeTypes )
         {
-            Type type = source.GetType();
-            MemberInfo info = type.Member( source.ToString(), Flags.StaticAnyVisibility | Flags.DeclaredOnly );
+            Type type = provider.GetType();
+            MemberInfo info = type.Member( provider.ToString(), Flags.StaticAnyVisibility | Flags.DeclaredOnly );
             return info.Attributes( attributeTypes );
         }
         #endregion
 
         #region HasAttribute Lookup (Presence Detection)
         /// <summary>
-        /// Determines whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
+        /// Determines whether the <paramref name="provider"/> element has an associated <see href="Attribute"/>
         /// of type <paramref name="attributeType"/>.
         /// </summary>
         /// <returns>True if the source element has the associated attribute, false otherwise.</returns>
-        public static bool HasAttribute( this ICustomAttributeProvider source, Type attributeType )
+        public static bool HasAttribute( this ICustomAttributeProvider provider, Type attributeType )
         {
-            return source.Attribute( attributeType ) != null;
+            return provider.Attribute( attributeType ) != null;
         }
 
         /// <summary>
-        /// Determines whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
+        /// Determines whether the <paramref name="provider"/> element has an associated <see href="Attribute"/>
         /// of type <typeparamref name="T"/>.
         /// </summary>
         /// <returns>True if the source element has the associated attribute, false otherwise.</returns>
-        public static bool HasAttribute<T>( this ICustomAttributeProvider source ) where T : Attribute
+        public static bool HasAttribute<T>( this ICustomAttributeProvider provider ) where T : Attribute
         {
-            return source.HasAttribute( typeof(T) );
+            return provider.HasAttribute( typeof(T) );
         }
 
         /// <summary>
-        /// Determines whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
+        /// Determines whether the <paramref name="provider"/> element has an associated <see href="Attribute"/>
         /// of any of the types given in <paramref name="attributeTypes"/>.
         /// </summary>
-        /// <param name="source"></param>
+        /// <param name="provider"></param>
         /// <param name="attributeTypes">The list of attribute types to look for. If this list is <c>null</c> or
         /// empty an <see href="ArgumentException"/> will be thrown.</param>
         /// <returns>True if the source element has at least one of the specified attribute types, false otherwise.</returns>
-        public static bool HasAnyAttribute( this ICustomAttributeProvider source, params Type[] attributeTypes )
+        public static bool HasAnyAttribute( this ICustomAttributeProvider provider, params Type[] attributeTypes )
         {
-            return source.Attributes( attributeTypes ).Count() > 0;
+            return provider.Attributes( attributeTypes ).Count() > 0;
         }
 
         /// <summary>
-        /// Determines whether the <paramref name="source"/> element has an associated <see href="Attribute"/>
+        /// Determines whether the <paramref name="provider"/> element has an associated <see href="Attribute"/>
         /// of all of the types given in <paramref name="attributeTypes"/>.
         /// </summary>
         /// <returns>True if the source element has all of the specified attribute types, false otherwise.</returns>
-        public static bool HasAllAttributes( this ICustomAttributeProvider source, params Type[] attributeTypes )
+        public static bool HasAllAttributes( this ICustomAttributeProvider provider, params Type[] attributeTypes )
         {
 			bool hasTypes = attributeTypes != null && attributeTypes.Length > 0;
-            return ! hasTypes || attributeTypes.All( at => source.HasAttribute( at ) );
+            return ! hasTypes || attributeTypes.All( at => provider.HasAttribute( at ) );
         }
         #endregion
 
