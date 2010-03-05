@@ -31,9 +31,9 @@ namespace FasterflectSample
         {
 			//Console.WriteLine( AssemblyInfoWriter.ListExtensionMethodsWhereParametersViolateConventions( typeof(Flags).Assembly ) );
 
-   			Console.WriteLine( AssemblyInfoWriter.ListExtensionMethodsWithSuperfluousOverloads( typeof(Flags).Assembly ) );
+   			//Console.WriteLine( AssemblyInfoWriter.ListExtensionMethodsWithSuperfluousOverloads( typeof(Flags).Assembly ) );
 
-			//Console.WriteLine( AssemblyInfoWriter.ListExtensions( typeof(Flags).Assembly ) );
+			Console.WriteLine( AssemblyInfoWriter.ListExtensions( typeof(Flags).Assembly ) );
 
 
             // Load a type reflectively, just to look like real-life scenario

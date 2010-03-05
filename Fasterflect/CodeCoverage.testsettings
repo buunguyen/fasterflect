@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <TestSettings name="CodeCoverage" id="6e997f9e-a406-49b5-b5ce-8fc312df199d" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Description>These are test settings for a local test run with code coverage enabled.</Description>
-  <Deployment enabled="false" />
   <Execution>
     <Hosts skipUnhostableTests="false" />
     <Timeouts runTimeout="1800000" testTimeout="1000" />
@@ -28,7 +27,7 @@
           <Configuration>
             <CodeCoverage xmlns="">
               <Regular>
-                <CodeCoverageItem binaryFile="bin\Release\Fasterflect.dll" pdbFile="bin\Release\Fasterflect.pdb" instrumentInPlace="true" />
+                <CodeCoverageItem binaryFile="Fasterflect\bin\Debug\Fasterflect.dll" pdbFile="Fasterflect\bin\Debug\Fasterflect.pdb" instrumentInPlace="true" />
               </Regular>
             </CodeCoverage>
           </Configuration>

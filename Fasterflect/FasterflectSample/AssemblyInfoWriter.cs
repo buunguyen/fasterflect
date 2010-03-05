@@ -49,7 +49,7 @@ namespace FasterflectSample
 											   .ToList() ) );
         	return sb.ToString();
     	}
-    	private static bool IsSuperfluous( MethodInfo method, IList<MethodInfo> methods )
+    	private static bool IsSuperfluous( MethodInfo method, IEnumerable<MethodInfo> methods )
     	{
     		var parameters = method.Parameters();
 			bool lastIsParams = HasParamsParameter( parameters );
@@ -111,23 +111,47 @@ namespace FasterflectSample
 
 		private static void Write( StringBuilder sb, MethodInfo method, IList<ParameterInfo> parameters )
 		{
-			sb.AppendFormat( "{0}( ", method.Name );
+			sb.AppendFormat( "{0} ", GetTypeName( method.ReturnType ) );
+			sb.AppendFormat( "{0}{1}( ",  method.Name, GetGenericParameterText( method ) );
 			var last = parameters.LastOrDefault();
 			parameters.ForEach( p => sb.AppendFormat( "{0} {1}{2}", GetType( p ), p.Name, p == last ? "" : ", " ) );
 			sb.AppendFormat( " );{0}", Environment.NewLine );
 		}
 
+    	private static string GetGenericParameterText( MethodInfo method )
+    	{
+    		if( ! method.ContainsGenericParameters )
+    			return string.Empty;
+    		Type[] genericParameters = method.GetGenericArguments();
+    		string args = string.Join( ",", genericParameters.Select( p => p.Name ) );
+    		return "<" + args + ">";
+    	}
+
+    	private static string GetGenericParameterText( Type[] genericArguments )
+    	{
+    		if( genericArguments == null || genericArguments.Length == 0 )
+    			return string.Empty;
+    		string args = string.Join( ",", genericArguments.Select( GetTypeName ) );
+    		return "<" + args + ">";
+    	}
+
     	private static string GetType( ParameterInfo parameter )
     	{
     		bool isParams = parameter.ParameterType.IsArray && parameter.HasAttribute<ParamArrayAttribute>();
     		string prefix = isParams ? "params " : string.Empty;
-    		return prefix + GetTypeName( parameter.ParameterType );
+			return prefix + GetTypeName( parameter.ParameterType );
     	}
 
     	private static string GetTypeName( Type type )
 		{
 			if( type.IsArray )
 				return string.Format( "{0}[]", GetTypeName( type.GetElementType() ) );
+			if( type.ContainsGenericParameters || type.IsGenericType )
+			{
+				int index = type.Name.IndexOf( "`" );
+				string name = GetTypeName( index > 0 ? type.Name.Substring( 0, index ) : type.Name );
+				return name + GetGenericParameterText( type.GetGenericArguments() );
+			}
     		return GetTypeName( type.Name );
 		}
 
