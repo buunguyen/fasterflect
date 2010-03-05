@@ -131,6 +131,7 @@ namespace Fasterflect
         public static IList<T> Filter<T>( this IList<T> members, Flags bindingFlags ) where T : MemberInfo
         {
             var result = new List<T>( members.Count );
+        	var properties = new List<string>( members.Count );
 
             for( int i = 0; i < members.Count; i++ )
             {
@@ -151,6 +152,16 @@ namespace Fasterflect
 						// filter out base implementations when an overrride exists
 						exclude |= result.ContainsOverride( method );
  					}
+					var property = member as PropertyInfo;
+					if( property != null )
+					{
+						MethodInfo propertyGetter = property.GetGetMethod( true );
+						exclude |= propertyGetter.IsVirtual && properties.Contains( property.Name );
+						if( ! exclude )
+						{
+							properties.Add( property.Name );
+						}
+					}
 				}
                 exclude |= excludeExplicit && member.Name.Contains( "." ) && ! member.Name.IsReservedName();
                 if( exclude )
