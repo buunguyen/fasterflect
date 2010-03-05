@@ -20,14 +20,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using Fasterflect;
-using FasterflectTest.SampleModel.Animals;
-using FasterflectTest.SampleModel.Animals.Attributes;
-using FasterflectTest.SampleModel.Animals.Enumerations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.Lookup
@@ -71,7 +65,7 @@ namespace FasterflectTest.Lookup
         public void TestFindTypesByName()
         {
             Assembly assembly = Assembly.GetAssembly( typeof(int) );
-        	IList<Type> types = assembly.Types( "ArgumentException" );
+        	IList<Type> types = assembly.Types( "Int32" );
             Assert.IsNotNull( types );
             Assert.AreEqual( 1, types.Count );
         }
