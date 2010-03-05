@@ -215,6 +215,20 @@ namespace FasterflectTest.Lookup
 			properties = typeof(Lion).Properties( list );
 			CollectionAssert.AreEquivalent( list, properties.Select( p => p.Name ).ToArray() );
         }
+		
+		[TestMethod]
+		public void TestPropertiesWithExcludeBackingMembers()
+        {
+       		Flags flags = Flags.InstanceAnyVisibility | Flags.ExcludeBackingMembers;
+
+			IList<PropertyInfo> properties = typeof(Snake).Properties( "SlideDistance" );
+			Assert.AreEqual( 2, properties.Count );
+			Assert.AreEqual( typeof(Snake), properties.First().DeclaringType );
+
+			properties = typeof(Snake).Properties( flags, "SlideDistance" );
+			Assert.AreEqual( 1, properties.Count );
+			Assert.AreEqual( typeof(Snake), properties.First().DeclaringType );
+        }
 		#endregion
 	}
 }
