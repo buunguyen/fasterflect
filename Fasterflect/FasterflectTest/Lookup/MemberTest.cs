@@ -162,6 +162,33 @@ namespace FasterflectTest.Lookup
         }
 		#endregion
 
+		#region ExcludeBackingMembers
+		public class Person { public virtual string Name { get; protected set; } }
+		public class Employee : Person { public override string Name { get; protected set; } }		
+		[TestMethod]
+		public void TestWithExcludeBackingMembers()
+		{
+			Flags flags = Flags.InstanceAnyVisibility | Flags.ExcludeBackingMembers;
+
+			IList<PropertyInfo> properties = typeof(Employee).Properties( "Name" );
+			Assert.AreEqual( 2, properties.Count );
+			Assert.AreEqual( typeof(Employee), properties.First().DeclaringType );
+
+			properties = typeof(Employee).Properties( flags, "Name" );
+			Assert.AreEqual( 1, properties.Count );
+			Assert.AreEqual( typeof(Employee), properties.First().DeclaringType );
+
+			MemberTypes memberTypes = MemberTypes.Method | MemberTypes.Field | MemberTypes.Property;
+			IList<MemberInfo> members = typeof(Employee).Members( memberTypes );
+			Assert.AreEqual( 8, members.Count );
+			Assert.AreEqual( typeof(Employee), members.First().DeclaringType );
+
+			members = typeof(Employee).Members( memberTypes, flags );
+			Assert.AreEqual( 1, members.Count );
+			Assert.AreEqual( typeof(Employee), members.First().DeclaringType );
+		}
+		#endregion
+
 		#region Member Helpers (HasName, Type, IsReadable/IsWritable)
 		[TestMethod]
 		public void TestMemberHasName()
