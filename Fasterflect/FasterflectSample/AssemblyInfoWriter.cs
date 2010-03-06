@@ -161,6 +161,7 @@ namespace FasterflectSample
 			{
 				case "String": 
 				case "Object":
+				case "Void":
 					return typeName.ToLower();
 				case "Int16":
 					return "short";

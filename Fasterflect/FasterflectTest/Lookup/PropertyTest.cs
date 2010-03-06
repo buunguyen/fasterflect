@@ -229,6 +229,6 @@ namespace FasterflectTest.Lookup
 			Assert.AreEqual( 1, properties.Count );
 			Assert.AreEqual( typeof(Snake), properties.First().DeclaringType );
         }
-		#endregion
+    	#endregion
 	}
 }
