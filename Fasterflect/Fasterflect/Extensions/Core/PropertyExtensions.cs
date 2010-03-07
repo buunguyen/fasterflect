@@ -283,7 +283,7 @@ namespace Fasterflect
         /// If the indexer is of type <c>string</c> and accepts one parameter of type <c>int</c>, this 
         /// method should be invoked as follow:
         /// <code>
-        /// target.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
+        /// obj.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
         /// </code>
         /// </example>
         public static object SetIndexer( this object obj, params object[] parameters )
@@ -305,7 +305,7 @@ namespace Fasterflect
         /// If the indexer is of type <c>string</c> and accepts one parameter of type <c>int</c>, this 
         /// method should be invoked as follow:
         /// <code>
-        /// target.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
+        /// obj.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
         /// </code>
         /// </example>
         public static object SetIndexer( this object obj, Type[] parameterTypes, params object[] parameters )
@@ -354,7 +354,7 @@ namespace Fasterflect
         /// If the indexer is of type <c>string</c> and accepts one parameter of type <c>int</c>, this 
         /// method should be invoked as follow:
         /// <code>
-        /// target.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
+        /// obj.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
         /// </code>
         /// </example>
         public static object SetIndexer( this object obj, Flags bindingFlags, params object[] parameters )
@@ -378,7 +378,7 @@ namespace Fasterflect
         /// If the indexer is of type <c>string</c> and accepts one parameter of type <c>int</c>, this 
         /// method should be invoked as follow:
         /// <code>
-        /// target.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
+        /// obj.SetIndexer(new Type[]{typeof(int), typeof(string)}, new object[]{1, "a"});
         /// </code>
         /// </example>
         public static object SetIndexer( this object obj, Type[] parameterTypes, Flags bindingFlags, params object[] parameters )
