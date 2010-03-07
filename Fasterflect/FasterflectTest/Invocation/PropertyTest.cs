@@ -39,6 +39,20 @@ namespace FasterflectTest.Invocation
         }
 
         [TestMethod]
+        [ExpectedException(typeof(MissingMemberException))]
+        public void TestGetPublicStaticPropertyUnderNonPublicBindingFlags()
+        {
+            RunWith((Type type) => type.GetPropertyValue("TotalPeopleCreated", Flags.NonPublic | Flags.Instance));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMemberException))]
+        public void TestSetPublicStaticPropertyUnderNonPublicBindingFlags()
+        {
+            RunWith((Type type) => type.SetPropertyValue("TotalPeopleCreated", 2, Flags.NonPublic | Flags.Instance));
+        }
+
+        [TestMethod]
         public void TestSetStaticPropertyBySample()
         {
             RunWith( ( Type type ) =>
@@ -70,6 +84,20 @@ namespace FasterflectTest.Invocation
                    person.SetPropertyValue( "Name", name );
                    VerifyProperties( person, new { name } );
                } );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMemberException))]
+        public void TestGetPublicPropertyUnderNonPublicBindingFlags()
+        {
+            RunWith((object person) => person.GetPropertyValue("Name", Flags.NonPublic | Flags.Instance));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMemberException))]
+        public void TestSetPublicPropertyUnderNonPublicBindingFlags()
+        {
+            RunWith((object person) => person.SetPropertyValue("Name", "John", Flags.NonPublic | Flags.Instance));
         }
 
         [TestMethod]

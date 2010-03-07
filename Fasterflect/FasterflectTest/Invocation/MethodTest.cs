@@ -34,9 +34,29 @@ namespace FasterflectTest.Invocation
             RunWith( ( object person ) =>
                {
                    var elements = new[] { 1d, 2d, 3d, 4d, 5d };
-                   elements.ForEach( element => person.Invoke( "Walk", element ) );
+                   elements.ForEach( element => person.CallMethod( "Walk", element ) );
                    Assert.AreEqual( elements.Sum(), person.GetFieldValue( "metersTravelled" ) );
                } );
+        }
+
+        [TestMethod]
+        public void TestInvokePrivateInstanceMethodUnderNonPublicBindingFlags()
+        {
+            RunWith((object person) => person.CallMethod("Walk", Flags.NonPublic | Flags.Instance, 10d));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMethodException))]
+        public void TestInvokePublicStaticMethodUnderStaticBindingFlags()
+        {
+            RunWith((object person) => person.CallMethod("Walk", Flags.StaticAnyVisibility, 10d));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMethodException))]
+        public void TestInvokePrivateInstanceMethodUnderPublicBindingFlags()
+        {
+            RunWith((object person) => person.CallMethod("Walk", Flags.Public | Flags.Instance, 10d));
         }
 
         [TestMethod]
@@ -46,7 +66,7 @@ namespace FasterflectTest.Invocation
                {
                    var elements = new[] { 1d, 2d, 3d, 4d, 5d };
                    var methodInfo = person.UnwrapIfWrapped().GetType().Method( "Walk", new [] { typeof(int) }, Flags.InstanceAnyVisibility );
-                   elements.ForEach( element => methodInfo.Invoke( person, element ) );
+                   elements.ForEach( element => methodInfo.Call( person, element ) );
                    Assert.AreEqual( elements.Sum(), person.GetFieldValue( "metersTravelled" ) );
                } );
         }
@@ -56,7 +76,7 @@ namespace FasterflectTest.Invocation
         {
             var person = PersonType.CreateInstance();
             var friend = EmployeeType.CreateInstance();
-            var result = person.Invoke( "AddFriend", friend );
+            var result = person.CallMethod( "AddFriend", friend );
             Assert.AreSame( friend, result );
         }
 
@@ -66,7 +86,7 @@ namespace FasterflectTest.Invocation
             RunWith( ( object person ) =>
                {
                    var arguments = new object[] { 10d, null };
-                   person.Invoke( "Walk", new[] { typeof(double), typeof(double).MakeByRefType() }, arguments );
+                   person.CallMethod( "Walk", new[] { typeof(double), typeof(double).MakeByRefType() }, arguments );
                    Assert.AreEqual( person.GetFieldValue( "metersTravelled" ), arguments[ 1 ] );
                } );
         }
@@ -76,7 +96,7 @@ namespace FasterflectTest.Invocation
         {
 			var employee = EmployeeType.CreateInstance();
             var currentMeters = (double) employee.GetFieldValue( "metersTravelled" );
-            employee.Invoke("Swim", Flags.InstanceAnyVisibility | Flags.TrimExplicitlyImplemented, 100d);
+            employee.CallMethod("Swim", Flags.InstanceAnyVisibility | Flags.TrimExplicitlyImplemented, 100d);
             VerifyFields( employee, new { metersTravelled = currentMeters + 100 } );
         }
 
@@ -85,7 +105,7 @@ namespace FasterflectTest.Invocation
         {
             var employee = EmployeeType.CreateInstance();
             var currentMeters = (double) employee.GetFieldValue( "metersTravelled" );
-            employee.Invoke( "Walk", 100d );
+            employee.CallMethod( "Walk", 100d );
             VerifyFields( employee, new { metersTravelled = currentMeters + 100 } );
         }
 
@@ -95,8 +115,28 @@ namespace FasterflectTest.Invocation
             RunWith( ( Type type ) =>
                {
                    var totalPeopleCreated = (int) type.GetFieldValue( "totalPeopleCreated" );
-                   Assert.AreEqual( totalPeopleCreated, type.Invoke( "GetTotalPeopleCreated" ) );
+                   Assert.AreEqual( totalPeopleCreated, type.CallMethod( "GetTotalPeopleCreated" ) );
                } );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMethodException))]
+        public void TestInvokePublicStaticMethodUnderNonPublicBindingFlags()
+        {
+            RunWith((Type type) => type.CallMethod("GetTotalPeopleCreated", Flags.NonPublic | Flags.Static));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMethodException))]
+        public void TestInvokePublicStaticMethodUnderInstanceBindingFlags()
+        {
+            RunWith((Type type) => type.CallMethod("GetTotalPeopleCreated", Flags.InstanceAnyVisibility));
+        }
+
+        [TestMethod]
+        public void TestInvokePublicStaticMethodUnderPublicBindingFlags()
+        {
+            RunWith((Type type) => type.CallMethod("GetTotalPeopleCreated", Flags.Public | Flags.Static));
         }
 
         [TestMethod]
@@ -106,7 +146,7 @@ namespace FasterflectTest.Invocation
                {
                    var totalPeopleCreated = (int) type.GetFieldValue( "totalPeopleCreated" );
                    Assert.AreEqual( totalPeopleCreated,
-                                    type.Method( "GetTotalPeopleCreated", Flags.StaticAnyVisibility ).Invoke() );
+                                    type.Method( "GetTotalPeopleCreated", Flags.StaticAnyVisibility ).Call() );
                } );
         }
 
@@ -116,7 +156,7 @@ namespace FasterflectTest.Invocation
             RunWith( ( Type type ) =>
                {
                    var totalPeopleCreated = (int) type.GetFieldValue( "totalPeopleCreated" );
-                   Assert.AreEqual( totalPeopleCreated + 20, type.Invoke( "AdjustTotalPeopleCreated", 20 ) );
+                   Assert.AreEqual( totalPeopleCreated + 20, type.CallMethod( "AdjustTotalPeopleCreated", 20 ) );
                } );
         }
 
@@ -124,14 +164,14 @@ namespace FasterflectTest.Invocation
         [ExpectedException( typeof(MissingMethodException) )]
         public void TestInvokeNonExistentInstanceMethod()
         {
-            RunWith( ( object person ) => person.Invoke( "not_exist" ) );
+            RunWith( ( object person ) => person.CallMethod( "not_exist" ) );
         }
 
         [TestMethod]
         [ExpectedException( typeof(MissingMethodException) )]
         public void TestInvokeNonExistentStaticMethod()
         {
-            RunWith( ( Type type ) => type.Invoke( "not_exist" ) );
+            RunWith( ( Type type ) => type.CallMethod( "not_exist" ) );
         }
     }
 }

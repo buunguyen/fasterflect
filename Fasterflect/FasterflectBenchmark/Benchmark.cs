@@ -295,15 +295,15 @@ namespace FasterflectBenchmark
                                     {"Direct invoke (arg)", () => TargetPerson.Walk(10)},
                                     {"Reflection invoke", () => noArgMethodInfo.Invoke(TargetPerson, NoArgArray)},
                                     {"Reflection invoke (arg)", () => argMethodInfo.Invoke(TargetPerson, ArgArray)},
-                                    {"Fasterflect invoke", () => noArgMethodInfo.Invoke(TargetPerson)},
-                                    {"Fasterflect invoke (arg)", () => argMethodInfo.Invoke(TargetPerson, ArgArray)},
+                                    {"Fasterflect invoke", () => noArgMethodInfo.Call(TargetPerson)},
+                                    {"Fasterflect invoke (arg)", () => argMethodInfo.Call(TargetPerson, ArgArray)},
                                     
 			                		{"Direct static invoke", () => Person.Generate()},
 			                		{"Direct static invoke (arg)", () => Person.Generate(10)},
 			                		{"Reflection static invoke", () => noArgStaticMethodInfo.Invoke(TargetType, NoArgArray)},
 			                		{"Reflection static invoke (arg)", () => argStaticMethodInfo.Invoke(TargetType, ArgArray)},
-			                		{"Fasterflect static invoke", () => noArgStaticMethodInfo.Invoke()},
-			                		{"Fasterflect static invoke (arg)", () => argStaticMethodInfo.Invoke(ArgArray)},
+			                		{"Fasterflect static invoke", () => noArgStaticMethodInfo.Call()},
+			                		{"Fasterflect static invoke (arg)", () => argStaticMethodInfo.Call(ArgArray)},
 			                	};
             Execute("Metadata Integration Benchmark", initMap, actionMap);
         }
@@ -485,8 +485,8 @@ namespace FasterflectBenchmark
 			              					                                                       null, new Type[0], null);}},
 			              		{"Init arg info", () => {argMethodInfo = TargetType.GetMethod("Walk", BindingFlags.NonPublic | BindingFlags.Instance, null,
 			              					                                                  new Type[] {typeof (int)}, null);}},
-			              		{"Init no-arg invoker", () => { noArgInvoker = TargetType.DelegateForInvoke("Walk"); }},
-			              		{"Init arg invoker", () => { argInvoker = TargetType.DelegateForInvoke("Walk", new[] {typeof (int)}); }}
+			              		{"Init no-arg invoker", () => { noArgInvoker = TargetType.DelegateForCallMethod("Walk"); }},
+			              		{"Init arg invoker", () => { argInvoker = TargetType.DelegateForCallMethod("Walk", new[] {typeof (int)}); }}
 			              	};
 
 			dynamic tmp = TargetPerson;
@@ -498,8 +498,8 @@ namespace FasterflectBenchmark
 			                		{"'dynamic' invoke (arg)", () => { tmp.Walk(10); }},
 			                		{"Reflection invoke", () => noArgMethodInfo.Invoke(TargetPerson, NoArgArray)},
 			                		{"Reflection invoke (arg)", () => argMethodInfo.Invoke(TargetPerson, ArgArray)},
-			                		{"Fasterflect invoke", () => TargetPerson.Invoke("Walk")},
-			                		{"Fasterflect invoke (arg)", () => TargetPerson.Invoke("Walk", new[] {typeof (int)}, ArgArray)},
+			                		{"Fasterflect invoke", () => TargetPerson.CallMethod("Walk")},
+			                		{"Fasterflect invoke (arg)", () => TargetPerson.CallMethod("Walk", new[] {typeof (int)}, ArgArray)},
 			                		{"Fasterflect cached invoke", () => noArgInvoker(TargetPerson, NoArgArray)},
 			                		{"Fasterflect cached invoke (arg)", () => argInvoker(TargetPerson, ArgArray)}
 			                	};
@@ -519,8 +519,8 @@ namespace FasterflectBenchmark
 			              					                                                       null, new Type[0], null);}},
 			              		{"Init arg info", () => {argMethodInfo = TargetType.GetMethod("Generate", BindingFlags.NonPublic | BindingFlags.Static,
 			              					                                                  null, new[] {typeof (int)}, null);}},
-			              		{"Init no-arg invoker", () => { noArgInvoker = TargetType.DelegateForStaticInvoke("Generate"); }},
-			              		{"Init arg invoker", () => { argInvoker = TargetType.DelegateForStaticInvoke("Generate", new[] {typeof (int)}); }}
+			              		{"Init no-arg invoker", () => { noArgInvoker = TargetType.DelegateForCallStaticMethod("Generate"); }},
+			              		{"Init arg invoker", () => { argInvoker = TargetType.DelegateForCallStaticMethod("Generate", new[] {typeof (int)}); }}
 			              	};
 
 			var actionMap = new Dictionary<string, Action>
@@ -529,8 +529,8 @@ namespace FasterflectBenchmark
 			                		{"Direct invoke (arg)", () => Person.Generate(10)},
 			                		{"Reflection invoke", () => noArgMethodInfo.Invoke(TargetType, NoArgArray)},
 			                		{"Reflection invoke (arg)", () => argMethodInfo.Invoke(TargetType, ArgArray)},
-			                		{"Fasterflect invoke", () => TargetType.Invoke("Generate")},
-			                		{"Fasterflect invoke (arg)", () => TargetType.Invoke("Generate", new[] {typeof (int)}, ArgArray)},
+			                		{"Fasterflect invoke", () => TargetType.CallMethod("Generate")},
+			                		{"Fasterflect invoke (arg)", () => TargetType.CallMethod("Generate", new[] {typeof (int)}, ArgArray)},
 			                		{"Fasterflect cached invoke", () => noArgInvoker(NoArgArray)},
 			                		{"Fasterflect cached invoke (arg)", () => argInvoker(ArgArray)}
 			                	};
