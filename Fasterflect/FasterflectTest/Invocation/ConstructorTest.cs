@@ -37,6 +37,19 @@ namespace FasterflectTest.Invocation
         }
 
         [TestMethod]
+        public void TestInvokeCtorWithCorrectBindingFlags()
+        {
+            RunWith( type => type.CreateInstance( Flags.Instance | Flags.NonPublic ) );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingMemberException))]
+        public void TestInvokeCtorWithIncorrectBindingFlags()
+        {
+            RunWith(type => type.CreateInstance(Flags.Public | Flags.Instance));
+        }
+
+        [TestMethod]
         public void TestInvokeCtorWithPrimitiveArguments()
         {
             RunWith( type =>

@@ -39,6 +39,20 @@ namespace FasterflectTest.Invocation
         }
 
         [TestMethod]
+        [ExpectedException(typeof(MissingFieldException))]
+        public void TestGetPrivateStaticFieldUnderPublicBindingFlags()
+        {
+            RunWith((Type type) => type.GetFieldValue("totalPeopleCreated", Flags.Public | Flags.Instance));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingFieldException))]
+        public void TestSetPrivateStaticFieldUnderPublicBindingFlags()
+        {
+            RunWith((Type type) => type.SetFieldValue("totalPeopleCreated", 2, Flags.Public | Flags.Instance));
+        }
+
+        [TestMethod]
         public void TestSetStaticFieldBySample()
         {
             RunWith( ( Type type ) =>
@@ -70,6 +84,31 @@ namespace FasterflectTest.Invocation
                    person.SetFieldValue( "name", name );
                    VerifyFields( person, new { name } );
                } );
+        }
+
+        [TestMethod]
+        public void TestAccessPrivateFieldUnderNonPublicBindingFlags()
+        {
+            RunWith((object person) =>
+            {
+                var name = (string)person.GetFieldValue("name", Flags.NonPublic | Flags.Instance) + " updated";
+                person.SetFieldValue("name", name, Flags.NonPublic | Flags.Instance);
+                VerifyFields(person, new { name });
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingFieldException))]
+        public void TestGetPrivateFieldUnderPublicBindingFlags()
+        {
+            RunWith((object person) => person.GetFieldValue("name", Flags.Public | Flags.Instance));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(MissingFieldException))]
+        public void TestSetPrivateFieldUnderPublicBindingFlags()
+        {
+            RunWith((object person) => person.SetFieldValue("name", "John",  Flags.Public | Flags.Instance));
         }
 
         [TestMethod]
@@ -138,7 +177,7 @@ namespace FasterflectTest.Invocation
         [ExpectedException( typeof(MissingFieldException) )]
         public void TestSetNotExistentField()
         {
-            RunWith( ( object person ) => person.SetFieldValue( "not_exist", null ) );
+            RunWith( ( object person ) => person.GetFieldValue( "name", Flags.Public | Flags.Instance ) );
         }
 
         [TestMethod]

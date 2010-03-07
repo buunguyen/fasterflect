@@ -40,8 +40,8 @@ namespace FasterflectTest.Invocation
                                    () => type.DelegateForCreateInstance(),
                                    () => type.DelegateForCreateInstance( new[] { typeof(string), typeof(int) } ),
                                    () =>
-                                   type.DelegateForStaticInvoke( "AdjustTotalPeopleCreated", new[] { typeof(int) } ),
-                                   () => type.DelegateForStaticInvoke( "GetTotalPeopleCreated" ),
+                                   type.DelegateForCallStaticMethod( "AdjustTotalPeopleCreated", new[] { typeof(int) } ),
+                                   () => type.DelegateForCallStaticMethod( "GetTotalPeopleCreated" ),
                                    () => type.DelegateForSetStaticFieldValue( "totalPeopleCreated" ),
                                    () => type.DelegateForGetStaticFieldValue( "totalPeopleCreated" ),
                                    () => type.DelegateForSetStaticPropertyValue( "TotalPeopleCreated" ),
@@ -59,9 +59,9 @@ namespace FasterflectTest.Invocation
                                    () => type.DelegateForGetFieldValue( "name" ),
                                    () => type.DelegateForSetPropertyValue( "Age" ),
                                    () => type.DelegateForGetPropertyValue( "Age" ),
-                                   () => type.DelegateForInvoke( "Walk", new[] { typeof(double) } ),
+                                   () => type.DelegateForCallMethod( "Walk", new[] { typeof(double) } ),
                                    () =>
-                                   type.DelegateForInvoke( "Walk",
+                                   type.DelegateForCallMethod( "Walk",
                                                            new[] { typeof(double), typeof(double).MakeByRefType() } ),
                                };
                    var types = new[]

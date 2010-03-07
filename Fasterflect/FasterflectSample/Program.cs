@@ -79,15 +79,15 @@ namespace FasterflectSample
             AssertTrue(2 == (int)type.GetFieldValue("InstanceCount"));
 
             // Let's invoke Person.IncreaseCounter() static method to increase the counter
-            type.Invoke("IncreaseInstanceCount");
+            type.CallMethod("IncreaseInstanceCount");
             AssertTrue(3 == (int)type.GetFieldValue("InstanceCount"));
 
             // Now, let's retrieve Person.InstanceCount via the static method GetInstanceCount
-            AssertTrue(3 == (int)type.Invoke("GetInstanceCount"));
+            AssertTrue(3 == (int)type.CallMethod("GetInstanceCount"));
 
             // Invoke method receiving ref/out params, we need to put arguments in an array
             var arguments = new object[] { 1, 2 };
-            type.Invoke("Swap", 
+            type.CallMethod("Swap", 
                 // Parameter types must be set to the appropriate ref type
                 new[] { typeof(int).MakeByRefType(), typeof(int).MakeByRefType() },
                 arguments);
@@ -138,7 +138,7 @@ namespace FasterflectSample
             AssertTrue("Nguyen" == obj.GetPropertyValue("Name").ToString());
 
             // Let's have the folk walk 6 miles
-			obj.Invoke("Walk", 6);
+			obj.CallMethod("Walk", 6);
 			
             // Double-check the current value of the milesTravelled field
             AssertTrue(6 == (int)obj.GetFieldValue("milesTraveled"));
@@ -199,7 +199,7 @@ namespace FasterflectSample
 
             // Another example
             person = type.CreateInstance().WrapIfValueType();
-            MethodInvoker walk = type.DelegateForInvoke("Walk", new[] { typeof(int) });
+            MethodInvoker walk = type.DelegateForCallMethod("Walk", new[] { typeof(int) });
             range.ForEach(i => walk(person, i));
             AssertTrue(range.Sum() == (int)person.GetFieldValue("milesTraveled"));
         }

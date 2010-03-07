@@ -41,7 +41,6 @@ namespace FasterflectTest.Invocation
         [TestInitialize]
         public void TestInitialize()
         {
-            //delegateMap = typeof(DelegateCache).GetFieldValue<CacheStore<CallInfo,Delegate>>("cache").GetFieldValue<IDictionary>("entries");
             delegateMap = (IDictionary)typeof(BaseEmitter).GetFieldValue("cache").GetFieldValue("entries");
             delegateMap.Clear();
         }
@@ -100,15 +99,15 @@ namespace FasterflectTest.Invocation
             var arguments = new object[] { 100d, null };
             objectTypes.ForEach(
                                    obj =>
-                                   ExecuteCacheTest( () => obj.Invoke( "Walk", 100d ),
-                                                     () => obj.Invoke( "Walk",
+                                   ExecuteCacheTest( () => obj.CallMethod( "Walk", 100d ),
+                                                     () => obj.CallMethod( "Walk",
                                                                        new[]
                                                                        {
                                                                            typeof(double), typeof(double).MakeByRefType()
                                                                        }, arguments ) ) );
             Types.ForEach( type => ExecuteCacheTest(
-                                                       () => type.Invoke( "GetTotalPeopleCreated" ),
-                                                       () => type.Invoke( "AdjustTotalPeopleCreated", 10 ) ) );
+                                                       () => type.CallMethod( "GetTotalPeopleCreated" ),
+                                                       () => type.CallMethod( "AdjustTotalPeopleCreated", 10 ) ) );
         }
 
         [TestMethod]

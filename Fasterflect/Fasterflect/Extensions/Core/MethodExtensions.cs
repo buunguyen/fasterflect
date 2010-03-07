@@ -44,10 +44,10 @@ namespace Fasterflect
         /// <see cref="NullReferenceException"/> is thrown.  If you are not sure as to whether
         /// any element is <c>null</c> or not, use the overload that accepts <c>paramTypes</c> array.
         /// </remarks>
-        /// <seealso cref="Invoke(Type, string, Type[], object[])"/>
-        public static object Invoke( this Type type, string name, params object[] parameters )
+        /// <seealso cref="CallMethod(System.Type,string,System.Type[],object[])"/>
+        public static object CallMethod( this Type type, string name, params object[] parameters )
         {
-            return DelegateForStaticInvoke( type, name, parameters.GetTypeArray() )( parameters );
+            return DelegateForCallStaticMethod( type, name, parameters.GetTypeArray() )( parameters );
         }
 
         /// <summary>
@@ -57,11 +57,11 @@ namespace Fasterflect
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this Type type, string name, Type[] parameterTypes,
+        public static object CallMethod( this Type type, string name, Type[] parameterTypes,
                                      params object[] parameters )
         {
             return
-                DelegateForStaticInvoke( type, name, parameterTypes ?? parameters.GetTypeArray() )(
+                DelegateForCallStaticMethod( type, name, parameterTypes ?? parameters.GetTypeArray() )(
                     parameters );
         }
 
@@ -77,11 +77,11 @@ namespace Fasterflect
         /// <see cref="NullReferenceException"/> is thrown.  If you are not sure as to whether
         /// any element is <c>null</c> or not, use the overload that accepts <c>paramTypes</c> array.
         /// </remarks>
-        /// <seealso cref="Invoke(System.Type,string,System.Type[],Fasterflect.Flags,object[])"/>
-        public static object Invoke( this Type type, string name, Flags bindingFlags,
+        /// <seealso cref="CallMethod(System.Type,string,System.Type[],Fasterflect.Flags,object[])"/>
+        public static object CallMethod( this Type type, string name, Flags bindingFlags,
                                      params object[] parameters )
         {
-            return DelegateForStaticInvoke( type, name, bindingFlags, parameters.GetTypeArray() )( parameters );
+            return DelegateForCallStaticMethod( type, name, bindingFlags, parameters.GetTypeArray() )( parameters );
         }
 
         /// <summary>
@@ -91,9 +91,9 @@ namespace Fasterflect
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this Type type, string name, Type[] parameterTypes, Flags bindingFlags, params object[] parameters )
+        public static object CallMethod( this Type type, string name, Type[] parameterTypes, Flags bindingFlags, params object[] parameters )
         {
-            return DelegateForStaticInvoke( type, name, bindingFlags, parameterTypes )( parameters );
+            return DelegateForCallStaticMethod( type, name, bindingFlags, parameterTypes )( parameters );
         }
 
         /// <summary>
@@ -101,10 +101,10 @@ namespace Fasterflect
         /// whose parameter types are specified by <paramref name="parameterTypes"/> on the given <paramref name="type"/>.
         /// Leave <paramref name="parameterTypes"/> empty if the method has no argument.
         /// </summary>
-        public static StaticMethodInvoker DelegateForStaticInvoke( this Type type, string name,
+        public static StaticMethodInvoker DelegateForCallStaticMethod( this Type type, string name,
                                                                    params Type[] parameterTypes )
         {
-            return DelegateForStaticInvoke( type, name, Flags.StaticAnyVisibility, parameterTypes );
+            return DelegateForCallStaticMethod( type, name, Flags.StaticAnyVisibility, parameterTypes );
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Fasterflect
         /// on the given <paramref name="type"/>. Leave <paramref name="parameterTypes"/> empty if the 
         /// method has no argument.
         /// </summary>
-        public static StaticMethodInvoker DelegateForStaticInvoke( this Type type, string name,
+        public static StaticMethodInvoker DelegateForCallStaticMethod( this Type type, string name,
                                                                    Flags bindingFlags,
                                                                    params Type[] parameterTypes )
         {
@@ -135,10 +135,10 @@ namespace Fasterflect
         /// <see cref="NullReferenceException"/> is thrown.  If you are not sure as to whether
         /// any element is <c>null</c> or not, use the overload that accepts <c>paramTypes</c> array.
         /// </remarks>
-        /// <seealso cref="Invoke(object, string, Type[], object[])"/>
-        public static object Invoke( this object obj, string name, params object[] parameters )
+        /// <seealso cref="CallMethod(object,string,System.Type[],object[])"/>
+        public static object CallMethod( this object obj, string name, params object[] parameters )
         {
-            return DelegateForInvoke( obj.GetTypeAdjusted(), name, parameters.GetTypeArray() )( obj,
+            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, parameters.GetTypeArray() )( obj,
                                                                                                          parameters );
         }
 
@@ -149,10 +149,10 @@ namespace Fasterflect
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this object obj, string name, Type[] parameterTypes,
+        public static object CallMethod( this object obj, string name, Type[] parameterTypes,
                                      params object[] parameters )
         {
-            return DelegateForInvoke( obj.GetTypeAdjusted(), name, parameterTypes )( obj, parameters );
+            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, parameterTypes )( obj, parameters );
         }
 
         /// <summary>
@@ -167,11 +167,11 @@ namespace Fasterflect
         /// <see cref="NullReferenceException"/> is thrown.  If you are not sure as to whether
         /// any element is <c>null</c> or not, use the overload that accepts <c>paramTypes</c> array.
         /// </remarks>
-        /// <seealso cref="Invoke(object,string,System.Type[],Fasterflect.Flags,object[])"/>
-        public static object Invoke( this object obj, string name, Flags bindingFlags,
+        /// <seealso cref="CallMethod(object,string,System.Type[],Fasterflect.Flags,object[])"/>
+        public static object CallMethod( this object obj, string name, Flags bindingFlags,
                                      params object[] parameters )
         {
-            return DelegateForInvoke( obj.GetTypeAdjusted(), name, bindingFlags, parameters.GetTypeArray() )(
+            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, bindingFlags, parameters.GetTypeArray() )(
             						  obj, parameters );
         }
 
@@ -182,9 +182,9 @@ namespace Fasterflect
         /// </summary>
         /// <returns>The return value of the method.</returns>
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
-        public static object Invoke( this object obj, string name, Type[] parameterTypes, Flags bindingFlags, params object[] parameters )
+        public static object CallMethod( this object obj, string name, Type[] parameterTypes, Flags bindingFlags, params object[] parameters )
         {
-            return DelegateForInvoke( obj.GetTypeAdjusted(), name, bindingFlags, parameterTypes )( obj,
+            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, bindingFlags, parameterTypes )( obj,
                                                                                                             parameters );
         }
 
@@ -193,10 +193,10 @@ namespace Fasterflect
         /// whose parameter types are specified by <paramref name="parameterTypes"/> on the given <paramref name="type"/>.
         /// Leave <paramref name="parameterTypes"/> empty if the method has no argument.
         /// </summary>
-        public static MethodInvoker DelegateForInvoke( this Type type, string name,
+        public static MethodInvoker DelegateForCallMethod( this Type type, string name,
                                                        params Type[] parameterTypes )
         {
-            return DelegateForInvoke( type, name, Flags.InstanceAnyVisibility, parameterTypes );
+            return DelegateForCallMethod( type, name, Flags.InstanceAnyVisibility, parameterTypes );
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace Fasterflect
         /// <paramref name="parameterTypes"/> on the given <paramref name="type"/>.
         /// Leave <paramref name="parameterTypes"/> empty if the method has no argument.
         /// </summary>
-        public static MethodInvoker DelegateForInvoke( this Type type, string name, Flags bindingFlags,
+        public static MethodInvoker DelegateForCallMethod( this Type type, string name, Flags bindingFlags,
                                                        params Type[] parameterTypes )
         {
             return (MethodInvoker)
