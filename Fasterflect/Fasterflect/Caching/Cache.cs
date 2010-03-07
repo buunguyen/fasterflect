@@ -156,7 +156,7 @@ namespace Fasterflect.Caching
         }
         #endregion
     }
-#else 
+#elif DOT_NET_35
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -314,5 +314,7 @@ namespace Fasterflect.Caching
 		}
         #endregion
 	}
+#else
+	#error At least one of the compilation symbols DOT_NET_4 or DOT_NET_35 must be defined. 
 #endif
 }
