@@ -54,11 +54,11 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Creates a delegate which can retrieve element of <paramref name="targetArrayType"/>.
+        /// Creates a delegate which can retrieve element of <paramref name="arrayType"/>.
         /// </summary>
-        public static ArrayElementGetter DelegateForGetElement( this Type targetArrayType )
+        public static ArrayElementGetter DelegateForGetElement( this Type arrayType )
         {
-            return (ArrayElementGetter) new ArrayGetEmitter( targetArrayType ).GetDelegate();
+            return (ArrayElementGetter) new ArrayGetEmitter( arrayType ).GetDelegate();
         }
         #endregion
     }
