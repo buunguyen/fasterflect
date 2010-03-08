@@ -20,7 +20,6 @@
 
 using System;
 using Fasterflect;
-using FasterflectTest.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.Services
@@ -111,31 +110,6 @@ namespace FasterflectTest.Services
 			Verify( employee.Manager.Manager, clone.Manager.Manager );
 			Assert.AreNotSame( employee, employee.Manager );
 			Assert.AreSame( employee.Manager, employee.Manager.Manager );
-		}
-		#endregion
-
-		#region CopyFields
-		[TestMethod]
-		public void TestCopyFields()
-		{
-			DateTime birthday = new DateTime( 1973, 1, 27 );
-			Person person = new Person( 42, birthday, "Arthur Dent" );
-			Person copy = new Person();
-			person.CopyFields( copy );
-			Verify( person, copy );
-		}
-		#endregion
-
-		#region CopyProperties
-		[TestMethod]
-		public void TestCopyProperties()
-		{
-			DateTime birthday = new DateTime( 1973, 1, 27 );
-			Person person = new Person( 42, birthday, "Arthur Dent" );
-			Person copy = new Person();
-			person.CopyProperties( copy );
-			copy.SetFieldValue( "lastModified", person.GetFieldValue( "lastModified" ) );
-			Verify( person, copy );
 		}
 		#endregion
 

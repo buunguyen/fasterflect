@@ -21,9 +21,8 @@
 using System;
 using System.Collections;
 using Fasterflect;
-using Fasterflect.Caching;
 using Fasterflect.Emitter;
-using FasterflectTest.Model;
+using FasterflectTest.SampleModel.People;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.Invocation

@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
@@ -29,7 +28,6 @@ namespace Fasterflect
     /// </summary>
     public static class CloneExtensions
     {
-        #region Clone Overloads
         /// <summary>
         /// Produces a deep clone of the <paramref name="source"/> object. Reference integrity is maintained and
         /// every unique object in the graph is cloned only once.
@@ -43,6 +41,7 @@ namespace Fasterflect
             return source.DeepClone( null );
         }
 
+        #region Private Helpers
         private static T DeepClone<T>( this T source, Dictionary<object, object> map ) where T : class, new()
         {
             Type type = source.GetType();
@@ -53,16 +52,14 @@ namespace Fasterflect
             object[] values = fields.Select( f => GetValue( f, source, map ) ).ToArray();
             for( int i = 0; i < fields.Count; i++ )
             {
-                fields[ i ].SetValue( clone, values[ i ] );
+                fields[ i ].Set( clone, values[ i ] );
             }
             return clone;
         }
 
         private static object GetValue( FieldInfo field, object source, Dictionary<object, object> map )
         {
-            object result = field.GetValue( source );
-            // fails if field is not declated on source:
-            //object result = source.GetField<object>( field.Name );
+            object result = field.Get( source );
             object clone;
             if( map.TryGetValue( result, out clone ) )
             {
@@ -70,59 +67,6 @@ namespace Fasterflect
             }
             bool follow = result != null && result.GetType().IsClass && result.GetType() != typeof(string);
             return follow ? result.DeepClone( map ) : result;
-        }
-        #endregion
-
-        #region CopyFields
-        /// <summary>
-        /// Copies all public and non-public instance fields, including those defined on base classes,
-        /// from the <paramref name="source"/> object to the <paramref name="target"/> object.
-        /// </summary>
-        public static void CopyFields( this object source, object target )
-        {
-            source.CopyFields( target, Flags.InstanceAnyVisibility );
-        }
-
-        /// <summary>
-        /// Copies all fields matching the specified <paramref name="bindingFlags"/>, including those 
-        /// defined on base classes, from the <paramref name="source"/> object to the <paramref name="target"/>
-        /// object.
-        /// </summary>
-        public static void CopyFields( this object source, object target, Flags bindingFlags )
-        {
-            if( source == null || target == null )
-            {
-                throw new ArgumentException( "Unable to copy to or from null instance." );
-            }
-            var copier = (MemberCopier)
-                new CloneEmitter( source.GetType(), target.GetType(), bindingFlags, MemberTypes.Field ).GetDelegate();
-            copier( source, target );
-        }
-        #endregion
-
-        #region CopyProperties
-        /// <summary>
-        /// Copies all public and non-public instance properties, including those defined on base classes,
-        /// from the <paramref name="source"/> object to the <paramref name="target"/> object.
-        /// </summary>
-        public static void CopyProperties( this object source, object target )
-        {
-            source.CopyProperties( target, Flags.InstanceAnyVisibility );
-        }
-
-        /// <summary>
-        /// Copies all properties matching the specified <paramref name="bindingFlags"/> from the 
-        /// <paramref name="source"/> object to the <paramref name="target"/> object. 
-        /// </summary>
-        public static void CopyProperties( this object source, object target, Flags bindingFlags )
-        {
-            if( source == null || target == null )
-            {
-                throw new ArgumentException( "Unable to copy to or from null instance." );
-            }
-            var copier = (MemberCopier)
-                new CloneEmitter( source.GetType(), target.GetType(), bindingFlags, MemberTypes.Property ).GetDelegate();
-            copier( source, target );
         }
         #endregion
     }

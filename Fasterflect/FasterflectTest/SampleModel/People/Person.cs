@@ -20,7 +20,7 @@
 
 using System.Collections.Generic;
 
-namespace FasterflectTest.Model
+namespace FasterflectTest.SampleModel.People
 {
     public class Person
     {
