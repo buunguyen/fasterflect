@@ -130,10 +130,7 @@ namespace FasterflectSample
             AssertTrue("Buu" == obj.GetPropertyValue("Name").ToString());
              
             // How about modifying both properties at the same time using an anonymous sample
-            obj.SetProperties(new {
-                                      Id = 4, 
-                                      Name = "Nguyen"
-                                  });
+            obj.MapProperties( new { Id = 4, Name = "Nguyen" } );
             AssertTrue(4 == (int)obj.GetPropertyValue("Id"));
             AssertTrue("Nguyen" == obj.GetPropertyValue("Name").ToString());
 

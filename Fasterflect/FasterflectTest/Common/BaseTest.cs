@@ -51,13 +51,13 @@ namespace FasterflectTest.Common
         protected static void VerifyFields( Type type, object sample )
         {
             var properties = sample.GetType().Properties();
-            properties.ForEach( propInfo => Assert.AreEqual( propInfo.Get( sample ), type.GetFieldValue( propInfo.Name ) ) );
+            properties.ForEach( propInfo => Assert.AreEqual( propInfo.Get( sample ), type.GetFieldValue( propInfo.Name.FirstCharLower() ) ) );
         }
 
         protected static void VerifyFields( object obj, object sample )
         {
             var properties = sample.GetType().Properties();
-            properties.ForEach( propInfo => Assert.AreEqual( propInfo.Get( sample ), obj.GetFieldValue( propInfo.Name ) ) );
+            properties.ForEach( propInfo => Assert.AreEqual( propInfo.Get( sample ), obj.GetFieldValue( propInfo.Name.FirstCharLower() ) ) );
         }
 
         protected void RunWith( Action<Type> assertionAction )

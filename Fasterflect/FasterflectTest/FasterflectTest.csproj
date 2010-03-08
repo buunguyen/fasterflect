@@ -118,6 +118,7 @@
     <Compile Include="SampleModel\Animals\Lion.cs" />
     <Compile Include="SampleModel\Animals\Zoo.cs" />
     <Compile Include="Services\CloneTest.cs" />
+    <Compile Include="Services\MapTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fasterflect\Fasterflect.csproj">

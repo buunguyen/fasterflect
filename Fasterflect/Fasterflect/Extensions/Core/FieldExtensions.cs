@@ -30,8 +30,6 @@ namespace Fasterflect
     public static class FieldExtensions
     {
         #region Field Access
-
-        #region Single Access
         /// <summary>
         /// Sets the static field specified by <paramref name="name"/> of the given <paramref name="type"/>
         /// with the specified <paramref name="value" />.
@@ -188,88 +186,6 @@ namespace Fasterflect
             return (MemberGetter)
                 new MemberGetEmitter( type, bindingFlags, MemberTypes.Field, name ).GetDelegate();
         }
-        #endregion
-
-        #region Batch Setters
-        /// <summary>
-        /// Sets the public and non-public static fields of the given <paramref name="type"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by 
-        /// the optional list <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="type">The type whose static fields are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// static fields of the given <paramref name="type"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="type"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The type whose static fields are to be set.</returns>
-        public static Type SetFields( this Type type, object sample, params string[] propertiesToInclude )
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach( prop => type.SetFieldValue( prop.Name, prop.Get( sample ) ) );
-            return type;
-        }
-
-        /// <summary>
-        /// Sets the static fields matching <paramref name="bindingFlags"/> of the given <paramref name="type"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by 
-        /// the optional list <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="type">The type whose static fields are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// static fields of the given <paramref name="type"/>.</param>
-        /// <param name="bindingFlags">The binding flag used to lookup the static fields of <paramref name="type"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="type"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The type whose static fields are to be set.</returns>
-        public static Type SetFields(this Type type, object sample, Flags bindingFlags, params string[] propertiesToInclude)
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => type.SetFieldValue(prop.Name, prop.Get(sample), bindingFlags ));
-            return type;
-        }
-
-        /// <summary>
-        /// Sets the public and non-public instance fields of the given <paramref name="obj"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by the optional list 
-        /// <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="obj">The object whose instance fields are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// instance fields of the given <paramref name="obj"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="obj"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The object whose instance fields are to be set.</returns>
-        public static object SetFields( this object obj, object sample, params string[] propertiesToInclude )
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach( prop => obj.SetFieldValue( prop.Name, prop.Get( sample ) ) );
-            return obj;
-        }
-
-        /// <summary>
-        /// Sets the instance fields matching <paramref name="bindingFlags"/> of the given <paramref name="obj"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by the optional list 
-        /// <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="obj">The object whose instance fields are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// instance fields of the given <paramref name="obj"/>.</param>
-        /// <param name="bindingFlags">The binding flag used to lookup the instance fields of <paramref name="obj"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="obj"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The object whose instance fields are to be set.</returns>
-        public static object SetFields(this object obj, object sample, Flags bindingFlags, params string[] propertiesToInclude)
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => obj.SetFieldValue(prop.Name, prop.Get(sample), bindingFlags ));
-            return obj;
-        }
-        #endregion
-
         #endregion
 
         #region Field Lookup (Single)

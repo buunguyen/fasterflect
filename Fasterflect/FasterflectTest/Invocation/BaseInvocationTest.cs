@@ -20,7 +20,7 @@
 
 using System;
 using FasterflectTest.Common;
-using FasterflectTest.Model;
+using FasterflectTest.SampleModel.People;
 
 namespace FasterflectTest.Invocation
 {

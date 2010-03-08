@@ -18,7 +18,7 @@
 
 #endregion
 
-namespace FasterflectTest.Model
+namespace FasterflectTest.SampleModel.People
 {
     public class Employee : Person, ISwimmable
     {
