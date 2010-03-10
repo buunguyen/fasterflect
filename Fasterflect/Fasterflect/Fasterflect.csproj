@@ -101,6 +101,7 @@
     <Compile Include="Common\Flags.cs" />
     <Compile Include="Extensions\Core\FieldInfoExtensions.cs" />
     <Compile Include="Extensions\Core\MemberInfoExtensions.cs" />
+    <Compile Include="Extensions\Services\ObjectConstructionExtensions.cs" />
     <Compile Include="Extensions\Services\MapExtensions.cs" />
     <Compile Include="ObjectConstruction\TypeConverter.cs" />
     <Compile Include="Extensions\Core\PropertyInfoExtensions.cs" />

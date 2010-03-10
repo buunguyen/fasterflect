@@ -108,8 +108,8 @@ namespace FasterflectTest.Services
 			Verify( employee, clone );
 			Verify( employee.Manager, clone.Manager );
 			Verify( employee.Manager.Manager, clone.Manager.Manager );
-			Assert.AreNotSame( employee, employee.Manager );
-			Assert.AreSame( employee.Manager, employee.Manager.Manager );
+			Assert.AreNotSame( employee.Manager, clone.Manager );
+			Assert.AreSame( clone.Manager, clone.Manager.Manager );
 		}
 		#endregion
 
