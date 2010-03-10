@@ -20,6 +20,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Xml;
+using System.Text;
+using System.Linq;
+using System.Xml.Linq;
 using Fasterflect;
 using Fasterflect.ObjectConstruction;
 using FasterflectTest.SampleModel.Animals;
@@ -30,7 +34,7 @@ namespace FasterflectTest.ObjectConstruction
 	[TestClass]
 	public class TryCreateInstanceTest
 	{
-		#region TryCreateInstance Tests
+		#region TryCreateInstance Constructor Matching Tests
 		[TestMethod]
 		public void TestTryCreateInstanceWithMatchingEmptyArgumentShouldInvokeConstructor1()
 		{
@@ -139,6 +143,75 @@ namespace FasterflectTest.ObjectConstruction
 		public void TestTryCreateInstanceWithoutMatchShouldThrow()
 		{
 			typeof(Giraffe).TryCreateInstance( new { Id = 42 } );
+		}
+		#endregion
+
+		#region TryCreateInstance with XML input
+		#region Book class
+		private class Book
+		{
+			#pragma warning disable 0169, 0649
+			private int _id;
+			public string Author { get; private set; }
+			public string Title { get; private set; }
+			public double Rating { get; private set; }
+			#pragma warning restore 0169, 0649
+
+			public Book( string author, string title, double rating )
+			{
+				Author = author;
+				Title = title;
+				Rating = rating;
+			}
+		}
+		#endregion
+
+		[TestMethod]
+		public void TestConvertFromString()
+		{
+			XElement xml = new XElement( "Books",
+				new XElement( "Book",
+					new XAttribute( "id", 1 ),
+					new XAttribute( "author", "Douglad Adams" ),
+					new XAttribute( "title", "The Hitchhikers Guide to the Galaxy" ),
+					new XAttribute( "rating", 4.8 )
+				),
+				new XElement( "Book",
+					new XAttribute( "id", 2 ),
+					new XAttribute( "author", "Iain M. Banks" ),
+					new XAttribute( "title", "The Player of Games" ),
+					new XAttribute( "rating", 4.9 )
+				),
+				new XElement( "Book",
+					new XAttribute( "id", 3 ),
+					new XAttribute( "author", "Raymond E. Feist" ),
+					new XAttribute( "title", "Magician" ),
+					new XAttribute( "rating", 4.2 )
+				)
+			);
+
+			// now lets try to create instances of the Book class using these values
+			var data = from book in xml.Elements("Book")
+			           select new { id=book.Attribute("id"), author=book.Attribute("author"),
+			                        title=book.Attribute("title"), rating=book.Attribute("rating") };
+			
+			IList<Book> books = data.Select( b => typeof(Book).TryCreateInstance( b ) as Book ).ToList();
+			Assert.AreEqual( 3, books.Count );
+			
+			Assert.AreEqual( 1, books[ 0 ].GetFieldValue( "_id" ) );
+			Assert.AreEqual( "Douglad Adams", books[ 0 ].Author );
+			Assert.AreEqual( "The Hitchhikers Guide to the Galaxy", books[ 0 ].Title );
+			Assert.AreEqual( 4.8, books[ 0 ].Rating );
+			
+			Assert.AreEqual( 2, books[ 1 ].GetFieldValue( "_id" ) );
+			Assert.AreEqual( "Iain M. Banks", books[ 1 ].Author );
+			Assert.AreEqual( "The Player of Games", books[ 1 ].Title );
+			Assert.AreEqual( 4.9, books[ 1 ].Rating );
+			
+			Assert.AreEqual( 3, books[ 2 ].GetFieldValue( "_id" ) );
+			Assert.AreEqual( "Raymond E. Feist", books[ 2 ].Author );
+			Assert.AreEqual( "Magician", books[ 2 ].Title );
+			Assert.AreEqual( 4.2, books[ 2 ].Rating );
 		}
 		#endregion
 
