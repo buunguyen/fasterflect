@@ -28,6 +28,53 @@ namespace Fasterflect
     public static class MapExtensions
     {
 		#region Map
+		/// <summary>
+		/// Maps values from fields and properties on the source object to fields and properties with the 
+		/// same name on the target object.
+		/// </summary>
+		/// <param name="source">The source object from which member values are read.</param>
+		/// <param name="target">The target object to which member values are written.</param>
+        /// <param name="names">The optional list of member names against which to filter the members that are
+        /// to be mapped. If this parameter is <c>null</c> or empty no name filtering will be applied. The default 
+        /// behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.PartialNameMatch"/> to 
+        /// filter members by substring and <see href="Flags.IgnoreCase"/> to ignore case.</param>
+		public static void Map( this object source, object target, params string[] names )
+		{
+			const MemberTypes memberTypes = MemberTypes.Field | MemberTypes.Property;
+			source.Map( target, memberTypes, memberTypes, Flags.InstanceAnyVisibility, names );
+		}
+
+		/// <summary>
+		/// Maps values from fields and properties on the source object to fields and properties with the 
+		/// same name on the target object.
+		/// </summary>
+		/// <param name="source">The source object from which member values are read.</param>
+		/// <param name="target">The target object to which member values are written.</param>
+		/// <param name="bindingFlags">The <see href="Flags"/> used to define the scope when locating members.</param>
+        /// <param name="names">The optional list of member names against which to filter the members that are
+        /// to be mapped. If this parameter is <c>null</c> or empty no name filtering will be applied. The default 
+        /// behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.PartialNameMatch"/> to 
+        /// filter members by substring and <see href="Flags.IgnoreCase"/> to ignore case.</param>
+		public static void Map( this object source, object target, Flags bindingFlags, params string[] names )
+		{
+			const MemberTypes memberTypes = MemberTypes.Field | MemberTypes.Property;
+			source.Map( target, memberTypes, memberTypes, bindingFlags, names );
+		}
+
+		/// <summary>
+		/// Maps values from members on the source object to members with the same name on the target object.
+		/// </summary>
+		/// <param name="source">The source object from which member values are read.</param>
+		/// <param name="target">The target object to which member values are written.</param>
+		/// <param name="sourceTypes">The member types (Fields, Properties or both) to include on the source.</param>
+		/// <param name="targetTypes">The member types (Fields, Properties or both) to include on the target.</param>
+		/// <param name="bindingFlags">The <see href="Flags"/> used to define the scope when locating members. If
+		/// <paramref name="sourceTypes"/> is different from <paramref name="targetTypes"/> the flag value
+		/// <see cref="Flags.IgnoreCase"/> will automatically be applied.</param>
+        /// <param name="names">The optional list of member names against which to filter the members that are
+        /// to be mapped. If this parameter is <c>null</c> or empty no name filtering will be applied. The default 
+        /// behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.PartialNameMatch"/> to 
+        /// filter members by substring and <see href="Flags.IgnoreCase"/> to ignore case.</param>
 		public static void Map( this object source, object target, MemberTypes sourceTypes, MemberTypes targetTypes, 
 								Flags bindingFlags, params string[] names )
 		{
@@ -42,252 +89,63 @@ namespace Fasterflect
     	#endregion
 
 		#region Map Companions
-		public static void Map( this object source, object target, params string[] names )
-		{
-			const MemberTypes memberTypes = MemberTypes.Field | MemberTypes.Property;
-			source.Map( target, memberTypes, memberTypes, Flags.InstanceAnyVisibility, names );
-		}
-
-		public static void Map( this object source, object target, Flags bindingFlags, params string[] names )
-		{
-			const MemberTypes memberTypes = MemberTypes.Field | MemberTypes.Property;
-			source.Map( target, memberTypes, memberTypes, bindingFlags, names );
-		}
-
+		/// <summary>
+		/// Maps values from fields on the source object to fields with the same name on the target object.
+		/// </summary>
+		/// <param name="source">The source object from which field values are read.</param>
+		/// <param name="target">The target object to which field values are written.</param>
+        /// <param name="names">The optional list of field names against which to filter the fields that are
+        /// to be mapped. If this parameter is <c>null</c> or empty no name filtering will be applied. The default 
+        /// behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.PartialNameMatch"/> to 
+        /// filter fields by substring and <see href="Flags.IgnoreCase"/> to ignore case.</param>
     	public static void MapFields( this object source, object target, params string[] names )
 		{
 			source.Map( target, MemberTypes.Field, MemberTypes.Field, Flags.InstanceAnyVisibility, names );
 		}
 
+		/// <summary>
+		/// Maps values from properties on the source object to properties with the same name on the target object.
+		/// </summary>
+		/// <param name="source">The source object from which property values are read.</param>
+		/// <param name="target">The target object to which property values are written.</param>
+        /// <param name="names">The optional list of property names against which to filter the properties that are
+        /// to be mapped. If this parameter is <c>null</c> or empty no name filtering will be applied. The default 
+        /// behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.PartialNameMatch"/> to 
+        /// filter properties by substring and <see href="Flags.IgnoreCase"/> to ignore case.</param>
 		public static void MapProperties( this object source, object target, params string[] names )
 		{
 			source.Map( target, MemberTypes.Property, MemberTypes.Property, Flags.InstanceAnyVisibility, names );
 		}
 
+		/// <summary>
+		/// Maps values from fields on the source object to properties with the same name (ignoring case)
+		/// on the target object.
+		/// </summary>
+		/// <param name="source">The source object from which field values are read.</param>
+		/// <param name="target">The target object to which property values are written.</param>
+        /// <param name="names">The optional list of member names against which to filter the members that are
+        /// to be mapped. If this parameter is <c>null</c> or empty no name filtering will be applied. The default 
+        /// behavior is to check for an exact, case-insensitive match. Pass <see href="Flags.PartialNameMatch"/>
+        /// to filter members by substring.</param>
 		public static void MapFieldsToProperties( this object source, object target, params string[] names )
 		{
 			source.Map( target, MemberTypes.Field, MemberTypes.Property, Flags.InstanceAnyVisibility, names );
 		}
 
+		/// <summary>
+		/// Maps values from properties on the source object to fields with the same name (ignoring case) 
+		/// on the target object.
+		/// </summary>
+		/// <param name="source">The source object from which property values are read.</param>
+		/// <param name="target">The target object to which field values are written.</param>
+        /// <param name="names">The optional list of member names against which to filter the members that are
+        /// to be mapped. If this parameter is <c>null</c> or empty no name filtering will be applied. The default 
+        /// behavior is to check for an exact, case-insensitive match. Pass <see href="Flags.PartialNameMatch"/>
+        /// to filter members by substring.</param>
 		public static void MapPropertiesToFields( this object source, object target, params string[] names )
 		{
 			source.Map( target, MemberTypes.Property, MemberTypes.Field, Flags.InstanceAnyVisibility, names );
 		}
     	#endregion
-
-		/*
-		#region Batch Field Setters
-        /// <summary>
-        /// Sets the public and non-public static fields of the given <paramref name="type"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by 
-        /// the optional list <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="type">The type whose static fields are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// static fields of the given <paramref name="type"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="type"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The type whose static fields are to be set.</returns>
-        public static Type SetFields( this Type type, object sample, params string[] propertiesToInclude )
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach( prop => type.SetFieldValue( prop.Name, prop.Get( sample ) ) );
-            return type;
-        }
-
-        /// <summary>
-        /// Sets the static fields matching <paramref name="bindingFlags"/> of the given <paramref name="type"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by 
-        /// the optional list <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="type">The type whose static fields are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// static fields of the given <paramref name="type"/>.</param>
-        /// <param name="bindingFlags">The binding flag used to lookup the static fields of <paramref name="type"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="type"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The type whose static fields are to be set.</returns>
-        public static Type SetFields(this Type type, object sample, Flags bindingFlags, params string[] propertiesToInclude)
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => type.SetFieldValue(prop.Name, prop.Get(sample), bindingFlags ));
-            return type;
-        }
-
-        /// <summary>
-        /// Sets the public and non-public instance fields of the given <paramref name="obj"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by the optional list 
-        /// <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="obj">The object whose instance fields are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// instance fields of the given <paramref name="obj"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="obj"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The object whose instance fields are to be set.</returns>
-        public static object SetFields( this object obj, object sample, params string[] propertiesToInclude )
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach( prop => obj.SetFieldValue( prop.Name, prop.Get( sample ) ) );
-            return obj;
-        }
-
-        /// <summary>
-        /// Sets the instance fields matching <paramref name="bindingFlags"/> of the given <paramref name="obj"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by the optional list 
-        /// <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="obj">The object whose instance fields are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// instance fields of the given <paramref name="obj"/>.</param>
-        /// <param name="bindingFlags">The binding flag used to lookup the instance fields of <paramref name="obj"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="obj"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The object whose instance fields are to be set.</returns>
-        public static object SetFields(this object obj, object sample, Flags bindingFlags, params string[] propertiesToInclude)
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => obj.SetFieldValue(prop.Name, prop.Get(sample), bindingFlags ));
-            return obj;
-        }
-        #endregion
-
-		#region CopyFields
-        /// <summary>
-        /// Copies all public and non-public instance fields, including those defined on base classes,
-        /// from the <paramref name="source"/> object to the <paramref name="target"/> object.
-        /// </summary>
-        public static void CopyFields( this object source, object target )
-        {
-            source.CopyFields( target, Flags.InstanceAnyVisibility );
-        }
-
-        /// <summary>
-        /// Copies all fields matching the specified <paramref name="bindingFlags"/>, including those 
-        /// defined on base classes, from the <paramref name="source"/> object to the <paramref name="target"/>
-        /// object.
-        /// </summary>
-        public static void CopyFields( this object source, object target, Flags bindingFlags )
-        {
-            if( source == null || target == null )
-            {
-                throw new ArgumentException( "Unable to copy to or from null instance." );
-            }
-            var copier = (MemberCopier)
-                new MapEmitter( source.GetType(), target.GetType(), bindingFlags, MemberTypes.Field ).GetDelegate();
-            copier( source, target );
-        }
-        #endregion
-
-		#region Batch Setters
-        /// <summary>
-        /// Sets the public and non-public static properties of the given <paramref name="type"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by 
-        /// the optional list <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="type">The type whose static properties are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// static properties of the given <paramref name="type"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="type"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The type whose static properties are to be set.</returns>
-        public static Type SetProperties( this Type type, object sample, params string[] propertiesToInclude )
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => type.SetPropertyValue(prop.Name, prop.Get(sample)));
-            return type;
-        }
-
-        /// <summary>
-        /// Sets the static properties matching <paramref name="bindingFlags"/> of the given <paramref name="type"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by 
-        /// the optional list <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="type">The type whose static properties are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// static properties of the given <paramref name="type"/>.</param>
-        /// <param name="bindingFlags">The binding flag used to lookup the static properties of <paramref name="type"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="type"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The type whose static properties are to be set.</returns>
-        public static Type SetProperties(this Type type, object sample, Flags bindingFlags, params string[] propertiesToInclude)
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => type.SetPropertyValue(prop.Name, prop.Get(sample), bindingFlags ));
-            return type;
-        }
-
-        /// <summary>
-        /// Sets the public and non-public instance properties of the given <paramref name="obj"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by the optional list 
-        /// <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="obj">The object whose instance properties are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// instance properties of the given <paramref name="obj"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="obj"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The object whose instance properties are to be set.</returns>
-        public static object SetProperties(this object obj, object sample, params string[] propertiesToInclude)
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => obj.SetPropertyValue(prop.Name, prop.Get(sample)));
-            return obj;
-        }
-
-        /// <summary>
-        /// Sets the instance properties matching <paramref name="bindingFlags"/> of the given <paramref name="obj"/> based on
-        /// the public properties available in <paramref name="sample"/> filtered by the optional list 
-        /// <paramref name="propertiesToInclude"/>. 
-        /// </summary>
-        /// <param name="obj">The object whose instance properties are to be set.</param>
-        /// <param name="sample">An object whose public properties will be used to set the 
-        /// instance properties of the given <paramref name="obj"/>.</param>
-        /// <param name="bindingFlags">The binding flag used to lookup the instance properties of <paramref name="obj"/>.</param>
-        /// <param name="propertiesToInclude">An optional list of names of public properties to retrieve from 
-        /// <paramref name="sample"/> to set <paramref name="obj"/>.  If this is <c>null</c> or left empty, 
-        /// all public properties of <paramref name="sample"/> are used.</param>
-        /// <returns>The object whose instance properties are to be set.</returns>
-        public static object SetProperties(this object obj, object sample, Flags bindingFlags, params string[] propertiesToInclude)
-        {
-            var properties = sample.GetType().Properties(Flags.Instance | Flags.Public, propertiesToInclude);
-            properties.ForEach(prop => obj.SetPropertyValue(prop.Name, prop.Get(sample), bindingFlags ));
-            return obj;
-        }
-        #endregion
-
-        #region CopyProperties
-        /// <summary>
-        /// Copies all public and non-public instance properties, including those defined on base classes,
-        /// from the <paramref name="source"/> object to the <paramref name="target"/> object.
-        /// </summary>
-        public static void CopyProperties( this object source, object target )
-        {
-            source.CopyProperties( target, Flags.InstanceAnyVisibility );
-        }
-
-        /// <summary>
-        /// Copies all properties matching the specified <paramref name="bindingFlags"/> from the 
-        /// <paramref name="source"/> object to the <paramref name="target"/> object. 
-        /// </summary>
-        public static void CopyProperties( this object source, object target, Flags bindingFlags )
-        {
-            if( source == null || target == null )
-            {
-                throw new ArgumentException( "Unable to copy to or from null instance." );
-            }
-            var copier = (MemberCopier)
-                new MapEmitter( source.GetType(), target.GetType(), bindingFlags, MemberTypes.Property ).GetDelegate();
-            copier( source, target );
-        }
-        #endregion
-		*/
     }
 }
