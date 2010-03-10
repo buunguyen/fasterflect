@@ -131,7 +131,7 @@ namespace Fasterflect.ObjectConstruction
 					methodParameterIndex = methodParamIndex; // preserve loop variable outside loop
 					ParameterInfo parameter = parameters[ methodParamIndex ];
 					// permit casing differences to allow for matching lower-case parameters to upper-case properties
-					if( parameter.Name.Equals( paramName, StringComparison.OrdinalIgnoreCase ) )
+					if( parameter.HasName( paramName ) )
 					{
 						bool compatible = parameter.ParameterType.IsAssignableFrom( paramType );
 						// avoid checking if implicit conversion is possible
@@ -172,7 +172,15 @@ namespace Fasterflect.ObjectConstruction
 				{
 					// check if we can use reflection to set some members
 					MemberInfo member = type.Property( paramName, Flags.InstanceAnyVisibility | Flags.IgnoreCase );
-					member = member != null && member.IsWritable() ? member : type.Field( paramName, Flags.InstanceAnyVisibility | Flags.IgnoreCase );
+					// try again using leading underscore if nothing was found
+					member = member ?? type.Property( "_" + paramName, Flags.InstanceAnyVisibility | Flags.IgnoreCase );
+					// look for fields if we still got no match or property was readonly
+					if( member == null || ! member.IsWritable() )
+					{
+						member = type.Field( paramName, Flags.InstanceAnyVisibility | Flags.IgnoreCase );
+						// try again using leading underscore if nothing was found
+						member = member ?? type.Field( "_" + paramName, Flags.InstanceAnyVisibility | Flags.IgnoreCase );
+					}
 					bool exists = member != null; 
 					Type memberType = member != null ? member.Type() : null;
 					bool compatible = exists && memberType.IsAssignableFrom( paramType );

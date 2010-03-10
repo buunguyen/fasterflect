@@ -22,6 +22,7 @@ using System;
 using System.Globalization;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace Fasterflect.ObjectConstruction
 {
@@ -45,6 +46,36 @@ namespace Fasterflect.ObjectConstruction
 				return node;
 			}
 			return Get( targetType, node.InnerXml );
+		}
+		/// <summary>
+		/// Convert the supplied XAttribute into the specified target type. Only the Value portion
+		/// of the XAttribute is used in the conversion, unless the target type is itself an XAttribute.
+		/// </summary>
+		/// <param name="targetType">The type into which to convert</param>
+		/// <param name="attribute">The source value used in the conversion operation</param>
+		/// <returns>The converted value</returns>
+		public static object Get( Type targetType, XAttribute attribute )
+		{
+			if( targetType == typeof(XAttribute) )
+			{
+				return attribute;
+			}
+			return Get( targetType, attribute.Value );
+		}
+		/// <summary>
+		/// Convert the supplied XElement into the specified target type. Only the Value portion
+		/// of the XElement is used in the conversion, unless the target type is itself an XElement.
+		/// </summary>
+		/// <param name="targetType">The type into which to convert</param>
+		/// <param name="element">The source value used in the conversion operation</param>
+		/// <returns>The converted value</returns>
+		public static object Get( Type targetType, XElement element )
+		{
+			if( targetType == typeof(XElement) )
+			{
+				return element;
+			}
+			return Get( targetType, element.Value );
 		}
 
 		/// <summary>
@@ -106,6 +137,14 @@ namespace Fasterflect.ObjectConstruction
 			if( sourceType == typeof(XmlNode) )
 			{
 				return Get( targetType, value as XmlNode );
+			}
+			if( sourceType == typeof(XAttribute) )
+			{
+				return Get( targetType, value as XAttribute );
+			}
+			if( sourceType == typeof(XElement) )
+			{
+				return Get( targetType, value as XElement );
 			}
 			if( targetType.IsEnum || sourceType.IsEnum )
 			{
