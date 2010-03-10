@@ -113,8 +113,12 @@ namespace FasterflectSample
 		{
 			sb.AppendFormat( "{0} ", GetTypeName( method.ReturnType ) );
 			sb.AppendFormat( "{0}{1}( ",  method.Name, GetGenericParameterText( method ) );
+			var first = parameters.FirstOrDefault();
 			var last = parameters.LastOrDefault();
-			parameters.ForEach( p => sb.AppendFormat( "{0} {1}{2}", GetType( p ), p.Name, p == last ? "" : ", " ) );
+			var addPrefix = method.IsStatic && method.DeclaringType.Name.EndsWith( "Extensions" );
+			parameters.ForEach( p => sb.AppendFormat( "{0}{1} {2}{3}", 
+				p == first && addPrefix ? "this " : "", 
+				GetType( p ), p.Name, p == last ? "" : ", " ) );
 			sb.AppendFormat( " );{0}", Environment.NewLine );
 		}
 
