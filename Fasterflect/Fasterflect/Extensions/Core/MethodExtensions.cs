@@ -138,8 +138,7 @@ namespace Fasterflect
         /// <seealso cref="CallMethod(object,string,System.Type[],object[])"/>
         public static object CallMethod( this object obj, string name, params object[] parameters )
         {
-            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, parameters.GetTypeArray() )( obj,
-                                                                                                         parameters );
+            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, parameters.GetTypeArray() )( obj, parameters );
         }
 
         /// <summary>
@@ -184,8 +183,7 @@ namespace Fasterflect
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
         public static object CallMethod( this object obj, string name, Type[] parameterTypes, Flags bindingFlags, params object[] parameters )
         {
-            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, bindingFlags, parameterTypes )( obj,
-                                                                                                            parameters );
+            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, bindingFlags, parameterTypes )( obj, parameters );
         }
 
         /// <summary>
