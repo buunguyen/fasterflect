@@ -90,7 +90,14 @@ namespace Fasterflect
                 {
                     var type = paramTypes[ j ];
                     var parameter = parameters[ j ];
-                    match &= exact ? type == parameter.ParameterType : parameter.ParameterType.IsAssignableFrom( type );
+                	Type parameterType = parameter.ParameterType;
+                	bool ignoreParameterModifiers = ! exact;
+					if( ignoreParameterModifiers && parameterType.IsByRef )
+					{
+						string name = parameterType.FullName;
+						parameterType = Type.GetType( name.Substring( 0, name.Length - 1 ) ) ?? parameterType;
+					}
+                    match &= exact ? type == parameterType : parameterType.IsAssignableFrom( type );
                     if( ! match )
                     {
                         break;

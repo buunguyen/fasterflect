@@ -52,6 +52,7 @@ namespace Fasterflect
 			flagNames[ TrimExplicitlyImplemented ] = "TrimExplicitlyImplemented"; // new Flags( 1L << 33 );
 			flagNames[ ExcludeExplicitlyImplemented ] = "ExcludeExplicitlyImplemented"; // = new Flags( 1L << 34 );
 			flagNames[ ExcludeBackingMembers ] = "ExcludeBackingMembers"; // = new Flags( 1L << 35 );
+			flagNames[ IgnoreParameterModifiers ] = "IgnoreParameterModifiers"; // = new Flags( 1L << 36 );
 
 			// not yet supported:
 			//flagNames[ VisibilityMatch ] = "VisibilityMatch"; // = new Flags( 1L << 55 );
@@ -141,6 +142,14 @@ namespace Fasterflect
 		/// result.
 		/// </summary>
 		public static readonly Flags ExcludeBackingMembers = new Flags( 1L << 35 );
+
+		/// <summary>
+		/// If this option is specified the search for methods will avoid checking whether parameters
+		/// have been declared as ref or out. This allows you to locate a method by its signature
+		/// without supplying the exact details for every parameter.
+		/// </summary>
+		public static readonly Flags IgnoreParameterModifiers = new Flags( 1L << 36 );
+		
 
 		#region For The Future
 		///// <summary>

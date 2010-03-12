@@ -284,16 +284,17 @@ namespace Fasterflect
         /// due to method overloading the first found match will be returned.</returns>
         public static MethodInfo Method( this Type type, string name, Type[] parameterTypes, Flags bindingFlags )
         {
+            bool hasTypes = parameterTypes != null;
             // we need to check all methods to do partial name matches
-            if( bindingFlags.IsAnySet( Flags.PartialNameMatch | Flags.TrimExplicitlyImplemented ) )
+        	bool processAll = bindingFlags.IsAnySet( Flags.PartialNameMatch | Flags.TrimExplicitlyImplemented );
+        	processAll |= hasTypes && bindingFlags.IsSet( Flags.IgnoreParameterModifiers );
+            if( processAll )
             {
                 return type.Methods( parameterTypes, bindingFlags, name ).FirstOrDefault();
             }
 
-            bool hasTypes = parameterTypes != null;
-            var result = hasTypes
-                             ? type.GetMethod( name, bindingFlags, null, parameterTypes, null )
-                             : type.GetMethod( name, bindingFlags );
+            var result = hasTypes ? type.GetMethod( name, bindingFlags, null, parameterTypes, null )
+                             	  : type.GetMethod( name, bindingFlags );
             if( result == null && bindingFlags.IsNotSet( Flags.DeclaredOnly ) )
             {
                 if( type.BaseType != typeof(object) && type.BaseType != null )
@@ -301,7 +302,7 @@ namespace Fasterflect
                     return type.BaseType.Method( name, parameterTypes, bindingFlags );
                 }
             }
-            bool hasSpecialFlags =
+        	bool hasSpecialFlags =
                 bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
             if( hasSpecialFlags )
             {
