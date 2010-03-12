@@ -229,10 +229,15 @@ namespace Fasterflect
 		/// <param name="bindingFlags">A combination of Flags that define the scope of the search</param>
 		/// <returns>The value of the member or null if no member was found</returns>
         public static object TryGetValue( this object obj, string name, Flags bindingFlags )
-        {
-            Type type = obj.GetType();
-            var info = type.Member( name, bindingFlags );
-            return info != null ? info.Get( obj ) : null;
+		{
+			Type type = obj.GetType();
+			var info = type.Member( name, bindingFlags );
+			if( info == null )
+			{
+				return null;
+			}
+			bool valid = info is FieldInfo || info is PropertyInfo;
+			return valid ? info.Get( obj ) : null;
         }
         #endregion
 

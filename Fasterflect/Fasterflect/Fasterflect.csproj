@@ -85,6 +85,9 @@
   <ItemGroup>
     <Compile Include="Caching\CacheStrategy.cs" />
     <Compile Include="Caching\Cache.cs" />
+    <Compile Include="Common\FormatOptions.cs" />
+    <Compile Include="DynamicReflection\DynamicWrapper.cs" />
+    <Compile Include="DynamicReflection\DynamicBuilder.cs" />
     <Compile Include="Extensions\Core\AssemblyExtensions.cs" />
     <Compile Include="Extensions\Core\ParameterInfoExtensions.cs" />
     <Compile Include="Common\MemberFilter.cs" />
@@ -103,6 +106,7 @@
     <Compile Include="Extensions\Core\MemberInfoExtensions.cs" />
     <Compile Include="Extensions\Services\ObjectConstructionExtensions.cs" />
     <Compile Include="Extensions\Services\MapExtensions.cs" />
+    <Compile Include="Extensions\Services\XmlTransformerExtensions.cs" />
     <Compile Include="ObjectConstruction\TypeConverter.cs" />
     <Compile Include="Extensions\Core\PropertyInfoExtensions.cs" />
     <Compile Include="Extensions\Core\MemberExtensions.cs" />
