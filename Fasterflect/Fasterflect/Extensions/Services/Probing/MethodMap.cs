@@ -24,18 +24,18 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace Fasterflect.ObjectConstruction
+namespace Fasterflect.Probing
 {
 	/// <summary>
 	/// This class wraps a single invokable method call. It contains information on the method to call as well as 
 	/// the parameters to use in the method call.
-	/// This intermediary class is used by the ObjectConstructionExtensions class to select the best match to call
+	/// This intermediary class is used by the various other classes to select the best match to call
 	/// from a given set of available methods/constructors (and a set of parameter names and types).
 	/// </summary>
 	internal class MethodMap
 	{
 		#region Fields
-		private readonly bool allowUnusedParameters;
+		private readonly bool mustUseAllParameters;
 		protected long cost;
 		protected bool isPerfectMatch;
 		protected bool isValid;
@@ -60,17 +60,19 @@ namespace Fasterflect.ObjectConstruction
 		protected int requiredFoundCount;
 		protected int requiredParameterCount;
 		protected Type type;
+		private MethodInvoker instanceInvoker;
+		private StaticMethodInvoker staticInvoker;
 		#endregion
 
 		#region Constructors and Initialization
-		public MethodMap( MethodBase method, string[] paramNames, Type[] paramTypes, object[] sampleParamValues, bool allowUnusedParameters )
+		public MethodMap( MethodBase method, string[] paramNames, Type[] paramTypes, object[] sampleParamValues, bool mustUseAllParameters )
 		{
 			type = method.DeclaringType;
 			this.method = method;
 			this.paramNames = paramNames;
 			this.paramTypes = paramTypes;
 			requiredParameterCount = method.Parameters().Count;
-			this.allowUnusedParameters = allowUnusedParameters;
+			this.mustUseAllParameters = mustUseAllParameters;
 			parameters = method.Parameters();
 			InitializeBitArrays( Math.Max( parameters.Count, paramNames.Length ) );
 			InitializeMethodMap( sampleParamValues );
@@ -284,7 +286,7 @@ namespace Fasterflect.ObjectConstruction
 			isPerfectMatch &= cost == 0;
 			// isValid tells whether this CM can be used with the given columns
 			isValid = requiredFoundCount == requiredParameterCount && parameterUsageCount >= requiredParameterCount;
-			isValid &= allowUnusedParameters || parameterUsageCount == paramNames.Length;
+			isValid &= ! mustUseAllParameters || parameterUsageCount == paramNames.Length;
 			isValid &= noColumnForParameter == 0;
 			isValid &= AllSet( methodParameterUsageMask );
 			// this last specifies that we must use all of the supplied parameters to construct the object
@@ -380,15 +382,17 @@ namespace Fasterflect.ObjectConstruction
 		#region Method Invocation
 		public virtual object Invoke( object[] row )
 		{
-			throw new NotImplementedException( "Implemented in subclasses." );
+			throw new NotImplementedException( "This method is implemented in subclasses." );
 		}
 
 		public virtual object Invoke( object target, object[] row )
 		{
-			//CreateInvoker();
 			object[] methodParameters = isPerfectMatch ? row : PrepareParameters( row );
-			//return invoker.Invoke( methodParameters );
-			return method.Invoke( target, methodParameters );
+			if( method.IsStatic )
+			{
+				return staticInvoker.Invoke( target as Type, methodParameters );
+			}
+			return instanceInvoker.Invoke( target, methodParameters );
 		}
 
 		internal Type[] GetParamTypes()
@@ -478,7 +482,16 @@ namespace Fasterflect.ObjectConstruction
 
 		internal virtual void InitializeInvoker()
 		{
-			throw new NotImplementedException();
+			var mi = method as MethodInfo;
+			// invoker = method.IsStatic ? mi.DelegateForCallStaticMethod() : mi.DelegateForCallMethod();
+			if( method.IsStatic )
+			{
+				staticInvoker = mi.DelegateForCallStaticMethod();
+			}
+			else
+			{
+				instanceInvoker = mi.DelegateForCallMethod();
+			}
 		}
 	}
 }

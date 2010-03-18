@@ -75,7 +75,7 @@ namespace Fasterflect
         {
             var defaultValue = parameter.Attribute<DefaultValueAttribute>();
             return defaultValue != null
-                       ? ObjectConstruction.TypeConverter.Get( parameter.ParameterType, defaultValue.Value )
+                       ? Probing.TypeConverter.Get( parameter.ParameterType, defaultValue.Value )
                        : null;
         }
     }

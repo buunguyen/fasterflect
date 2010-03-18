@@ -109,6 +109,38 @@ namespace Fasterflect
         }
 
         /// <summary>
+        /// Determines whether the given <paramref name="member"/> is a static member.
+        /// </summary>
+        /// <returns>True for static fields, properties and methods and false for instance fields,
+        /// properties and methods. Throws an exception for all other <see href="MemberTypes" />.</returns>
+        public static bool IsStatic( this MemberInfo member )
+        {
+			var field = member as FieldInfo;
+            if( field != null )
+            	return field.IsStatic;
+			var property = member as PropertyInfo;
+            if( property != null )
+            	return property.CanRead ? property.GetGetMethod( true ).IsStatic : property.GetSetMethod( true ).IsStatic;
+			var method = member as MethodInfo;
+            if( method != null )
+            	return method.IsStatic;
+			string message = string.Format( "Unable to determine IsStatic for member {0}.{1}"+
+				"MemberType was {2} but only fields, properties and methods are supported.", 
+				member.Name, member.MemberType, Environment.NewLine );
+        	throw new NotSupportedException( message );
+		}
+
+        /// <summary>
+        /// Determines whether the given <paramref name="member"/> is an instance member.
+        /// </summary>
+        /// <returns>True for instance fields, properties and methods and false for static fields,
+        /// properties and methods. Throws an exception for all other <see href="MemberTypes" />.</returns>
+        public static bool IsInstance( this MemberInfo member )
+        {
+        	return ! member.IsStatic();
+		}
+
+        /// <summary>
         /// Determines whether the given <paramref name="member"/> has the given <paramref name="name"/>.
         /// The comparison uses OrdinalIgnoreCase and allows for a leading underscore in either name
         /// to be ignored.

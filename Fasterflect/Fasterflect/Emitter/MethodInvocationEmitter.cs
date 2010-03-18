@@ -25,7 +25,7 @@ namespace Fasterflect.Emitter
 	internal class MethodInvocationEmitter : InvocationEmitter
 	{
 		public MethodInvocationEmitter( MethodInfo methodInfo, Flags bindingFlags )
-			: this( methodInfo.DeclaringType, bindingFlags, methodInfo.Name, methodInfo.GetParameters().GetTypeArray(), methodInfo )
+			: this( methodInfo.DeclaringType, bindingFlags, methodInfo.Name, methodInfo.GetParameters().ToTypeArray(), methodInfo )
 		{
 		}
 

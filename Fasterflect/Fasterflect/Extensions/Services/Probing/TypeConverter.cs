@@ -24,7 +24,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Fasterflect.ObjectConstruction
+namespace Fasterflect.Probing
 {
 	/// <summary>
 	/// Helper class for converting values between various types.

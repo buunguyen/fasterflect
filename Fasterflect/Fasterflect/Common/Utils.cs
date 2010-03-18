@@ -35,7 +35,7 @@ namespace Fasterflect
 			       	: wrapper.Value.GetType();
 		}
 
-        public static Type[] GetTypeArray(this ParameterInfo[] parameters)
+        public static Type[] ToTypeArray(this ParameterInfo[] parameters)
         {
             if (parameters.Length == 0)
                 return Type.EmptyTypes;
@@ -47,7 +47,7 @@ namespace Fasterflect
             return types;
         }
 
-		public static Type[] GetTypeArray(this object[] objects)
+		public static Type[] ToTypeArray(this object[] objects)
         {
             if (objects.Length == 0)
                 return Type.EmptyTypes;

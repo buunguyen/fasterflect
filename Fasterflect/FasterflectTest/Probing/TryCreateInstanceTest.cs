@@ -20,16 +20,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Xml;
-using System.Text;
 using System.Linq;
 using System.Xml.Linq;
 using Fasterflect;
-using Fasterflect.ObjectConstruction;
+using Fasterflect.Probing;
 using FasterflectTest.SampleModel.Animals;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FasterflectTest.ObjectConstruction
+namespace FasterflectTest.Probing
 {
 	[TestClass]
 	public class TryCreateInstanceTest

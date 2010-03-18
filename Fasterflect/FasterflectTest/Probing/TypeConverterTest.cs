@@ -20,11 +20,11 @@
 
 using System;
 using System.Linq;
-using Fasterflect.ObjectConstruction;
+using Fasterflect.Probing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FasterflectTest.SampleModel.Animals.Enumerations;
 
-namespace FasterflectTest.ObjectConstruction
+namespace FasterflectTest.Probing
 {
 	[TestClass]
 	public class TypeConverterTest
