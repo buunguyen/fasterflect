@@ -155,7 +155,7 @@ namespace Fasterflect
  					if( method != null )
  					{
  						// filter out property backing methods
-						exclude |= member.Name.Substring( 1, 3 ) == "et_";
+						exclude |= member.Name.Length > 4 && member.Name.Substring( 1, 3 ) == "et_";
 						// filter out base implementations when an overrride exists
 						exclude |= result.ContainsOverride( method );
  					}

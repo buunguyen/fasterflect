@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Fasterflect.ObjectConstruction
+namespace Fasterflect.Probing
 {
 	internal class SourceInfo
 	{

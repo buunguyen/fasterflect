@@ -208,7 +208,7 @@ namespace Fasterflect
         /// </example>
         public static object SetIndexer( this object obj, params object[] parameters )
         {
-            DelegateForSetIndexer( obj.GetTypeAdjusted(), parameters.GetTypeArray() )( obj, parameters );
+            DelegateForSetIndexer( obj.GetTypeAdjusted(), parameters.ToTypeArray() )( obj, parameters );
             return obj;
         }
 
@@ -245,7 +245,7 @@ namespace Fasterflect
         /// <returns>The value returned by the indexer.</returns>
         public static object GetIndexer( this object obj, params object[] parameters )
         {
-            return DelegateForGetIndexer( obj.GetTypeAdjusted(), parameters.GetTypeArray() )( obj, parameters );
+            return DelegateForGetIndexer( obj.GetTypeAdjusted(), parameters.ToTypeArray() )( obj, parameters );
         }
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace Fasterflect
         /// </example>
         public static object SetIndexer( this object obj, Flags bindingFlags, params object[] parameters )
         {
-            DelegateForSetIndexer( obj.GetTypeAdjusted(), bindingFlags, parameters.GetTypeArray() )( obj,
+            DelegateForSetIndexer( obj.GetTypeAdjusted(), bindingFlags, parameters.ToTypeArray() )( obj,
                                                                                                         parameters );
             return obj;
         }
@@ -319,7 +319,7 @@ namespace Fasterflect
         /// <returns>The value returned by the indexer.</returns>
         public static object GetIndexer( this object obj, Flags bindingFlags, params object[] parameters )
         {
-            return DelegateForGetIndexer( obj.GetTypeAdjusted(), bindingFlags, parameters.GetTypeArray() )( obj,
+            return DelegateForGetIndexer( obj.GetTypeAdjusted(), bindingFlags, parameters.ToTypeArray() )( obj,
                                                                                                                parameters );
         }
 

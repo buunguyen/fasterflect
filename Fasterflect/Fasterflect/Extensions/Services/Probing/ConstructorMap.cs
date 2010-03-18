@@ -21,15 +21,15 @@
 using System;
 using System.Reflection;
 
-namespace Fasterflect.ObjectConstruction
+namespace Fasterflect.Probing
 {
 	internal class ConstructorMap : MethodMap
 	{
 		private ConstructorInvoker invoker;
 
 		public ConstructorMap( ConstructorInfo constructor, string[] paramNames, Type[] parameterTypes, 
-			                   object[] sampleParamValues, bool allowUnusedParameters )
-            : base(constructor, paramNames, parameterTypes, sampleParamValues, allowUnusedParameters)
+			                   object[] sampleParamValues, bool mustUseAllParameters )
+            : base(constructor, paramNames, parameterTypes, sampleParamValues, mustUseAllParameters)
 		{
 		}
 
@@ -51,7 +51,7 @@ namespace Fasterflect.ObjectConstruction
 		}
 		#endregion
 
-		public override object Invoke(object[] row)
+		public override object Invoke( object[] row )
 		{
 			object[] methodParameters = isPerfectMatch ? row : PrepareParameters(row);
 			object result = invoker.Invoke(methodParameters);

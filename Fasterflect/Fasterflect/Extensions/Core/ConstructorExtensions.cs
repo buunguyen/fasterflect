@@ -42,7 +42,7 @@ namespace Fasterflect
         /// <seealso cref="CreateInstance(Type, Type[], object[])"/>
         public static object CreateInstance( this Type type, params object[] parameters )
         {
-            return DelegateForCreateInstance( type, parameters.GetTypeArray() )( parameters );
+            return DelegateForCreateInstance( type, parameters.ToTypeArray() )( parameters );
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Fasterflect
         /// <seealso cref="CreateInstance(System.Type,System.Type[],Fasterflect.Flags,object[])"/>
         public static object CreateInstance( this Type type, Flags bindingFlags, params object[] parameters )
         {
-            return DelegateForCreateInstance( type, bindingFlags, parameters.GetTypeArray() )( parameters );
+            return DelegateForCreateInstance( type, bindingFlags, parameters.ToTypeArray() )( parameters );
         }
 
         /// <summary>

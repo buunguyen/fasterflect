@@ -22,10 +22,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Fasterflect;
 using Fasterflect.Caching;
 using Fasterflect.Emitter;
-using Fasterflect.ObjectConstruction;
+using Fasterflect.Probing;
 
 namespace FasterflectBenchmark
 {
@@ -94,7 +95,7 @@ namespace FasterflectBenchmark
 
         public static void Main( string[] args )
         {
-            
+            Prepare();
 #if DOT_NET_4
             Console.SetOut( new StreamWriter( "benchmark.4.txt" ) );
 #else
@@ -915,6 +916,29 @@ namespace FasterflectBenchmark
                 watch.Reset();
             }
         }
+        #endregion
+
+        #region Prepare Environment
+		private static void Prepare()
+		{
+			CollectGarbage();
+			IncreaseThreadAndProcessPriority();
+		}
+
+    	private static void CollectGarbage()
+		{
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			GC.Collect();
+			GC.WaitForFullGCComplete();
+		}
+
+		private static void IncreaseThreadAndProcessPriority()
+		{
+			Thread.CurrentThread.Priority = ThreadPriority.Highest;
+			Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.RealTime;
+			Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(1);
+		}
         #endregion
     }
 }

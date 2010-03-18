@@ -66,7 +66,7 @@ namespace Fasterflect
 		public override bool TryInvokeMember( InvokeMemberBinder binder, object[] args, out object result )
 		{
 			var bindingFlags = Flags.InstanceAnyVisibility | Flags.IgnoreParameterModifiers;
-			var method = target.GetType().Method( binder.Name, args.GetTypeArray(), bindingFlags );
+			var method = target.GetType().Method( binder.Name, args.ToTypeArray(), bindingFlags );
 			result = method == null ? null : method.Call( target, args );
 			return method != null;
 		}

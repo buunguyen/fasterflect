@@ -19,12 +19,13 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using Fasterflect.Caching;
 
-namespace Fasterflect.ObjectConstruction
+namespace Fasterflect.Probing
 {
 	/// <summary>
 	/// Helper class for producing invocation maps that describe how to create an instance of an object
@@ -40,7 +41,7 @@ namespace Fasterflect.ObjectConstruction
 		private static readonly Cache<int, MethodMap> mapCache = new Cache<int, MethodMap>();
 
 		#region Map Construction
-		public static MethodMap PrepareInvoke( this Type type, string[] paramNames, Type[] parameterTypes,
+		public static MethodMap PrepareInvoke( Type type, string[] paramNames, Type[] parameterTypes,
 		                                       object[] sampleParamValues )
 		{
             SourceInfo sourceInfo = new SourceInfo(type, paramNames, parameterTypes);
@@ -56,13 +57,41 @@ namespace Fasterflect.ObjectConstruction
 		#endregion
 
 		#region Map Construction Helpers
-		private static MethodMap DetermineBestConstructorMatch( Type type, string[] paramNames, Type[] parameterTypes,
+		internal static MethodMap DetermineBestConstructorMatch( Type type, string[] paramNames, Type[] parameterTypes,
 		                                                        object[] sampleParamValues )
 		{
-			MethodMap bestMap = null;
-			foreach( ConstructorInfo ci in type.Constructors() )
+			MethodMap map = DetermineBestMatch( type.GetConstructors(), true, paramNames, parameterTypes, sampleParamValues );
+			if( map != null )
 			{
-                MethodMap map = CreateMap(ci, paramNames, parameterTypes, sampleParamValues, true);
+				return map;
+			}
+			var sb = new StringBuilder();
+			sb.AppendFormat( "No constructor found for type {0} using parameters:{1}", type.Name, Environment.NewLine );
+            sb.AppendFormat("{0}{1}", string.Join(", ", Enumerable.Range(0, paramNames.Length).Select(i => string.Format("{0}:{1}", paramNames[i], parameterTypes[i])).ToArray()), Environment.NewLine);
+			throw new MissingMethodException( sb.ToString() );
+		}
+		internal static MethodMap DetermineBestMethodMatch( IEnumerable<MethodBase> methods, bool mustUseAllParameters, string[] paramNames, 
+															Type[] parameterTypes, object[] sampleParamValues )
+		{
+			MethodMap map = DetermineBestMatch( methods, mustUseAllParameters, paramNames, parameterTypes, sampleParamValues );
+			if( map != null )
+			{
+				return map;
+			}
+			var sb = new StringBuilder();
+			sb.AppendFormat( "No method found ({0} candidates examined) matching the parameters:{1}", methods.ToList().Count, Environment.NewLine );
+			//sb.AppendFormat( "{0}{1}", Format( parameters, "=", ", " ), Environment.NewLine );
+            sb.AppendFormat("{0}{1}", string.Join(", ", Enumerable.Range(0, paramNames.Length).Select(i => string.Format("{0}:{1}", paramNames[i], parameterTypes[i])).ToArray()), Environment.NewLine);
+			throw new MissingMethodException( sb.ToString() );
+		}
+
+		private static MethodMap DetermineBestMatch( IEnumerable<MethodBase> methods, bool mustUseAllParameters,
+													 string[] paramNames, Type[] parameterTypes, object[] sampleParamValues )
+		{
+			MethodMap bestMap = null;
+			foreach( MethodBase method in methods )
+			{
+                MethodMap map = CreateMap( method, paramNames, parameterTypes, sampleParamValues, mustUseAllParameters );
 				if( map != null && map.IsValid )
 				{
 					bool isBetter = bestMap == null;
@@ -82,21 +111,18 @@ namespace Fasterflect.ObjectConstruction
 				bestMap.InitializeInvoker();
 				return bestMap;
 			}
-			var sb = new StringBuilder();
-			sb.AppendFormat( "No constructor found for type {0} using parameters:{1}", type.Name, Environment.NewLine );
-            sb.AppendFormat("{0}{1}", string.Join(", ", Enumerable.Range(0, paramNames.Length).Select(i => string.Format("{0}:{1}", paramNames[i], parameterTypes[i])).ToArray()), Environment.NewLine);
-			throw new MissingMethodException( sb.ToString() );
+			return null;
 		}
 
 		private static MethodMap CreateMap( MethodBase method, string[] paramNames, Type[] parameterTypes,
-		                                    object[] sampleParamValues, bool allowUnusedParameters )
+		                                    object[] sampleParamValues, bool mustUseAllParameters )
 		{
 			if( method.IsConstructor )
 			{
-                return new ConstructorMap(method as ConstructorInfo, paramNames, parameterTypes, sampleParamValues,
-				                           allowUnusedParameters );
+                return new ConstructorMap( method as ConstructorInfo, paramNames, parameterTypes, sampleParamValues,
+				                           mustUseAllParameters );
 			}
-            return new MethodMap(method, paramNames, parameterTypes, sampleParamValues, allowUnusedParameters);
+            return new MethodMap( method, paramNames, parameterTypes, sampleParamValues, mustUseAllParameters );
 		}
 		#endregion
 	}

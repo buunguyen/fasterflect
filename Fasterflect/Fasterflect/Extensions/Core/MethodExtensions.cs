@@ -47,7 +47,7 @@ namespace Fasterflect
         /// <seealso cref="CallMethod(System.Type,string,System.Type[],object[])"/>
         public static object CallMethod( this Type type, string name, params object[] parameters )
         {
-            return DelegateForCallStaticMethod( type, name, parameters.GetTypeArray() )( parameters );
+            return DelegateForCallStaticMethod( type, name, parameters.ToTypeArray() )( parameters );
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Fasterflect
                                      params object[] parameters )
         {
             return
-                DelegateForCallStaticMethod( type, name, parameterTypes ?? parameters.GetTypeArray() )(
+                DelegateForCallStaticMethod( type, name, parameterTypes ?? parameters.ToTypeArray() )(
                     parameters );
         }
 
@@ -81,7 +81,7 @@ namespace Fasterflect
         public static object CallMethod( this Type type, string name, Flags bindingFlags,
                                      params object[] parameters )
         {
-            return DelegateForCallStaticMethod( type, name, bindingFlags, parameters.GetTypeArray() )( parameters );
+            return DelegateForCallStaticMethod( type, name, bindingFlags, parameters.ToTypeArray() )( parameters );
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Fasterflect
         /// <seealso cref="CallMethod(object,string,System.Type[],object[])"/>
         public static object CallMethod( this object obj, string name, params object[] parameters )
         {
-            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, parameters.GetTypeArray() )( obj, parameters );
+            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, parameters.ToTypeArray() )( obj, parameters );
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace Fasterflect
         public static object CallMethod( this object obj, string name, Flags bindingFlags,
                                      params object[] parameters )
         {
-            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, bindingFlags, parameters.GetTypeArray() )(
+            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, bindingFlags, parameters.ToTypeArray() )(
             						  obj, parameters );
         }
 

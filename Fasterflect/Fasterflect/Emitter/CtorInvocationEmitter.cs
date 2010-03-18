@@ -27,7 +27,7 @@ namespace Fasterflect.Emitter
 	internal class CtorInvocationEmitter : InvocationEmitter
     {
         public CtorInvocationEmitter(ConstructorInfo ctorInfo, Flags bindingFlags)
-            : this(ctorInfo.DeclaringType, bindingFlags, ctorInfo.GetParameters().GetTypeArray(), ctorInfo) { }
+            : this(ctorInfo.DeclaringType, bindingFlags, ctorInfo.GetParameters().ToTypeArray(), ctorInfo) { }
 
         public CtorInvocationEmitter(Type targetType, Flags bindingFlags, Type[] paramTypes)
             : this(targetType, bindingFlags, paramTypes, null) { }
