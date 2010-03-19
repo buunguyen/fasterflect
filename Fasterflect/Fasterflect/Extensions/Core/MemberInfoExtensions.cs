@@ -107,6 +107,14 @@ namespace Fasterflect
             var property = member as PropertyInfo;
             return (field != null && ! field.IsInitOnly && ! field.IsLiteral) || (property != null && property.CanWrite);
         }
+        /// <summary>
+        /// Determines whether the given <paramref name="member"/> is invokable.
+        /// </summary>
+        /// <returns>True for methods and constructors, false otherwise.</returns>
+        public static bool IsInvokable( this MemberInfo member )
+        {
+        	return member is MethodBase;
+        }
 
         /// <summary>
         /// Determines whether the given <paramref name="member"/> is a static member.
