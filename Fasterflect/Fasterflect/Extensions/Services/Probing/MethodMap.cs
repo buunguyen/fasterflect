@@ -161,16 +161,16 @@ namespace Fasterflect.Probing
 						errorText = string.Format( "constructor parameter {0} of type {1}", parameter.Name, parameter.ParameterType );
 					}
 				}
-				#endregion
-
-				#region No parameter handling (member check)
 				// method can only be invoked if we have the required number of parameters
 				// parameters are checked from left to right (so any required number wont be enough)
 				if( foundParam && methodParameterIndex < requiredParameterCount )
 				{
 					requiredFoundCount++;
 				}
-				if( ! foundParam )
+				#endregion
+
+				#region No parameter handling (member check)
+				if( ! foundParam && method is ConstructorInfo )
 				{
 					// check if we can use reflection to set some members
 					MemberInfo member = type.Property( paramName, Flags.InstanceAnyVisibility | Flags.IgnoreCase );
@@ -192,6 +192,7 @@ namespace Fasterflect.Probing
 					{
 						members[ invokeParamIndex ] = member;
 						// input not included in method call but member field or property is present
+						parameterUsageCount++;
 						parameterReflectionMask[ invokeParamIndex ] = true;
 						cost += 10;
 						// flag input parameter for type conversion
@@ -220,6 +221,7 @@ namespace Fasterflect.Probing
 
 			#region Default value injection
 			// check whether method has unused parameters
+			/*
 			if( noColumnForParameter > 0 )
 			{
 				for( int methodParamIndex = 0; methodParamIndex < parameters.Count; methodParamIndex++ )
@@ -268,6 +270,7 @@ namespace Fasterflect.Probing
 					}
 				}
 			}
+		 	*/
 			#endregion
 
 			#region Cost calculation and map validity checks

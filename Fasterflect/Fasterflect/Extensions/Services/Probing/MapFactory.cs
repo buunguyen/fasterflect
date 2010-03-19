@@ -60,7 +60,7 @@ namespace Fasterflect.Probing
 		internal static MethodMap DetermineBestConstructorMatch( Type type, string[] paramNames, Type[] parameterTypes,
 		                                                        object[] sampleParamValues )
 		{
-			MethodMap map = DetermineBestMatch( type.GetConstructors(), true, paramNames, parameterTypes, sampleParamValues );
+			MethodMap map = DetermineBestMatch( type.GetConstructors(), false, paramNames, parameterTypes, sampleParamValues );
 			if( map != null )
 			{
 				return map;
