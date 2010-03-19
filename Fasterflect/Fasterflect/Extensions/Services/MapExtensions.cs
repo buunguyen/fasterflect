@@ -82,8 +82,9 @@ namespace Fasterflect
             {
                 throw new ArgumentException( "Unable to map members to or from a null instance." );
             }
-			var emitter = new MapEmitter( source.GetType(), target.GetType(), sourceTypes, targetTypes, bindingFlags, names );
-            var copier = emitter.GetDelegate();
+		    var emitter = new MapEmitter( source.GetType(), target.GetTypeAdjusted(), sourceTypes, targetTypes, bindingFlags,
+		                                  names );
+            var copier = (MemberCopier)emitter.GetDelegate();
             copier( source, target );
 		}
     	#endregion

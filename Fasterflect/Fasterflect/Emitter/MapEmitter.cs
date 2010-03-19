@@ -25,108 +25,127 @@ using Fasterflect.Caching;
 
 namespace Fasterflect.Emitter
 {
-    internal class MapEmitter
+    internal class MapEmitter : BaseEmitter
     {
-        private static volatile Cache<long, Delegate> cache = new Cache<long, Delegate>();
-        private readonly long cacheKey;
         private readonly Type sourceType;
-        private readonly Type targetType;
-		private readonly MemberTypes sourceMemberTypes;
-		private readonly MemberTypes targetMemberTypes;
-        private readonly Flags bindingFlags;
-		private readonly string[] names;
+        private readonly MemberTypes sourceMemberTypes;
+        private readonly MemberTypes targetMemberTypes;
+        private readonly string[] names;
 
-		public MapEmitter( Type sourceType, Type targetType, MemberTypes sourceMemberTypes, MemberTypes targetMemberTypes, 
-						   Flags bindingFlags, params string[] names )
-		{
+        public MapEmitter(Type sourceType, Type targetType, MemberTypes sourceMemberTypes, MemberTypes targetMemberTypes,
+                           Flags bindingFlags, params string[] names)
+        {
             this.sourceType = sourceType;
-            this.targetType = targetType;
-			this.sourceMemberTypes = sourceMemberTypes;
-			this.targetMemberTypes = targetMemberTypes;
-			this.names = names;
-			// auto-apply IgnoreCase if we're mapping from one membertype to another
-			bool different = (sourceMemberTypes & targetMemberTypes) != sourceMemberTypes;
-			this.bindingFlags = Flags.SetIf( bindingFlags, Flags.IgnoreCase, different );
-			// calculate the key for caching of the delegate
-            cacheKey = (((long) sourceType.GetHashCode() << 32) + targetType.GetHashCode()) ^
-                       (bindingFlags.GetHashCode() ^ sourceMemberTypes.GetHashCode() ^ targetMemberTypes.GetHashCode());
-			if( names != null && names.Length > 0 )
-			{
-				foreach( var name in names )
-				{
-					cacheKey += name.GetHashCode();
-				}
-			}
-		}
+            this.sourceMemberTypes = sourceMemberTypes;
+            this.targetMemberTypes = targetMemberTypes;
+            this.names = names;
 
-        public MemberCopier GetDelegate()
-        {
-            MemberCopier action = cache.Get( cacheKey ) as MemberCopier;
-            if( action == null )
+            // auto-apply IgnoreCase if we're mapping from one membertype to another
+            bool different = (sourceMemberTypes & targetMemberTypes) != sourceMemberTypes;
+            bindingFlags = Flags.SetIf(bindingFlags, Flags.IgnoreCase, different);
+
+            var parameterTypes = new Type[1 + (names == null ? 0 : names.Length)];
+            parameterTypes[0] = sourceType;
+            for (int i = 1; i < parameterTypes.Length; i++)
             {
-                action = CreateDelegate();
-                cache.Insert( cacheKey, action, CacheStrategy.Temporary );
+                parameterTypes[i] = typeof(string);
             }
-            return action;
+            callInfo = new CallInfo(targetType, bindingFlags, MemberTypes.Custom, "Copier", parameterTypes, null);
+
         }
 
-        protected internal MemberCopier CreateDelegate()
+        protected internal override int GetCacheKey()
         {
-            var name = string.Format( "Map_{0}_to_{1}", sourceType.Name, targetType.Name );
-            var args = new[] { Constants.ObjectType, Constants.ObjectType };
-            DynamicMethod method = BaseEmitter.CreateDynamicMethod( name, sourceType, null, args );
-            var generator = new EmitHelper( method.GetILGenerator() );
-
-            foreach( var pair in GetMatchingMembers() )
+            int key = ((sourceType.GetHashCode() << 32) + callInfo.TargetType.GetHashCode()) ^
+                           (callInfo.BindingFlags.GetHashCode() ^ sourceMemberTypes.GetHashCode() ^ targetMemberTypes.GetHashCode());
+            if (names != null && names.Length > 0)
             {
-				generator
-				    .ldarg_1
-				    .castclass( targetType )
-				    .ldarg_0
-				    .castclass( sourceType );
-				GenerateGetMemberValue( generator, pair.Key );
-				GenerateSetMemberValue( generator, pair.Value );
-			}
-            generator.ret();
-            return (MemberCopier) method.CreateDelegate( typeof(MemberCopier) );
+                for (int index = 0; index < names.Length; index++)
+                {
+                    var name = names[index];
+                    key += name.GetHashCode();
+                }
+            }
+            return key;
         }
-		private void GenerateGetMemberValue( EmitHelper generator, MemberInfo member )
-		{
-			if( member is FieldInfo )
-			{
-				generator.ldfld( (FieldInfo) member );
-			}
-			else
-			{
-				var method = ((PropertyInfo) member).GetGetMethod( true );
-				generator.callvirt( method, null );
-			}
-		}
-		private void GenerateSetMemberValue( EmitHelper generator, MemberInfo member )
-		{
-			if( member is FieldInfo )
-			{
-				generator.stfld( (FieldInfo) member );
-			}
-			else
-			{
-				var method = ((PropertyInfo) member).GetSetMethod( true );
-				generator.callvirt( method, null );
-			}
-		}
+
+        protected internal override DynamicMethod CreateDynamicMethod()
+        {
+            return CreateDynamicMethod(sourceType.Name, sourceType, null, new[] { Constants.ObjectType, Constants.ObjectType });
+        }
+
+        protected internal override Delegate CreateDelegate()
+        {
+            bool handleInnerStruct = !callInfo.BindingFlags.IsSet(Flags.Static) && callInfo.TargetType.IsValueType;
+
+            if (handleInnerStruct)
+            {
+                generator.ldarg_1.end();                     // load arg-1 (target)
+                generator.DeclareLocal(callInfo.TargetType); // TargetType localStr;
+                generator
+                    .castclass(Constants.StructType) // (ValueTypeHolder)wrappedStruct
+                    .callvirt(StructGetMethod) // <stack>.get_Value()
+                    .unbox_any(callInfo.TargetType) // unbox <stack>
+                    .stloc(0); // localStr = <stack>
+            }
+
+            foreach (var pair in GetMatchingMembers())
+            {
+                if (handleInnerStruct)
+                    generator.ldloca_s(0).end(); // load &localStr
+                else
+                    generator.ldarg_1.castclass(callInfo.TargetType).end(); // ((TargetType)target)
+                generator.ldarg_0.castclass(sourceType);
+                GenerateGetMemberValue(pair.Key);
+                GenerateSetMemberValue(pair.Value);
+            }
+
+            if (handleInnerStruct)
+            {
+                StoreLocalToInnerStruct(1, 0);     // ((ValueTypeHolder)this)).Value = tmpStr
+            }
+
+            generator.ret();
+            return method.CreateDelegate(typeof(MemberCopier));
+        }
+
+        private void GenerateGetMemberValue(MemberInfo member)
+        {
+            if (member is FieldInfo)
+            {
+                generator.ldfld((FieldInfo)member);
+            }
+            else
+            {
+                var method = ((PropertyInfo)member).GetGetMethod(true);
+                generator.callvirt(method, null);
+            }
+        }
+        private void GenerateSetMemberValue(MemberInfo member)
+        {
+            if (member is FieldInfo)
+            {
+                generator.stfld((FieldInfo)member);
+            }
+            else
+            {
+                var method = ((PropertyInfo)member).GetSetMethod(true);
+                generator.callvirt(method, null);
+            }
+        }
 
         internal IDictionary<MemberInfo, MemberInfo> GetMatchingMembers()
         {
-        	StringComparison comparison = bindingFlags.IsSet( Flags.IgnoreCase )
-        	                              	? StringComparison.OrdinalIgnoreCase
-        	                              	: StringComparison.Ordinal;
-            var query = from s in sourceType.Members( sourceMemberTypes, bindingFlags, names )
-                        from t in targetType.Members( targetMemberTypes, bindingFlags, names )
-                        where s.Name.Equals( t.Name, comparison ) && 
-							  t.Type().IsAssignableFrom( s.Type() ) && 
-							  s.IsReadable() && t.IsWritable()
+            StringComparison comparison = callInfo.BindingFlags.IsSet(Flags.IgnoreCase)
+                                            ? StringComparison.OrdinalIgnoreCase
+                                            : StringComparison.Ordinal;
+            var query = from s in sourceType.Members(sourceMemberTypes, callInfo.BindingFlags, names)
+                        from t in callInfo.TargetType.Members(targetMemberTypes, callInfo.BindingFlags, names)
+                        where s.Name.Equals(t.Name, comparison) &&
+                              t.Type().IsAssignableFrom(s.Type()) &&
+                              s.IsReadable() && t.IsWritable()
                         select new { Source = s, Target = t };
-            return query.ToDictionary( k => k.Source, v => v.Target );
+            return query.ToDictionary(k => k.Source, v => v.Target);
         }
     }
 }
