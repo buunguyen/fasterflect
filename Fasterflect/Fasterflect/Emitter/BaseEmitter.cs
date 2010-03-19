@@ -25,27 +25,33 @@ namespace Fasterflect.Emitter
 {
     internal abstract class BaseEmitter
     {
-        private static readonly Cache<CallInfo, Delegate> cache = new Cache<CallInfo, Delegate>();
-        private static readonly MethodInfo structGetMethod =
+        private static readonly Cache<int, Delegate> cache = new Cache<int, Delegate>();
+        protected static readonly MethodInfo StructGetMethod =
             Constants.StructType.GetMethod("get_Value", BindingFlags.Public | BindingFlags.Instance);
-        private static readonly MethodInfo structSetMethod =
+        protected static readonly MethodInfo StructSetMethod =
             Constants.StructType.GetMethod("set_Value", BindingFlags.Public | BindingFlags.Instance);
 
         protected CallInfo callInfo;
         protected DynamicMethod method;
         protected EmitHelper generator;
-
-        public Delegate GetDelegate()
+        
+        internal virtual Delegate GetDelegate()
         {
-            Delegate action = cache.Get( callInfo );
+            var cacheKey = GetCacheKey();
+            Delegate action = cache.Get( cacheKey );
             if( action == null )
             {
                 method = CreateDynamicMethod();
                 generator = new EmitHelper( method.GetILGenerator() );
                 action = CreateDelegate();
-                cache.Insert( callInfo, action, CacheStrategy.Temporary );
+                cache.Insert( cacheKey, action, CacheStrategy.Temporary );
             }
             return action;
+        }
+
+        protected internal virtual int GetCacheKey()
+        {
+            return callInfo.GetHashCode();
         }
 
         protected internal abstract DynamicMethod CreateDynamicMethod();
@@ -64,7 +70,7 @@ namespace Fasterflect.Emitter
         {
             generator
                 .castclass( Constants.StructType ) // (ValueTypeHolder)wrappedStruct
-                .callvirt(structGetMethod) // <stack>.get_Value()
+                .callvirt(StructGetMethod) // <stack>.get_Value()
                 .unbox_any( callInfo.TargetType ) // unbox <stack>
                 .stloc( localPosition ) // localStr = <stack>
                 .ldloca_s( localPosition ); // load &localStr
@@ -72,12 +78,17 @@ namespace Fasterflect.Emitter
 
         protected void StoreLocalToInnerStruct( byte localPosition )
         {
+            StoreLocalToInnerStruct( 0, localPosition ); // 0: 'this'
+        }
+
+        protected void StoreLocalToInnerStruct(byte argPosition, byte localPosition)
+        {
             generator
-                .ldarg_0 // load arg-0 (this)
-                .castclass( Constants.StructType ) // wrappedStruct = (ValueTypeHolder)this
-                .ldloc( localPosition ) // load localStr
-                .boxIfValueType( callInfo.TargetType ) // box <stack>
-                .callvirt( structSetMethod ); // wrappedStruct.set_Value(<stack>)
+                .ldarg(argPosition)
+                .castclass(Constants.StructType) // wrappedStruct = (ValueTypeHolder)this
+                .ldloc(localPosition) // load localStr
+                .boxIfValueType(callInfo.TargetType) // box <stack>
+                .callvirt(StructSetMethod); // wrappedStruct.set_Value(<stack>)
         }
     }
 }
