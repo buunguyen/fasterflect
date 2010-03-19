@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using Fasterflect.Caching;
 
 namespace Fasterflect.Emitter
 {
@@ -51,7 +50,6 @@ namespace Fasterflect.Emitter
                 parameterTypes[i] = typeof(string);
             }
             callInfo = new CallInfo(targetType, bindingFlags, MemberTypes.Custom, "Copier", parameterTypes, null);
-
         }
 
         protected internal override int GetCacheKey()
@@ -76,8 +74,7 @@ namespace Fasterflect.Emitter
 
         protected internal override Delegate CreateDelegate()
         {
-            bool handleInnerStruct = !callInfo.BindingFlags.IsSet(Flags.Static) && callInfo.TargetType.IsValueType;
-
+            bool handleInnerStruct = callInfo.ShouldHandleInnerStruct;
             if (handleInnerStruct)
             {
                 generator.ldarg_1.end();                     // load arg-1 (target)
