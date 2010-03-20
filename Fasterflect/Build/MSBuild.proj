@@ -1,105 +1,132 @@
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- UsingTask TaskName="Dobkin.Common.Tasks.MSTest"AssemblyFile="D:\MyFolder\Dobkin.Common.Tasks.dll"/ -->
-  <PropertyGroup>
-    <AssemblyName>Fasterflect</AssemblyName>
-    <RootRelativeToBuildFile>..\</RootRelativeToBuildFile>
-    <DefineConstants>DOT_NET_4</DefineConstants>
-    <OutputType>Library</OutputType>
-    <Platform>AnyCPU</Platform>
-    <ProcessorArchitecture>msil</ProcessorArchitecture>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <ToolsVersion>4.0</ToolsVersion>
-    <OutputPath>$(RootRelativeToBuildFile)Output\</OutputPath>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration> 
-    <DebugType>None</DebugType>
-    <Optimize>yes</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='DEBUG'">
-    <Optimize>no</Optimize>
-  </PropertyGroup>
+<Project DefaultTargets="Build"	ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<!-- UsingTask TaskName="Dobkin.Common.Tasks.MSTest"AssemblyFile="D:\MyFolder\Dobkin.Common.Tasks.dll"/ -->
+	<PropertyGroup>
+		<AssemblyName>Fasterflect</AssemblyName>
+		<RootRelativeToBuildFile>..\</RootRelativeToBuildFile>
+		<DefineConstants>DOT_NET_4</DefineConstants>
+		<OutputType>Library</OutputType>
+		<Platform>AnyCPU</Platform>
+		<ProcessorArchitecture>msil</ProcessorArchitecture>
+		<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+		<ToolsVersion>4.0</ToolsVersion>
+		<OutputPath>$(RootRelativeToBuildFile)Output\</OutputPath>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<Configuration Condition=" '$(Configuration)' == ''	">Release</Configuration> 
+		<DebugType>None</DebugType>
+		<Optimize>yes</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='DEBUG'">
+		<Optimize>no</Optimize>
+	</PropertyGroup>
  
-  <ItemGroup>
-    <ProjectToBuild Include="$(RootRelativeToBuildFile)\Fasterflect.sln">
-      <Properties>ToolsVersion=4.0</Properties >
-      <DefineConstants>DOT_NET_40</DefineConstants>
-    </ProjectToBuild>
-  </ItemGroup>
-                 
-  <ItemGroup>
-    <FasterflectSources Include="$(RootRelativeToBuildFile)Fasterflect\**\*.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <UnitTestSources Include="$(RootRelativeToBuildFile)FasterflectTest\**\*.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <SampleSources Include="$(RootRelativeToBuildFile)FasterflectSample\**\*.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <BenchmarkSources Include="$(RootRelativeToBuildFile)FasterflectBenchmark\**\*.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectOutputs Include="$(RootRelativeToBuildFile)Fasterflect\bin\$(Configuration)\*.*" />
-    <ProjectOutputs Include="$(RootRelativeToBuildFile)FasterflectTest\bin\$(Configuration)\*.*" />
-    <ProjectOutputs Include="$(RootRelativeToBuildFile)FasterflectSample\bin\$(Configuration)\*.*" />
-    <ProjectOutputs Include="$(RootRelativeToBuildFile)FasterflectBenchmark\bin\$(Configuration)\*.*" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectAssemblies Include="$(RootRelativeToBuildFile)Fasterflect\bin\$(Configuration)\*.dll" />
-    <ProjectAssemblies Include="$(RootRelativeToBuildFile)FasterflectTest\bin\$(Configuration)\*.dll" />
-    <ProjectAssemblies Include="$(RootRelativeToBuildFile)FasterflectSample\bin\$(Configuration)\*.exe" />
-    <ProjectAssemblies Include="$(RootRelativeToBuildFile)FasterflectBenchmark\bin\$(Configuration)\*.exe" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectToBuild	Include="$(RootRelativeToBuildFile)\Fasterflect.sln">
+			<Properties>ToolsVersion=4.0</Properties >
+			<DefineConstants>DOT_NET_40</DefineConstants>
+		</ProjectToBuild>
+	</ItemGroup>
+
+	
+	<ItemGroup>
+		<ProjectAssemblies Include="$(RootRelativeToBuildFile)Fasterflect\bin\$(Configuration)\*.dll" />
+		<ProjectAssemblies Include="$(RootRelativeToBuildFile)FasterflectTest\bin\$(Configuration)\*.dll" />
+		<ProjectAssemblies Include="$(RootRelativeToBuildFile)FasterflectSample\bin\$(Configuration)\*.exe"	/>
+		<ProjectAssemblies Include="$(RootRelativeToBuildFile)FasterflectBenchmark\bin\$(Configuration)\*.exe" />
+	</ItemGroup>
+			 
+	<ItemGroup>
+		<FasterflectSources	Include="$(RootRelativeToBuildFile)Fasterflect\**\*.cs"	/>
+	</ItemGroup>
+	<ItemGroup>
+		<UnitTestSources Include="$(RootRelativeToBuildFile)FasterflectTest\**\*.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<SampleSources Include="$(RootRelativeToBuildFile)FasterflectSample\**\*.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<BenchmarkSources Include="$(RootRelativeToBuildFile)FasterflectBenchmark\**\*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectOutputs	Include="$(RootRelativeToBuildFile)Fasterflect\bin\$(Configuration)\*.*" />
+		<ProjectOutputs	Include="$(RootRelativeToBuildFile)FasterflectTest\bin\$(Configuration)\*.*" />
+		<ProjectOutputs	Include="$(RootRelativeToBuildFile)FasterflectSample\bin\$(Configuration)\*.*" />
+		<ProjectOutputs	Include="$(RootRelativeToBuildFile)FasterflectBenchmark\bin\$(Configuration)\*.*" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectAssemblies Include="$(RootRelativeToBuildFile)Fasterflect\bin\$(Configuration)\*.dll" />
+		<ProjectAssemblies Include="$(RootRelativeToBuildFile)FasterflectTest\bin\$(Configuration)\*.dll" />
+		<ProjectAssemblies Include="$(RootRelativeToBuildFile)FasterflectSample\bin\$(Configuration)\*.exe"	/>
+		<ProjectAssemblies Include="$(RootRelativeToBuildFile)FasterflectBenchmark\bin\$(Configuration)\*.exe" />
+	</ItemGroup>
  
-  <Target Name="Prepare">
-    <MakeDir Directories="$(OutputPath)" Condition="!Exists('$(OutputPath)')" />
-  </Target>
+	<Target Name="Prepare">
+	<MakeDir Directories="$(OutputPath)" Condition="!Exists('$(OutputPath)')" />
+	</Target>
 
-  <Target Name="Compile40" DependsOnTargets="Prepare">
-    <MakeDir Directories="$(OutputPath)$(ToolsVersion)" Condition="!Exists('$(OutputPath)$(ToolsVersion)')" />
-    <!-- MSBuild Projects="@(ProjectToBuild)" Targets="Build" /-->
-    <!-- MSBuild Projects="$(RootRelativeToBuildFile)\Fasterflect.sln" Targets="Build" /-->
-    <Csc Sources="@(FasterflectSources)" DefineConstants="DOT_NET_4" Optimize="$(Optimize)" 
-		 OutputAssembly="$(OutputPath)4.0\$(AssemblyName).dll" Platform="$(Platform)" TargetType="library"
-		 TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30128\" />
-    <Csc Sources="@(UnitTestSources)" DefineConstants="DOT_NET_4" Optimize="$(Optimize)" 
-		 OutputAssembly="$(OutputPath)4.0\$(AssemblyName)Test.dll" Platform="$(Platform)" TargetType="library"
-		 TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30128\"
-		 AdditionalLibPaths="$(OutputPath)4.0\;c:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\PublicAssemblies"
-		 References="Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll;Fasterflect.dll" /> 
-    <!-- Copy SourceFiles="@(ProjectAssemblies)" DestinationFolder="$(OutputPath)$(ToolsVersion)\" /-->       
-  </Target>
-  <Target Name="Compile35" DependsOnTargets="Prepare">
-    <MakeDir Directories="$(OutputPath)3.5" Condition="!Exists('$(OutputPath)$(ToolsVersion)')" />
-    <Csc Sources="@(FasterflectSources)" DefineConstants="DOT_NET_35" Optimize="$(Optimize)" 
-		 OutputAssembly="$(OutputPath)3.5\$(AssemblyName).dll" Platform="$(Platform)" TargetType="library"
-		 TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v3.5\" />
-    <Csc Sources="@(UnitTestSources)" DefineConstants="DOT_NET_35" Optimize="$(Optimize)" 
-		 OutputAssembly="$(OutputPath)3.5\$(AssemblyName)Test.dll" Platform="$(Platform)" TargetType="library"
-		 TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v3.5\"
-		 AdditionalLibPaths="$(OutputPath)3.5\;c:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\PublicAssemblies"
-		 References="Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll;Fasterflect.dll" /> 
-  </Target>
+	<Target Name="Compile40" DependsOnTargets="Prepare">
+		<MakeDir Directories="$(OutputPath)$(ToolsVersion)"	Condition="!Exists('$(OutputPath)4.0')"	/>
+		<!-- MSBuild Projects="@(ProjectToBuild)" Targets="Build" /-->
+		<!-- MSBuild Projects="$(RootRelativeToBuildFile)\Fasterflect.sln" Targets="Build" /-->
+		<Csc Sources="@(FasterflectSources)" DefineConstants="DOT_NET_4" Optimize="$(Optimize)"	
+			OutputAssembly="$(OutputPath)4.0\$(AssemblyName).dll" Platform="$(Platform)" TargetType="library"
+			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30128\" />
+		<Csc Sources="@(UnitTestSources)" DefineConstants="DOT_NET_4" Optimize="$(Optimize)" 
+			OutputAssembly="$(OutputPath)4.0\$(AssemblyName)Test.dll" Platform="$(Platform)" TargetType="library"
+			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30128\"
+			AdditionalLibPaths="$(OutputPath)4.0\;c:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\PublicAssemblies"
+			References="Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll;Fasterflect.dll"	/> 
+		<!-- Copy SourceFiles="@(ProjectAssemblies)" DestinationFolder="$(OutputPath)$(ToolsVersion)\" /-->		  
+	</Target>
+	<Target Name="Compile35" DependsOnTargets="Prepare">
+		<MakeDir Directories="$(OutputPath)3.5"	Condition="!Exists('$(OutputPath)3.5')" />
+		<Csc Sources="@(FasterflectSources)" DefineConstants="DOT_NET_35" Optimize="$(Optimize)" 
+			OutputAssembly="$(OutputPath)3.5\$(AssemblyName).dll" Platform="$(Platform)" TargetType="library"
+			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v3.5\" />
+		<Csc Sources="@(UnitTestSources)" DefineConstants="DOT_NET_35" Optimize="$(Optimize)" 
+			OutputAssembly="$(OutputPath)3.5\$(AssemblyName)Test.dll" Platform="$(Platform)" TargetType="library"
+			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v3.5\"
+			AdditionalLibPaths="$(OutputPath)3.5\;c:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\PublicAssemblies"
+			References="Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll;Fasterflect.dll" /> 
+	</Target>
+	<Target Name="CompileSilverlight40" DependsOnTargets="Prepare">
+		<MakeDir Directories="$(OutputPath)Silverlight"	Condition="!Exists('$(OutputPath)Silverlight')" />
+		<MakeDir Directories="$(OutputPath)Silverlight\4.0"	Condition="!Exists('$(OutputPath)Silverlight\4.0')" />
+		<Csc Sources="@(FasterflectSources)" DefineConstants="DOT_NET_35" Optimize="$(Optimize)"
+			OutputAssembly="$(OutputPath)Silverlight\4.0\$(AssemblyName).dll" Platform="$(Platform)" TargetType="library"
+			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30128\"
+			NoStandardLib="true" AdditionalLibPaths="c:\Program Files\Microsoft Silverlight\4.0.50303.0" 
+			References="c:\Program Files\Microsoft Silverlight\4.0.50303.0\mscorlib.dll" />
+		<!--
+		<Csc Sources="@(FasterflectSources)" DefineConstants="DOT_NET_4" Optimize="$(Optimize)"	
+			OutputAssembly="$(OutputPath)Silverlight\4.0\$(AssemblyName).dll" Platform="$(Platform)" TargetType="library"
+			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30128\"
+			NoStandardLib="true" AdditionalLibPaths="@(SilverlightLibPaths)" References="@(SilverlightReferences)">
+			<Reference	Include="MyCodeLibrary">
+				<Aliases>LS1</Aliases>
+			</Reference>
+		</Csc>
+		-->
+	</Target>
 
-  <Target Name="Build" DependsOnTargets="Compile40;Compile35" />
+	<Target Name="Build" DependsOnTargets="Compile40;Compile35" />
 
-  <Target Name="Clean">
-    <Delete Files="@(ProjectOutputs)" />
-  </Target>
+	<Target Name="Clean">
+		<Delete	Files="@(ProjectOutputs)" />
+	</Target>
 
-  <Target Name="Rebuild" DependsOnTargets="Clean;Build" />
-  
-  <Target Name="RunTests40" DependsOnTargets="Build">  
-	<Exec Command='"c:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\mstest.exe" /testcontainer:FasterflectTest.dll'
-		WorkingDirectory="$(OutputPath)4.0" />
-    <Message Text="Tests ran successfully!"></Message>  
-  </Target>    
-  <Target Name="RunTests35" DependsOnTargets="Build">  
-	<Exec Command='"c:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\mstest.exe" /testcontainer:FasterflectTest.dll'
-		WorkingDirectory="$(OutputPath)3.5" />
-    <Message Text="Tests ran successfully!"></Message>  
-  </Target>    
-  <Target Name="RunTests" DependsOnTargets="RunTests40;RunTests35" />  
+	<Target Name="Rebuild" DependsOnTargets="Clean;Build"	/>
+
+	<Target Name="RunTests40"	DependsOnTargets="Build">  
+		<Exec Command='"c:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\mstest.exe" /testcontainer:FasterflectTest.dll'
+			WorkingDirectory="$(OutputPath)4.0"	/>
+		<Message Text="Tests ran successfully!"></Message>	
+	</Target>	   
+	<Target Name="RunTests35"	DependsOnTargets="Build">  
+		<Exec Command='"c:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\mstest.exe" /testcontainer:FasterflectTest.dll'
+			WorkingDirectory="$(OutputPath)3.5"	/>
+		<Message Text="Tests ran successfully!"></Message>	
+	</Target>	   
+	<Target Name="RunTests" DependsOnTargets="RunTests40;RunTests35" />  
   
 </Project>

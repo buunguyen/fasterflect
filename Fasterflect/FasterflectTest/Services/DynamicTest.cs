@@ -25,6 +25,7 @@ using FasterflectTest.SampleModel.People;
 
 namespace FasterflectTest.Services
 {
+#if DOT_NET_4
     [TestClass]
     public class DynamicTest
 	{
@@ -56,4 +57,5 @@ namespace FasterflectTest.Services
 			Assert.AreEqual( "Value = 5", obj.GetMessage() );
 		}
 	}
+#endif
 }
