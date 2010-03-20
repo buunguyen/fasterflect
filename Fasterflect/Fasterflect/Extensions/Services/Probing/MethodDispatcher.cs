@@ -1,5 +1,4 @@
 ﻿#region License
-
 // Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,7 +14,6 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System;
@@ -31,7 +29,8 @@ namespace Fasterflect.Probing
 	/// </summary>
 	public class MethodDispatcher
 	{
-		private readonly List<MethodInfo> methodPool = new List<MethodInfo>();
+		//private readonly List<MethodInfo> methodPool = new List<MethodInfo>();
+		private readonly List<MethodBase> methodPool = new List<MethodBase>();
 
 		/// <summary>
 		/// Add a method to the list of available methods for this method dispatcher.
@@ -40,9 +39,13 @@ namespace Fasterflect.Probing
 		public void AddMethod( MethodInfo method )
 		{
 			if( method.IsStatic )
+			{
 				throw new ArgumentException( "Method dispatching currently only supports instance methods.", method.Name );
+			}
 			if( method.IsAbstract )
+			{
 				throw new ArgumentException( "Method dispatching does not support abstract methods.", method.Name );
+			}
 			methodPool.Add( method );
 		}
 
@@ -57,19 +60,19 @@ namespace Fasterflect.Probing
 		/// <returns>The return value of the invocation.</returns>
 		public object Invoke( object obj, bool mustUseAllParameters, object sample )
 		{
-            Type sourceType = sample.GetType();
-            var sourceInfo = new SourceInfo( sourceType );
-        	bool isStatic = obj is Type;
-        	var names = sourceInfo.ParamNames;
-			var types = sourceInfo.ParamTypes;
-            var values = sourceInfo.GetParameterValues( sample );
+			Type sourceType = sample.GetType();
+			var sourceInfo = new SourceInfo( sourceType );
+			bool isStatic = obj is Type;
+			string[] names = sourceInfo.ParamNames;
+			Type[] types = sourceInfo.ParamTypes;
+			object[] values = sourceInfo.GetParameterValues( sample );
 			if( names.Length != values.Length || names.Length != types.Length )
 			{
-                throw new ArgumentException( "Mismatching name, type and value arrays (must be of identical length)." );
+				throw new ArgumentException( "Mismatching name, type and value arrays (must be of identical length)." );
 			}
-            MethodMap map = MapFactory.DetermineBestMethodMatch( methodPool, mustUseAllParameters, names, types, values );
-            return isStatic ? map.Invoke( values ) : map.Invoke( obj, values );
-        }
+			MethodMap map = MapFactory.DetermineBestMethodMatch( methodPool, mustUseAllParameters, names, types, values );
+			return isStatic ? map.Invoke( values ) : map.Invoke( obj, values );
+		}
 
 		/// <summary>
 		/// Invoke the best available match for the supplied parameters. 
@@ -82,45 +85,16 @@ namespace Fasterflect.Probing
 		/// <returns>The return value of the invocation.</returns>
 		public object Invoke( object obj, bool mustUseAllParameters, Dictionary<string, object> parameters )
 		{
-        	bool isStatic = obj is Type;
-        	var names = parameters.Keys.ToArray() ?? new string[ 0 ];
-			var values = parameters.Values.ToArray() ?? new object[ 0 ];
-        	var types = values.ToTypeArray() ?? new Type[ 0 ];
+			bool isStatic = obj is Type;
+			string[] names = parameters.Keys.ToArray() ?? new string[0];
+			object[] values = parameters.Values.ToArray() ?? new object[0];
+			Type[] types = values.ToTypeArray() ?? new Type[0];
 			if( names.Length != values.Length || names.Length != types.Length )
 			{
-                throw new ArgumentException( "Mismatching name, type and value arrays (must be of identical length)." );
+				throw new ArgumentException( "Mismatching name, type and value arrays (must be of identical length)." );
 			}
-            MethodMap map = MapFactory.DetermineBestMethodMatch( methodPool, mustUseAllParameters, names, types, values );
-            return isStatic ? map.Invoke( values ) : map.Invoke( obj, values );
+			MethodMap map = MapFactory.DetermineBestMethodMatch( methodPool, mustUseAllParameters, names, types, values );
+			return isStatic ? map.Invoke( values ) : map.Invoke( obj, values );
 		}
-
-		#region ToString Formatters
-		/// <summary>
-		/// Calling this method returns a string with all entries from the supplied Hashtable.
-		/// </summary>
-		private static string Format( Dictionary<string, object> source, string itemDelimiter, string pairDelimiter,
-		                             int pairsPerLine )
-		{
-			StringBuilder sb = new StringBuilder();
-			int count = 0;
-			foreach( string key in source.Keys )
-			{
-				sb.AppendFormat( "{0}{1}{2}", key, itemDelimiter, source[ key ] );
-				if( ++count < source.Count )
-					sb.Append( pairDelimiter );
-				if( pairsPerLine > 0 && count % pairsPerLine == 0 )
-					sb.Append( Environment.NewLine );
-			}
-			return sb.ToString();
-		}
-
-		/// <summary>
-		/// Calling this method returns a string with all entries from the supplied Hashtable.
-		/// </summary>
-		private static string Format( Dictionary<string, object> source, string itemDelimiter, string pairDelimiter )
-		{
-			return Format( source, itemDelimiter, pairDelimiter, 0 );
-		}
-		#endregion
 	}
 }

@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Fasterflect.Probing;
 
 namespace Fasterflect
@@ -87,9 +88,9 @@ namespace Fasterflect
 			{
                 throw new ArgumentException( "Mismatching name, type and value arrays (must be of identical length)." );
 			}
-            MethodMap map = MapFactory.DetermineBestMethodMatch( type.Methods( methodName ), mustUseAllParameters, names, types, values );
+			MethodMap map = MapFactory.DetermineBestMethodMatch( type.Methods( methodName ).Cast<MethodBase>(), mustUseAllParameters, names, types, values );
 			return isStatic ? map.Invoke( values ) : map.Invoke( obj, values );
-        }
+		}
         #endregion
     }
 }
