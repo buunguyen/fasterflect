@@ -78,10 +78,7 @@ namespace FasterflectTest.Services
 		}
 		#endregion
 
-		public MapTest() : base( new [] { typeof(Person), typeof(PersonStruct) } )
-		//public MapTest() : base( new [] { typeof(Person) } )
-		{
-		}
+		public MapTest() : base( new [] { typeof(Person), typeof(PersonStruct) } ){}
 
     	#region Map
 		[TestMethod]

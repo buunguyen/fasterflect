@@ -25,27 +25,27 @@ namespace Fasterflect.Emitter
     internal class ArrayGetEmitter : BaseEmitter
     {
         public ArrayGetEmitter( Type targetType )
+            : base(new CallInfo( targetType, Flags.InstanceAnyVisibility, MemberTypes.Method,
+                                     Constants.ArrayGetterName, new[] { typeof(int) }, null ))
         {
-            callInfo = new CallInfo( targetType, Flags.InstanceAnyVisibility, MemberTypes.Method,
-                                     Constants.ArrayGetterName, new[] { typeof(int) }, null );
         }
 
         protected internal override DynamicMethod CreateDynamicMethod()
         {
-            return CreateDynamicMethod( Constants.ArrayGetterName, callInfo.TargetType,
+            return CreateDynamicMethod( Constants.ArrayGetterName, CallInfo.TargetType,
                                         Constants.ObjectType, new[] { Constants.ObjectType, Constants.IntType } );
         }
 
         protected internal override Delegate CreateDelegate()
         {
-            Type elementType = callInfo.TargetType.GetElementType();
-            generator.ldarg_0 // load array
-                .castclass( callInfo.TargetType ) // (T[])array
+            Type elementType = CallInfo.TargetType.GetElementType();
+            Generator.ldarg_0 // load array
+                .castclass( CallInfo.TargetType ) // (T[])array
                 .ldarg_1 // load index
                 .ldelem( elementType ) // load array[index]
                 .boxIfValueType( elementType ) // [box] return
                 .ret();
-            return method.CreateDelegate( typeof(ArrayElementGetter) );
+            return Method.CreateDelegate( typeof(ArrayElementGetter) );
         }
     }
 }

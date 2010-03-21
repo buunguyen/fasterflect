@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright 2009 Buu Nguyen (http://www.buunguyen.net/blog)
+
+// Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
 // you may not use this file except in compliance with the License. 
@@ -14,6 +15,7 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
+
 #endregion
 
 namespace FasterflectSample
@@ -30,7 +32,7 @@ namespace FasterflectSample
         public string Name { get; private set; }
         private static int InstanceCount;
 
-        public Person() : this(0) {}
+        public Person() : this(0) { }
 
         public Person(int id) : this(id, string.Empty) { }
 
@@ -46,7 +48,7 @@ namespace FasterflectSample
             get { return Name[index]; }
         }
 
-        private void Walk(int miles) 
+        private void Walk(int miles)
         {
             milesTraveled += miles;
         }
@@ -60,7 +62,7 @@ namespace FasterflectSample
         {
             return InstanceCount;
         }
-        
+
         public static void Swap(ref int i, ref int j)
         {
             int tmp = i;
