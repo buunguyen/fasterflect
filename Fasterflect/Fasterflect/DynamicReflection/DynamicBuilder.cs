@@ -25,7 +25,7 @@ namespace Fasterflect
 {
 	internal sealed class DynamicBuilder : DynamicObject
 	{
-		private Dictionary <string, object> members = new Dictionary <string, object>();  
+		private readonly Dictionary <string, object> members = new Dictionary <string, object>();  
 		
 		#region DynamicObject Overrides
 		/// <summary>

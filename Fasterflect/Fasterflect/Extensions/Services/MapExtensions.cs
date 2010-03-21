@@ -40,8 +40,7 @@ namespace Fasterflect
         /// filter members by substring and <see href="Flags.IgnoreCase"/> to ignore case.</param>
 		public static void Map( this object source, object target, params string[] names )
 		{
-			const MemberTypes memberTypes = MemberTypes.Field | MemberTypes.Property;
-			source.Map( target, memberTypes, memberTypes, Flags.InstanceAnyVisibility, names );
+            DelegateForMap(source.GetType(), target.GetTypeAdjusted(), names)(source, target);
 		}
 
 		/// <summary>
@@ -57,8 +56,7 @@ namespace Fasterflect
         /// filter members by substring and <see href="Flags.IgnoreCase"/> to ignore case.</param>
 		public static void Map( this object source, object target, Flags bindingFlags, params string[] names )
 		{
-			const MemberTypes memberTypes = MemberTypes.Field | MemberTypes.Property;
-			source.Map( target, memberTypes, memberTypes, bindingFlags, names );
+            DelegateForMap(source.GetType(), target.GetTypeAdjusted(), bindingFlags, names)(source, target);
 		}
 
 		/// <summary>
@@ -78,15 +76,63 @@ namespace Fasterflect
 		public static void Map( this object source, object target, MemberTypes sourceTypes, MemberTypes targetTypes, 
 								Flags bindingFlags, params string[] names )
 		{
-            if( source == null || target == null )
-            {
-                throw new ArgumentException( "Unable to map members to or from a null instance." );
-            }
-		    var emitter = new MapEmitter( source.GetType(), target.GetTypeAdjusted(), sourceTypes, targetTypes, bindingFlags,
-		                                  names );
-            var copier = (MemberCopier)emitter.GetDelegate();
-            copier( source, target );
+		    DelegateForMap( source.GetType(), target.GetTypeAdjusted(), sourceTypes, targetTypes, bindingFlags, names )(
+		        source, target );
 		}
+
+        /// <summary>
+        /// Creates a delegate that can map values from fields and properties on the source object to fields and properties with the 
+        /// same name on the target object.
+        /// </summary>
+        /// <param name="sourceType">The type of the source object.</param>
+        /// <param name="targetType">The type of the target object.</param>
+        /// <param name="names">The optional list of member names against which to filter the members that are
+        /// to be mapped. If this parameter is <c>null</c> or empty no name filtering will be applied. The default 
+        /// behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.PartialNameMatch"/> to 
+        /// filter members by substring and <see href="Flags.IgnoreCase"/> to ignore case.</param>
+        public static ObjectMapper DelegateForMap(this Type sourceType, Type targetType, params string[] names)
+        {
+            return DelegateForMap(sourceType, targetType, Flags.InstanceAnyVisibility, names);
+        }
+
+        /// <summary>
+        /// Creates a delegate that can map values from fields and properties on the source object to fields and properties with the 
+        /// same name on the target object.
+        /// </summary>
+        /// <param name="sourceType">The type of the source object.</param>
+        /// <param name="targetType">The type of the target object.</param>
+		/// <param name="bindingFlags">The <see href="Flags"/> used to define the scope when locating members.</param>
+        /// <param name="names">The optional list of member names against which to filter the members that are
+        /// to be mapped. If this parameter is <c>null</c> or empty no name filtering will be applied. The default 
+        /// behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.PartialNameMatch"/> to 
+        /// filter members by substring and <see href="Flags.IgnoreCase"/> to ignore case.</param>
+        public static ObjectMapper DelegateForMap(this Type sourceType, Type targetType, Flags bindingFlags, params string[] names)
+        {
+            const MemberTypes memberTypes = MemberTypes.Field | MemberTypes.Property;
+            return DelegateForMap( sourceType, targetType, memberTypes, memberTypes, bindingFlags, names );
+        }
+
+        /// <summary>
+        /// Creates a delegate that can map values from fields and properties on the source object to fields and properties with the 
+        /// same name on the target object.
+        /// </summary>
+        /// <param name="sourceType">The type of the source object.</param>
+        /// <param name="targetType">The type of the target object.</param>
+        /// <param name="sourceTypes">The member types (Fields, Properties or both) to include on the source.</param>
+        /// <param name="targetTypes">The member types (Fields, Properties or both) to include on the target.</param>
+        /// <param name="bindingFlags">The <see href="Flags"/> used to define the scope when locating members. If
+        /// <paramref name="sourceTypes"/> is different from <paramref name="targetTypes"/> the flag value
+        /// <see cref="Flags.IgnoreCase"/> will automatically be applied.</param>
+        /// <param name="names">The optional list of member names against which to filter the members that are
+        /// to be mapped. If this parameter is <c>null</c> or empty no name filtering will be applied. The default 
+        /// behavior is to check for an exact, case-sensitive match. Pass <see href="Flags.PartialNameMatch"/> to 
+        /// filter members by substring and <see href="Flags.IgnoreCase"/> to ignore case.</param>
+        public static ObjectMapper DelegateForMap(this Type sourceType, Type targetType, MemberTypes sourceTypes, MemberTypes targetTypes,
+                               Flags bindingFlags, params string[] names)
+        {
+            var emitter = new MapEmitter(sourceType, targetType, sourceTypes, targetTypes, bindingFlags, names);
+            return (ObjectMapper)emitter.GetDelegate();
+        }
     	#endregion
 
 		#region Map Companions

@@ -36,88 +36,88 @@ namespace Fasterflect.Emitter
 
 		private MethodInvocationEmitter( Type targetType, Flags bindingFlags, string name, Type[] parameterTypes,
 		                                 MemberInfo methodInfo )
+            : base(new CallInfo(targetType, bindingFlags, MemberTypes.Method, name, parameterTypes, methodInfo))
 		{
-			callInfo = new CallInfo( targetType, bindingFlags, MemberTypes.Method, name, parameterTypes, methodInfo );
 		}
 
 		protected internal override DynamicMethod CreateDynamicMethod()
 		{
-			return CreateDynamicMethod( "invoke", callInfo.TargetType, Constants.ObjectType,
-			                            callInfo.IsStatic
+			return CreateDynamicMethod( "invoke", CallInfo.TargetType, Constants.ObjectType,
+			                            CallInfo.IsStatic
 			                            	? new[] { Constants.ObjectType.MakeArrayType() }
 			                            	: new[] { Constants.ObjectType, Constants.ObjectType.MakeArrayType() } );
 		}
 
 		protected internal override Delegate CreateDelegate()
 		{
-			MethodInfo methodInfo = LookupUtils.GetMethod( callInfo );
-			byte paramArrayIndex = callInfo.IsStatic ? (byte) 0 : (byte) 1;
+			MethodInfo methodInfo = LookupUtils.GetMethod( CallInfo );
+			byte paramArrayIndex = CallInfo.IsStatic ? (byte) 0 : (byte) 1;
 			bool hasReturnType = methodInfo.ReturnType != Constants.VoidType;
 
 			byte startUsableLocalIndex = 0;
-			if( callInfo.HasRefParam )
+			if( CallInfo.HasRefParam )
 			{
 				startUsableLocalIndex = CreateLocalsForByRefParams( paramArrayIndex, methodInfo );
 					// create by_ref_locals from argument array
-				generator.DeclareLocal( hasReturnType
+				Generator.DeclareLocal( hasReturnType
 				                        	? methodInfo.ReturnType
 				                        	: Constants.ObjectType ); // T result;
 				GenerateInvocation( methodInfo, paramArrayIndex, (byte) (startUsableLocalIndex + 1) );
 				if( hasReturnType )
 				{
-					generator.stloc( startUsableLocalIndex ); // result = <stack>;
+					Generator.stloc( startUsableLocalIndex ); // result = <stack>;
 				}
 				AssignByRefParamsToArray( paramArrayIndex ); // store by_ref_locals back to argument array
 			}
 			else
 			{
-				generator.DeclareLocal( hasReturnType
+				Generator.DeclareLocal( hasReturnType
 				                        	? methodInfo.ReturnType
 				                        	: Constants.ObjectType ); // T result;
 				GenerateInvocation( methodInfo, paramArrayIndex, (byte) (startUsableLocalIndex + 1) );
 				if( hasReturnType )
 				{
-					generator.stloc( startUsableLocalIndex ); // result = <stack>;
+					Generator.stloc( startUsableLocalIndex ); // result = <stack>;
 				}
 			}
 
-			if( callInfo.ShouldHandleInnerStruct )
+			if( CallInfo.ShouldHandleInnerStruct )
 			{
 				StoreLocalToInnerStruct( (byte) (startUsableLocalIndex + 1) ); // ((ValueTypeHolder)this)).Value = tmpStr; 
 			}
 			if( hasReturnType )
 			{
-				generator.ldloc( startUsableLocalIndex ) // push result;
+				Generator.ldloc( startUsableLocalIndex ) // push result;
 					.boxIfValueType( methodInfo.ReturnType ); // box result;
 			}
 			else
 			{
-				generator.ldnull.end(); // load null
+				Generator.ldnull.end(); // load null
 			}
-			generator.ret();
+			Generator.ret();
 
-			return method.CreateDelegate( callInfo.IsStatic
+			return Method.CreateDelegate( CallInfo.IsStatic
 			                              	? typeof(StaticMethodInvoker)
 			                              	: typeof(MethodInvoker) );
 		}
 
 		private void GenerateInvocation( MethodInfo methodInfo, byte paramArrayIndex, byte structLocalPosition )
 		{
-			if( !callInfo.IsStatic )
+			if( !CallInfo.IsStatic )
 			{
-				generator.ldarg_0.end(); // load arg-0 (this);
-				if( callInfo.ShouldHandleInnerStruct )
+				Generator.ldarg_0.end(); // load arg-0 (this);
+				if( CallInfo.ShouldHandleInnerStruct )
 				{
-					generator.DeclareLocal( callInfo.TargetType ); // TargetType tmpStr;
+					Generator.DeclareLocal( CallInfo.TargetType ); // TargetType tmpStr;
 					LoadInnerStructToLocal( structLocalPosition ); // tmpStr = ((ValueTypeHolder)this)).Value;
 				}
 				else
 				{
-					generator.castclass( callInfo.TargetType ); // (TargetType)arg-0;
+					Generator.castclass( CallInfo.TargetType ); // (TargetType)arg-0;
 				}
 			}
 			PushParamsOrLocalsToStack( paramArrayIndex ); // push arguments and by_ref_locals
-			generator.call( callInfo.IsStatic || callInfo.IsTargetTypeStruct, methodInfo ); // call OR callvirt
+			Generator.call( CallInfo.IsStatic || CallInfo.IsTargetTypeStruct, methodInfo ); // call OR callvirt
 		}
 	}
 }

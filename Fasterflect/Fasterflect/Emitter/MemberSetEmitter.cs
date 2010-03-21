@@ -37,48 +37,48 @@ namespace Fasterflect.Emitter
 		}
 
         private MemberSetEmitter(Type targetType, Flags bindingFlags, MemberTypes memberType, string fieldOrProperty, MemberInfo memberInfo)
+            : base(new CallInfo(targetType, bindingFlags, memberType, fieldOrProperty, Constants.ArrayOfObjectType, memberInfo))
         {
-            callInfo = new CallInfo(targetType, bindingFlags, memberType, fieldOrProperty, Constants.ArrayOfObjectType, memberInfo);
         }
 
         protected internal override DynamicMethod CreateDynamicMethod()
         {
-            return callInfo.IsStatic
-                                    ? CreateDynamicMethod("setter", callInfo.TargetType, null, new[] { Constants.ObjectType })
-                                    : CreateDynamicMethod("setter", callInfo.TargetType, null,
+            return CallInfo.IsStatic
+                                    ? CreateDynamicMethod("setter", CallInfo.TargetType, null, new[] { Constants.ObjectType })
+                                    : CreateDynamicMethod("setter", CallInfo.TargetType, null,
                                                           new[] { Constants.ObjectType, Constants.ObjectType });
         }
 
 		protected internal override Delegate CreateDelegate()
 		{
-            MemberInfo member = LookupUtils.GetMember(callInfo);
-			bool handleInnerStruct = callInfo.ShouldHandleInnerStruct;
+            MemberInfo member = LookupUtils.GetMember(CallInfo);
+			bool handleInnerStruct = CallInfo.ShouldHandleInnerStruct;
 
-			generator.ldarg_0.end();                            // load arg-0 (this or value-to-be-set)
+			Generator.ldarg_0.end();                            // load arg-0 (this or value-to-be-set)
 			if (handleInnerStruct)
 			{
-				generator.DeclareLocal(callInfo.TargetType);    // TargetType tmpStr
+				Generator.DeclareLocal(CallInfo.TargetType);    // TargetType tmpStr
 				LoadInnerStructToLocal(0);                      // tmpStr = ((ValueTypeHolder)this)).Value;
-                generator.ldarg_1.end();                        // load value-to-be-set;
+                Generator.ldarg_1.end();                        // load value-to-be-set;
 			}
-			else if (!callInfo.IsStatic)
+			else if (!CallInfo.IsStatic)
 			{
-                generator.castclass( callInfo.TargetType )      // (TargetType)this
+                Generator.castclass( CallInfo.TargetType )      // (TargetType)this
 				         .ldarg_1.end();                        // load value-to-be-set;
 			}
 
 			Type memberType = member is FieldInfo
 			                  	? ((FieldInfo) member).FieldType
 			                  	: ((PropertyInfo) member).PropertyType;
-            generator.CastFromObject(memberType);               // unbox | cast value-to-be-set
+            Generator.CastFromObject(memberType);               // unbox | cast value-to-be-set
 			if (member.MemberType == MemberTypes.Field)
 			{
-                generator.stfld(callInfo.IsStatic, (FieldInfo)member);  // (this|tmpStr).field = value-to-be-set;
+                Generator.stfld(CallInfo.IsStatic, (FieldInfo)member);  // (this|tmpStr).field = value-to-be-set;
 			}
 			else
 			{
-				MethodInfo setMethod = LookupUtils.GetPropertySetMethod((PropertyInfo) member, callInfo);
-                generator.call(callInfo.IsStatic || callInfo.IsTargetTypeStruct, setMethod); // (this|tmpStr).set_Prop(value-to-be-set);
+				MethodInfo setMethod = LookupUtils.GetPropertySetMethod((PropertyInfo) member, CallInfo);
+                Generator.call(CallInfo.IsStatic || CallInfo.IsTargetTypeStruct, setMethod); // (this|tmpStr).set_Prop(value-to-be-set);
 			}
 
 			if (handleInnerStruct)
@@ -86,11 +86,11 @@ namespace Fasterflect.Emitter
                 StoreLocalToInnerStruct(0); // ((ValueTypeHolder)this)).Value = tmpStr
 			}
 
-		    generator.ret();
+		    Generator.ret();
 
-			return callInfo.IsStatic
-			       	? method.CreateDelegate(typeof (StaticMemberSetter))
-			       	: method.CreateDelegate(typeof (MemberSetter));
+			return CallInfo.IsStatic
+			       	? Method.CreateDelegate(typeof (StaticMemberSetter))
+			       	: Method.CreateDelegate(typeof (MemberSetter));
 		}
 	}
 }

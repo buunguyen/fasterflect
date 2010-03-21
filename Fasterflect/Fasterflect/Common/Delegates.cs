@@ -86,9 +86,9 @@ namespace Fasterflect
     public delegate object ConstructorInvoker( params object[] parameters );
 
     /// <summary>
-    /// A delegate to copy member values from one object instance to another of the same type.
+    /// A delegate to copy values of instance members (fields, properties, or both) from one object to another.
     /// </summary>
-    /// <param name="source">The object whose member values will be read.</param>
-    /// <param name="target">The object whose member values will be written.</param>
-    public delegate void MemberCopier( object source, object target );
+    /// <param name="source">The object whose instance members' values will be read.</param>
+    /// <param name="target">The object whose instance members' values will be written.</param>
+    public delegate void ObjectMapper( object source, object target );
 }

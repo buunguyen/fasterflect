@@ -29,7 +29,7 @@ namespace Fasterflect
     /// </summary>
     public static class TryCallMethodExtensions
     {
-        #region Constructor Invocation (TryCreateInstance)
+        #region Method Invocation (TryCallMethod)
         /// <summary>
         /// Obtains a list of all methods with the given <paramref name="methodName"/> on the given 
         /// <paramref name="obj" />, and invokes the best match for the parameters obtained from the 

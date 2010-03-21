@@ -25,34 +25,17 @@ using Fasterflect;
 
 namespace FasterflectSample
 {
-	class Program
+    class Program
     {
         static void Main()
         {
-			//Console.WriteLine( AssemblyInfoWriter.ListExtensionMethodsWhereParametersViolateConventions( typeof(Flags).Assembly ) );
-
-   			//Console.WriteLine( AssemblyInfoWriter.ListExtensionMethodsWithSuperfluousOverloads( typeof(Flags).Assembly ) );
-
-			Console.WriteLine( AssemblyInfoWriter.ListExtensions( typeof(Flags).Assembly ) );
-
-
-            // Load a type reflectively, just to look like real-life scenario
-            //var types = new[]
-            //                {
-            //                    Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonClass"),
-            //                    Assembly.GetExecutingAssembly().GetType("FasterflectSample.PersonStruct")
-            //                };
-            //Array.ForEach(types, type =>
-            //                         {
-            //                             ExecuteNormalApi(type);
-            //                             ExecuteCacheApi(type);
-            //                         });
+            var type = Assembly.GetExecutingAssembly().GetType( "FasterflectSample.Person" );
+            ExecuteNormalApi(type);
+            ExecuteCacheApi(type);
         }
 
         private static void ExecuteNormalApi(Type type)
         {
-            bool isStruct = type.IsValueType;
-
             // Person.InstanceCount should be 0 since no instance is created yet
             AssertTrue((int)type.GetFieldValue("InstanceCount") == 0);
             
@@ -62,19 +45,10 @@ namespace FasterflectSample
             // Double-check if the constructor is invoked successfully or not
             AssertTrue(null != obj);
 
-            // struct's no-arg constructor cannot be overriden, thus the following checking
-            // is not applicable to struct type
-            if (!isStruct)
-            {
-                // Now, Person.InstanceCount should be 1
-                AssertTrue(1 == (int)type.GetFieldValue("InstanceCount"));
+            // Now, Person.InstanceCount should be 1
+            AssertTrue(1 == (int)type.GetFieldValue("InstanceCount"));
 
-                // What if we don't know the type of InstanceCount?  
-                // Just specify object as the type parameter
-                AssertTrue(type.GetFieldValue("InstanceCount") != null);
-            }
-
-            // We can bypass the constructor to change the value of Person.InstanceCount
+            // We can bypass the constructor to change the value of Person.InstanceCount directly
             type.SetFieldValue("InstanceCount", 2);
             AssertTrue(2 == (int)type.GetFieldValue("InstanceCount"));
 
@@ -95,13 +69,8 @@ namespace FasterflectSample
             AssertTrue(1 == (int)arguments[1]);
 
             // Now, invoke the 2-arg constructor.  We don't even have to specify parameter types
-            // if we know that the arguments are not null (Fasterflect will internally retrieve type info).
+            // if we know that the arguments are not null (Fasterflect will call arg[n].GetType() internally).
             obj = type.CreateInstance(1, "Doe");
-
-            // Due to struct type's pass-by-value nature, in order for struct to be used 
-            // properly with Fasterflect, you need to convert it into a holder (wrapper) first.  
-            // The call below does nothing if obj is reference type so when unsure, just call it.
-            obj = obj.WrapIfValueType();
 
             // id and name should have been set properly
             AssertTrue(1 == (int)obj.GetFieldValue("id"));
@@ -112,8 +81,7 @@ namespace FasterflectSample
 
             // If there's null argument, or when we're unsure whether there's a null argument
             // we must explicitly specify the param type array
-            obj = type.CreateInstance(new[] { typeof(int), typeof(string) }, new object[] { 1, null })
-                .WrapIfValueType();
+            obj = type.CreateInstance( new[] { typeof(int), typeof(string) }, 1, null );
 
             // id and name should have been set properly
             AssertTrue(1 == (int)obj.GetFieldValue("id"));
@@ -125,18 +93,19 @@ namespace FasterflectSample
             AssertTrue(2 == (int)obj.GetPropertyValue("Id"));
 
             // We can chain calls
-            obj.SetFieldValue("id", 3).SetPropertyValue("Name", "Buu");
+            obj.SetFieldValue("id", 3)
+               .SetPropertyValue("Name", "Buu");
             AssertTrue(3 == (int)obj.GetPropertyValue("Id"));
-            AssertTrue("Buu" == obj.GetPropertyValue("Name").ToString());
+            AssertTrue("Buu" == (string)obj.GetPropertyValue("Name"));
              
-            // How about modifying both properties at the same time using an anonymous sample
-            obj.MapProperties( new { Id = 4, Name = "Nguyen" } );
+            // Map a set of properties from a source to a target
+            new { Id = 4, Name = "Nguyen" }.MapProperties( obj );
             AssertTrue(4 == (int)obj.GetPropertyValue("Id"));
-            AssertTrue("Nguyen" == obj.GetPropertyValue("Name").ToString());
+            AssertTrue("Nguyen" == (string)obj.GetPropertyValue("Name"));
 
             // Let's have the folk walk 6 miles
-			obj.CallMethod("Walk", 6);
-			
+    		obj.CallMethod("Walk", 6);
+    		
             // Double-check the current value of the milesTravelled field
             AssertTrue(6 == (int)obj.GetFieldValue("milesTraveled"));
 
@@ -145,25 +114,12 @@ namespace FasterflectSample
 
             // GetValue & set element of array
             obj = type.CreateInstance();
-            arr.SetElement(4, obj).SetElement(9, obj);
+            arr.SetElement(4, obj)
+               .SetElement(9, obj);
 
-            if (isStruct) // struct, won't have same reference
-            {
-                AssertTrue(obj.Equals(arr.GetElement(4)));
-                AssertTrue(obj.Equals(arr.GetElement(9)));
-            }
-            else 
-            {
-                AssertTrue(obj == arr.GetElement(4));
-                AssertTrue(obj == arr.GetElement(9));
-            }
-
-            // Remember, struct array doesn't have null element 
-            // (instead always initialized to default struct)
-            if (!isStruct)
-            {
-                AssertTrue(null == arr.GetElement(0));
-            }
+            AssertTrue(obj == arr.GetElement(4));
+            AssertTrue(obj == arr.GetElement(9));
+            AssertTrue(null == arr.GetElement(0));
         }
 
         private static void ExecuteCacheApi(Type type)
@@ -178,27 +134,34 @@ namespace FasterflectSample
             ConstructorInvoker ctor = type.DelegateForCreateInstance(new[] { typeof(int), typeof(string) });
             range.ForEach(i =>
             {
-                object obj = ctor(i, "_" + i).WrapIfValueType();
+                object obj = ctor(i, "_" + i);
                 AssertTrue(++currentInstanceCount == (int)count());
                 AssertTrue(i == (int)obj.GetFieldValue("id"));
                 AssertTrue("_" + i == obj.GetPropertyValue("Name").ToString());
             });
 
-            // Whatever thing we can do with the normal API, we can do with the cache API.
-            // For example:
+            // Getter/setter
             MemberSetter nameSetter = type.DelegateForSetPropertyValue("Name");
             MemberGetter nameGetter = type.DelegateForGetPropertyValue("Name");
 
-            object person = ctor(1, "Buu").WrapIfValueType();
-            AssertTrue("Buu" == (string)nameGetter(person));
-            nameSetter(person, "Doe");
-            AssertTrue("Doe" == (string)nameGetter(person));
+            object person = ctor(1, "John");
+            AssertTrue("John" == (string)nameGetter(person));
+            nameSetter(person, "Jane");
+            AssertTrue("Jane" == (string)nameGetter(person));
 
-            // Another example
-            person = type.CreateInstance().WrapIfValueType();
+            // Invoke method
+            person = type.CreateInstance();
             MethodInvoker walk = type.DelegateForCallMethod("Walk", new[] { typeof(int) });
             range.ForEach(i => walk(person, i));
             AssertTrue(range.Sum() == (int)person.GetFieldValue("milesTraveled"));
+            
+            // Map properties
+            var ano = new { Id = 4, Name = "Doe" };
+            var mapper = ano.GetType().DelegateForMap( type );
+            mapper(ano, person);
+            AssertTrue(4 == (int)person.GetPropertyValue("Id"));
+            AssertTrue("Doe" == (string)person.GetPropertyValue("Name"));
+
         }
 
         public static void AssertTrue(bool expression)

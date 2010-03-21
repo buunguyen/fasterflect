@@ -33,55 +33,55 @@ namespace Fasterflect.Emitter
             : this(targetType, bindingFlags, paramTypes, null) { }
 
 		private CtorInvocationEmitter(Type targetType, Flags flags, Type[] parameterTypes, ConstructorInfo ctorInfo)
+            : base(new CallInfo(targetType, flags, MemberTypes.Constructor, targetType.Name, parameterTypes, ctorInfo))
 		{
-            callInfo = new CallInfo(targetType, flags, MemberTypes.Constructor, targetType.Name, parameterTypes, ctorInfo);
 		}
         
 		protected internal override DynamicMethod CreateDynamicMethod()
 		{
-            return CreateDynamicMethod("ctor", callInfo.TargetType, Constants.ObjectType, new[] { Constants.ObjectType });
+            return CreateDynamicMethod("ctor", CallInfo.TargetType, Constants.ObjectType, new[] { Constants.ObjectType });
 		}
 
 		protected internal override Delegate CreateDelegate()
 		{
-			if (callInfo.IsTargetTypeStruct && callInfo.HasNoParam) // no-arg struct needs special initialization
+			if (CallInfo.IsTargetTypeStruct && CallInfo.HasNoParam) // no-arg struct needs special initialization
 			{
-			    generator.DeclareLocal( callInfo.TargetType );      // TargetType tmp
-                generator.ldloca_s(0)                               // &tmp
-			             .initobj( callInfo.TargetType )            // init_obj(&tmp)
+			    Generator.DeclareLocal( CallInfo.TargetType );      // TargetType tmp
+                Generator.ldloca_s(0)                               // &tmp
+			             .initobj( CallInfo.TargetType )            // init_obj(&tmp)
 			             .ldloc_0.end();                            // load tmp
 			}
-			else if (callInfo.TargetType.IsArray)
+			else if (CallInfo.TargetType.IsArray)
 			{
-			    generator.ldarg_0                                           // load args[] (method arguments)
+			    Generator.ldarg_0                                           // load args[] (method arguments)
                          .ldc_i4_0                                          // load 0
                          .ldelem_ref                                        // load args[0] (length)
                          .unbox_any( typeof(int) )                          // unbox stack
-                         .newarr( callInfo.TargetType.GetElementType() );   // new T[args[0]]
+                         .newarr( CallInfo.TargetType.GetElementType() );   // new T[args[0]]
 			}
 			else
 			{
-                ConstructorInfo ctorInfo = LookupUtils.GetConstructor(callInfo);
+                ConstructorInfo ctorInfo = LookupUtils.GetConstructor(CallInfo);
                 byte startUsableLocalIndex = 0;
-				if (callInfo.HasRefParam)
+				if (CallInfo.HasRefParam)
 				{
                     startUsableLocalIndex = CreateLocalsForByRefParams(0, ctorInfo); // create by_ref_locals from argument array
-					generator.DeclareLocal(callInfo.TargetType);                     // TargetType tmp;
+					Generator.DeclareLocal(CallInfo.TargetType);                     // TargetType tmp;
                 }
                 
                 PushParamsOrLocalsToStack(0);               // push arguments and by_ref_locals
-                generator.newobj(ctorInfo);                 // ctor (<stack>)
+                Generator.newobj(ctorInfo);                 // ctor (<stack>)
 
-				if (callInfo.HasRefParam)
+				if (CallInfo.HasRefParam)
 				{
-                    generator.stloc(startUsableLocalIndex); // tmp = <stack>;
+                    Generator.stloc(startUsableLocalIndex); // tmp = <stack>;
                     AssignByRefParamsToArray(0);            // store by_ref_locals back to argument array
-                    generator.ldloc(startUsableLocalIndex); // tmp
+                    Generator.ldloc(startUsableLocalIndex); // tmp
 				}
 			}
-            generator.boxIfValueType(callInfo.TargetType)
+            Generator.boxIfValueType(CallInfo.TargetType)
                      .ret();                                // return (box)<stack>;
-			return method.CreateDelegate(typeof (ConstructorInvoker));
+			return Method.CreateDelegate(typeof (ConstructorInvoker));
 		}
 	}
 }
