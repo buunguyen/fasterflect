@@ -29,9 +29,9 @@ namespace FasterflectSample
     {
         static void Main()
         {
-            var type = Assembly.GetExecutingAssembly().GetType( "FasterflectSample.Person" );
-            ExecuteNormalApi(type);
-            ExecuteCacheApi(type);
+			var type = Assembly.GetExecutingAssembly().GetType( "FasterflectSample.Person" );
+			ExecuteNormalApi(type);
+			ExecuteCacheApi(type);
         }
 
         private static void ExecuteNormalApi(Type type)
