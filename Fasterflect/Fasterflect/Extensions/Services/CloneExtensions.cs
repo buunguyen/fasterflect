@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -45,29 +46,53 @@ namespace Fasterflect
         private static T DeepClone<T>( this T source, Dictionary<object, object> map ) where T : class, new()
         {
             Type type = source.GetType();
-            IList<FieldInfo> fields = type.Fields( Flags.StaticInstanceAnyVisibility );
-            var clone = type.CreateInstance() as T;
+            var clone = type.IsArray ? Activator.CreateInstance( type, ((ICollection) source).Count ) as T : type.CreateInstance() as T;
             map = map ?? new Dictionary<object, object>();
             map[ source ] = clone;
+			if( type.IsArray )
+			{
+				source.CloneArray( clone, map );
+				return clone;
+			}
+        	IList<FieldInfo> fields = type.Fields( Flags.StaticInstanceAnyVisibility ).Where( f => ! f.IsLiteral ).ToList();
             object[] values = fields.Select( f => GetValue( f, source, map ) ).ToArray();
             for( int i = 0; i < fields.Count; i++ )
             {
-                fields[ i ].Set( clone, values[ i ] );
+				fields[ i ].Set( clone, values[ i ] );
             }
             return clone;
+        }
+        private static void CloneArray<T>( this T source, T clone, Dictionary<object, object> map ) where T : class, new()
+        {
+        	var sourceList = (IList) source;
+        	var cloneList = (IList) clone;
+			for( int i=0; i<sourceList.Count; i++ )
+			{
+				object element = sourceList[ i ];
+            	cloneList[ i ] = element.ShouldClone() ? element.DeepClone( map ) : element;
+			}
         }
 
         private static object GetValue( FieldInfo field, object source, Dictionary<object, object> map )
         {
-            object result = field.Get( source );
-            object clone;
+            object result = field.IsLiteral ? field.GetRawConstantValue() : field.Get( source );
+			if( result == null || ! result.ShouldClone() )
+			{
+				return result;
+			}
+			object clone;
             if( map.TryGetValue( result, out clone ) )
             {
                 return clone;
             }
-            bool follow = result != null && result.GetType().IsClass && result.GetType() != typeof(string);
-            return follow ? result.DeepClone( map ) : result;
+            return result.DeepClone( map );
         }
+
+        private static bool ShouldClone( this object obj )
+        {
+            bool result = obj != null && obj.GetType().IsClass && obj.GetType() != typeof(string);
+        	return result;
+		}
         #endregion
     }
 }

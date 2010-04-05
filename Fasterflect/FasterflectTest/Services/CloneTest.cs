@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -36,6 +37,8 @@ namespace FasterflectTest.Services
             public string Name { get; set; }
             public int Age { get { return DateTime.Now.Year - Birthday.Year + (DateTime.Now.DayOfYear >= Birthday.DayOfYear ? 1 : 0); } }
 			public DateTime LastModified { get { return lastModified; } }
+            public string[] Roles { get; private set; }
+            public Dictionary<string,Person> Family { get; private set; }
 
 			public Person()
 			{
@@ -45,6 +48,8 @@ namespace FasterflectTest.Services
         		Id = id;
         		Birthday = birthday;
         		Name = name;
+				Roles = new [] { "User", "Tester" };
+				Family = new Dictionary<string, Person>();
         	}
 		}
 
@@ -122,6 +127,7 @@ namespace FasterflectTest.Services
 			Assert.AreEqual( person.Birthday, clone.Birthday );
 			Assert.AreEqual( person.Name, clone.Name );
 			Assert.AreEqual( person.LastModified, clone.LastModified );
+			CollectionAssert.AreEqual( person.Roles, clone.Roles );
 		}
 		private static void Verify( Employee employee, Employee clone )
 		{
