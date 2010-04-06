@@ -31,7 +31,8 @@ namespace FasterflectTest.Services
 		#region Sample Reflection Classes
 		private class Person
         {
-			private DateTime lastModified = DateTime.Now; 
+			private DateTime lastModified = DateTime.Now;
+			private Type myType = typeof(Person);
 			public int Id { get; set; }
             public DateTime Birthday { get; set; }
             public string Name { get; set; }
