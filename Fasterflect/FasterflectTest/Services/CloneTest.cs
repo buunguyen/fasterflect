@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -29,6 +30,24 @@ namespace FasterflectTest.Services
     public class CloneTest
 	{
 		#region Sample Reflection Classes
+        private class Dynamic
+        {
+            public dynamic number;
+            public dynamic person;
+            public dynamic expando;
+
+            public Dynamic()
+            {
+            }
+
+            public Dynamic( dynamic number, dynamic person, dynamic expando )
+            {
+                this.number = number;
+                this.person = person;
+                this.expando = expando;
+            }
+        }
+
 		private class Person
         {
 			private DateTime lastModified = DateTime.Now;
@@ -117,7 +136,32 @@ namespace FasterflectTest.Services
 			Assert.AreNotSame( employee.Manager, clone.Manager );
 			Assert.AreSame( clone.Manager, clone.Manager.Manager );
 		}
-		#endregion
+        #endregion
+
+        #region Dynamic
+
+        [TestMethod]
+        public void TestDynamic()
+        {
+            var person = new Person(42, DateTime.Now, "Arthur Dent");
+            dynamic expando = new ExpandoObject();
+            expando.person = person;
+            expando.number = 15;
+            var dynamic = new Dynamic(15, person, expando);
+            expando.dynamic = dynamic;
+            var clone = dynamic.DeepClone();
+            Verify(dynamic, clone);
+            Verify(dynamic.expando.dynamic, clone.expando.dynamic);
+        }
+
+        private static void Verify(dynamic dynamic, dynamic clone)
+        {
+            Assert.AreEqual(dynamic.number, clone.number);
+            Verify(dynamic.person, clone.person);
+            Assert.AreEqual(dynamic.expando.number, clone.expando.number);
+            Verify((Person)dynamic.expando.person, (Person)clone.expando.person);
+        }
+        #endregion
 
 		#region Verify Helpers
 		private static void Verify( Person person, Person clone )
@@ -137,5 +181,5 @@ namespace FasterflectTest.Services
 			Assert.AreNotSame( employee.Manager, clone.Manager );
 		}
 		#endregion
-	}
+    }
 }
