@@ -32,8 +32,8 @@ namespace Fasterflect
 		{
 			var wrapper = obj as ValueTypeHolder;
 			return wrapper == null
-			       	? obj.GetType()
-			       	: wrapper.Value.GetType();
+				? obj is Type ? obj as Type : obj.GetType()
+			    : wrapper.Value.GetType();
 		}
 
         public static Type[] ToTypeArray(this ParameterInfo[] parameters)

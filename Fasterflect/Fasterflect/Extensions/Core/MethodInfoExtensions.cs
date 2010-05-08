@@ -36,7 +36,7 @@ namespace Fasterflect
         /// <remarks>If the method has no return type, <c>null</c> is returned.</remarks>
         public static object Call( this MethodInfo methodInfo, params object[] parameters )
         {
-            return methodInfo.DelegateForCallStaticMethod()( parameters );
+            return methodInfo.DelegateForCallMethod()( null, parameters );
         }
 
         /// <summary>
@@ -52,19 +52,12 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Creates a delegate which can invoke the static method identified by <paramref name="methodInfo"/>.
-        /// </summary>
-        public static StaticMethodInvoker DelegateForCallStaticMethod( this MethodInfo methodInfo )
-        {
-            return (StaticMethodInvoker) new MethodInvocationEmitter( methodInfo, Flags.StaticAnyVisibility ).GetDelegate();
-        }
-
-        /// <summary>
         /// Creates a delegate which can invoke the instance method identified by <paramref name="methodInfo"/>.
         /// </summary>
         public static MethodInvoker DelegateForCallMethod( this MethodInfo methodInfo )
         {
-            return (MethodInvoker) new MethodInvocationEmitter( methodInfo, Flags.InstanceAnyVisibility ).GetDelegate();
+		    var flags = methodInfo.IsStatic ? Flags.StaticAnyVisibility : Flags.InstanceAnyVisibility;
+            return (MethodInvoker) new MethodInvocationEmitter( methodInfo, flags ).GetDelegate();
         }
         #endregion
 

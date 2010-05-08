@@ -31,19 +31,8 @@ namespace Fasterflect
     {
         #region Property Access
         /// <summary>
-        /// Sets the static property specified by <paramref name="name"/> of the given <paramref name="type"/>
-        /// with the specified <paramref name="value" />.
-        /// </summary>
-        /// <returns><paramref name="type"/>.</returns>
-        public static Type SetPropertyValue( this Type type, string name, object value )
-        {
-            DelegateForSetStaticPropertyValue( type, name )( value );
-            return type;
-        }
-
-        /// <summary>
-        /// Sets the instance property specified by <paramref name="name"/> of the given <paramref name="obj"/>
-        /// with the specified <paramref name="value" />.
+        /// Sets the property specified by <param name="name"/> on the given <param name="obj"/> to the 
+        /// specified <param name="value" />.
         /// </summary>
         /// <returns><paramref name="obj"/>.</returns>
         public static object SetPropertyValue( this object obj, string name, object value )
@@ -53,15 +42,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Gets the value of the static property specified by <paramref name="name"/> of the given <paramref name="type"/>.
-        /// </summary>
-        public static object GetPropertyValue( this Type type, string name )
-        {
-            return DelegateForGetStaticPropertyValue( type, name )();
-        }
-
-        /// <summary>
-        /// Gets the value of the property specified by <paramref name="name"/> of the given <paramref name="obj"/>.
+        /// Gets the value of the property specified by <param name="name"/> on the given <param name="obj"/>.
         /// </summary>
         public static object GetPropertyValue( this object obj, string name )
         {
@@ -69,19 +50,8 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Sets the static property specified by <paramref name="name"/> matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="type"/> with the specified <paramref name="value" />.
-        /// </summary>
-        /// <returns><paramref name="type"/>.</returns>
-        public static Type SetPropertyValue( this Type type, string name, object value, Flags bindingFlags )
-        {
-            DelegateForSetStaticPropertyValue( type, name, bindingFlags )( value );
-            return type;
-        }
-
-        /// <summary>
-        /// Sets the instance property specified by <paramref name="name"/> matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="obj"/> with the specified <paramref name="value" />.
+        /// Sets the property specified by <param name="name"/> matching <param name="bindingFlags"/>
+        /// on the given <param name="obj"/> to the specified <param name="value" />.
         /// </summary>
         /// <returns><paramref name="obj"/>.</returns>
         public static object SetPropertyValue( this object obj, string name, object value, Flags bindingFlags )
@@ -91,17 +61,8 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Gets the value of the static property specified by <paramref name="name"/> matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="type"/>.
-        /// </summary>
-        public static object GetPropertyValue( this Type type, string name, Flags bindingFlags )
-        {
-            return DelegateForGetStaticPropertyValue( type, name, bindingFlags )();
-        }
-
-        /// <summary>
-        /// Gets the value of the instance property specified by <paramref name="name"/> matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="obj"/>.
+        /// Gets the value of the property specified by <param name="name"/> matching <param name="bindingFlags"/>
+        /// on the given <param name="obj"/>.
         /// </summary>
         public static object GetPropertyValue( this object obj, string name, Flags bindingFlags )
         {
@@ -109,85 +70,53 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Creates a delegate which can set the value of the static property specified by <paramref name="name"/>
-        /// of the given <paramref name="type"/>.
-        /// </summary>
-        public static StaticMemberSetter DelegateForSetStaticPropertyValue( this Type type, string name )
-        {
-            return DelegateForSetStaticPropertyValue( type, name, Flags.StaticAnyVisibility );
-        }
-
-        /// <summary>
-        /// Creates a delegate which can set the value of the instance property specified by <paramref name="name"/>
-        /// of the given <paramref name="type"/>.
+        /// Creates a delegate which can set the value of the property specified by <param name="name"/>
+        /// on the given <param name="type"/>.
         /// </summary>
         public static MemberSetter DelegateForSetPropertyValue( this Type type, string name )
         {
-            return DelegateForSetPropertyValue( type, name, Flags.InstanceAnyVisibility );
+            return DelegateForSetPropertyValue( type, name, Flags.StaticInstanceAnyVisibility );
         }
 
         /// <summary>
-        /// Creates a delegate which can get the value of the static property specified by <paramref name="name"/>
-        /// of the given <paramref name="type"/>.
-        /// </summary>
-        public static StaticMemberGetter DelegateForGetStaticPropertyValue( this Type type, string name )
-        {
-            return DelegateForGetStaticPropertyValue( type, name, Flags.StaticAnyVisibility );
-        }
-
-        /// <summary>
-        /// Creates a delegate which can get the value of the instance property specified by <paramref name="name"/>
-        /// of the given <paramref name="type"/>.
+        /// Creates a delegate which can get the value of the property specified by <param name="name"/>
+        /// on the given <param name="type"/>.
         /// </summary>
         public static MemberGetter DelegateForGetPropertyValue( this Type type, string name )
         {
-            return DelegateForGetPropertyValue( type, name, Flags.InstanceAnyVisibility );
+            return DelegateForGetPropertyValue( type, name, Flags.StaticInstanceAnyVisibility );
         }
 
         /// <summary>
-        /// Creates a delegate which can set the value of the static property specified by <paramref name="name"/>
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
+        /// Creates a delegate which can set the value of the property specified by <param name="name"/>
+        /// matching <param name="bindingFlags"/> on the given <param name="type"/>.
         /// </summary>
-        public static StaticMemberSetter DelegateForSetStaticPropertyValue( this Type type, string name,
-                                                                            Flags bindingFlags )
+        public static MemberSetter DelegateForSetPropertyValue( this Type type, string name, Flags bindingFlags )
         {
-            return (StaticMemberSetter)
-                new MemberSetEmitter( type, bindingFlags, MemberTypes.Property, name ).GetDelegate();
+        	return type.FindProperty( name, ref bindingFlags ).DelegateForSetPropertyValue( bindingFlags );
         }
 
         /// <summary>
-        /// Creates a delegate which can set the value of the instance property specified by <paramref name="name"/>
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
+        /// Creates a delegate which can get the value of the property specified by <param name="name"/>
+        /// matching <param name="bindingFlags"/> on the given <param name="type"/>.
         /// </summary>
-        public static MemberSetter DelegateForSetPropertyValue( this Type type, string name,
-                                                                Flags bindingFlags )
+        public static MemberGetter DelegateForGetPropertyValue( this Type type, string name, Flags bindingFlags )
         {
-            return (MemberSetter)
-                new MemberSetEmitter( type, bindingFlags, MemberTypes.Property, name ).GetDelegate();
+        	return type.FindProperty( name, ref bindingFlags ).DelegateForGetPropertyValue( bindingFlags );
         }
 
-        /// <summary>
-        /// Creates a delegate which can get the value of the static property specified by <paramref name="name"/>
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
-        /// </summary>
-        public static StaticMemberGetter DelegateForGetStaticPropertyValue( this Type type, string name,
-                                                                            Flags bindingFlags )
-        {
-            return (StaticMemberGetter)
-                new MemberGetEmitter( type, bindingFlags, MemberTypes.Property, name ).GetDelegate();
-        }
-
-        /// <summary>
-        /// Creates a delegate which can get the value of the instance property specified by <paramref name="name"/>
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
-        /// </summary>
-        public static MemberGetter DelegateForGetPropertyValue( this Type type, string name,
-                                                                Flags bindingFlags )
-        {
-            return (MemberGetter)
-                new MemberGetEmitter( type, bindingFlags, MemberTypes.Property, name ).GetDelegate();
-        }
-        #endregion
+		private static PropertyInfo FindProperty( this Type type, string name, ref Flags bindingFlags )
+		{
+	       	var property = type.Property( name, bindingFlags );
+			if( property == null )
+			{
+				const string fmt = "No match for property with name {0} and flags {1} on type {2}.";
+				throw new MissingMemberException( string.Format( fmt, name, bindingFlags, type ) );
+			}
+			bindingFlags = Flags.SetOnlyIf( bindingFlags, Flags.Static, property.IsStatic() );
+        	return property;
+		}
+    	#endregion
 
         #region Indexer Access
         /// <summary>

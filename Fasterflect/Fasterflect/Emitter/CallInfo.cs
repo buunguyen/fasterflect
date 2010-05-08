@@ -32,7 +32,7 @@ namespace Fasterflect.Emitter
         public MemberTypes MemberTypes { get; set; }
         public Type[] ParamTypes { get; private set; }
         public string Name { get; private set; }
-        public MemberInfo MemberInfo { get; private set; }
+        public MemberInfo MemberInfo { get; internal set; }
 
         public CallInfo( Type targetType, Flags bindingFlags, MemberTypes memberTypes, string name,
                          Type[] parameterTypes, MemberInfo memberInfo )
@@ -58,10 +58,10 @@ namespace Fasterflect.Emitter
             get { return IsTargetTypeStruct && !IsStatic; }
         }
 
-        public bool IsStatic
-        {
-            get { return BindingFlags.IsSet( Flags.Static ); }
-        }
+		public bool IsStatic
+		{
+		    get { return BindingFlags.IsSet( Flags.Static ); }
+		}
 
         public bool IsTargetTypeStruct
         {

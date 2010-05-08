@@ -31,19 +31,8 @@ namespace Fasterflect
     {
         #region Field Access
         /// <summary>
-        /// Sets the static field specified by <paramref name="name"/> of the given <paramref name="type"/>
-        /// with the specified <paramref name="value" />.
-        /// </summary>
-        /// <returns><paramref name="type"/>.</returns>
-        public static Type SetFieldValue( this Type type, string name, object value )
-        {
-            DelegateForSetStaticFieldValue( type, name )( value );
-            return type;
-        }
-
-        /// <summary>
-        /// Sets the instance field specified by <paramref name="name"/> of the given <paramref name="obj"/>
-        /// with the specified <paramref name="value" />.
+        /// Sets the field specified by <paramref name="name"/> on the given <paramref name="obj"/>
+        /// to the specified <paramref name="value" />.
         /// </summary>
         /// <returns><paramref name="obj"/>.</returns>
         public static object SetFieldValue( this object obj, string name, object value )
@@ -53,15 +42,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Gets the value of the static field specified by <paramref name="name"/> of the given <paramref name="type"/>.
-        /// </summary>
-        public static object GetFieldValue( this Type type, string name )
-        {
-            return DelegateForGetStaticFieldValue( type, name )();
-        }
-
-        /// <summary>
-        /// Gets the value of the instance field specified by <paramref name="name"/> of the given <paramref name="obj"/>.
+        /// Gets the value of the field specified by <paramref name="name"/> on the given <paramref name="obj"/>.
         /// </summary>
         public static object GetFieldValue( this object obj, string name )
         {
@@ -69,19 +50,8 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Sets the static field specified by <paramref name="name"/> and matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="type"/> with the specified <paramref name="value" />.
-        /// </summary>
-        /// <returns><paramref name="type"/>.</returns>
-        public static Type SetFieldValue( this Type type, string name, object value, Flags bindingFlags )
-        {
-            DelegateForSetStaticFieldValue( type, name, bindingFlags )( value );
-            return type;
-        }
-
-        /// <summary>
-        /// Sets the instance field specified by <paramref name="name"/> and matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="obj"/> with the specified <paramref name="value" />.
+        /// Sets the field specified by <paramref name="name"/> and matching <paramref name="bindingFlags"/>
+        /// on the given <paramref name="obj"/> to the specified <paramref name="value" />.
         /// </summary>
         /// <returns><paramref name="obj"/>.</returns>
         public static object SetFieldValue( this object obj, string name, object value, Flags bindingFlags )
@@ -91,17 +61,8 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Gets the value of the static field specified by <paramref name="name"/> and matching <paramref name="bindingFlags"/> 
-        /// of the given <paramref name="type"/>.
-        /// </summary>
-        public static object GetFieldValue( this Type type, string name, Flags bindingFlags )
-        {
-            return DelegateForGetStaticFieldValue( type, name, bindingFlags )();
-        }
-
-        /// <summary>
-        /// Gets the value of the instance field specified by <paramref name="name"/> and matching <paramref name="bindingFlags"/>
-        /// of the given <paramref name="obj"/>.
+        /// Gets the value of the field specified by <paramref name="name"/> and matching <paramref name="bindingFlags"/>
+        /// on the given <paramref name="obj"/>.
         /// </summary>
         public static object GetFieldValue( this object obj, string name, Flags bindingFlags )
         {
@@ -109,83 +70,51 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Creates a delegate which can set the value of the static field specified by <paramref name="name"/> of 
-        /// the given <paramref name="type"/>.
-        /// </summary>
-        public static StaticMemberSetter DelegateForSetStaticFieldValue( this Type type, string name )
-        {
-            return DelegateForSetStaticFieldValue( type, name, Flags.StaticAnyVisibility );
-        }
-
-        /// <summary>
-        /// Creates a delegate which can set the value of the instance field specified by <paramref name="name"/> of 
+        /// Creates a delegate which can set the value of the field specified by <paramref name="name"/> on 
         /// the given <paramref name="type"/>.
         /// </summary>
         public static MemberSetter DelegateForSetFieldValue( this Type type, string name )
         {
-            return DelegateForSetFieldValue( type, name, Flags.InstanceAnyVisibility );
+            return DelegateForSetFieldValue( type, name, Flags.StaticInstanceAnyVisibility );
         }
 
         /// <summary>
-        /// Creates a delegate which can get the value of the static field specified by <paramref name="name"/> of 
-        /// the given <paramref name="type"/>.
-        /// </summary>
-        public static StaticMemberGetter DelegateForGetStaticFieldValue( this Type type, string name )
-        {
-            return DelegateForGetStaticFieldValue( type, name, Flags.StaticAnyVisibility );
-        }
-
-        /// <summary>
-        /// Creates a delegate which can get the value of the instance field specified by <paramref name="name"/> of 
+        /// Creates a delegate which can get the value of the field specified by <paramref name="name"/> on 
         /// the given <paramref name="type"/>.
         /// </summary>
         public static MemberGetter DelegateForGetFieldValue( this Type type, string name )
         {
-            return DelegateForGetFieldValue( type, name, Flags.InstanceAnyVisibility );
+            return DelegateForGetFieldValue( type, name, Flags.StaticInstanceAnyVisibility );
         }
 
         /// <summary>
-        /// Creates a delegate which can set the value of the static field specified by <paramref name="name"/> and 
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
-        /// </summary>
-        public static StaticMemberSetter DelegateForSetStaticFieldValue( this Type type, string name,
-                                                                         Flags bindingFlags )
-        {
-            return (StaticMemberSetter)
-                new MemberSetEmitter( type, bindingFlags, MemberTypes.Field, name ).GetDelegate();
-        }
-
-        /// <summary>
-        /// Creates a delegate which can set the value of the instance field specified by <paramref name="name"/> and
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
+        /// Creates a delegate which can set the value of the field specified by <paramref name="name"/> and
+        /// matching <paramref name="bindingFlags"/> on the given <paramref name="type"/>.
         /// </summary>
         public static MemberSetter DelegateForSetFieldValue( this Type type, string name, Flags bindingFlags )
         {
-            return (MemberSetter)
-                new MemberSetEmitter( type, bindingFlags, MemberTypes.Field, name ).GetDelegate();
+        	return type.FindField( name, bindingFlags ).DelegateForSetFieldValue();
         }
 
         /// <summary>
-        /// Creates a delegate which can get the value of the static field specified by <paramref name="name"/> and 
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
-        /// </summary>
-        public static StaticMemberGetter DelegateForGetStaticFieldValue( this Type type, string name,
-                                                                         Flags bindingFlags )
-        {
-            return
-                (StaticMemberGetter)
-                new MemberGetEmitter( type, bindingFlags, MemberTypes.Field, name ).GetDelegate();
-        }
-
-        /// <summary>
-        /// Creates a delegate which can get the value of the instance field specified by <paramref name="name"/> and
-        /// matching <paramref name="bindingFlags"/> of the given <paramref name="type"/>.
+        /// Creates a delegate which can get the value of the field specified by <paramref name="name"/> and
+        /// matching <paramref name="bindingFlags"/> on the given <paramref name="type"/>.
         /// </summary>
         public static MemberGetter DelegateForGetFieldValue( this Type type, string name, Flags bindingFlags )
         {
-            return (MemberGetter)
-                new MemberGetEmitter( type, bindingFlags, MemberTypes.Field, name ).GetDelegate();
+        	return type.FindField( name, bindingFlags ).DelegateForGetFieldValue();
         }
+
+		private static FieldInfo FindField( this Type type, string name, Flags bindingFlags )
+		{
+	       	var field = type.Field( name, bindingFlags );
+			if( field == null )
+			{
+				const string fmt = "No match for property with name {0} and flags {1} on type {2}.";
+				throw new MissingFieldException( string.Format( fmt, name, bindingFlags, type ) );
+			}
+        	return field;
+		}
         #endregion
 
         #region Field Lookup (Single)
