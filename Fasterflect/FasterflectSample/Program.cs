@@ -1,5 +1,4 @@
 ﻿#region License
-
 // Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,161 +14,161 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Fasterflect;
 
 namespace FasterflectSample
 {
-    class Program
-    {
-        static void Main()
-        {
-			var type = Assembly.GetExecutingAssembly().GetType( "FasterflectSample.Person" );
-			ExecuteNormalApi(type);
-			ExecuteCacheApi(type);
-        }
+	internal class Program
+	{
+		private static void Main()
+		{
+		    Type type = Assembly.GetExecutingAssembly().GetType( "FasterflectSample.Person" );
+		    ExecuteNormalApi( type );
+		    ExecuteCacheApi( type );
+		}
 
-        private static void ExecuteNormalApi(Type type)
-        {
-            // Person.InstanceCount should be 0 since no instance is created yet
-            AssertTrue((int)type.GetFieldValue("InstanceCount") == 0);
-            
-            // Invokes the no-arg constructor
-            object obj = type.CreateInstance();
+		private static void ExecuteNormalApi( Type type )
+		{
+			// Person.InstanceCount should be 0 since no instance is created yet
+			AssertTrue( (int) type.GetFieldValue( "InstanceCount" ) == 0 );
 
-            // Double-check if the constructor is invoked successfully or not
-            AssertTrue(null != obj);
+			// Invokes the no-arg constructor
+			object obj = type.CreateInstance();
 
-            // Now, Person.InstanceCount should be 1
-            AssertTrue(1 == (int)type.GetFieldValue("InstanceCount"));
+			// Double-check if the constructor is invoked successfully or not
+			AssertTrue( null != obj );
 
-            // We can bypass the constructor to change the value of Person.InstanceCount directly
-            type.SetFieldValue("InstanceCount", 2);
-            AssertTrue(2 == (int)type.GetFieldValue("InstanceCount"));
+			// Now, Person.InstanceCount should be 1
+			AssertTrue( 1 == (int) type.GetFieldValue( "InstanceCount" ) );
 
-            // Let's invoke Person.IncreaseCounter() static method to increase the counter
-            type.CallMethod("IncreaseInstanceCount");
-            AssertTrue(3 == (int)type.GetFieldValue("InstanceCount"));
+			// We can bypass the constructor to change the value of Person.InstanceCount directly
+			type.SetFieldValue( "InstanceCount", 2 );
+			AssertTrue( 2 == (int) type.GetFieldValue( "InstanceCount" ) );
 
-            // Now, let's retrieve Person.InstanceCount via the static method GetInstanceCount
-            AssertTrue(3 == (int)type.CallMethod("GetInstanceCount"));
+			// Let's invoke Person.IncreaseCounter() static method to increase the counter
+			type.CallMethod( "IncreaseInstanceCount" );
+			AssertTrue( 3 == (int) type.GetFieldValue( "InstanceCount" ) );
 
-            // Invoke method receiving ref/out params, we need to put arguments in an array
-            var arguments = new object[] { 1, 2 };
-            type.CallMethod("Swap", 
-                // Parameter types must be set to the appropriate ref type
-                new[] { typeof(int).MakeByRefType(), typeof(int).MakeByRefType() },
-                arguments);
-            AssertTrue(2 == (int)arguments[0]);
-            AssertTrue(1 == (int)arguments[1]);
+			// Now, let's retrieve Person.InstanceCount via the static method GetInstanceCount
+			AssertTrue( 3 == (int) type.CallMethod( "GetInstanceCount" ) );
 
-            // Now, invoke the 2-arg constructor.  We don't even have to specify parameter types
-            // if we know that the arguments are not null (Fasterflect will call arg[n].GetType() internally).
-            obj = type.CreateInstance(1, "Doe");
+			// Invoke method receiving ref/out params, we need to put arguments in an array
+			var arguments = new object[] { 1, 2 };
+			type.CallMethod( "Swap",
+			                 // Parameter types must be set to the appropriate ref type
+			                 new[] { typeof(int).MakeByRefType(), typeof(int).MakeByRefType() },
+			                 arguments );
+			AssertTrue( 2 == (int) arguments[ 0 ] );
+			AssertTrue( 1 == (int) arguments[ 1 ] );
 
-            // id and name should have been set properly
-            AssertTrue(1 == (int)obj.GetFieldValue("id"));
-            AssertTrue("Doe" == obj.GetPropertyValue("Name").ToString());
+			// Now, invoke the 2-arg constructor.  We don't even have to specify parameter types
+			// if we know that the arguments are not null (Fasterflect will call arg[n].GetType() internally).
+			obj = type.CreateInstance( 1, "Doe" );
 
-            // Let's use the indexer to retrieve the character at index 1
-            AssertTrue('o' == (char)obj.GetIndexer(1));
+			// id and name should have been set properly
+			AssertTrue( 1 == (int) obj.GetFieldValue( "id" ) );
+			AssertTrue( "Doe" == obj.GetPropertyValue( "Name" ).ToString() );
 
-            // If there's null argument, or when we're unsure whether there's a null argument
-            // we must explicitly specify the param type array
-            obj = type.CreateInstance( new[] { typeof(int), typeof(string) }, 1, null );
+			// Let's use the indexer to retrieve the character at index 1
+			AssertTrue( 'o' == (char) obj.GetIndexer( 1 ) );
 
-            // id and name should have been set properly
-            AssertTrue(1 == (int)obj.GetFieldValue("id"));
-            AssertTrue(null == obj.GetPropertyValue("Name"));
+			// If there's null argument, or when we're unsure whether there's a null argument
+			// we must explicitly specify the param type array
+			obj = type.CreateInstance( new[] { typeof(int), typeof(string) }, 1, null );
 
-            // Now, modify the id
-            obj.SetFieldValue("id", 2);
-            AssertTrue(2 == (int)obj.GetFieldValue("id"));
-            AssertTrue(2 == (int)obj.GetPropertyValue("Id"));
+			// id and name should have been set properly
+			AssertTrue( 1 == (int) obj.GetFieldValue( "id" ) );
+			AssertTrue( null == obj.GetPropertyValue( "Name" ) );
 
-            // We can chain calls
-            obj.SetFieldValue("id", 3)
-               .SetPropertyValue("Name", "Buu");
-            AssertTrue(3 == (int)obj.GetPropertyValue("Id"));
-            AssertTrue("Buu" == (string)obj.GetPropertyValue("Name"));
-             
-            // Map a set of properties from a source to a target
-            new { Id = 4, Name = "Nguyen" }.MapProperties( obj );
-            AssertTrue(4 == (int)obj.GetPropertyValue("Id"));
-            AssertTrue("Nguyen" == (string)obj.GetPropertyValue("Name"));
+			// Now, modify the id
+			obj.SetFieldValue( "id", 2 );
+			AssertTrue( 2 == (int) obj.GetFieldValue( "id" ) );
+			AssertTrue( 2 == (int) obj.GetPropertyValue( "Id" ) );
 
-            // Let's have the folk walk 6 miles
-    		obj.CallMethod("Walk", 6);
-    		
-            // Double-check the current value of the milesTravelled field
-            AssertTrue(6 == (int)obj.GetFieldValue("milesTraveled"));
+			// We can chain calls
+			obj.SetFieldValue( "id", 3 )
+				.SetPropertyValue( "Name", "Buu" );
+			AssertTrue( 3 == (int) obj.GetPropertyValue( "Id" ) );
+			AssertTrue( "Buu" == (string) obj.GetPropertyValue( "Name" ) );
 
-            // Construct an array of 10 elements for current type
-            var arr = type.MakeArrayType().CreateInstance(10);
+			// Map a set of properties from a source to a target
+			new { Id = 4, Name = "Nguyen" }.MapProperties( obj );
+			AssertTrue( 4 == (int) obj.GetPropertyValue( "Id" ) );
+			AssertTrue( "Nguyen" == (string) obj.GetPropertyValue( "Name" ) );
 
-            // GetValue & set element of array
-            obj = type.CreateInstance();
-            arr.SetElement(4, obj)
-               .SetElement(9, obj);
+			// Let's have the folk walk 6 miles
+			obj.CallMethod( "Walk", 6 );
 
-            AssertTrue(obj == arr.GetElement(4));
-            AssertTrue(obj == arr.GetElement(9));
-            AssertTrue(null == arr.GetElement(0));
-        }
+			// Double-check the current value of the milesTravelled field
+			AssertTrue( 6 == (int) obj.GetFieldValue( "milesTraveled" ) );
 
-        private static void ExecuteCacheApi(Type type)
-        {
-            var range = Enumerable.Range(0, 10).ToList();
+			// Construct an array of 10 elements for current type
+			object arr = type.MakeArrayType().CreateInstance( 10 );
 
-            // Let's cache the getter for InstanceCount
-            StaticMemberGetter count = type.DelegateForGetStaticFieldValue("InstanceCount");
+			// GetValue & set element of array
+			obj = type.CreateInstance();
+			arr.SetElement( 4, obj )
+				.SetElement( 9, obj );
 
-            // Now cache the 2-arg constructor of Person and playaround with the delegate returned
-            int currentInstanceCount = (int)count();
-            ConstructorInvoker ctor = type.DelegateForCreateInstance(new[] { typeof(int), typeof(string) });
-            range.ForEach(i =>
-            {
-                object obj = ctor(i, "_" + i);
-                AssertTrue(++currentInstanceCount == (int)count());
-                AssertTrue(i == (int)obj.GetFieldValue("id"));
-                AssertTrue("_" + i == obj.GetPropertyValue("Name").ToString());
-            });
+			AssertTrue( obj == arr.GetElement( 4 ) );
+			AssertTrue( obj == arr.GetElement( 9 ) );
+			AssertTrue( null == arr.GetElement( 0 ) );
+		}
 
-            // Getter/setter
-            MemberSetter nameSetter = type.DelegateForSetPropertyValue("Name");
-            MemberGetter nameGetter = type.DelegateForGetPropertyValue("Name");
+		private static void ExecuteCacheApi( Type type )
+		{
+			List<int> range = Enumerable.Range( 0, 10 ).ToList();
 
-            object person = ctor(1, "John");
-            AssertTrue("John" == (string)nameGetter(person));
-            nameSetter(person, "Jane");
-            AssertTrue("Jane" == (string)nameGetter(person));
+			// Let's cache the getter for the static InstanceCount
+			MemberGetter count = type.DelegateForGetFieldValue( "InstanceCount" );
 
-            // Invoke method
-            person = type.CreateInstance();
-            MethodInvoker walk = type.DelegateForCallMethod("Walk", new[] { typeof(int) });
-            range.ForEach(i => walk(person, i));
-            AssertTrue(range.Sum() == (int)person.GetFieldValue("milesTraveled"));
-            
-            // Map properties
-            var ano = new { Id = 4, Name = "Doe" };
-            var mapper = ano.GetType().DelegateForMap( type );
-            mapper(ano, person);
-            AssertTrue(4 == (int)person.GetPropertyValue("Id"));
-            AssertTrue("Doe" == (string)person.GetPropertyValue("Name"));
+			// Now cache the 2-arg constructor of Person and playaround with the delegate returned
+			var currentInstanceCount = (int) count( null );
+			ConstructorInvoker ctor = type.DelegateForCreateInstance( new[] { typeof(int), typeof(string) } );
+			range.ForEach( i =>
+			               {
+			               	object obj = ctor( i, "_" + i );
+			               	AssertTrue( ++currentInstanceCount == (int) count( null ) );
+			               	AssertTrue( i == (int) obj.GetFieldValue( "id" ) );
+			               	AssertTrue( "_" + i == obj.GetPropertyValue( "Name" ).ToString() );
+			               } );
 
-        }
+			// Getter/setter
+			MemberSetter nameSetter = type.DelegateForSetPropertyValue( "Name" );
+			MemberGetter nameGetter = type.DelegateForGetPropertyValue( "Name" );
 
-        public static void AssertTrue(bool expression)
-        {
-            if (!expression)
-                throw new Exception("Not true");
-            Console.WriteLine("Ok!");
-        }
-    }
+			object person = ctor( 1, "John" );
+			AssertTrue( "John" == (string) nameGetter( person ) );
+			nameSetter( person, "Jane" );
+			AssertTrue( "Jane" == (string) nameGetter( person ) );
 
+			// Invoke method
+			person = type.CreateInstance();
+			MethodInvoker walk = type.DelegateForCallMethod( "Walk", new[] { typeof(int) } );
+			range.ForEach( i => walk( person, i ) );
+			AssertTrue( range.Sum() == (int) person.GetFieldValue( "milesTraveled" ) );
+
+			// Map properties
+			var ano = new { Id = 4, Name = "Doe" };
+			ObjectMapper mapper = ano.GetType().DelegateForMap( type );
+			mapper( ano, person );
+			AssertTrue( 4 == (int) person.GetPropertyValue( "Id" ) );
+			AssertTrue( "Doe" == (string) person.GetPropertyValue( "Name" ) );
+		}
+
+		public static void AssertTrue( bool expression )
+		{
+			if( !expression )
+			{
+				throw new Exception( "Not true" );
+			}
+			Console.WriteLine( "Ok!" );
+		}
+	}
 }

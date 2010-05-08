@@ -66,6 +66,20 @@ namespace Fasterflect
 		}
 		#endregion
 
+		#region TypesImplementing
+		/// <summary>
+		/// Gets all types in the given <paramref name="assembly"/> that implement the given <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">The interface types should implement.</typeparam>
+		/// <param name="assembly">The assembly in which to look for types.</param>
+		/// <returns>A list of all matching types. This method never returns null.</returns>
+		public static IList<Type> TypesImplementing<T>( this Assembly assembly )
+		{
+			Type[] types = assembly.GetTypes();
+			return types.Where( t => t.Implements<T>() ).ToList();
+		}
+		#endregion
+
 		#region TypesWith Lookup
 		/// <summary>
 		/// Gets all types in the given <paramref name="assembly"/> that are decorated with an

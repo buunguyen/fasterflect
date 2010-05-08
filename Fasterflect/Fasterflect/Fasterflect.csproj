@@ -89,6 +89,7 @@
     <Compile Include="DynamicReflection\DynamicWrapper.cs" />
     <Compile Include="DynamicReflection\DynamicBuilder.cs" />
     <Compile Include="Extensions\Core\AssemblyExtensions.cs" />
+    <Compile Include="Extensions\Core\TypeExtensions.cs" />
     <Compile Include="Extensions\Core\ParameterInfoExtensions.cs" />
     <Compile Include="Common\MemberFilter.cs" />
     <Compile Include="Emitter\MapEmitter.cs" />

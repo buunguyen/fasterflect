@@ -19,22 +19,11 @@
 namespace Fasterflect
 {
     /// <summary>
-    /// A delegate to retrieve the value of a static field or property of a type.
-    /// </summary>
-    public delegate object StaticMemberGetter();
-
-    /// <summary>
     /// A delegate to retrieve the value of an instance field or property of an object.
     /// </summary>
     /// <param name="obj">The object whose field's or property's value is to be retrieved.</param>
     /// <returns>The value of the instance field or property.</returns>
     public delegate object MemberGetter( object obj );
-
-    /// <summary>
-    /// A delegate to set the value of a static field or property of a type.
-    /// </summary>
-    /// <param name="value">The value to be set to the field or property.</param>
-    public delegate void StaticMemberSetter( object value );
 
     /// <summary>
     /// A delegate to set the value of an instance field or property of an object.
@@ -58,14 +47,6 @@ namespace Fasterflect
     /// <param name="index">The index of the element to be retrieved</param>
     /// <returns>The element at <paramref name="index"/></returns>
     public delegate object ArrayElementGetter( object array, int index );
-
-    /// <summary>
-    /// A delegate to invoke a static method of a type.
-    /// </summary>
-    /// <param name="parameters">The properly-ordered parameter list of the method.</param>
-    /// <returns>The return value of the method.  Null is returned if the method has no
-    /// return type.</returns>
-    public delegate object StaticMethodInvoker( params object[] parameters );
 
     /// <summary>
     /// A delegate to invoke an instance method or indexer of an object.

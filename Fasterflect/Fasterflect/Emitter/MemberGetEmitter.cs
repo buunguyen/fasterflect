@@ -43,15 +43,12 @@ namespace Fasterflect.Emitter
 
         protected internal override DynamicMethod CreateDynamicMethod()
         {
-            return CallInfo.IsStatic
-                                    ? CreateDynamicMethod("getter", CallInfo.TargetType, Constants.ObjectType, null)
-                                    : CreateDynamicMethod("getter", CallInfo.TargetType, Constants.ObjectType,
-                                                          new[] { Constants.ObjectType });
+            return CreateDynamicMethod("getter", CallInfo.TargetType, Constants.ObjectType, new[] { Constants.ObjectType });
         }
 
 	    protected internal override Delegate CreateDelegate()
 		{
-			MemberInfo member = LookupUtils.GetMember(CallInfo);
+	    	MemberInfo member = CallInfo.MemberInfo;
 			bool handleInnerStruct = CallInfo.ShouldHandleInnerStruct;
 
 			if (handleInnerStruct)
@@ -64,21 +61,21 @@ namespace Fasterflect.Emitter
 			else if (!CallInfo.IsStatic)
 			{
                 Generator.ldarg_0                               // load arg-0 (this)
-				         .castclass( CallInfo.TargetType);      // (TargetType)this
+				         .castclass( CallInfo.TargetType );     // (TargetType)this
 			}
 
 			if (member.MemberType == MemberTypes.Field)
 			{
 				var field = member as FieldInfo;
-                Generator.ldfld(CallInfo.IsStatic, field)       // (this|tmpStr).field OR TargetType.field
-                         .boxIfValueType(field.FieldType);      // (object)<stack>
+                Generator.ldfld( field.IsStatic, field )        // (this|tmpStr).field OR TargetType.field
+                         .boxIfValueType( field.FieldType );    // (object)<stack>
 			}
 			else
 			{
 				var prop = member as PropertyInfo;
                 MethodInfo getMethod = LookupUtils.GetPropertyGetMethod(prop, CallInfo);
-                Generator.call(CallInfo.IsStatic || CallInfo.IsTargetTypeStruct, getMethod) // (this|tmpStr).prop OR TargetType.prop
-                         .boxIfValueType(prop.PropertyType);                                // (object)<stack>
+                Generator.call(getMethod.IsStatic || CallInfo.IsTargetTypeStruct, getMethod ) // (this|tmpStr).prop OR TargetType.prop
+                         .boxIfValueType(prop.PropertyType);    // (object)<stack>
 			}
 
 			if (handleInnerStruct)
@@ -90,9 +87,7 @@ namespace Fasterflect.Emitter
 
 	        Generator.ret();
 
-			return CallInfo.IsStatic
-			       	? Method.CreateDelegate(typeof (StaticMemberGetter))
-			       	: Method.CreateDelegate(typeof (MemberGetter));
+			return Method.CreateDelegate(typeof (MemberGetter));
 		}
 	}
 }

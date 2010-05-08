@@ -173,7 +173,7 @@ namespace FasterflectSample.Internal
 				int index = type.Name.IndexOf( "`" );
 				string genericTypeName = index > 0 ? type.Name.Substring( 0, index ) : type.Name;
 				string genericArgs = string.Join( ",", type.GetGenericArguments().Select( GetTypeName ) );
-				return genericTypeName + "<" + genericArgs + ">";
+				return genericArgs.Length == 0 ? genericTypeName : genericTypeName + "<" + genericArgs + ">";
 			}
 			return GetCSharpTypeName( type.Name );
 		}

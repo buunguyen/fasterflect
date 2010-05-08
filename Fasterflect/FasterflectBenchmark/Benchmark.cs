@@ -547,8 +547,8 @@ namespace FasterflectBenchmark
         private static void RunStaticFieldBenchmark()
         {
             FieldInfo fieldInfo = null;
-            StaticMemberSetter setter = null;
-            StaticMemberGetter getter = null;
+            MemberSetter setter = null;
+            MemberGetter getter = null;
             var initMap = new Dictionary<string, Action>
                           {
                               {
@@ -561,11 +561,11 @@ namespace FasterflectBenchmark
                                   },
                               {
                                   "Init setter",
-                                  () => { setter = TargetType.DelegateForSetStaticFieldValue( "counter" ); }
+                                  () => { setter = TargetType.DelegateForSetFieldValue( "counter" ); }
                                   },
                               {
                                   "Init getter",
-                                  () => { getter = TargetType.DelegateForGetStaticFieldValue( "counter" ); }
+                                  () => { getter = TargetType.DelegateForGetFieldValue( "counter" ); }
                                   }
                           };
 
@@ -577,8 +577,8 @@ namespace FasterflectBenchmark
                                 { "Reflection get", () => fieldInfo.GetValue( TargetType ) },
                                 { "Fasterflect set", () => TargetType.SetFieldValue( "counter", 1 ) },
                                 { "Fasterflect get", () => TargetType.GetFieldValue( "counter" ) },
-                                { "Fasterflect cached set", () => setter( 1 ) },
-                                { "Fasterflect cached get", () => getter() },
+                                { "Fasterflect cached set", () => setter( null, 1 ) },
+                                { "Fasterflect cached get", () => getter( null ) },
                             };
             Execute( "Benchmark for Static Field Access", initMap, actionMap );
         }
@@ -626,8 +626,8 @@ namespace FasterflectBenchmark
         private static void RunStaticPropertyBenchmark()
         {
             PropertyInfo propInfo = null;
-            StaticMemberSetter setter = null;
-            StaticMemberGetter getter = null;
+            MemberSetter setter = null;
+            MemberGetter getter = null;
 
             var initMap = new Dictionary<string, Action>
                           {
@@ -641,11 +641,11 @@ namespace FasterflectBenchmark
                                   },
                               {
                                   "Init setter",
-                                  () => { setter = TargetType.DelegateForSetStaticPropertyValue( "Counter" ); }
+                                  () => { setter = TargetType.DelegateForSetPropertyValue( "Counter" ); }
                                   },
                               {
                                   "Init getter",
-                                  () => { getter = TargetType.DelegateForGetStaticPropertyValue( "Counter" ); }
+                                  () => { getter = TargetType.DelegateForGetPropertyValue( "Counter" ); }
                                   }
                           };
 
@@ -657,8 +657,8 @@ namespace FasterflectBenchmark
                                 { "Reflection get", () => propInfo.GetValue( TargetType, null ) },
                                 { "Fasterflect set", () => TargetType.SetPropertyValue( "Counter", 10 ) },
                                 { "Fasterflect get", () => TargetType.GetPropertyValue( "Counter" ) },
-                                { "Fasterflect cached set", () => setter( 10 ) },
-                                { "Fasterflect cached get", () => getter() },
+                                { "Fasterflect cached set", () => setter( null, 10 ) },
+                                { "Fasterflect cached get", () => getter( null ) },
                             };
             Execute( "Benchmark for Static Property Access", initMap, actionMap );
         }
@@ -800,8 +800,8 @@ namespace FasterflectBenchmark
         {
             MethodInfo noArgMethodInfo = null;
             MethodInfo argMethodInfo = null;
-            StaticMethodInvoker noArgInvoker = null;
-            StaticMethodInvoker argInvoker = null;
+            MethodInvoker noArgInvoker = null;
+            MethodInvoker argInvoker = null;
 
             var initMap = new Dictionary<string, Action>
                           {
@@ -827,13 +827,13 @@ namespace FasterflectBenchmark
                                   },
                               {
                                   "Init no-arg invoker",
-                                  () => { noArgInvoker = TargetType.DelegateForCallStaticMethod( "Generate" ); }
+                                  () => { noArgInvoker = TargetType.DelegateForCallMethod( "Generate" ); }
                                   },
                               {
                                   "Init arg invoker",
                                   () =>
                                   {
-                                      argInvoker = TargetType.DelegateForCallStaticMethod( "Generate",
+                                      argInvoker = TargetType.DelegateForCallMethod( "Generate",
                                                                                            new[] { typeof(int) } );
                                   }
                                   }
@@ -850,8 +850,8 @@ namespace FasterflectBenchmark
                                     "Fasterflect invoke (arg)",
                                     () => TargetType.CallMethod( "Generate", new[] { typeof(int) }, ArgArray )
                                     },
-                                { "Fasterflect cached invoke", () => noArgInvoker( NoArgArray ) },
-                                { "Fasterflect cached invoke (arg)", () => argInvoker( ArgArray ) }
+                                { "Fasterflect cached invoke", () => noArgInvoker( null, NoArgArray ) },
+                                { "Fasterflect cached invoke (arg)", () => argInvoker( null, ArgArray ) }
                             };
             Execute( "Benchmark for Static Method Invocation", initMap, actionMap );
         }

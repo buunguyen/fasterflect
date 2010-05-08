@@ -34,6 +34,7 @@ namespace Fasterflect.Emitter
             ctorInfo = callInfo.TargetType.Constructor( callInfo.BindingFlags, callInfo.ParamTypes );
             if (ctorInfo == null)
                 throw new MissingMemberException("Constructor does not exist");
+			//callInfo.MemberInfo = ctorInfo;
             return ctorInfo;
         }
 
@@ -45,9 +46,11 @@ namespace Fasterflect.Emitter
 
             methodInfo = callInfo.TargetType.Method( callInfo.Name, callInfo.ParamTypes, callInfo.BindingFlags );
             if (methodInfo == null)
-                throw new MissingMethodException(callInfo.IsStatic
-                                                    ? "Static method "
-                                                    : "Method " + callInfo.Name + " does not exist");
+			{
+				const string fmt = "No match for method with name {0} and flags {1} on type {2}.";
+				throw new MissingMethodException( string.Format( fmt, callInfo.Name, callInfo.BindingFlags, callInfo.TargetType ) );
+			}
+			//callInfo.MemberInfo = methodInfo;
             return methodInfo;
         }
 
@@ -61,16 +64,22 @@ namespace Fasterflect.Emitter
             {
                 memberInfo = callInfo.TargetType.Property(callInfo.Name, callInfo.BindingFlags);
                 if (memberInfo == null)
-                        throw new MissingMemberException((callInfo.IsStatic ? "Static property" : "Property") +
-                            " '" + callInfo.Name + "' does not exist");
-                return memberInfo;
+				{
+					const string fmt = "No match for property with name {0} and flags {1} on type {2}.";
+					throw new MissingMemberException( string.Format( fmt, callInfo.Name, callInfo.BindingFlags, callInfo.TargetType ) );
+				}
+				//callInfo.MemberInfo = memberInfo;
+				return memberInfo;
             }
             if (callInfo.MemberTypes == MemberTypes.Field)
             {
                 memberInfo = callInfo.TargetType.Field(callInfo.Name, callInfo.BindingFlags);
                 if (memberInfo == null)
-                    throw new MissingFieldException((callInfo.IsStatic ? "Static field" : "Field") +
-                        " '" + callInfo.Name + "' does not exist");
+				{
+					const string fmt = "No match for field with name {0} and flags {1} on type {2}.";
+					throw new MissingFieldException( string.Format( fmt, callInfo.Name, callInfo.BindingFlags, callInfo.TargetType ) );
+				}
+				//callInfo.MemberInfo = memberInfo;
                 return memberInfo;
             }
             throw new ArgumentException(callInfo.MemberTypes + " is not supported");
@@ -79,21 +88,29 @@ namespace Fasterflect.Emitter
         public static MethodInfo GetPropertyGetMethod(PropertyInfo propInfo, CallInfo callInfo)
         {
             var methodInfo = propInfo.GetGetMethod();
-            return methodInfo ?? GetPropertyMethod("get_", "Getter", callInfo);
+			//if( methodInfo != null )
+			//    callInfo.MemberInfo = methodInfo;
+			return methodInfo ?? GetPropertyMethod("get_", "getter", callInfo);
         }
 
         public static MethodInfo GetPropertySetMethod(PropertyInfo propInfo, CallInfo callInfo)
         {
             var methodInfo = propInfo.GetSetMethod();
-            return methodInfo ?? GetPropertyMethod("set_", "Setter", callInfo);
+			//if( methodInfo != null )
+			//    callInfo.MemberInfo = methodInfo;
+            return methodInfo ?? GetPropertyMethod("set_", "setter", callInfo);
         }
 
-        private static MethodInfo GetPropertyMethod(string infoPrefix, string errorPrefix, CallInfo callInfo)
+        private static MethodInfo GetPropertyMethod(string infoPrefix, string propertyMethod, CallInfo callInfo)
         {
-            MethodInfo setMethod = callInfo.TargetType.Method(infoPrefix + callInfo.Name, callInfo.BindingFlags);
-            if (setMethod == null)
-                throw new MissingMemberException(errorPrefix + " method for property " + callInfo.Name + " does not exist");
-            return setMethod;
+            MethodInfo method = callInfo.TargetType.Method(infoPrefix + callInfo.Name, callInfo.BindingFlags);
+            if (method == null)
+			{
+				const string fmt = "No {0} for property {1} with flags {2} on type {3}.";
+				throw new MissingFieldException( string.Format( fmt, propertyMethod, callInfo.Name, callInfo.BindingFlags, callInfo.TargetType ) );
+			}
+			//callInfo.MemberInfo = method;
+            return method;
         }
     }
 }

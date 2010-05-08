@@ -1,6 +1,5 @@
 #region License
-
-// Copyright 2010 Morten Mertner, Buu Nguyen (http://www.buunguyen.net/blog)
+// Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
 // you may not use this file except in compliance with the License. 
@@ -15,28 +14,26 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
-using Fasterflect.Emitter;
+using System;
 
 namespace Fasterflect
 {
 	/// <summary>
-	/// Extension methods for working with types.
+	/// Extension methods for inspecting types.
 	/// </summary>
 	public static class TypeExtensions
 	{
-		///<summary>
-		/// Returns a wrapper <seealso cref="ValueTypeHolder"/> instance if <paramref name="obj"/> 
-		/// is a value type.  Otherwise, returns <paramref name="obj"/>.
-		///</summary>
-		///<param name="obj">An object to be examined.</param>
-		///<returns>A wrapper <seealso cref="ValueTypeHolder"/> instance if <paramref name="obj"/>
-		/// is a value type, or <paramref name="obj"/> itself if it's a reference type.</returns>
-		public static object CreateHolderIfValueType(this object obj)
+		/// <summary>
+		/// Returns true of the supplied <paramref name="type"/> implements the given <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">The type (interface) to check for.</typeparam>
+		/// <param name="type">The type to check.</param>
+		/// <returns>True if the given type implements the interface.</returns>
+		public static bool Implements<T>( this Type type )
 		{
-			return obj.GetType().IsValueType ? new ValueTypeHolder(obj) : obj;
+			return typeof(T).IsAssignableFrom( type ) && typeof(T) != type;
 		}
 	}
 }

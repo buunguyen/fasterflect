@@ -43,15 +43,13 @@ namespace Fasterflect.Emitter
 		protected internal override DynamicMethod CreateDynamicMethod()
 		{
 			return CreateDynamicMethod( "invoke", CallInfo.TargetType, Constants.ObjectType,
-			                            CallInfo.IsStatic
-			                            	? new[] { Constants.ObjectType.MakeArrayType() }
-			                            	: new[] { Constants.ObjectType, Constants.ObjectType.MakeArrayType() } );
+				new[] { Constants.ObjectType, Constants.ObjectType.MakeArrayType() } );
 		}
 
 		protected internal override Delegate CreateDelegate()
 		{
-			MethodInfo methodInfo = LookupUtils.GetMethod( CallInfo );
-			byte paramArrayIndex = CallInfo.IsStatic ? (byte) 0 : (byte) 1;
+			MethodInfo methodInfo = (MethodInfo) CallInfo.MemberInfo ?? LookupUtils.GetMethod( CallInfo );
+			const byte paramArrayIndex = 1;
 			bool hasReturnType = methodInfo.ReturnType != Constants.VoidType;
 
 			byte startUsableLocalIndex = 0;
@@ -96,16 +94,14 @@ namespace Fasterflect.Emitter
 			}
 			Generator.ret();
 
-			return Method.CreateDelegate( CallInfo.IsStatic
-			                              	? typeof(StaticMethodInvoker)
-			                              	: typeof(MethodInvoker) );
+			return Method.CreateDelegate( typeof(MethodInvoker) );
 		}
 
 		private void GenerateInvocation( MethodInfo methodInfo, byte paramArrayIndex, byte structLocalPosition )
 		{
-			if( !CallInfo.IsStatic )
+			if( ! CallInfo.IsStatic )
 			{
-				Generator.ldarg_0.end(); // load arg-0 (this);
+				Generator.ldarg_0.end(); // load arg-0 (this/null);
 				if( CallInfo.ShouldHandleInnerStruct )
 				{
 					Generator.DeclareLocal( CallInfo.TargetType ); // TargetType tmpStr;
@@ -117,7 +113,7 @@ namespace Fasterflect.Emitter
 				}
 			}
 			PushParamsOrLocalsToStack( paramArrayIndex ); // push arguments and by_ref_locals
-			Generator.call( CallInfo.IsStatic || CallInfo.IsTargetTypeStruct, methodInfo ); // call OR callvirt
+			Generator.call( methodInfo.IsStatic || CallInfo.IsTargetTypeStruct, methodInfo ); // call OR callvirt
 		}
 	}
 }

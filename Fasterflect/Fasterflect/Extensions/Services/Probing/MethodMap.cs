@@ -60,8 +60,7 @@ namespace Fasterflect.Probing
 		protected int requiredFoundCount;
 		protected int requiredParameterCount;
 		protected Type type;
-		private MethodInvoker instanceInvoker;
-		private StaticMethodInvoker staticInvoker;
+		private MethodInvoker invoker;
 		#endregion
 
 		#region Constructors and Initialization
@@ -391,11 +390,7 @@ namespace Fasterflect.Probing
 		public virtual object Invoke( object target, object[] row )
 		{
 			object[] methodParameters = isPerfectMatch ? row : PrepareParameters( row );
-			if( method.IsStatic )
-			{
-				return staticInvoker.Invoke( target as Type, methodParameters );
-			}
-			return instanceInvoker.Invoke( target, methodParameters );
+			return invoker.Invoke( target, methodParameters );
 		}
 
 		internal Type[] GetParamTypes()
@@ -486,15 +481,7 @@ namespace Fasterflect.Probing
 		internal virtual void InitializeInvoker()
 		{
 			var mi = method as MethodInfo;
-			// invoker = method.IsStatic ? mi.DelegateForCallStaticMethod() : mi.DelegateForCallMethod();
-			if( method.IsStatic )
-			{
-				staticInvoker = mi.DelegateForCallStaticMethod();
-			}
-			else
-			{
-				instanceInvoker = mi.DelegateForCallMethod();
-			}
+			invoker = mi.DelegateForCallMethod();
 		}
 	}
 }

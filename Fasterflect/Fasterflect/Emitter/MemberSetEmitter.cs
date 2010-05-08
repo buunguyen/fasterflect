@@ -43,42 +43,45 @@ namespace Fasterflect.Emitter
 
         protected internal override DynamicMethod CreateDynamicMethod()
         {
-            return CallInfo.IsStatic
-                                    ? CreateDynamicMethod("setter", CallInfo.TargetType, null, new[] { Constants.ObjectType })
-                                    : CreateDynamicMethod("setter", CallInfo.TargetType, null,
-                                                          new[] { Constants.ObjectType, Constants.ObjectType });
+            return CreateDynamicMethod("setter", CallInfo.TargetType, null, new[] { Constants.ObjectType, Constants.ObjectType });
         }
 
 		protected internal override Delegate CreateDelegate()
 		{
-            MemberInfo member = LookupUtils.GetMember(CallInfo);
+			MemberInfo member = CallInfo.MemberInfo;
 			bool handleInnerStruct = CallInfo.ShouldHandleInnerStruct;
 
-			Generator.ldarg_0.end();                            // load arg-0 (this or value-to-be-set)
-			if (handleInnerStruct)
+			if( CallInfo.IsStatic )
 			{
-				Generator.DeclareLocal(CallInfo.TargetType);    // TargetType tmpStr
-				LoadInnerStructToLocal(0);                      // tmpStr = ((ValueTypeHolder)this)).Value;
-                Generator.ldarg_1.end();                        // load value-to-be-set;
+				Generator.ldarg_1.end();							// load value-to-be-set
 			}
-			else if (!CallInfo.IsStatic)
+			else 
 			{
-                Generator.castclass( CallInfo.TargetType )      // (TargetType)this
-				         .ldarg_1.end();                        // load value-to-be-set;
+				Generator.ldarg_0.end();							// load arg-0 (this)
+				if (handleInnerStruct)
+				{
+					Generator.DeclareLocal(CallInfo.TargetType);    // TargetType tmpStr
+					LoadInnerStructToLocal(0);                      // tmpStr = ((ValueTypeHolder)this)).Value;
+					Generator.ldarg_1.end();                        // load value-to-be-set;
+				}
+				else
+				{
+					Generator.castclass( CallInfo.TargetType )      // (TargetType)this
+						.ldarg_1.end();								// load value-to-be-set;
+				}
 			}
 
-			Type memberType = member is FieldInfo
-			                  	? ((FieldInfo) member).FieldType
-			                  	: ((PropertyInfo) member).PropertyType;
-            Generator.CastFromObject(memberType);               // unbox | cast value-to-be-set
+            Generator.CastFromObject( member.Type() );				// unbox | cast value-to-be-set
 			if (member.MemberType == MemberTypes.Field)
 			{
-                Generator.stfld(CallInfo.IsStatic, (FieldInfo)member);  // (this|tmpStr).field = value-to-be-set;
+				var field = member as FieldInfo;
+                Generator.stfld(field.IsStatic, field);				// (this|tmpStr).field = value-to-be-set;
 			}
 			else
 			{
-				MethodInfo setMethod = LookupUtils.GetPropertySetMethod((PropertyInfo) member, CallInfo);
-                Generator.call(CallInfo.IsStatic || CallInfo.IsTargetTypeStruct, setMethod); // (this|tmpStr).set_Prop(value-to-be-set);
+				var prop = member as PropertyInfo;
+				MethodInfo setMethod = LookupUtils.GetPropertySetMethod(prop, CallInfo);
+                Generator.call(setMethod.IsStatic || CallInfo.IsTargetTypeStruct, setMethod); // (this|tmpStr).set_Prop(value-to-be-set);
 			}
 
 			if (handleInnerStruct)
@@ -88,9 +91,7 @@ namespace Fasterflect.Emitter
 
 		    Generator.ret();
 
-			return CallInfo.IsStatic
-			       	? Method.CreateDelegate(typeof (StaticMemberSetter))
-			       	: Method.CreateDelegate(typeof (MemberSetter));
+			return Method.CreateDelegate(typeof (MemberSetter));
 		}
 	}
 }
