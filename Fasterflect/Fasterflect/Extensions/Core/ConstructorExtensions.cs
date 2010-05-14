@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
 
@@ -103,8 +104,26 @@ namespace Fasterflect
         }
         #endregion
 
-        #region Constructor Lookup (Single)
-        /// <summary>
+		#region Constructor Invocation (CreateInstances)
+		/// <summary>
+		/// Finds all types implementing a specific interface or base class <typeparamref name="T"/> in the
+		/// given <paramref name="assembly"/> and invokes the default constructor on each to return a list of
+		/// instances. Any type that is not a class or does not have a default constructor is ignored.
+		/// </summary>
+		/// <typeparam name="T">The interface or base class type to look for in the given assembly.</typeparam>
+		/// <param name="assembly">The assembly in which to look for types derived from the type parameter.</param>
+		/// <returns>A list containing one instance for every unique type implementing T. This will never be null.</returns>
+		public static IList<T> CreateInstances<T>( this Assembly assembly )
+		{
+			var query = from type in assembly.TypesImplementing<T>() 
+						where type.IsClass && type.Constructor() != null 
+						select (T) type.CreateInstance();
+			return query.ToList();
+		}
+    	#endregion
+
+		#region Constructor Lookup (Single)
+		/// <summary>
         /// Gets the constructor corresponding to the supplied <paramref name="parameterTypes"/> on the
         /// given <paramref name="type"/>.
         /// </summary>

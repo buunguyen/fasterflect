@@ -21,6 +21,8 @@
 using System;
 using System.Reflection;
 using Fasterflect;
+using FasterflectTest.SampleModel.Animals;
+using FasterflectTest.SampleModel.Animals.Interfaces;
 using FasterflectTest.SampleModel.People;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -135,6 +137,23 @@ namespace FasterflectTest.Invocation
                    var person = ctorInfo.CreateInstance( null, 10 ).WrapIfValueType();
                    VerifyFields( person, new { name = (string) null, age = 10 } );
                } );
+        }
+
+		[TestMethod]
+        public void TestInvokeViaAssemblyScanner()
+        {
+			var assembly = Assembly.GetExecutingAssembly();
+			var list1 = assembly.CreateInstances<ISwimmable>();
+			Assert.AreEqual( 1, list1.Count );
+			Assert.IsInstanceOfType( list1[ 0 ], typeof(ISwimmable) );
+
+			var list2 = assembly.CreateInstances<ISlide>();
+			Assert.AreEqual( 1, list2.Count );
+			Assert.IsInstanceOfType( list2[ 0 ], typeof(ISlide) );
+
+			var list3 = assembly.CreateInstances<Mammal>();
+			Assert.AreEqual( 2, list3.Count ); // Elephant + Lion (Giraffe has no default ctor)
+			list3.ForEach( o => Assert.IsInstanceOfType( o, typeof(Mammal) ) );
         }
     }
 }
