@@ -19,6 +19,7 @@
 using System;
 using System.Reflection;
 using Fasterflect;
+using FasterflectTest.SampleModel.People;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.Invocation
@@ -160,6 +161,15 @@ namespace FasterflectTest.Invocation
 		public void TestSetNullToValueType()
 		{
 			RunWith( ( object person ) => person.SetPropertyValue( "Age", null ) );
+		}
+
+		[TestMethod]
+		public void TestGetPropertyUsingMemberExpression()
+		{
+			var person = new Person( "Arthur", 32 );
+			Assert.AreEqual( "Arthur", person.GetPropertyValue( () => person.Name ) );
+			person.SetPropertyValue( () => person.Name, "Ford" );
+			Assert.AreEqual( "Ford", person.Name );
 		}
 	}
 }
