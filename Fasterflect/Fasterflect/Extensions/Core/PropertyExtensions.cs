@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using Fasterflect.Emitter;
 
@@ -67,6 +68,34 @@ namespace Fasterflect
         public static object GetPropertyValue( this object obj, string name, Flags bindingFlags )
         {
             return DelegateForGetPropertyValue( obj.GetTypeAdjusted(), name, bindingFlags )( obj );
+        }
+
+        /// <summary>
+        /// Sets the property specified by <param name="memberExpression"/> on the given <param name="obj"/> to the 
+        /// specified <param name="value" />.
+        /// </summary>
+        /// <returns><paramref name="obj"/>.</returns>
+        public static object SetPropertyValue( this object obj, Expression<Func<object>> memberExpression, object value )
+        {
+        	var body = memberExpression != null ? memberExpression.Body as MemberExpression : null;
+			if( body == null || body.Member == null )
+			{
+				throw new ArgumentNullException( "memberExpression" );
+			}
+        	return obj.SetPropertyValue( body.Member.Name, value );
+        }
+
+        /// <summary>
+        /// Gets the value of the property specified by <param name="memberExpression"/> on the given <param name="obj"/>.
+        /// </summary>
+        public static object GetPropertyValue( this object obj, Expression<Func<object>> memberExpression )
+        {
+        	var body = memberExpression != null ? memberExpression.Body as MemberExpression : null;
+			if( body == null || body.Member == null )
+			{
+				throw new ArgumentNullException( "memberExpression" );
+			}
+        	return obj.GetPropertyValue( body.Member.Name );
         }
 
         /// <summary>
