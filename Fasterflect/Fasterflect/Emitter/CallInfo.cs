@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -25,6 +26,7 @@ namespace Fasterflect.Emitter
     /// <summary>
     /// Stores all necessary information to construct a dynamic method.
     /// </summary>
+    [DebuggerStepThrough]
     internal class CallInfo
     {
         public Type TargetType { get; private set; }

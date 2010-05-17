@@ -20,12 +20,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Reflection;
 using Fasterflect.Emitter;
 
 namespace Fasterflect
 {
+    [DebuggerStepThrough]
 	internal static class Utils
 	{
 		public static Type GetTypeAdjusted( this object obj )
