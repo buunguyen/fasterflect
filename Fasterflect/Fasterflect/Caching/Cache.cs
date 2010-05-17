@@ -18,6 +18,7 @@
 
 #endregion
 
+
 namespace Fasterflect.Caching
 {
 #if DOT_NET_4
@@ -25,12 +26,14 @@ namespace Fasterflect.Caching
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-
+    using System.Diagnostics;
+    
+    [DebuggerStepThrough]
     internal sealed class Cache<TKey, TValue>
     {
         private readonly IDictionary<TKey, object> entries;
 
-        #region Constructors
+    #region Constructors
         public Cache()
         {
             entries = new ConcurrentDictionary<TKey, object>();
@@ -39,9 +42,9 @@ namespace Fasterflect.Caching
         {
             entries = new ConcurrentDictionary<TKey, object>(equalityComparer);
         }
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
         /// <summary>
         /// Returns the number of entries currently stored in the cache. Accessing this property
         /// causes a check of all entries in the cache to ensure collected entries are not counted.
@@ -50,9 +53,9 @@ namespace Fasterflect.Caching
         {
             get { return ClearCollected(); }
         }
-        #endregion
+    #endregion
 
-        #region Indexers
+    #region Indexers
         /// <summary>
         /// Indexer for accessing or adding cache entries.
         /// </summary>
@@ -69,9 +72,9 @@ namespace Fasterflect.Caching
         {
             set { Insert(key, value, strategy); }
         }
-        #endregion
+    #endregion
 
-        #region Insert Methods
+    #region Insert Methods
         /// <summary>
         /// Insert a collectible object into the cache.
         /// </summary>
@@ -95,9 +98,9 @@ namespace Fasterflect.Caching
                 ? new WeakReference(value) 
                 : value as object;
         }
-        #endregion
+    #endregion
 
-        #region Get Methods
+    #region Get Methods
         /// <summary>
         /// Retrieves an entry from the cache using the given key.
         /// </summary>
@@ -110,9 +113,9 @@ namespace Fasterflect.Caching
             var wr = entry as WeakReference;
             return (TValue)(wr != null ? wr.Target : entry);
         }
-        #endregion
+    #endregion
 
-        #region Remove Methods
+    #region Remove Methods
         /// <summary>
         /// Removes the object associated with the given key from the cache.
         /// </summary>
@@ -122,9 +125,9 @@ namespace Fasterflect.Caching
         {
             return entries.Remove(key);
         }
-        #endregion
+    #endregion
 
-        #region Clear Methods
+    #region Clear Methods
         /// <summary>
         /// Removes all entries from the cache.
         /// </summary>
@@ -143,9 +146,9 @@ namespace Fasterflect.Caching
             keys.ForEach(k => entries.Remove(k));
             return entries.Count;
         }
-        #endregion
+    #endregion
 
-        #region ToString
+    #region ToString
         /// <summary>
         /// This method returns a string with information on the cache contents (number of contained objects).
         /// </summary>
@@ -154,14 +157,16 @@ namespace Fasterflect.Caching
             int count = ClearCollected();
             return count > 0 ? String.Format("Cache contains {0} live objects.", count) : "Cache is empty.";
         }
-        #endregion
+    #endregion
     }
 #elif DOT_NET_35
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using System.Diagnostics;
 
+    [DebuggerStepThrough]
 	internal sealed class Cache<TKey,TValue>
 	{
 		private readonly Dictionary<TKey, object> entries;
