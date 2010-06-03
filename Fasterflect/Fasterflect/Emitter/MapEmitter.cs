@@ -39,7 +39,8 @@ namespace Fasterflect.Emitter
                 MemberTypes.Custom, 
                 "Fasterflect_Map", 
                 Type.EmptyTypes, 
-                null))
+                null,
+				false))
         {
             this.sourceType = sourceType;
             this.sourceMemberTypes = sourceMemberTypes;

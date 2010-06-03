@@ -30,14 +30,17 @@ namespace Fasterflect.Emitter
     internal class CallInfo
     {
         public Type TargetType { get; private set; }
-        public Flags BindingFlags { get; private set; }
+        public Flags BindingFlags { get; internal set; }
         public MemberTypes MemberTypes { get; set; }
         public Type[] ParamTypes { get; private set; }
         public string Name { get; private set; }
+		public bool IsReadOperation { get; set; }
+		// discovered dynamically, not part of CallInfo identity:
         public MemberInfo MemberInfo { get; internal set; }
+		public bool IsStatic { get; internal set; }
 
         public CallInfo( Type targetType, Flags bindingFlags, MemberTypes memberTypes, string name,
-                         Type[] parameterTypes, MemberInfo memberInfo )
+                         Type[] parameterTypes, MemberInfo memberInfo, bool isReadOperation )
         {
             TargetType = targetType;
             BindingFlags = bindingFlags;
@@ -47,6 +50,8 @@ namespace Fasterflect.Emitter
                              ? Type.EmptyTypes
                              : parameterTypes;
             MemberInfo = memberInfo;
+        	IsReadOperation = isReadOperation;
+        	IsStatic = BindingFlags.IsSet( Flags.Static );
         }
 
         /// <summary>
@@ -59,11 +64,6 @@ namespace Fasterflect.Emitter
         {
             get { return IsTargetTypeStruct && !IsStatic; }
         }
-
-		public bool IsStatic
-		{
-		    get { return BindingFlags.IsSet( Flags.Static ); }
-		}
 
         public bool IsTargetTypeStruct
         {
@@ -97,11 +97,11 @@ namespace Fasterflect.Emitter
                 return true;
             }
 
-            if( other.MemberInfo != MemberInfo ||
-                other.TargetType != TargetType ||
+            if( other.TargetType != TargetType ||
                 other.Name != Name ||
                 other.MemberTypes != MemberTypes ||
                 other.BindingFlags != BindingFlags ||
+				other.IsReadOperation != IsReadOperation ||
                 other.ParamTypes.Length != ParamTypes.Length )
             {
                 return false;
@@ -120,16 +120,12 @@ namespace Fasterflect.Emitter
 
         public override int GetHashCode()
         {
-            int hash = TargetType.GetHashCode() + (int) MemberTypes * Name.GetHashCode() + BindingFlags.GetHashCode();
-            if( MemberInfo != null )
-            {
-                hash += MemberInfo.GetHashCode();
-            }
+        	int hash = TargetType.GetHashCode() + (int) MemberTypes * Name.GetHashCode() + BindingFlags.GetHashCode() + IsReadOperation.GetHashCode();
             for( int i = 0; i < ParamTypes.Length; i++ )
             {
                 hash += ParamTypes[ i ].GetHashCode();
             }
             return hash;
-        }
+        }        
     }
 }

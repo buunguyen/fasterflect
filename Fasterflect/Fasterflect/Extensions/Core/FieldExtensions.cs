@@ -93,7 +93,8 @@ namespace Fasterflect
         /// </summary>
         public static MemberSetter DelegateForSetFieldValue( this Type type, string name, Flags bindingFlags )
         {
-        	return type.FindField( name, bindingFlags ).DelegateForSetFieldValue();
+			var callInfo = new CallInfo( type, bindingFlags, MemberTypes.Field, name, null, null, false );
+			return (MemberSetter) new MemberSetEmitter( callInfo ).GetDelegate();
         }
 
         /// <summary>
@@ -102,19 +103,9 @@ namespace Fasterflect
         /// </summary>
         public static MemberGetter DelegateForGetFieldValue( this Type type, string name, Flags bindingFlags )
         {
-        	return type.FindField( name, bindingFlags ).DelegateForGetFieldValue();
+			var callInfo = new CallInfo( type, bindingFlags, MemberTypes.Field, name, null, null, true );
+			return (MemberGetter) new MemberGetEmitter( callInfo ).GetDelegate();
         }
-
-		private static FieldInfo FindField( this Type type, string name, Flags bindingFlags )
-		{
-	       	var field = type.Field( name, bindingFlags );
-			if( field == null )
-			{
-				const string fmt = "No match for property with name {0} and flags {1} on type {2}.";
-				throw new MissingFieldException( string.Format( fmt, name, bindingFlags, type ) );
-			}
-        	return field;
-		}
         #endregion
 
         #region Field Lookup (Single)

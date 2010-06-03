@@ -42,16 +42,16 @@ namespace Fasterflect.Emitter
         
         internal Delegate GetDelegate()
         {
-            int cacheKey = GetCacheKey();
-            Delegate action = cache.Get( cacheKey );
-            if( action == null )
-            {
-                Method = CreateDynamicMethod();
-                Generator = new EmitHelper( Method.GetILGenerator() );
-                action = CreateDelegate();
-                cache.Insert( cacheKey, action, CacheStrategy.Temporary );
-            }
-            return action;
+        	int cacheKey = GetCacheKey();
+        	var action = cache.Get( cacheKey );
+			if( action == null )
+			{
+				Method = CreateDynamicMethod();
+				Generator = new EmitHelper( Method.GetILGenerator() );
+				action = CreateDelegate();
+				cache.Insert( cacheKey, action, CacheStrategy.Temporary );
+			}
+			return action;
         }
 
         protected internal virtual int GetCacheKey()

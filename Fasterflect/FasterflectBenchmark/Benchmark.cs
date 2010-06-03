@@ -85,7 +85,7 @@ namespace FasterflectBenchmark
         }
         #endregion
 
-        private static readonly int[] Iterations = new[] { 20000, 2000000 };
+    	private static readonly int[] Iterations = new[] { 20000, 2000000 };
         private static readonly object[] NoArgArray = new object[0];
         private static readonly object[] ArgArray = new object[] { 10 };
         private static readonly Type TargetType = typeof(Person);
@@ -104,17 +104,18 @@ namespace FasterflectBenchmark
             //RunDictionaryBenchmark();
             //RunHashCodeBenchmark();
             //RunTryCreateInstanceBenchmark();
-            RunConstructorBenchmark();
+           
+			RunConstructorBenchmark();
             RunFieldBenchmark();
             RunStaticFieldBenchmark();
-            RunPropertyBenchmark();
-            RunStaticPropertyBenchmark();
-            RunMethodInvocationBenchmark();
-            RunStaticMethodInvocationBenchmark();
-            RunIndexerBenchmark();
-            RunArrayBenchmark();
-            RunMetadataIntegrationBenchmark();
-            RunLookupBenchmark();
+			RunPropertyBenchmark();
+			RunStaticPropertyBenchmark();
+			RunMethodInvocationBenchmark();
+			RunStaticMethodInvocationBenchmark();
+			RunIndexerBenchmark();
+			RunArrayBenchmark();
+			RunMetadataIntegrationBenchmark();
+			RunLookupBenchmark();
             Console.Out.Flush();
         }
 
@@ -131,9 +132,6 @@ namespace FasterflectBenchmark
             stringList.ForEach( s => stringCache.Insert( s, s, CacheStrategy.Permanent ) );
 
             string key = stringList[ index ];
-            var callInfo = new CallInfo( TargetType, Flags.InstanceAnyVisibility, MemberTypes.Field, "name",
-                                         Constants.ArrayOfObjectType, null );
-
             var initMap = new Dictionary<string, Action> { };
             var actionMap = new Dictionary<string, Action>
                             {
@@ -156,9 +154,9 @@ namespace FasterflectBenchmark
         private static void RunHashCodeBenchmark()
         {
             var callInfo = new CallInfo( TargetType, Flags.InstanceAnyVisibility, MemberTypes.Field, "name",
-                                         new[] { typeof(int), typeof(string) }, null );
+                                         new[] { typeof(int), typeof(string) }, null,true );
             var callInfoOther = new CallInfo( typeof(CallInfo), Flags.InstanceAnyVisibility, MemberTypes.Field, "other",
-                                              new[] { typeof(string) }, null );
+                                              new[] { typeof(string) }, null, true );
             var sourceInfo = new SourceInfo( new { ID = 42, Name = "Test" }.GetType() );
             var sourceInfoOther = new SourceInfo( new { id = 42, Name = "Test" }.GetType() );
 
@@ -175,7 +173,7 @@ namespace FasterflectBenchmark
                                     "new CallInfo",
                                     () =>
                                     new CallInfo( TargetType, Flags.InstanceAnyVisibility, MemberTypes.Field, "name",
-                                                  new[] { typeof(int), typeof(string) }, null )
+                                                  new[] { typeof(int), typeof(string) }, null, true )
                                     },
                                 {
                                     "new SourceInfo",

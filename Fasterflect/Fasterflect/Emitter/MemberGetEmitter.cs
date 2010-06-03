@@ -26,20 +26,23 @@ namespace Fasterflect.Emitter
 {
 	internal class MemberGetEmitter : BaseEmitter
     {
-        public MemberGetEmitter(MemberInfo memberInfo, Flags bindingFlags)
-            : this(memberInfo.DeclaringType, bindingFlags, memberInfo.MemberType, memberInfo.Name, memberInfo)
+        public MemberGetEmitter( MemberInfo memberInfo, Flags bindingFlags )
+            : this( memberInfo.DeclaringType, bindingFlags, memberInfo.MemberType, memberInfo.Name, memberInfo )
         {
         }
 
-        public MemberGetEmitter(Type targetType, Flags bindingFlags, MemberTypes memberType, string fieldOrPropertyName)
-            : this(targetType, bindingFlags, memberType, fieldOrPropertyName, null)
+        public MemberGetEmitter( Type targetType, Flags bindingFlags, MemberTypes memberType, string fieldOrPropertyName )
+            : this( targetType, bindingFlags, memberType, fieldOrPropertyName, null )
         {
         }
 
-        private MemberGetEmitter(Type targetType, Flags bindingFlags, MemberTypes memberType, string fieldOrPropertyName, MemberInfo memberInfo)
-            : base(new CallInfo(targetType, bindingFlags, memberType, fieldOrPropertyName, Type.EmptyTypes, memberInfo))
+        private MemberGetEmitter( Type targetType, Flags bindingFlags, MemberTypes memberType, string fieldOrPropertyName, MemberInfo memberInfo )
+            : base( new CallInfo( targetType, bindingFlags, memberType, fieldOrPropertyName, Type.EmptyTypes, memberInfo,true ) )
 		{
 		}
+        internal MemberGetEmitter( CallInfo callInfo ) : base( callInfo )
+        {
+        }
 
         protected internal override DynamicMethod CreateDynamicMethod()
         {
@@ -49,7 +52,12 @@ namespace Fasterflect.Emitter
 	    protected internal override Delegate CreateDelegate()
 		{
 	    	MemberInfo member = CallInfo.MemberInfo;
-			bool handleInnerStruct = CallInfo.ShouldHandleInnerStruct;
+			if( member == null )
+			{
+		    	member = LookupUtils.GetMember( CallInfo );
+				CallInfo.IsStatic = member.IsStatic();
+			}
+	    	bool handleInnerStruct = CallInfo.ShouldHandleInnerStruct;
 
 			if (handleInnerStruct)
 			{

@@ -108,19 +108,9 @@ namespace Fasterflect
         /// </summary>
         public static MethodInvoker DelegateForCallMethod( this Type type, string name, Flags bindingFlags, params Type[] parameterTypes )
         {
-        	return type.FindMethod( name, parameterTypes, bindingFlags ).DelegateForCallMethod();
+			var callInfo = new CallInfo( type, bindingFlags, MemberTypes.Method, name, parameterTypes, null, true );
+			return (MethodInvoker) new MethodInvocationEmitter( callInfo ).GetDelegate();
         }
-
-		private static MethodInfo FindMethod( this Type type, string name, Type[] parameterTypes, Flags bindingFlags )
-		{
-            var method = type.Method( name, parameterTypes, bindingFlags );
-            if( method == null )
-			{
-				const string fmt = "No match for method with name {0} and flags {1} on type {2}.";
-				throw new MissingMethodException( string.Format( fmt, name, bindingFlags, type ) );
-			}
-        	return method;
-		}
 		#endregion
 
         #region Method Lookup (Single)

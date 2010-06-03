@@ -36,7 +36,11 @@ namespace Fasterflect.Emitter
 
 		private MethodInvocationEmitter( Type targetType, Flags bindingFlags, string name, Type[] parameterTypes,
 		                                 MemberInfo methodInfo )
-            : base(new CallInfo(targetType, bindingFlags, MemberTypes.Method, name, parameterTypes, methodInfo))
+            : base(new CallInfo(targetType, bindingFlags, MemberTypes.Method, name, parameterTypes, methodInfo,true))
+		{
+		}
+
+		public MethodInvocationEmitter( CallInfo callInfo ) : base( callInfo )
 		{
 		}
 
@@ -48,19 +52,20 @@ namespace Fasterflect.Emitter
 
 		protected internal override Delegate CreateDelegate()
 		{
-			MethodInfo methodInfo = (MethodInfo) CallInfo.MemberInfo ?? LookupUtils.GetMethod( CallInfo );
+			var method = (MethodInfo) CallInfo.MemberInfo ?? LookupUtils.GetMethod( CallInfo );
+			CallInfo.IsStatic = method.IsStatic;
 			const byte paramArrayIndex = 1;
-			bool hasReturnType = methodInfo.ReturnType != Constants.VoidType;
+			bool hasReturnType = method.ReturnType != Constants.VoidType;
 
 			byte startUsableLocalIndex = 0;
 			if( CallInfo.HasRefParam )
 			{
-				startUsableLocalIndex = CreateLocalsForByRefParams( paramArrayIndex, methodInfo );
+				startUsableLocalIndex = CreateLocalsForByRefParams( paramArrayIndex, method );
 					// create by_ref_locals from argument array
 				Generator.DeclareLocal( hasReturnType
-				                        	? methodInfo.ReturnType
+				                        	? method.ReturnType
 				                        	: Constants.ObjectType ); // T result;
-				GenerateInvocation( methodInfo, paramArrayIndex, (byte) (startUsableLocalIndex + 1) );
+				GenerateInvocation( method, paramArrayIndex, (byte) (startUsableLocalIndex + 1) );
 				if( hasReturnType )
 				{
 					Generator.stloc( startUsableLocalIndex ); // result = <stack>;
@@ -70,9 +75,9 @@ namespace Fasterflect.Emitter
 			else
 			{
 				Generator.DeclareLocal( hasReturnType
-				                        	? methodInfo.ReturnType
+				                        	? method.ReturnType
 				                        	: Constants.ObjectType ); // T result;
-				GenerateInvocation( methodInfo, paramArrayIndex, (byte) (startUsableLocalIndex + 1) );
+				GenerateInvocation( method, paramArrayIndex, (byte) (startUsableLocalIndex + 1) );
 				if( hasReturnType )
 				{
 					Generator.stloc( startUsableLocalIndex ); // result = <stack>;
@@ -86,7 +91,7 @@ namespace Fasterflect.Emitter
 			if( hasReturnType )
 			{
 				Generator.ldloc( startUsableLocalIndex ) // push result;
-					.boxIfValueType( methodInfo.ReturnType ); // box result;
+					.boxIfValueType( method.ReturnType ); // box result;
 			}
 			else
 			{
