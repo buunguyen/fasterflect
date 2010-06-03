@@ -26,7 +26,7 @@ namespace Fasterflect.Emitter
     {
         public ArrayGetEmitter( Type targetType )
             : base(new CallInfo( targetType, Flags.InstanceAnyVisibility, MemberTypes.Method,
-                                     Constants.ArrayGetterName, new[] { typeof(int) }, null ))
+                                     Constants.ArrayGetterName, new[] { typeof(int) }, null, true ))
         {
         }
 

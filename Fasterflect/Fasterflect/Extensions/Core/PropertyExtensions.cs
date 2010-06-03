@@ -122,7 +122,8 @@ namespace Fasterflect
         /// </summary>
         public static MemberSetter DelegateForSetPropertyValue( this Type type, string name, Flags bindingFlags )
         {
-        	return type.FindProperty( name, ref bindingFlags ).DelegateForSetPropertyValue( bindingFlags );
+			var callInfo = new CallInfo( type, bindingFlags, MemberTypes.Property, name, null, null, false );
+			return (MemberSetter) new MemberSetEmitter( callInfo ).GetDelegate();
         }
 
         /// <summary>
@@ -131,20 +132,9 @@ namespace Fasterflect
         /// </summary>
         public static MemberGetter DelegateForGetPropertyValue( this Type type, string name, Flags bindingFlags )
         {
-        	return type.FindProperty( name, ref bindingFlags ).DelegateForGetPropertyValue( bindingFlags );
+			var callInfo = new CallInfo( type, bindingFlags, MemberTypes.Property, name, null, null, true );
+			return (MemberGetter) new MemberGetEmitter( callInfo ).GetDelegate();
         }
-
-		private static PropertyInfo FindProperty( this Type type, string name, ref Flags bindingFlags )
-		{
-	       	var property = type.Property( name, bindingFlags );
-			if( property == null )
-			{
-				const string fmt = "No match for property with name {0} and flags {1} on type {2}.";
-				throw new MissingMemberException( string.Format( fmt, name, bindingFlags, type ) );
-			}
-			bindingFlags = Flags.SetOnlyIf( bindingFlags, Flags.Static, property.IsStatic() );
-        	return property;
-		}
     	#endregion
 
         #region Indexer Access

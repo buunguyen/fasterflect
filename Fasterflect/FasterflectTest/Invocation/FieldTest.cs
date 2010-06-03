@@ -19,6 +19,7 @@
 using System;
 using System.Reflection;
 using Fasterflect;
+using FasterflectTest.SampleModel.People;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.Invocation
@@ -135,7 +136,7 @@ namespace FasterflectTest.Invocation
 		[ExpectedException( typeof(MissingFieldException) )]
 		public void TestSetNotExistentField()
 		{
-			RunWith( ( object person ) => person.GetFieldValue( "name", Flags.Public | Flags.Instance ) );
+			RunWith( ( object person ) => person.GetFieldValue( "not_exist", Flags.Public | Flags.Instance ) );
 		}
 
 		[TestMethod]
