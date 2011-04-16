@@ -122,7 +122,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberSetter DelegateForSetPropertyValue( this Type type, string name, Flags bindingFlags )
         {
-			var callInfo = new CallInfo( type, bindingFlags, MemberTypes.Property, name, null, null, false );
+            var callInfo = new CallInfo(type, null, bindingFlags, MemberTypes.Property, name, null, null, false);
 			return (MemberSetter) new MemberSetEmitter( callInfo ).GetDelegate();
         }
 
@@ -132,7 +132,7 @@ namespace Fasterflect
         /// </summary>
         public static MemberGetter DelegateForGetPropertyValue( this Type type, string name, Flags bindingFlags )
         {
-			var callInfo = new CallInfo( type, bindingFlags, MemberTypes.Property, name, null, null, true );
+            var callInfo = new CallInfo(type, null, bindingFlags, MemberTypes.Property, name, null, null, true);
 			return (MemberGetter) new MemberGetEmitter( callInfo ).GetDelegate();
         }
     	#endregion

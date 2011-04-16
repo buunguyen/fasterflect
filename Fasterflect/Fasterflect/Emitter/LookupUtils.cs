@@ -42,8 +42,7 @@ namespace Fasterflect.Emitter
             MethodInfo methodInfo = callInfo.MemberInfo as MethodInfo;
             if (methodInfo != null)
                 return methodInfo;
-
-            methodInfo = callInfo.TargetType.Method( callInfo.Name, callInfo.ParamTypes, callInfo.BindingFlags );
+            methodInfo = callInfo.TargetType.Method(callInfo.GenericTypes, callInfo.Name, callInfo.ParamTypes, callInfo.BindingFlags);
             if (methodInfo == null)
 			{
 				const string fmt = "No match for method with name {0} and flags {1} on type {2}.";

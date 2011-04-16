@@ -57,7 +57,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EventHandlerTest.cs" />
-    <Compile Include="Invocation.cs" />
+    <Compile Include="GenericTest.cs" />
+    <Compile Include="IssueList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

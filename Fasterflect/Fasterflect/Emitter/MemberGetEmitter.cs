@@ -37,7 +37,7 @@ namespace Fasterflect.Emitter
         }
 
         private MemberGetEmitter( Type targetType, Flags bindingFlags, MemberTypes memberType, string fieldOrPropertyName, MemberInfo memberInfo )
-            : base( new CallInfo( targetType, bindingFlags, memberType, fieldOrPropertyName, Type.EmptyTypes, memberInfo,true ) )
+            : base(new CallInfo(targetType, null, bindingFlags, memberType, fieldOrPropertyName, Type.EmptyTypes, memberInfo, true))
 		{
 		}
         internal MemberGetEmitter( CallInfo callInfo ) : base( callInfo )

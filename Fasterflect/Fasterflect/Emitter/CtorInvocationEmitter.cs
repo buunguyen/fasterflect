@@ -33,7 +33,7 @@ namespace Fasterflect.Emitter
             : this(targetType, bindingFlags, paramTypes, null) { }
 
 		private CtorInvocationEmitter(Type targetType, Flags flags, Type[] parameterTypes, ConstructorInfo ctorInfo)
-            : base(new CallInfo(targetType, flags, MemberTypes.Constructor, targetType.Name, parameterTypes, ctorInfo, true))
+            : base(new CallInfo(targetType, null, flags, MemberTypes.Constructor, targetType.Name, parameterTypes, ctorInfo, true))
 		{
 		}
         

@@ -1,5 +1,4 @@
-﻿using System;
-using Fasterflect;
+﻿using Fasterflect;
 using NUnit.Framework;
 
 namespace FasterflectTest.NUnit
