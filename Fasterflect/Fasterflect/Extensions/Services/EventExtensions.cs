@@ -16,6 +16,8 @@
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
 #endregion
 
+using System.Reflection;
+
 namespace Fasterflect
 {
     using System;
@@ -24,6 +26,16 @@ namespace Fasterflect
 
     public static class DynamicHandler
     {
+        public static object InvokeDelegate(this Type targetType, string delegateName, params object[] parameters)
+        {
+            return ((Delegate)targetType.GetFieldValue(delegateName)).DynamicInvoke(parameters);
+        }
+
+        public static object InvokeDelegate(this object target, string delegateName, params object[] parameters)
+        {
+            return ((Delegate)target.GetFieldValue(delegateName)).DynamicInvoke(parameters);
+        }
+
         public static Type AddHandler(this Type targetType, string fieldName,
             Func<object[], object> func)
         {
@@ -52,7 +64,9 @@ namespace Fasterflect
             Func<object[], object> func, object target, bool assignHandler)
         {
             Type delegateType;
-            var eventInfo = targetType.GetEvent(fieldName);
+            var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic |
+                               (target == null ? BindingFlags.Static : BindingFlags.Instance);
+            var eventInfo = targetType.GetEvent(fieldName, bindingFlags);
             if (eventInfo != null && assignHandler)
                 throw new ArgumentException("Event can be assigned.  Use AddHandler() overloads instead.");
 
@@ -60,7 +74,7 @@ namespace Fasterflect
             {
                 delegateType = eventInfo.EventHandlerType;
                 var dynamicHandler = BuildDynamicHandler(targetType, delegateType, func);
-                eventInfo.GetAddMethod().Invoke(target, new Object[] { dynamicHandler });
+                eventInfo.GetAddMethod(true).Invoke(target, new Object[] { dynamicHandler });
             }
             else
             {
