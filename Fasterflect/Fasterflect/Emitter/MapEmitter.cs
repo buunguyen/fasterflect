@@ -33,7 +33,7 @@ namespace Fasterflect.Emitter
 
         public MapEmitter(Type sourceType, Type targetType, MemberTypes sourceMemberTypes, MemberTypes targetMemberTypes,
                            Flags bindingFlags, params string[] names)
-            : base(new CallInfo(targetType,
+            : base(new CallInfo(targetType, null, 
                 // Auto-apply IgnoreCase if we're mapping from one membertype to another
                 Flags.SetIf(bindingFlags, Flags.IgnoreCase, (sourceMemberTypes & targetMemberTypes) != sourceMemberTypes), 
                 MemberTypes.Custom, 

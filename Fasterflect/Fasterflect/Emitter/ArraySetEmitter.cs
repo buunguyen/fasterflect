@@ -25,7 +25,7 @@ namespace Fasterflect.Emitter
     internal class ArraySetEmitter : BaseEmitter
     {
         public ArraySetEmitter( Type targetType )
-            : base(new CallInfo(targetType, Flags.InstanceAnyVisibility, MemberTypes.Method, Constants.ArraySetterName,
+            : base(new CallInfo(targetType, null, Flags.InstanceAnyVisibility, MemberTypes.Method, Constants.ArraySetterName,
                                      new[] { typeof(int), targetType.GetElementType() }, null, false))
         {
         }

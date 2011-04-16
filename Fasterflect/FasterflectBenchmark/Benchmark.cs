@@ -153,9 +153,9 @@ namespace FasterflectBenchmark
 
         private static void RunHashCodeBenchmark()
         {
-            var callInfo = new CallInfo( TargetType, Flags.InstanceAnyVisibility, MemberTypes.Field, "name",
+            var callInfo = new CallInfo(TargetType, null, Flags.InstanceAnyVisibility, MemberTypes.Field, "name",
                                          new[] { typeof(int), typeof(string) }, null,true );
-            var callInfoOther = new CallInfo( typeof(CallInfo), Flags.InstanceAnyVisibility, MemberTypes.Field, "other",
+            var callInfoOther = new CallInfo(typeof(CallInfo), null, Flags.InstanceAnyVisibility, MemberTypes.Field, "other",
                                               new[] { typeof(string) }, null, true );
             var sourceInfo = new SourceInfo( new { ID = 42, Name = "Test" }.GetType() );
             var sourceInfoOther = new SourceInfo( new { id = 42, Name = "Test" }.GetType() );
@@ -172,7 +172,7 @@ namespace FasterflectBenchmark
                                 {
                                     "new CallInfo",
                                     () =>
-                                    new CallInfo( TargetType, Flags.InstanceAnyVisibility, MemberTypes.Field, "name",
+                                    new CallInfo( TargetType, null,  Flags.InstanceAnyVisibility, MemberTypes.Field, "name",
                                                   new[] { typeof(int), typeof(string) }, null, true )
                                     },
                                 {

@@ -36,7 +36,7 @@ namespace Fasterflect.Emitter
 
 		private MethodInvocationEmitter( Type targetType, Flags bindingFlags, string name, Type[] parameterTypes,
 		                                 MemberInfo methodInfo )
-            : base(new CallInfo(targetType, bindingFlags, MemberTypes.Method, name, parameterTypes, methodInfo,true))
+            : base(new CallInfo(targetType, null, bindingFlags, MemberTypes.Method, name, parameterTypes, methodInfo, true))
 		{
 		}
 

@@ -33,16 +33,21 @@ namespace Fasterflect.Emitter
         public Flags BindingFlags { get; internal set; }
         public MemberTypes MemberTypes { get; set; }
         public Type[] ParamTypes { get; private set; }
+        public Type[] GenericTypes { get; private set; }
         public string Name { get; private set; }
-		public bool IsReadOperation { get; set; }
-		// discovered dynamically, not part of CallInfo identity:
+        public bool IsReadOperation { get; set; }
+        public bool IsStatic { get; internal set; }
+		
+        // This field doesn't constitute CallInfo identity:
         public MemberInfo MemberInfo { get; internal set; }
-		public bool IsStatic { get; internal set; }
 
-        public CallInfo( Type targetType, Flags bindingFlags, MemberTypes memberTypes, string name,
-                         Type[] parameterTypes, MemberInfo memberInfo, bool isReadOperation )
+        public CallInfo(Type targetType, Type[] genericTypes, Flags bindingFlags, MemberTypes memberTypes, string name,
+                        Type[] parameterTypes, MemberInfo memberInfo, bool isReadOperation )
         {
             TargetType = targetType;
+            GenericTypes = genericTypes == null || genericTypes.Length == 0
+                             ? Type.EmptyTypes
+                             : genericTypes;
             BindingFlags = bindingFlags;
             MemberTypes = memberTypes;
             Name = name;
@@ -75,6 +80,11 @@ namespace Fasterflect.Emitter
             get { return ParamTypes == Type.EmptyTypes; }
         }
 
+        public bool IsGeneric
+        {
+            get { return GenericTypes != Type.EmptyTypes; }
+        }
+
         public bool HasRefParam
         {
             get { return ParamTypes.Any( t => t.IsByRef ); }
@@ -83,7 +93,7 @@ namespace Fasterflect.Emitter
         /// <summary>
         /// Two <c>CallInfo</c> instances are considered equaled if the following properties
         /// are equaled: <c>TargetType</c>, <c>Flags</c>, <c>IsStatic</c>, <c>MemberTypes</c>, <c>Name</c>,
-        /// and <c>ParamTypes</c>.
+        /// <c>ParamTypes</c> and <c>GenericTypes</c>.
         /// </summary>
         public override bool Equals( object obj )
         {
@@ -102,7 +112,8 @@ namespace Fasterflect.Emitter
                 other.MemberTypes != MemberTypes ||
                 other.BindingFlags != BindingFlags ||
 				other.IsReadOperation != IsReadOperation ||
-                other.ParamTypes.Length != ParamTypes.Length )
+                other.ParamTypes.Length != ParamTypes.Length ||
+                other.GenericTypes.Length != GenericTypes.Length)
             {
                 return false;
             }
@@ -110,6 +121,14 @@ namespace Fasterflect.Emitter
             for( int i = 0; i < ParamTypes.Length; i++ )
             {
                 if( ParamTypes[ i ] != other.ParamTypes[ i ] )
+                {
+                    return false;
+                }
+            }
+
+            for (int i = 0; i < GenericTypes.Length; i++)
+            {
+                if (GenericTypes[i] != other.GenericTypes[i])
                 {
                     return false;
                 }
@@ -124,6 +143,10 @@ namespace Fasterflect.Emitter
             for( int i = 0; i < ParamTypes.Length; i++ )
             {
                 hash += ParamTypes[ i ].GetHashCode();
+            }
+            for (int i = 0; i < GenericTypes.Length; i++)
+            {
+                hash += GenericTypes[i].GetHashCode();
             }
             return hash;
         }        
