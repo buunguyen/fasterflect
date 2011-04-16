@@ -24,10 +24,10 @@ namespace FasterflectTest.NUnit
             {
                 list2.CallMethod("Add", i);
             }
-            //var size = (int)list.GetPropertyValue("Count");
+            //var size = (int)list2.GetPropertyValue("Count");
             //for (int i = 0; i < size; i++)
             //{
-            //    Assert.AreEqual(i + 1, list.GetIndexer(i));
+            //    Assert.AreEqual(i + 1, list2.GetIndexer(i));
             //}
         }
     }
