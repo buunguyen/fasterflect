@@ -20,7 +20,9 @@
 
 using System;
 using System.Collections.Generic;
+#if DOT_NET_4
 using System.Dynamic;
+#endif
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -30,6 +32,7 @@ namespace FasterflectTest.Services
     public class CloneTest
 	{
 		#region Sample Reflection Classes
+#if DOT_NET_4
         private class Dynamic
         {
             public dynamic number;
@@ -47,6 +50,7 @@ namespace FasterflectTest.Services
                 this.expando = expando;
             }
         }
+#endif
 
 		private class Person
         {
@@ -97,6 +101,32 @@ namespace FasterflectTest.Services
 		}
 		#endregion
 
+		#region DeepClone Sample Classes
+		class AddressPoco
+		{
+			public string LineOne { get; set; }
+			public string LineTwo { get; set; }
+			public string City { get; set; }
+			public string State { get; set; }
+			public string ZipCode { get; set; }
+		}
+
+		class PersonPoco
+		{
+			public string Name { get; set; }
+			public int Ssn { get; set; }
+			public string Employer { get; set; }
+			public AddressPoco Address { get; set; }
+		}
+
+		class LibraryPoco : Dictionary<string, string>
+		{
+			public string Name { get; set; }
+			public AddressPoco Address { get; set; }
+			public List<PersonPoco> WaitingList { get; set; }
+		}
+		#endregion
+
 		#region DeepClone
 		[TestMethod]
         public void TestDeepCloneSimpleObject()
@@ -136,10 +166,58 @@ namespace FasterflectTest.Services
 			Assert.AreNotSame( employee.Manager, clone.Manager );
 			Assert.AreSame( clone.Manager, clone.Manager.Manager );
 		}
+
+
+		[TestMethod]
+		public void TestDeepCloneWithComplexObjectGraph()
+		{
+			// arrange test objects
+			var personAddress = new AddressPoco { City = "Copenhagen", ZipCode = "2300" };
+			var libraryAddress = new AddressPoco { City = "London" };
+			var otherAddress = new AddressPoco { City = "Berlin" };
+			var arthur = new PersonPoco { Name = "Arthur Dent", Address = personAddress, Employer = "British Tea Company", Ssn = 123 };
+			var trish = new PersonPoco { Name = "Trish", Address = personAddress, Employer = "", Ssn = 456 };
+			var ford = new PersonPoco { Name = "Ford Prefect", Address = otherAddress, Employer = "Ursa Minor Publishing", Ssn = 789 };
+			var library = new LibraryPoco
+			              {
+			              	   Address = libraryAddress,
+			              	   Name = "The Library",
+			              	   WaitingList = new List<PersonPoco> { arthur, trish, ford }
+			              };
+			library[ "foo" ] = "bar";
+			library[ "h2g2" ] = "dont panic";
+
+			// deep clone
+			var clone = library.DeepClone();
+
+			// verify clone
+			Assert.AreEqual( 2, clone.Keys.Count );
+			Assert.AreEqual( 3, clone.WaitingList.Count );
+			Assert.AreSame( clone.WaitingList[ 0 ].Address, clone.WaitingList[ 1 ].Address );
+		}
         #endregion
 
-        #region Dynamic
+		#region Verify Helpers
+		private static void Verify( Person person, Person clone )
+		{
+			Assert.IsNotNull( clone );
+			Assert.AreNotSame( person, clone );
+			Assert.AreEqual( person.Id, clone.Id );
+			Assert.AreEqual( person.Birthday, clone.Birthday );
+			Assert.AreEqual( person.Name, clone.Name );
+			Assert.AreEqual( person.LastModified, clone.LastModified );
+			CollectionAssert.AreEqual( person.Roles, clone.Roles );
+		}
+		private static void Verify( Employee employee, Employee clone )
+		{
+			Verify( employee as Person, clone as Person );
+			Assert.AreEqual( employee.Initials, clone.Initials );
+			Assert.AreNotSame( employee.Manager, clone.Manager );
+		}
+		#endregion
 
+        #region Dynamic
+#if DOT_NET_4
         [TestMethod]
         public void TestDynamic()
         {
@@ -161,25 +239,7 @@ namespace FasterflectTest.Services
             Assert.AreEqual(dynamic.expando.number, clone.expando.number);
             Verify((Person)dynamic.expando.person, (Person)clone.expando.person);
         }
+#endif
         #endregion
-
-		#region Verify Helpers
-		private static void Verify( Person person, Person clone )
-		{
-			Assert.IsNotNull( clone );
-			Assert.AreNotSame( person, clone );
-			Assert.AreEqual( person.Id, clone.Id );
-			Assert.AreEqual( person.Birthday, clone.Birthday );
-			Assert.AreEqual( person.Name, clone.Name );
-			Assert.AreEqual( person.LastModified, clone.LastModified );
-			CollectionAssert.AreEqual( person.Roles, clone.Roles );
-		}
-		private static void Verify( Employee employee, Employee clone )
-		{
-			Verify( employee as Person, clone as Person );
-			Assert.AreEqual( employee.Initials, clone.Initials );
-			Assert.AreNotSame( employee.Manager, clone.Manager );
-		}
-		#endregion
     }
 }
