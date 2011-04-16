@@ -154,7 +154,7 @@ namespace Fasterflect
         /// </summary>
         public static MethodInvoker DelegateForCallMethod( this Type type, string name, Flags bindingFlags, params Type[] parameterTypes )
         {
-            return DelegateForCallMethod(type, null, name, Flags.StaticInstanceAnyVisibility, parameterTypes);
+            return DelegateForCallMethod(type, null, name, bindingFlags, parameterTypes);
         }
 
         /// <summary>
