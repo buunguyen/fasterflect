@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Linq;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
