@@ -1,0 +1,7 @@
+syntax: glob
+*.ReSharper
+*.user
+bin
+obj
+*.suo
+*.vs10x
