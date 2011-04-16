@@ -212,6 +212,18 @@ namespace Fasterflect
 		public static readonly Flags StaticInstanceAnyVisibility = InstanceAnyVisibility | Static;
 		#endregion
 
+		#region Intellisense Convenience Flags
+		/// <summary>
+		/// Search criteria encompassing all public and non-public instance members, including base members.
+		/// </summary>
+		public static readonly Flags Default = InstanceAnyVisibility;
+
+		/// <summary>
+		/// Search criteria encompassing all members (public and non-public, instance and static), including base members.
+		/// </summary>
+		public static readonly Flags AllMembers = StaticInstanceAnyVisibility;
+		#endregion
+
 		#endregion
 
 		#region Helper Methods
