@@ -295,7 +295,8 @@ namespace Fasterflect
         	processAll |= hasTypes && bindingFlags.IsSet( Flags.IgnoreParameterModifiers );
             if( processAll )
             {
-                return type.Methods( parameterTypes, bindingFlags, name ).FirstOrDefault();
+                return type.Methods( parameterTypes, bindingFlags, name ).FirstOrDefault()
+                    .MakeGeneric( genericTypes );
             }
 
             var result = hasTypes ? type.GetMethod( name, bindingFlags, null, parameterTypes, null )
@@ -304,7 +305,8 @@ namespace Fasterflect
             {
                 if( type.BaseType != typeof(object) && type.BaseType != null )
                 {
-                    return type.BaseType.Method( name, parameterTypes, bindingFlags );
+                    return type.BaseType.Method( name, parameterTypes, bindingFlags )
+                        .MakeGeneric( genericTypes );
                 }
             }
         	bool hasSpecialFlags =
@@ -313,9 +315,20 @@ namespace Fasterflect
             {
                 IList<MethodInfo> methods = new List<MethodInfo> { result };
                 methods = methods.Filter( bindingFlags );
-                return methods.Count > 0 ? methods[ 0 ] : null;
+                return (methods.Count > 0 ? methods[ 0 ] : null).MakeGeneric( genericTypes );
             }
-            return result;
+            return result.MakeGeneric(genericTypes);
+        }
+
+        private static MethodInfo MakeGeneric(this MethodInfo methodInfo, Type[] genericTypes)
+        {
+            if (methodInfo == null)
+                return null;
+            if (genericTypes == null ||
+                genericTypes.Length == 0 ||
+                genericTypes == Type.EmptyTypes)
+                return methodInfo;
+            return methodInfo.MakeGenericMethod( genericTypes );
         }
         #endregion
 
