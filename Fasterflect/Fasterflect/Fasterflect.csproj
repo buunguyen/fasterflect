@@ -89,6 +89,7 @@
     <Compile Include="Common\FormatOptions.cs" />
     <Compile Include="DynamicReflection\DynamicWrapper.cs" />
     <Compile Include="DynamicReflection\DynamicBuilder.cs" />
+    <Compile Include="Emitter\MapCallInfo.cs" />
     <Compile Include="Extensions\Core\AssemblyExtensions.cs" />
     <Compile Include="Extensions\Core\TypeExtensions.cs" />
     <Compile Include="Extensions\Core\ParameterInfoExtensions.cs" />

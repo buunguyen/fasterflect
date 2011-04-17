@@ -16,8 +16,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Fasterflect.vsmdi = Fasterflect.vsmdi
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterflectTest.NUnit", "FasterflectTest.NUnit\FasterflectTest.NUnit.csproj", "{510E8C71-4A2E-4375-8350-D40305E1A87A}"
-EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Fasterflect.vsmdi
@@ -71,16 +69,6 @@ Global
 		{4A6052E6-7583-40BA-9AF5-13EEAF419BF0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{4A6052E6-7583-40BA-9AF5-13EEAF419BF0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{4A6052E6-7583-40BA-9AF5-13EEAF419BF0}.Release|x86.ActiveCfg = Release|Any CPU
-		{510E8C71-4A2E-4375-8350-D40305E1A87A}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{510E8C71-4A2E-4375-8350-D40305E1A87A}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{510E8C71-4A2E-4375-8350-D40305E1A87A}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{510E8C71-4A2E-4375-8350-D40305E1A87A}.Debug|x86.ActiveCfg = Debug|x86
-		{510E8C71-4A2E-4375-8350-D40305E1A87A}.Debug|x86.Build.0 = Debug|x86
-		{510E8C71-4A2E-4375-8350-D40305E1A87A}.Release|Any CPU.ActiveCfg = Release|x86
-		{510E8C71-4A2E-4375-8350-D40305E1A87A}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{510E8C71-4A2E-4375-8350-D40305E1A87A}.Release|Mixed Platforms.Build.0 = Release|x86
-		{510E8C71-4A2E-4375-8350-D40305E1A87A}.Release|x86.ActiveCfg = Release|x86
-		{510E8C71-4A2E-4375-8350-D40305E1A87A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

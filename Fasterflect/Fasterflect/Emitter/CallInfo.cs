@@ -32,7 +32,7 @@ namespace Fasterflect.Emitter
         public Type TargetType { get; private set; }
         public Flags BindingFlags { get; internal set; }
         public MemberTypes MemberTypes { get; set; }
-        public Type[] ParamTypes { get; private set; }
+        public Type[] ParamTypes { get; internal set; }
         public Type[] GenericTypes { get; private set; }
         public string Name { get; private set; }
         public bool IsReadOperation { get; set; }
@@ -140,15 +140,15 @@ namespace Fasterflect.Emitter
         public override int GetHashCode()
         {
         	int hash = TargetType.GetHashCode() + (int) MemberTypes * Name.GetHashCode() + BindingFlags.GetHashCode() + IsReadOperation.GetHashCode();
-            for( int i = 0; i < ParamTypes.Length; i++ )
-            {
-                hash += ParamTypes[ i ].GetHashCode();
-            }
-            for (int i = 0; i < GenericTypes.Length; i++)
-            {
-                hash += GenericTypes[i].GetHashCode();
-            }
-            return hash;
-        }        
+        	for( int i = 0; i < ParamTypes.Length; i++ )
+        	{
+        	    hash += ParamTypes[ i ].GetHashCode() * (i+1);
+        	}
+        	for (int i = 0; i < GenericTypes.Length; i++)
+        	{
+        	    hash += GenericTypes[i].GetHashCode() * (i+1);
+        	}
+        	return hash;
+        }
     }
 }

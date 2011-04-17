@@ -27,55 +27,60 @@ namespace Fasterflect.Emitter
     {
         public static ConstructorInfo GetConstructor(CallInfo callInfo)
         {
-            ConstructorInfo ctorInfo = callInfo.MemberInfo as ConstructorInfo;
-            if (ctorInfo != null)
-                return ctorInfo;
+            var constructor = callInfo.MemberInfo as ConstructorInfo;
+            if (constructor != null)
+                return constructor;
 
-            ctorInfo = callInfo.TargetType.Constructor( callInfo.BindingFlags, callInfo.ParamTypes );
-            if (ctorInfo == null)
+            constructor = callInfo.TargetType.Constructor( callInfo.BindingFlags, callInfo.ParamTypes );
+            if (constructor == null)
                 throw new MissingMemberException("Constructor does not exist");
-            return ctorInfo;
+			callInfo.MemberInfo = constructor;
+            return constructor;
         }
 
         public static MethodInfo GetMethod(CallInfo callInfo)
         {
-            MethodInfo methodInfo = callInfo.MemberInfo as MethodInfo;
-            if (methodInfo != null)
-                return methodInfo;
-            methodInfo = callInfo.TargetType.Method(callInfo.GenericTypes, callInfo.Name, callInfo.ParamTypes, callInfo.BindingFlags);
-            if (methodInfo == null)
+            var method = callInfo.MemberInfo as MethodInfo;
+            if (method != null)
+                return method;
+            method = callInfo.TargetType.Method(callInfo.GenericTypes, callInfo.Name, callInfo.ParamTypes, callInfo.BindingFlags);
+            if (method == null)
 			{
 				const string fmt = "No match for method with name {0} and flags {1} on type {2}.";
 				throw new MissingMethodException( string.Format( fmt, callInfo.Name, callInfo.BindingFlags, callInfo.TargetType ) );
 			}
-            return methodInfo;
+			callInfo.MemberInfo = method;
+        	callInfo.ParamTypes = method.GetParameters().ToTypeArray();
+            return method;
         }
 
         public static MemberInfo GetMember(CallInfo callInfo)
         {
-            MemberInfo memberInfo = callInfo.MemberInfo;
-            if (memberInfo != null)
-                return memberInfo;
+            var member = callInfo.MemberInfo;
+            if (member != null)
+                return member;
 
             if (callInfo.MemberTypes == MemberTypes.Property)
             {
-                memberInfo = callInfo.TargetType.Property(callInfo.Name, callInfo.BindingFlags);
-                if (memberInfo == null)
+                member = callInfo.TargetType.Property(callInfo.Name, callInfo.BindingFlags);
+                if (member == null)
 				{
 					const string fmt = "No match for property with name {0} and flags {1} on type {2}.";
 					throw new MissingMemberException( string.Format( fmt, callInfo.Name, callInfo.BindingFlags, callInfo.TargetType ) );
 				}
-				return memberInfo;
+				callInfo.MemberInfo = member;
+				return member;
             }
             if (callInfo.MemberTypes == MemberTypes.Field)
             {
-                memberInfo = callInfo.TargetType.Field(callInfo.Name, callInfo.BindingFlags);
-                if (memberInfo == null)
+                member = callInfo.TargetType.Field(callInfo.Name, callInfo.BindingFlags);
+                if (member == null)
 				{
 					const string fmt = "No match for field with name {0} and flags {1} on type {2}.";
 					throw new MissingFieldException( string.Format( fmt, callInfo.Name, callInfo.BindingFlags, callInfo.TargetType ) );
 				}
-                return memberInfo;
+				callInfo.MemberInfo = member;
+                return member;
             }
             throw new ArgumentException(callInfo.MemberTypes + " is not supported");
         }
@@ -88,6 +93,7 @@ namespace Fasterflect.Emitter
 				const string fmt = "No match for field with name {0} and flags {1} on type {2}.";
 				throw new MissingFieldException( string.Format( fmt, callInfo.Name, callInfo.BindingFlags, callInfo.TargetType ) );
 			}
+			callInfo.MemberInfo = field;
 			return field;
 		}
 
@@ -99,29 +105,35 @@ namespace Fasterflect.Emitter
 				const string fmt = "No match for property with name {0} and flags {1} on type {2}.";
 				throw new MissingMemberException( string.Format( fmt, callInfo.Name, callInfo.BindingFlags, callInfo.TargetType ) );
 			}
+			callInfo.MemberInfo = property;
 			return property;
 		}
 
     	public static MethodInfo GetPropertyGetMethod(PropertyInfo propInfo, CallInfo callInfo)
         {
-            var methodInfo = propInfo.GetGetMethod();
-			return methodInfo ?? GetPropertyMethod("get_", "getter", callInfo);
+            var method = propInfo.GetGetMethod();
+			if( method != null )
+			    callInfo.MemberInfo = method;
+			return method ?? GetPropertyMethod("get_", "getter", callInfo);
         }
 
         public static MethodInfo GetPropertySetMethod(PropertyInfo propInfo, CallInfo callInfo)
         {
-            var methodInfo = propInfo.GetSetMethod();
-            return methodInfo ?? GetPropertyMethod("set_", "setter", callInfo);
+            var method = propInfo.GetSetMethod();
+			if( method != null )
+			    callInfo.MemberInfo = method;
+            return method ?? GetPropertyMethod("set_", "setter", callInfo);
         }
 
         private static MethodInfo GetPropertyMethod(string infoPrefix, string propertyMethod, CallInfo callInfo)
         {
-            MethodInfo method = callInfo.TargetType.Method(infoPrefix + callInfo.Name, callInfo.BindingFlags);
+            var method = callInfo.TargetType.Method(infoPrefix + callInfo.Name, callInfo.BindingFlags);
             if (method == null)
 			{
 				const string fmt = "No {0} for property {1} with flags {2} on type {3}.";
 				throw new MissingFieldException( string.Format( fmt, propertyMethod, callInfo.Name, callInfo.BindingFlags, callInfo.TargetType ) );
 			}
+			callInfo.MemberInfo = method;
             return method;
         }
     }

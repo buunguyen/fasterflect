@@ -1,9 +1,10 @@
 ﻿using Fasterflect;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.NUnit
 {
-    class EventHandlerTest
+	[TestClass]
+    public class EventHandlerTest
     {
         class EventSource
         {
@@ -33,7 +34,7 @@ namespace FasterflectTest.NUnit
             }
         }
 
-        [Test]
+        [TestMethod]
         public void Test_assign_static_no_arg_void_return_delegate()
         {
             var type = typeof(EventSource);
@@ -43,7 +44,7 @@ namespace FasterflectTest.NUnit
             Assert.AreEqual( true, call );
         }
 
-        [Test]
+        [TestMethod]
         public void Test_handle_static_int_arg_int_return_delegate()
         {
             var type = typeof(EventSource);
@@ -55,7 +56,7 @@ namespace FasterflectTest.NUnit
             Assert.AreEqual(10, result);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_assign_static_string_arg_string_return_delegate()
         {
             var type = typeof(EventSource);
@@ -65,7 +66,7 @@ namespace FasterflectTest.NUnit
             Assert.AreEqual("A2", result);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_assign_instance_no_arg_void_return_delegate()
         {
             var target = typeof(EventSource).CreateInstance(  );
@@ -75,7 +76,7 @@ namespace FasterflectTest.NUnit
             Assert.AreEqual(true, call);
         }
         
-        [Test]
+        [TestMethod]
         public void Test_handle_instance_int_arg_int_return_delegate()
         {
             var target = typeof(EventSource).CreateInstance();
@@ -87,7 +88,7 @@ namespace FasterflectTest.NUnit
             Assert.AreEqual(10, result);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_assign_instance_string_arg_string_return_delegate()
         {
             var target = typeof(EventSource).CreateInstance(  );
@@ -97,7 +98,7 @@ namespace FasterflectTest.NUnit
             Assert.AreEqual("A2", result);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_handle_instance_int_arg_int_return_event()
         {
             var target = typeof(EventSource).CreateInstance();
@@ -109,7 +110,7 @@ namespace FasterflectTest.NUnit
             Assert.AreEqual(10, result);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_handle_static_int_arg_int_return_event()
         {
             var type = typeof(EventSource);

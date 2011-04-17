@@ -70,21 +70,33 @@ namespace Fasterflect
         /// <summary>
         /// This method applies method parameter type filtering to a set of methods.
         /// </summary>
-        public static IList<T> Filter<T>( this IList<T> methods, Flags bindingFlags, Type[] paramTypes )
+        public static IList<T> Filter<T>( this IList<T> methods, Flags bindingFlags, Type[] genericTypes, Type[] paramTypes )
             where T : MethodBase
         {
             var result = new List<T>( methods.Count );
 
             bool exact = bindingFlags.IsSet( Flags.ExactBinding );
+        	bool hasGenericTypes = genericTypes != null && genericTypes.Length > 0;
 
             for( int i = 0; i < methods.Count; i++ )
             {
                 var method = methods[ i ];
-                var parameters = method.GetParameters();
+				// verify generic type parameters
+				if( method.ContainsGenericParameters )
+				{
+					if( ! hasGenericTypes )
+						continue;
+					var genericArgs = method.GetGenericArguments();
+					if( genericArgs.Length != genericTypes.Length )
+						continue;
+				}
+				// verify parameters
+            	var parameters = method.GetParameters();
                 if( parameters.Length != paramTypes.Length )
                 {
                     continue;
                 }
+				// verify parameter type compatibility
                 bool match = true;
                 for( int j = 0; j < paramTypes.Length; j++ )
                 {
@@ -97,7 +109,7 @@ namespace Fasterflect
 						string name = parameterType.FullName;
 						parameterType = Type.GetType( name.Substring( 0, name.Length - 1 ) ) ?? parameterType;
 					}
-                    match &= exact ? type == parameterType : parameterType.IsAssignableFrom( type );
+                    match &= parameterType.IsGenericParameter || (exact ? type == parameterType : parameterType.IsAssignableFrom( type ));
                     if( ! match )
                     {
                         break;

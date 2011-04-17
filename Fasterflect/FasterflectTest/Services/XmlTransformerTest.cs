@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FasterflectTest.SampleModel.People;
@@ -28,16 +29,35 @@ namespace FasterflectTest.Services
     [TestClass]
     public class XmlTransformerTest
 	{
-    	#region Map
+    	#region ToXml
+		//[TestMethod]
+		//public void TestToXml()
+		//{
+		//    string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>{0}" +
+		//                 "<Person>{0}{1}<Name>Bruce Lee</Name>{0}{1}<Age>25</Age>{0}{1}" +
+		//                 "<MetersTravelled>0</MetersTravelled>{0}</Person>{0}";
+		//    string expected = string.Format( xml, Environment.NewLine, "\t" );
+		//    Person person = new Person( "Bruce Lee", 25 );
+		//    Assert.AreEqual( expected, person.ToXml() );
+		//}
+
 		[TestMethod]
 		public void TestToXml()
 		{
 			string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>{0}" +
-			             "<Person>{0}{1}<Name>Bruce Lee</Name>{0}{1}<Age>25</Age>{0}{1}" +
-						 "<MetersTravelled>0</MetersTravelled>{0}</Person>{0}";
-			string expected = string.Format( xml, Environment.NewLine, "\t" );
+			             "<Person>{0}{1}</Person>{0}";
+			string name = string.Format( "{1}<Name>Bruce Lee</Name>{0}", Environment.NewLine, "\t" );
+			string age = string.Format( "{1}<Age>25</Age>{0}", Environment.NewLine, "\t" );
+			string mt = string.Format( "{1}<MetersTravelled>0</MetersTravelled>{0}", Environment.NewLine, "\t" );
+			var expected = new List<string>();
+			expected.Add( string.Format( xml, Environment.NewLine, name + age + mt ) );
+			expected.Add( string.Format( xml, Environment.NewLine, name + mt + age ) );
+			expected.Add( string.Format( xml, Environment.NewLine, age + name + mt ) );
+			expected.Add( string.Format( xml, Environment.NewLine, age + mt + name ) );
+			expected.Add( string.Format( xml, Environment.NewLine, mt + age + name ) );
+			expected.Add( string.Format( xml, Environment.NewLine, mt + name + age ) );
 			Person person = new Person( "Bruce Lee", 25 );
-			Assert.AreEqual( expected, person.ToXml() );
+			Assert.IsTrue( expected.Contains( person.ToXml() ) );
 		}
     	#endregion
 	}

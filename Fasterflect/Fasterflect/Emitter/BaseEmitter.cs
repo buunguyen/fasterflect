@@ -25,7 +25,7 @@ namespace Fasterflect.Emitter
 {
     internal abstract class BaseEmitter
     {
-        private static readonly Cache<int, Delegate> cache = new Cache<int, Delegate>();
+        private static readonly Cache<CallInfo, Delegate> cache = new Cache<CallInfo, Delegate>();
         protected static readonly MethodInfo StructGetMethod =
             Constants.StructType.GetMethod("get_Value", BindingFlags.Public | BindingFlags.Instance);
         protected static readonly MethodInfo StructSetMethod =
@@ -42,21 +42,15 @@ namespace Fasterflect.Emitter
         
         internal Delegate GetDelegate()
         {
-        	int cacheKey = GetCacheKey();
-        	var action = cache.Get( cacheKey );
+        	var action = cache.Get( CallInfo );
 			if( action == null )
 			{
 				Method = CreateDynamicMethod();
 				Generator = new EmitHelper( Method.GetILGenerator() );
 				action = CreateDelegate();
-				cache.Insert( cacheKey, action, CacheStrategy.Temporary );
+				cache.Insert( CallInfo, action, CacheStrategy.Temporary );
 			}
 			return action;
-        }
-
-        protected internal virtual int GetCacheKey()
-        {
-            return CallInfo.GetHashCode();
         }
 
         protected internal abstract DynamicMethod CreateDynamicMethod();

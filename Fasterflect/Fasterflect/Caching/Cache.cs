@@ -33,131 +33,131 @@ namespace Fasterflect.Caching
     {
         private readonly IDictionary<TKey, object> entries;
 
-    #region Constructors
-        public Cache()
-        {
-            entries = new ConcurrentDictionary<TKey, object>();
-        }
-        public Cache(IEqualityComparer<TKey> equalityComparer)
-        {
-            entries = new ConcurrentDictionary<TKey, object>(equalityComparer);
-        }
-    #endregion
+		#region Constructors
+		public Cache()
+		{
+			entries = new ConcurrentDictionary<TKey, object>();
+		}
+		public Cache(IEqualityComparer<TKey> equalityComparer)
+		{
+			entries = new ConcurrentDictionary<TKey, object>(equalityComparer);
+		}
+		#endregion
 
-    #region Properties
-        /// <summary>
-        /// Returns the number of entries currently stored in the cache. Accessing this property
-        /// causes a check of all entries in the cache to ensure collected entries are not counted.
-        /// </summary>
-        public int Count
-        {
-            get { return ClearCollected(); }
-        }
-    #endregion
+		#region Properties
+		/// <summary>
+		/// Returns the number of entries currently stored in the cache. Accessing this property
+		/// causes a check of all entries in the cache to ensure collected entries are not counted.
+		/// </summary>
+		public int Count
+		{
+			get { return ClearCollected(); }
+		}
+		#endregion
 
-    #region Indexers
-        /// <summary>
-        /// Indexer for accessing or adding cache entries.
-        /// </summary>
-        public TValue this[TKey key]
-        {
-            get { return Get(key); }
-            set { Insert(key, value, CacheStrategy.Temporary); }
-        }
+		#region Indexers
+		/// <summary>
+		/// Indexer for accessing or adding cache entries.
+		/// </summary>
+		public TValue this[TKey key]
+		{
+			get { return Get(key); }
+			set { Insert(key, value, CacheStrategy.Temporary); }
+		}
 
-        /// <summary>
-        /// Indexer for adding a cache item using the specified strategy.
-        /// </summary>
-        public TValue this[TKey key, CacheStrategy strategy]
-        {
-            set { Insert(key, value, strategy); }
-        }
-    #endregion
+		/// <summary>
+		/// Indexer for adding a cache item using the specified strategy.
+		/// </summary>
+		public TValue this[TKey key, CacheStrategy strategy]
+		{
+			set { Insert(key, value, strategy); }
+		}
+		#endregion
 
-    #region Insert Methods
-        /// <summary>
-        /// Insert a collectible object into the cache.
-        /// </summary>
-        /// <param name="key">The cache key used to reference the item.</param>
-        /// <param name="value">The object to be inserted into the cache.</param>
-        public void Insert(TKey key, TValue value)
-        {
-            Insert(key, value, CacheStrategy.Temporary);
-        }
+		#region Insert Methods
+		/// <summary>
+		/// Insert a collectible object into the cache.
+		/// </summary>
+		/// <param name="key">The cache key used to reference the item.</param>
+		/// <param name="value">The object to be inserted into the cache.</param>
+		public void Insert(TKey key, TValue value)
+		{
+			Insert(key, value, CacheStrategy.Temporary);
+		}
 
-        /// <summary>
-        /// Insert an object into the cache using the specified cache strategy (lifetime management).
-        /// </summary>
-        /// <param name="key">The cache key used to reference the item.</param>
-        /// <param name="value">The object to be inserted into the cache.</param>
-        /// <param name="strategy">The strategy to apply for the inserted item (use Temporary for objects 
-        /// that are collectible and Permanent for objects you wish to keep forever).</param>
-        public void Insert(TKey key, TValue value, CacheStrategy strategy)
-        {
-            entries[key] = strategy == CacheStrategy.Temporary 
-                ? new WeakReference(value) 
-                : value as object;
-        }
-    #endregion
+		/// <summary>
+		/// Insert an object into the cache using the specified cache strategy (lifetime management).
+		/// </summary>
+		/// <param name="key">The cache key used to reference the item.</param>
+		/// <param name="value">The object to be inserted into the cache.</param>
+		/// <param name="strategy">The strategy to apply for the inserted item (use Temporary for objects 
+		/// that are collectible and Permanent for objects you wish to keep forever).</param>
+		public void Insert(TKey key, TValue value, CacheStrategy strategy)
+		{
+			entries[key] = strategy == CacheStrategy.Temporary 
+				? new WeakReference(value) 
+				: value as object;
+		}
+		#endregion
 
-    #region Get Methods
-        /// <summary>
-        /// Retrieves an entry from the cache using the given key.
-        /// </summary>
-        /// <param name="key">The cache key of the item to retrieve.</param>
-        /// <returns>The retrieved cache item or null if not found.</returns>
-        public TValue Get(TKey key)
-        {
-            object entry;
-            entries.TryGetValue(key, out entry);
-            var wr = entry as WeakReference;
-            return (TValue)(wr != null ? wr.Target : entry);
-        }
-    #endregion
+		#region Get Methods
+		/// <summary>
+		/// Retrieves an entry from the cache using the given key.
+		/// </summary>
+		/// <param name="key">The cache key of the item to retrieve.</param>
+		/// <returns>The retrieved cache item or null if not found.</returns>
+		public TValue Get(TKey key)
+		{
+			object entry;
+			entries.TryGetValue(key, out entry);
+			var wr = entry as WeakReference;
+			return (TValue)(wr != null ? wr.Target : entry);
+		}
+		#endregion
 
-    #region Remove Methods
-        /// <summary>
-        /// Removes the object associated with the given key from the cache.
-        /// </summary>
-        /// <param name="key">The cache key of the item to remove.</param>
-        /// <returns>True if an item removed from the cache and false otherwise.</returns>
-        public bool Remove(TKey key)
-        {
-            return entries.Remove(key);
-        }
-    #endregion
+		#region Remove Methods
+		/// <summary>
+		/// Removes the object associated with the given key from the cache.
+		/// </summary>
+		/// <param name="key">The cache key of the item to remove.</param>
+		/// <returns>True if an item removed from the cache and false otherwise.</returns>
+		public bool Remove(TKey key)
+		{
+			return entries.Remove(key);
+		}
+		#endregion
 
-    #region Clear Methods
-        /// <summary>
-        /// Removes all entries from the cache.
-        /// </summary>
-        public void Clear()
-        {
-            entries.Clear();
-        }
+		#region Clear Methods
+		/// <summary>
+		/// Removes all entries from the cache.
+		/// </summary>
+		public void Clear()
+		{
+			entries.Clear();
+		}
 
-        /// <summary>
-        /// Process all entries in the cache and remove entries that refer to collected entries.
-        /// </summary>
-        /// <returns>The number of live cache entries still in the cache.</returns>
-        private int ClearCollected()
-        {
-            IList<TKey> keys = entries.Where(kvp => kvp.Value is WeakReference && !(kvp.Value as WeakReference).IsAlive).Select(kvp => kvp.Key).ToList();
-            keys.ForEach(k => entries.Remove(k));
-            return entries.Count;
-        }
-    #endregion
+		/// <summary>
+		/// Process all entries in the cache and remove entries that refer to collected entries.
+		/// </summary>
+		/// <returns>The number of live cache entries still in the cache.</returns>
+		private int ClearCollected()
+		{
+			IList<TKey> keys = entries.Where(kvp => kvp.Value is WeakReference && !(kvp.Value as WeakReference).IsAlive).Select(kvp => kvp.Key).ToList();
+			keys.ForEach(k => entries.Remove(k));
+			return entries.Count;
+		}
+		#endregion
 
-    #region ToString
-        /// <summary>
-        /// This method returns a string with information on the cache contents (number of contained objects).
-        /// </summary>
-        public override string ToString()
-        {
-            int count = ClearCollected();
-            return count > 0 ? String.Format("Cache contains {0} live objects.", count) : "Cache is empty.";
-        }
-    #endregion
+		#region ToString
+		/// <summary>
+		/// This method returns a string with information on the cache contents (number of contained objects).
+		/// </summary>
+		public override string ToString()
+		{
+			int count = ClearCollected();
+			return count > 0 ? String.Format("Cache contains {0} live objects.", count) : "Cache is empty.";
+		}
+		#endregion
     }
 #elif DOT_NET_35
     using System;

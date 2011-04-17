@@ -94,8 +94,7 @@ namespace Fasterflect
         /// <seealso cref="CallMethod(object,string,System.Type[],Fasterflect.Flags,object[])"/>
         public static object CallMethod( this object obj, string name, Flags bindingFlags, params object[] parameters )
         {
-            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, bindingFlags, 
-				parameters.ToTypeArray() )( obj, parameters );
+            return DelegateForCallMethod( obj.GetTypeAdjusted(), name, bindingFlags, parameters.ToTypeArray() )( obj, parameters );
         }
 
         /// <summary>
@@ -289,14 +288,15 @@ namespace Fasterflect
         /// due to method overloading the first found match will be returned.</returns>
         public static MethodInfo Method( this Type type, Type[] genericTypes, string name, Type[] parameterTypes, Flags bindingFlags )
         {
-            bool hasTypes = parameterTypes != null;
-            // we need to check all methods to do partial name matches
+			bool hasTypes = parameterTypes != null;
+        	bool hasGenericTypes = genericTypes != null && genericTypes.Length > 0;
+            // we need to check all methods to do partial name matches or complex parameter binding
         	bool processAll = bindingFlags.IsAnySet( Flags.PartialNameMatch | Flags.TrimExplicitlyImplemented );
         	processAll |= hasTypes && bindingFlags.IsSet( Flags.IgnoreParameterModifiers );
+        	processAll |= hasGenericTypes;
             if( processAll )
             {
-                return type.Methods( parameterTypes, bindingFlags, name ).FirstOrDefault()
-                    .MakeGeneric( genericTypes );
+                return type.Methods( genericTypes, parameterTypes, bindingFlags, name ).FirstOrDefault().MakeGeneric( genericTypes );
             }
 
             var result = hasTypes ? type.GetMethod( name, bindingFlags, null, parameterTypes, null )
@@ -305,16 +305,13 @@ namespace Fasterflect
             {
                 if( type.BaseType != typeof(object) && type.BaseType != null )
                 {
-                    return type.BaseType.Method( name, parameterTypes, bindingFlags )
-                        .MakeGeneric( genericTypes );
+                    return type.BaseType.Method( name, parameterTypes, bindingFlags ).MakeGeneric( genericTypes );
                 }
             }
-        	bool hasSpecialFlags =
-                bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+        	bool hasSpecialFlags = bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
             if( hasSpecialFlags )
             {
-                IList<MethodInfo> methods = new List<MethodInfo> { result };
-                methods = methods.Filter( bindingFlags );
+                var methods = new List<MethodInfo> { result }.Filter( bindingFlags );
                 return (methods.Count > 0 ? methods[ 0 ] : null).MakeGeneric( genericTypes );
             }
             return result.MakeGeneric(genericTypes);
@@ -399,19 +396,21 @@ namespace Fasterflect
 		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
 		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
         /// <returns>A list of all matching methods. This value will never be null.</returns>
-        public static IList<MethodInfo> Methods( this Type type, Type[] parameterTypes, Flags bindingFlags,
-                                                 params string[] names )
+        public static IList<MethodInfo> Methods( this Type type, Type[] parameterTypes, Flags bindingFlags, params string[] names )
+    	{
+    		return type.Methods( null, parameterTypes, bindingFlags, names );
+    	}
+
+    	public static IList<MethodInfo> Methods( this Type type, Type[] genericTypes, Type[] parameterTypes, Flags bindingFlags, params string[] names )
         {
             if( type == null || type == typeof(object) )
             {
                 return new MethodInfo[0];
             }
-
-            bool recurse = bindingFlags.IsNotSet( Flags.DeclaredOnly );
+			bool recurse = bindingFlags.IsNotSet( Flags.DeclaredOnly );
             bool hasNames = names != null && names.Length > 0;
-            bool hasTypes = parameterTypes != null;
-            bool hasSpecialFlags =
-                bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+        	bool hasTypes = parameterTypes != null;
+            bool hasSpecialFlags = bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
 
             if( ! recurse && ! hasNames && ! hasTypes && ! hasSpecialFlags )
             {
@@ -420,7 +419,7 @@ namespace Fasterflect
 
             var methods = GetMethods( type, bindingFlags );
             methods = hasNames ? methods.Filter( bindingFlags, names ) : methods;
-            methods = hasTypes ? methods.Filter( bindingFlags, parameterTypes ) : methods;
+            methods = hasTypes ? methods.Filter( bindingFlags, genericTypes, parameterTypes ) : methods;
             methods = hasSpecialFlags ? methods.Filter( bindingFlags ) : methods;
             return methods;
         }
