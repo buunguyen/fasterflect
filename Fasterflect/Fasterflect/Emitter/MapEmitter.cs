@@ -33,34 +33,23 @@ namespace Fasterflect.Emitter
 
         public MapEmitter(Type sourceType, Type targetType, MemberTypes sourceMemberTypes, MemberTypes targetMemberTypes,
                            Flags bindingFlags, params string[] names)
-            : base(new CallInfo(targetType, null, 
+            : base(new MapCallInfo(targetType, null, 
                 // Auto-apply IgnoreCase if we're mapping from one membertype to another
                 Flags.SetIf(bindingFlags, Flags.IgnoreCase, (sourceMemberTypes & targetMemberTypes) != sourceMemberTypes), 
                 MemberTypes.Custom, 
                 "Fasterflect_Map", 
                 Type.EmptyTypes, 
                 null,
-				false))
+				false, 
+				sourceType, 
+				sourceMemberTypes, 
+				targetMemberTypes, 
+				names))
         {
             this.sourceType = sourceType;
             this.sourceMemberTypes = sourceMemberTypes;
             this.targetMemberTypes = targetMemberTypes;
             this.names = names;
-        }
-
-        protected internal override int GetCacheKey()
-        {
-            int key = ((sourceType.GetHashCode() << 32) + CallInfo.TargetType.GetHashCode()) ^
-                           (CallInfo.BindingFlags.GetHashCode() ^ sourceMemberTypes.GetHashCode() ^ targetMemberTypes.GetHashCode());
-            if (names != null && names.Length > 0)
-            {
-                for (int index = 0; index < names.Length; index++)
-                {
-                    var name = names[index];
-                    key += name.GetHashCode();
-                }
-            }
-            return key;
         }
 
         protected internal override DynamicMethod CreateDynamicMethod()

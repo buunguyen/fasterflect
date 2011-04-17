@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections;
 using Fasterflect;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.NUnit
 {
-    [TestFixture]
-    class IssueList
+    [TestClass]
+    public class IssueList
     {
-        [Test]
+        [TestMethod]
         public void Issue1()
         {
             Console.WriteLine("List 1: Add() without Fasterflect");

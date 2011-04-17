@@ -96,6 +96,7 @@
     <Compile Include="Lookup\PropertyTest.cs" />
     <Compile Include="Lookup\MemberTest.cs" />
     <Compile Include="Lookup\FieldTest.cs" />
+    <Compile Include="Lookup\TypeTest.cs" />
     <Compile Include="Probing\MethodDispatcherTest.cs" />
     <Compile Include="Probing\TryCallMethodTest.cs" />
     <Compile Include="Probing\TryCreateInstanceTest.cs" />
@@ -126,6 +127,9 @@
     <Compile Include="Services\DynamicTest.cs" />
     <Compile Include="Services\XmlTransformerTest.cs" />
     <Compile Include="Services\MapTest.cs" />
+    <Compile Include="_new\EventHandlerTest.cs" />
+    <Compile Include="_new\GenericTest.cs" />
+    <Compile Include="_new\IssueList.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fasterflect\Fasterflect.csproj">
