@@ -130,6 +130,7 @@
     <Compile Include="_new\EventHandlerTest.cs" />
     <Compile Include="_new\GenericTest.cs" />
     <Compile Include="_new\IssueList.cs" />
+    <Compile Include="_new\IssueList2.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fasterflect\Fasterflect.csproj">
