@@ -116,7 +116,7 @@ namespace Fasterflect
 		public static IList<T> CreateInstances<T>( this Assembly assembly )
 		{
 			var query = from type in assembly.TypesImplementing<T>() 
-						where type.IsClass && type.Constructor() != null 
+						where type.IsClass && ! type.IsAbstract && type.Constructor() != null 
 						select (T) type.CreateInstance();
 			return query.ToList();
 		}
