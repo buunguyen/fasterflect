@@ -56,7 +56,8 @@ namespace Fasterflect
 			var types = new Type[objects.Length];
 			for (int i = 0; i < types.Length; i++)
 			{
-				types[i] = objects[i].GetType();
+				var obj = objects[ i ];
+				types[i] = obj != null ? obj.GetType() : null;
 			}
 			return types;
 		}
