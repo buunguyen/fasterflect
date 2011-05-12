@@ -109,7 +109,7 @@ namespace Fasterflect
 						string name = parameterType.FullName;
 						parameterType = Type.GetType( name.Substring( 0, name.Length - 1 ) ) ?? parameterType;
 					}
-                    match &= parameterType.IsGenericParameter || (exact ? type == parameterType : parameterType.IsAssignableFrom( type ));
+                    match &= parameterType.IsGenericParameter || parameterType.ContainsGenericParameters || (exact ? type == parameterType : parameterType.IsAssignableFrom( type ));
                     if( ! match )
                     {
                         break;
