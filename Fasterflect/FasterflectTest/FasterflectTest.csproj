@@ -97,6 +97,7 @@
     <Compile Include="Lookup\MemberTest.cs" />
     <Compile Include="Lookup\FieldTest.cs" />
     <Compile Include="Lookup\TypeTest.cs" />
+    <Compile Include="Probing\TryCallMethodValuesOnlyTest.cs" />
     <Compile Include="Probing\MethodDispatcherTest.cs" />
     <Compile Include="Probing\TryCallMethodTest.cs" />
     <Compile Include="Probing\TryCreateInstanceTest.cs" />
