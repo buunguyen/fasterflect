@@ -65,6 +65,14 @@ namespace FasterflectTest.SampleModel.Animals
 		{
 			MethodInvoked = 11;
 		}	
+        public void Accept( char c )
+        {
+            MethodInvoked = 12;
+        }
+        public void AcceptParams( params string[] args )
+        {
+            MethodInvoked = 13;
+        }
 		#endregion
 	}
 }

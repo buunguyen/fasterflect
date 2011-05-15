@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Fasterflect.Caching;
 using Fasterflect.Probing;
 
@@ -135,6 +136,7 @@ namespace Fasterflect
             MethodMap map = MapFactory.PrepareInvoke( type, names, types, values );
             return map.Invoke( values );
         }
+
         #endregion
     }
 }

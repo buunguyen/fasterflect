@@ -91,56 +91,6 @@ namespace Fasterflect
 			MethodMap map = MapFactory.DetermineBestMethodMatch( type.Methods( methodName ).Cast<MethodBase>(), mustUseAllParameters, names, types, values );
 			return isStatic ? map.Invoke( values ) : map.Invoke( obj, values );
 		}
-
-        /// <summary>
-        /// Obtains a list of all methods with the given <paramref name="methodName"/> on the given 
-        /// <paramref name="obj" />, and invokes the best match for the supplied parameters. This
-        /// overload requires that the supplied <paramref name="parameterValues"/> are all used in
-        /// the order in which they are supplied. Parameter values can be null.
-        /// TryCallMethod is very liberal and attempts to convert values that are not otherwise
-        /// considered compatible, such as between strings and enums or numbers, Guids and byte[16], etc.
-        /// You should carefully test any usage to ensure correct program behavior.
-        /// </summary>
-        /// <param name="obj">The type of which an instance should be created.</param>
-        /// <param name="methodName">The name of the overloaded methods.</param>
-        /// <param name="parameterValues">The values to use when invoking the method.</param>
-        /// <returns>The result of the invocation.</returns>
-        public static object TryCallMethod( this object obj, string methodName, params object[] parameterValues )
-        {
-        	bool isStatic = obj is Type;
-			var type = isStatic ? obj as Type : obj.GetType();
-        	var types = parameterValues != null ? parameterValues.ToTypeArray() : Type.EmptyTypes;
-			var values = parameterValues ?? new object[ 0 ];
-        	var methods = type.Methods( isStatic ? Flags.StaticAnyVisibility : Flags.InstanceAnyVisibility, methodName )
-				.Select( m => new { Method = m, Parameters = m.GetParameters() } )
-				.Where( m => m.Parameters.Length >= values.Length )
-				.OrderBy( m => m.Parameters.Count() );
-
-			foreach( var method in methods )
-			{
-				int valueIndex = 0;
-				foreach( var parameter in method.Parameters )
-				{
-					var isNullableParameter = parameter.ParameterType.IsClass || parameter.ParameterType == typeof(string);
-					var valueType = types[ valueIndex ];
-					object value = values[ valueIndex ];
-					if( (valueType == null && isNullableParameter) || 
-						(valueType != null && (value = TypeConverter.Get( parameter.ParameterType, value )) != null) )
-					{
-						values[ valueIndex ] = value;
-						valueIndex++;
-					}
-				}
-				if( valueIndex == values.Length )
-				{
-					return method.Method.Invoke( obj, parameterValues );
-				}
-			}
-			throw new MissingMethodException( string.Format( "Unable to locate a matching method {0} on type {1} for parameters: {2}", 
-				methodName, type.Name, string.Join( ", ", values.Select( v => v == null ? "null" : v.ToString() ) ) ) );
-			//MethodMap map = MapFactory.DetermineBestMethodMatch( type.Methods( methodName ), true, names, types, values );
-			//return isStatic ? map.Invoke( values ) : map.Invoke( obj, values );
-		}
         #endregion
     }
 }

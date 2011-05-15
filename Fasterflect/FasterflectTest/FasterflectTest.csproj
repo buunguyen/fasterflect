@@ -128,8 +128,8 @@
     <Compile Include="Services\DynamicTest.cs" />
     <Compile Include="Services\XmlTransformerTest.cs" />
     <Compile Include="Services\MapTest.cs" />
-    <Compile Include="_new\EventHandlerTest.cs" />
-    <Compile Include="_new\GenericTest.cs" />
+    <Compile Include="Services\EventHandlerTest.cs" />
+    <Compile Include="Invocation\GenericTest.cs" />
     <Compile Include="_new\IssueList.cs" />
     <Compile Include="_new\IssueList2.cs" />
   </ItemGroup>

@@ -111,6 +111,7 @@
     <Compile Include="Extensions\Services\TryCallMethodExtensions.cs" />
     <Compile Include="Extensions\Services\TryCreateInstanceExtensions.cs" />
     <Compile Include="Extensions\Services\MapExtensions.cs" />
+    <Compile Include="Extensions\Services\TryInvokeWithValuesExtensions.cs" />
     <Compile Include="Extensions\Services\XmlTransformerExtensions.cs" />
     <Compile Include="Extensions\Services\Probing\TypeConverter.cs" />
     <Compile Include="Extensions\Core\PropertyInfoExtensions.cs" />
