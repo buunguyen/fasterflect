@@ -68,28 +68,38 @@ namespace Fasterflect
         }
 
         /// <summary>
+        /// This method applies type parameter type filtering to a set of methods.
+        /// </summary>
+        public static IList<T> Filter<T>(this IList<T> methods, Type[] genericTypes)
+            where T : MethodBase
+        {
+            var result = new List<T>(methods.Count);
+            for (int i = 0; i < methods.Count; i++)
+            {
+                var method = methods[i];
+                if (method.ContainsGenericParameters)
+                {
+                    var genericArgs = method.GetGenericArguments();
+                    if (genericArgs.Length != genericTypes.Length)
+                        continue; 
+                    result.Add(method);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// This method applies method parameter type filtering to a set of methods.
         /// </summary>
-        public static IList<T> Filter<T>( this IList<T> methods, Flags bindingFlags, Type[] genericTypes, Type[] paramTypes )
+        public static IList<T> Filter<T>( this IList<T> methods, Flags bindingFlags, Type[] paramTypes )
             where T : MethodBase
         {
             var result = new List<T>( methods.Count );
 
             bool exact = bindingFlags.IsSet( Flags.ExactBinding );
-        	bool hasGenericTypes = genericTypes != null && genericTypes.Length > 0;
-
             for( int i = 0; i < methods.Count; i++ )
             {
                 var method = methods[ i ];
-				// verify generic type parameters
-				if( method.ContainsGenericParameters )
-				{
-					if( ! hasGenericTypes )
-						continue;
-					var genericArgs = method.GetGenericArguments();
-					if( genericArgs.Length != genericTypes.Length )
-						continue;
-				}
 				// verify parameters
             	var parameters = method.GetParameters();
                 if( parameters.Length != paramTypes.Length )

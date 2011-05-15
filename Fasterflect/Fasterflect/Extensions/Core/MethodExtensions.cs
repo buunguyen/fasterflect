@@ -317,7 +317,7 @@ namespace Fasterflect
             return result.MakeGeneric(genericTypes);
         }
 
-        private static MethodInfo MakeGeneric(this MethodInfo methodInfo, Type[] genericTypes)
+        internal static MethodInfo MakeGeneric(this MethodInfo methodInfo, Type[] genericTypes)
         {
             if (methodInfo == null)
                 return null;
@@ -409,7 +409,8 @@ namespace Fasterflect
             }
 			bool recurse = bindingFlags.IsNotSet( Flags.DeclaredOnly );
             bool hasNames = names != null && names.Length > 0;
-        	bool hasTypes = parameterTypes != null;
+            bool hasTypes = parameterTypes != null;
+            bool hasGenericTypes = genericTypes != null && genericTypes.Length > 0;
             bool hasSpecialFlags = bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
 
             if( ! recurse && ! hasNames && ! hasTypes && ! hasSpecialFlags )
@@ -418,8 +419,9 @@ namespace Fasterflect
             }
 
             var methods = GetMethods( type, bindingFlags );
-            methods = hasNames ? methods.Filter( bindingFlags, names ) : methods;
-            methods = hasTypes ? methods.Filter( bindingFlags, genericTypes, parameterTypes ) : methods;
+            methods = hasNames ? methods.Filter(bindingFlags, names) : methods;
+            methods = hasGenericTypes ? methods.Filter(genericTypes) : methods;
+            methods = hasTypes ? methods.Filter( bindingFlags, parameterTypes ) : methods;
             methods = hasSpecialFlags ? methods.Filter( bindingFlags ) : methods;
             return methods;
         }

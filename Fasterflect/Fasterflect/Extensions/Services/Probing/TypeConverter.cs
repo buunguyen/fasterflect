@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Xml;
@@ -113,7 +114,7 @@ namespace Fasterflect.Probing
 			}
 		}
 
-		/// <summary>
+	    /// <summary>
 		/// Convert the supplied object into the specified target type. 
 		/// </summary>
 		/// <param name="targetType">The type into which to convert</param>
