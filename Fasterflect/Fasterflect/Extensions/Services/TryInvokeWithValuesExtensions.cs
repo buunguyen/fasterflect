@@ -25,11 +25,10 @@ using Fasterflect.Probing;
 namespace Fasterflect
 {
     /// <summary>
-    /// A converter used to convert <paramref name="value"/> to <paramref name="parameterType"/>
-    /// if it makes sense in the application.  Why implementation of converter can
-    /// set new value for <paramref name="value"/>, it should not attempt to 
-    /// modify child objects of <paramref name="value"/> because those changes will
-    /// be permanent although if the method in question will not be selected as a match.
+    /// A converter used to convert <paramref name="value"/> to <paramref name="parameterType"/>.  
+    /// While implementation of converter can assign new value for <paramref name="value"/>, 
+    /// it should not attempt to modify child objects of <paramref name="value"/> because 
+    /// those changes will be permanent even if the method in question will not be selected as a match.
     /// </summary>
     /// <param name="parameterType">The type to be converted to.</param>
     /// <param name="target">The type or object whose method or constructor is being called.</param>
@@ -222,9 +221,12 @@ namespace Fasterflect
                         object paramArg;
                         if (parameters.Length - 1 == values.Length)
                         {
-                            paramArg = parameter.ParameterType.CreateInstance(0);
+							paramArg = Array.CreateInstance(parameter.ParameterType.GetElementType(), 0);
+                           	
+							// This doesn't work under Mac OSX's Mono
+							// paramArg = parameter.ParameterType.CreateInstance(0);
                         }
-                        else
+                        else 
                         {
                             paramArg = parameter.ParameterType.CreateInstance(values.Length - parameters.Length + 1);
                             var elementType = parameter.ParameterType.GetElementType();
