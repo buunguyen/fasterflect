@@ -25,10 +25,11 @@ using Fasterflect.Probing;
 namespace Fasterflect
 {
     /// <summary>
-    /// A converter used to convert <paramref name="value"/> to <paramref name="parameterType"/>.  
-    /// While implementation of converter can assign new value for <paramref name="value"/>, 
-    /// it should not attempt to modify child objects of <paramref name="value"/> because 
-    /// those changes will be permanent even if the method in question will not be selected as a match.
+    /// A converter used to convert <paramref name="value"/> to <paramref name="parameterType"/>
+    /// if it makes sense in the application.  Why implementation of converter can
+    /// set new value for <paramref name="value"/>, it should not attempt to 
+    /// modify child objects of <paramref name="value"/> because those changes will
+    /// be permanent although if the method in question will not be selected as a match.
     /// </summary>
     /// <param name="parameterType">The type to be converted to.</param>
     /// <param name="target">The type or object whose method or constructor is being called.</param>
@@ -188,29 +189,13 @@ namespace Fasterflect
             object obj, object[] parameterValues)
         {
             converter = converter ?? new ParameterConverter(StandardConvert);
-            object[] values;
-            if (parameterValues == null || parameterValues.Length == 0)
+            if (parameterValues == null)
             {
-                values = new object[0];
+                parameterValues = new object[0];
             }
-            else
+            foreach (var mb in GetCandidates(parameterValues, methodBases))
             {
-                values = new object[parameterValues.Length];
-                Array.Copy( parameterValues, values, values.Length );
-            }
-
-            methodBases = (from methodBase in methodBases
-                           let parameters = methodBase.GetParameters()
-                           where parameters.Length == values.Length ||
-                                (parameters.Length > 0 && 
-                                 IsParams(parameters[parameters.Length - 1]) &&
-                                 values.Length >= (parameters.Length - 1)
-                                )
-                           orderby parameters.Count()
-                           select methodBase).ToList();
-
-            foreach (var mb in methodBases)
-            {
+                var convertedArgs = new List<object>();
                 var parameters = mb.GetParameters();
                 bool isMatch = true;
                 for (int paramIndex = 0; paramIndex < parameters.Length; paramIndex++)
@@ -219,20 +204,17 @@ namespace Fasterflect
                     if (paramIndex == parameters.Length - 1 && IsParams(parameter))
                     {
                         object paramArg;
-                        if (parameters.Length - 1 == values.Length)
+                        if (parameters.Length - 1 == parameterValues.Length)
                         {
-							paramArg = Array.CreateInstance(parameter.ParameterType.GetElementType(), 0);
-                           	
-							// This doesn't work under Mac OSX's Mono
-							// paramArg = parameter.ParameterType.CreateInstance(0);
+                            paramArg = parameter.ParameterType.CreateInstance(0);
                         }
-                        else 
+                        else
                         {
-                            paramArg = parameter.ParameterType.CreateInstance(values.Length - parameters.Length + 1);
+                            paramArg = parameter.ParameterType.CreateInstance(parameterValues.Length - parameters.Length + 1);
                             var elementType = parameter.ParameterType.GetElementType();
-                            for (int argIndex = paramIndex; argIndex < values.Length; argIndex++)
+                            for (int argIndex = paramIndex; argIndex < parameterValues.Length; argIndex++)
                             {
-                                var value = values[argIndex];
+                                var value = parameterValues[argIndex];
                                 if (!converter(elementType, obj, ref value))
                                 {
                                     isMatch = false;
@@ -241,34 +223,42 @@ namespace Fasterflect
                                 ((Array)paramArg).SetValue( value, argIndex - paramIndex );
                             }
                         }
-                        var tmpArray = new object[parameters.Length];
-                        Array.Copy(values, tmpArray, values.Length < parameters.Length
-                            ? values.Length : parameters.Length);
-                        tmpArray[parameters.Length - 1] = paramArg;
-                        values = tmpArray;
+                        convertedArgs.Add(paramArg);
                     }
                     else
                     {
-                        var value = values[paramIndex];
+                        var value = parameterValues[paramIndex];
                         if (!converter(parameter.ParameterType, obj, ref value))
                         {
                             isMatch = false;
                             goto end_of_loop;
                         }
-                        values[paramIndex] = value;
+                        convertedArgs.Add(value);
                     }
                 }
 
             end_of_loop:
                 if (isMatch)
                 {
-                    parameterValues = values.Length == 0 ? null : values;
+                    parameterValues = convertedArgs.Count == 0 ? null : convertedArgs.ToArray();
                     return mb is ConstructorInfo
                                ? ((ConstructorInfo) mb).Invoke(parameterValues)
                                : mb.Invoke(obj is Type ? null : obj, parameterValues);
                 }
             } // foreach loop
             throw new MissingMemberException();
+        }
+
+        private static IEnumerable<MethodBase> GetCandidates(object[] parameterValues, IEnumerable<MethodBase> methodBases)
+        {
+            return (from methodBase in methodBases
+                    let parameters = methodBase.GetParameters()
+                    where parameters.Length == parameterValues.Length ||
+                          (parameters.Length > 0 && 
+                           IsParams(parameters[parameters.Length - 1]) &&
+                           parameterValues.Length >= (parameters.Length - 1))
+                    orderby parameters.Count()
+                    select methodBase).ToList();
         }
 
         private static bool StandardConvert(Type targetType, object owner, ref object value)
