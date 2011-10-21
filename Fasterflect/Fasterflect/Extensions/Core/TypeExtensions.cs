@@ -29,7 +29,7 @@ namespace Fasterflect
 	{
 		#region Implements
 		/// <summary>
-		/// Returns true of the supplied <paramref name="type"/> implements the given <typeparamref name="T"/>.
+		/// Returns true of the supplied <paramref name="type"/> implements the given interface <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">The type (interface) to check for.</typeparam>
 		/// <param name="type">The type to check.</param>
@@ -41,6 +41,7 @@ namespace Fasterflect
 		#endregion
 
 		#region IsFrameworkType
+
 		#region IsFrameworkType Helpers
 		private static readonly List<byte[]> tokens = new List<byte[]>
 		                                              {
@@ -74,6 +75,59 @@ namespace Fasterflect
 			}
 			byte[] publicKeyToken = type.Assembly.GetName().GetPublicKeyToken();
 			return publicKeyToken != null && tokens.Contains( publicKeyToken, new ByteArrayEqualityComparer() );
+		}
+		#endregion
+
+		#region Name (with generic pretty-printing)
+		/// <summary>
+		/// Returns the C# name, including any generic parameters, of the supplied <paramref name="type"/>.
+		/// </summary>
+		/// <param name="type">The type to return the name for.</param>
+		/// <returns>The type name formatted as you'd write it in C#.</returns>
+		public static string Name( this Type type )
+		{
+			if( type.IsArray )
+			{
+				return string.Format( "{0}[]", type.GetElementType().Name() );
+			}
+			if( type.ContainsGenericParameters || type.IsGenericType )
+			{
+				if( type.BaseType == typeof(Nullable<>) || (type.BaseType == typeof(ValueType) && type.UnderlyingSystemType.Name.StartsWith( "Nullable" )) )
+				{
+					return GetCSharpTypeName( type.GetGenericArguments().Single().Name ) + "?";
+				}
+				int index = type.Name.IndexOf( "`" );
+				string genericTypeName = index > 0 ? type.Name.Substring( 0, index ) : type.Name;
+				string genericArgs = string.Join( ",", type.GetGenericArguments().Select( t => t.Name() ) );
+				return genericArgs.Length == 0 ? genericTypeName : genericTypeName + "<" + genericArgs + ">";
+			}
+			return GetCSharpTypeName( type.Name );
+		}
+
+		private static string GetCSharpTypeName( string typeName )
+		{
+			switch( typeName )
+			{
+				case "String":
+				case "Object":
+				case "Void":
+				case "Byte":
+				case "Double":
+				case "Decimal":
+					return typeName.ToLower();
+				case "Int16":
+					return "short";
+				case "Int32":
+					return "int";
+				case "Int64":
+					return "long";
+				case "Single":
+					return "float";
+				case "Boolean":
+					return "bool";
+				default:
+					return typeName;
+			}
 		}
 		#endregion
 	}

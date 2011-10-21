@@ -23,6 +23,7 @@ using System.Collections.Generic;
 #if DOT_NET_4
 using System.Dynamic;
 #endif
+using System.Linq;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -104,10 +105,8 @@ namespace FasterflectTest.Services
 		#region DeepClone Sample Classes
 		class AddressPoco
 		{
-			public string LineOne { get; set; }
-			public string LineTwo { get; set; }
+			public string Street { get; set; }
 			public string City { get; set; }
-			public string State { get; set; }
 			public string ZipCode { get; set; }
 		}
 
@@ -167,7 +166,6 @@ namespace FasterflectTest.Services
 			Assert.AreSame( clone.Manager, clone.Manager.Manager );
 		}
 
-
 		[TestMethod]
 		public void TestDeepCloneWithComplexObjectGraph()
 		{
@@ -182,11 +180,12 @@ namespace FasterflectTest.Services
 			              {
 			              	   Address = libraryAddress,
 			              	   Name = "The Library",
-			              	   WaitingList = new List<PersonPoco> { arthur, trish, ford }
+			              	   WaitingList = new List<PersonPoco> { arthur, trish, ford },
 			              };
 			library[ "foo" ] = "bar";
 			library[ "h2g2" ] = "dont panic";
 
+			library.Values.Contains( "foo" );
 			// deep clone
 			var clone = library.DeepClone();
 
@@ -194,6 +193,8 @@ namespace FasterflectTest.Services
 			Assert.AreEqual( 2, clone.Keys.Count );
 			Assert.AreEqual( 3, clone.WaitingList.Count );
 			Assert.AreSame( clone.WaitingList[ 0 ].Address, clone.WaitingList[ 1 ].Address );
+			Assert.AreNotSame( library.Values, clone.Values );
+			Assert.AreEqual( library.Values.Count, clone.Values.Count );
 		}
         #endregion
 

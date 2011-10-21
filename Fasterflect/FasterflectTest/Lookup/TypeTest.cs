@@ -1,5 +1,4 @@
 ﻿#region License
-
 // Copyright 2010 Buu Nguyen, Morten Mertner
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,13 +14,13 @@
 // limitations under the License.
 // 
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
-
 #endregion
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using Fasterflect;
 using FasterflectTest.SampleModel.Animals;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -31,7 +30,7 @@ namespace FasterflectTest.Lookup
 	[TestClass]
 	public class TypeTest
 	{
-		#region Implements()
+		#region Implements
 		[TestMethod]
 		public void TestImplements()
 		{
@@ -50,7 +49,7 @@ namespace FasterflectTest.Lookup
 		}
 		#endregion
 
-		#region Implements()
+		#region IsFrameworkType
 		[TestMethod]
 		public void TestIsFrameworkType()
 		{
@@ -61,6 +60,38 @@ namespace FasterflectTest.Lookup
 			Assert.IsTrue( typeof(int).IsFrameworkType() );
 			Assert.IsFalse( typeof(Flags).IsFrameworkType() );
 			Assert.IsFalse( typeof(Lion).IsFrameworkType() );
+		}
+		#endregion
+
+		#region Name
+		[TestMethod]
+		public void TestNameWithNonGenericTypes()
+		{
+			Assert.AreEqual( "string", typeof(string).Name() );
+			Assert.AreEqual( "int", typeof(Int32).Name() );
+			Assert.AreEqual( "decimal", typeof(Decimal).Name() );
+			Assert.AreEqual( "bool[]", typeof(Boolean[]).Name() );
+			Assert.AreEqual( "int[][]", typeof(int[][]).Name() );
+			Assert.AreEqual( "StringBuilder", typeof(StringBuilder).Name() );
+		}
+
+		[TestMethod]
+		public void TestNameWithNullableTypes()
+		{
+			Assert.AreEqual( "T?", typeof(Nullable<>).Name() );
+			Assert.AreEqual( "bool?", typeof(bool?).Name() );
+			Assert.AreEqual( "int?", typeof(int?).Name() );
+			Assert.AreEqual( "decimal?[]", typeof(decimal?[]).Name() );
+			Assert.AreEqual( "int?[][]", typeof(int?[][]).Name() );
+		}
+
+		[TestMethod]
+		public void TestNameWithGenericTypes()
+		{
+			Assert.AreEqual( "StringBuilder", typeof(StringBuilder).Name() );
+			Assert.AreEqual( "List<T>", typeof(List<>).Name() );
+			Assert.AreEqual( "Dictionary<TKey,TValue>", typeof(Dictionary<,>).Name() );
+			Assert.AreEqual( "Dictionary<int,List<string>>", typeof(Dictionary<int, List<string>>).Name() );
 		}
 		#endregion
 	}
