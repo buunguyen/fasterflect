@@ -129,7 +129,7 @@ namespace FasterflectSample.Internal
 
 		private static void Write( StringBuilder sb, MethodInfo method, IList<ParameterInfo> parameters )
 		{
-			sb.AppendFormat( "{0} ", GetTypeName( method.ReturnType ) ); // GetTypeName(method.ReturnType));
+			sb.AppendFormat( "{0} ", method.ReturnType.Name() );
 			sb.AppendFormat( "{0}{1}( ", method.Name, GetGenericParameterText( method ) );
 			ParameterInfo first = parameters.FirstOrDefault();
 			ParameterInfo last = parameters.LastOrDefault();
@@ -147,7 +147,7 @@ namespace FasterflectSample.Internal
 				return string.Empty;
 			}
 			Type[] genericParameters = method.GetGenericArguments();
-			string args = string.Join( ",", genericParameters.Select( GetTypeName ) );
+			string args = string.Join( ",", genericParameters.Select( t => t.Name() ) );
 			return "<" + args + ">";
 		}
 
@@ -155,53 +155,7 @@ namespace FasterflectSample.Internal
 		{
 			bool isParams = parameter.ParameterType.IsArray && parameter.HasAttribute<ParamArrayAttribute>();
 			string prefix = isParams ? "params " : string.Empty;
-			return prefix + GetTypeName( parameter.ParameterType );
-		}
-
-		private static string GetTypeName( Type type )
-		{
-			if( type.IsArray )
-			{
-				return string.Format( "{0}[]", GetTypeName( type.GetElementType() ) );
-			}
-			if( type.ContainsGenericParameters || type.IsGenericType )
-			{
-				if( type.BaseType == typeof(Nullable<>) )
-				{
-					return GetCSharpTypeName( type.GetGenericArguments().Single().Name ) + "?";
-				}
-				int index = type.Name.IndexOf( "`" );
-				string genericTypeName = index > 0 ? type.Name.Substring( 0, index ) : type.Name;
-				string genericArgs = string.Join( ",", type.GetGenericArguments().Select( GetTypeName ) );
-				return genericArgs.Length == 0 ? genericTypeName : genericTypeName + "<" + genericArgs + ">";
-			}
-			return GetCSharpTypeName( type.Name );
-		}
-
-		private static string GetCSharpTypeName( string typeName )
-		{
-			switch( typeName )
-			{
-				case "String":
-				case "Object":
-				case "Void":
-				case "Byte":
-				case "Double":
-				case "Decimal":
-					return typeName.ToLower();
-				case "Int16":
-					return "short";
-				case "Int32":
-					return "int";
-				case "Int64":
-					return "long";
-				case "Single":
-					return "float";
-				case "Boolean":
-					return "bool";
-				default:
-					return typeName;
-			}
+			return prefix + parameter.ParameterType.Name();
 		}
 	}
 }
