@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\BaseTest.cs" />
+    <Compile Include="Internal\HashCodeTest.cs" />
     <Compile Include="Internal\FlagsTest.cs" />
     <Compile Include="Invocation\ArrayTest.cs" />
     <Compile Include="Invocation\BaseInvocationTest.cs" />
