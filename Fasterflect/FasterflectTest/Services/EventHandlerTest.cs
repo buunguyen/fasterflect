@@ -12,7 +12,9 @@ namespace FasterflectTest.NUnit
             private delegate string StringOp(string s);
             public delegate int IntOp(int i);
 
-            private VoidOp voidOp;
+			#pragma warning disable 0169
+			// ReSharper disable UnusedMember.Local
+			private VoidOp voidOp;
             private StringOp stringOp;
             private IntOp intOp;
 
@@ -22,8 +24,10 @@ namespace FasterflectTest.NUnit
 
             private event IntOp intEvent;
             private static event IntOp StaticIntEvent;
-
-            public int TriggerEvents(int i)
+			// ReSharper restore UnusedMember.Local
+			#pragma warning restore 0169
+			
+			public int TriggerEvents(int i)
             {
                 return intEvent(i);
             }
