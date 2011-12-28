@@ -1,0 +1,9 @@
+<Configuration>
+  <NamespaceFolders>
+    <SkipFolder>FDF54936-A188-45B1-B482-632DA23DB0B0/d:Common</SkipFolder>
+    <SkipFolder>FDF54936-A188-45B1-B482-632DA23DB0B0/d:DynamicReflection</SkipFolder>
+    <SkipFolder>FDF54936-A188-45B1-B482-632DA23DB0B0/d:Extensions/d:Core</SkipFolder>
+    <SkipFolder>FDF54936-A188-45B1-B482-632DA23DB0B0/d:Extensions/d:Services</SkipFolder>
+    <SkipFolder>FDF54936-A188-45B1-B482-632DA23DB0B0/d:Extensions</SkipFolder>
+  </NamespaceFolders>
+</Configuration>
