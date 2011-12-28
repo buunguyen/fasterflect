@@ -75,8 +75,17 @@ namespace Fasterflect.Emitter
 			if (member.MemberType == MemberTypes.Field)
 			{
 				var field = member as FieldInfo;
-                Generator.ldfld( field.IsStatic, field )        // (this|tmpStr).field OR TargetType.field
-                         .boxIfValueType( field.FieldType );    // (object)<stack>
+
+				if( field.DeclaringType.IsEnum ) // special enum handling as ldsfld does not support enums
+				{
+					Generator.ldc_i4( (int) field.GetValue( field.DeclaringType ) )
+							 .boxIfValueType( field.FieldType );
+				}
+				else
+				{
+					Generator.ldfld( field.IsStatic, field )        // (this|tmpStr).field OR TargetType.field
+							 .boxIfValueType( field.FieldType );    // (object)<stack>
+				}
 			}
 			else
 			{
