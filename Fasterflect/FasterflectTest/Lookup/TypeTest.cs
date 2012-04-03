@@ -23,6 +23,7 @@ using System.Reflection;
 using System.Text;
 using Fasterflect;
 using FasterflectTest.SampleModel.Animals;
+using FasterflectTest.SampleModel.Generics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FasterflectTest.Lookup
@@ -34,18 +35,77 @@ namespace FasterflectTest.Lookup
 		[TestMethod]
 		public void TestImplements()
 		{
-			Assert.IsTrue( typeof(int).Implements<IComparable>() );
-			Assert.IsFalse( typeof(Stack).Implements<IComparable>() );
-			Assert.IsTrue( typeof(int[]).Implements<ICollection>() );
-			Assert.IsTrue( typeof(List<>).Implements<ICollection>() );
-			Assert.IsTrue( typeof(List<int>).Implements<ICollection>() );
-			Assert.IsTrue( typeof(List<int>).Implements<IList<int>>() );
-			Assert.IsFalse( typeof(List<int>).Implements<IList<string>>() );
-			Assert.IsFalse( typeof(List<int>).Implements<IEnumerator>() );
-			Assert.IsTrue( typeof(IList).Implements<ICollection>() );
-			Assert.IsTrue( typeof(IList<int>).Implements<ICollection<int>>() );
-			Assert.IsFalse( typeof(ICollection).Implements<IList>() );
-			Assert.IsFalse( typeof(ICollection<int>).Implements<IList<int>>() );
+			Assert.IsTrue( typeof( int ).Implements<IComparable>() );
+			Assert.IsFalse( typeof( Stack ).Implements<IComparable>() );
+			Assert.IsTrue( typeof( int[] ).Implements<ICollection>() );
+			Assert.IsTrue( typeof( List<> ).Implements<ICollection>() );
+			Assert.IsTrue( typeof( List<> ).Implements( typeof(IEnumerable<>) ) );
+			Assert.IsTrue( typeof( List<> ).Implements( typeof(ICollection<>) ) );
+			Assert.IsTrue( typeof( List<> ).Implements( typeof(IList<>) ) );
+			Assert.IsTrue( typeof( IList<> ).Implements( typeof(ICollection<>) ) );
+			Assert.IsTrue( typeof( List<int> ).Implements<ICollection>() );
+			Assert.IsTrue( typeof( List<int> ).Implements( typeof(ICollection<>) ) );
+			Assert.IsTrue( typeof( List<int> ).Implements<IList<int>>() );
+			Assert.IsFalse( typeof( List<int> ).Implements<IList<string>>() );
+			Assert.IsFalse( typeof( List<int> ).Implements<IEnumerator>() );
+			Assert.IsTrue( typeof( IList ).Implements<ICollection>() );
+			Assert.IsTrue( typeof( IList<int> ).Implements<ICollection<int>>() );
+			Assert.IsFalse( typeof( ICollection ).Implements<IList>() );
+			Assert.IsFalse( typeof( ICollection<int> ).Implements<IList<int>>() );
+		}
+		#endregion
+
+		#region Inherits
+		[TestMethod]
+		public void TestInherits()
+		{
+			Assert.IsFalse( typeof(Concrete).Inherits( typeof(Concrete) ) );
+			Assert.IsTrue( typeof(Concrete).Inherits( typeof(GenericBase<int>) ) );
+			Assert.IsTrue( typeof(Concrete).Inherits( typeof(GenericBase<>) ) );
+			Assert.IsTrue( typeof(Concrete).Inherits( typeof(AbstractGenericBase<>) ) );
+			Assert.IsFalse( typeof(Concrete).Inherits( typeof(GenericBase<long>) ) );
+			Assert.IsTrue( typeof(Concrete).Inherits( typeof(AbstractGenericBase<int>) ) );
+			Assert.IsTrue( typeof(GenericBase<>).Inherits( typeof(AbstractGenericBase<>) ) );
+			Assert.IsTrue( typeof(GenericBase<int>).Inherits( typeof(AbstractGenericBase<>) ) );
+			Assert.IsTrue( typeof(GenericBase<int>).Inherits( typeof(AbstractGenericBase<int>) ) );
+			Assert.IsFalse( typeof(GenericBase<>).Inherits( typeof(AbstractGenericBase<int>) ) );
+			Assert.IsFalse( typeof(GenericBase<>).Inherits( typeof(GenericBase<>) ) );
+		}
+		#endregion
+
+		#region InheritsOrImplements
+		[TestMethod]
+		public void TestInheritsOrImplements()
+		{
+			Assert.IsTrue( typeof( int ).InheritsOrImplements<IComparable>() );
+			Assert.IsFalse( typeof( Stack ).InheritsOrImplements<IComparable>() );
+			Assert.IsTrue( typeof( int[] ).InheritsOrImplements<ICollection>() );
+			Assert.IsTrue( typeof( List<> ).InheritsOrImplements<ICollection>() );
+			Assert.IsTrue( typeof( List<> ).InheritsOrImplements( typeof(IEnumerable<>) ) );
+			Assert.IsTrue( typeof( List<> ).InheritsOrImplements( typeof(ICollection<>) ) );
+			Assert.IsTrue( typeof( List<> ).InheritsOrImplements( typeof(IList<>) ) );
+			Assert.IsTrue( typeof( IList<> ).InheritsOrImplements( typeof(ICollection<>) ) );
+			Assert.IsTrue( typeof( List<int> ).InheritsOrImplements<ICollection>() );
+			Assert.IsTrue( typeof( List<int> ).InheritsOrImplements( typeof(ICollection<>) ) );
+			Assert.IsTrue( typeof( List<int> ).InheritsOrImplements<IList<int>>() );
+			Assert.IsFalse( typeof( List<int> ).InheritsOrImplements<IList<string>>() );
+			Assert.IsFalse( typeof( List<int> ).InheritsOrImplements<IEnumerator>() );
+			Assert.IsTrue( typeof( IList ).InheritsOrImplements<ICollection>() );
+			Assert.IsTrue( typeof( IList<int> ).InheritsOrImplements<ICollection<int>>() );
+			Assert.IsFalse( typeof( ICollection ).InheritsOrImplements<IList>() );
+			Assert.IsFalse( typeof( ICollection<int> ).InheritsOrImplements<IList<int>>() );
+
+			Assert.IsFalse( typeof(Concrete).InheritsOrImplements( typeof(Concrete) ) );
+			Assert.IsTrue( typeof(Concrete).InheritsOrImplements( typeof(GenericBase<int>) ) );
+			Assert.IsTrue( typeof(Concrete).InheritsOrImplements( typeof(GenericBase<>) ) );
+			Assert.IsTrue( typeof(Concrete).InheritsOrImplements( typeof(AbstractGenericBase<>) ) );
+			Assert.IsFalse( typeof(Concrete).InheritsOrImplements( typeof(GenericBase<long>) ) );
+			Assert.IsTrue( typeof(Concrete).InheritsOrImplements( typeof(AbstractGenericBase<int>) ) );
+			Assert.IsTrue( typeof(GenericBase<>).InheritsOrImplements( typeof(AbstractGenericBase<>) ) );
+			Assert.IsTrue( typeof(GenericBase<int>).InheritsOrImplements( typeof(AbstractGenericBase<>) ) );
+			Assert.IsTrue( typeof(GenericBase<int>).InheritsOrImplements( typeof(AbstractGenericBase<int>) ) );
+			Assert.IsFalse( typeof(GenericBase<>).InheritsOrImplements( typeof(AbstractGenericBase<int>) ) );
+			Assert.IsFalse( typeof(GenericBase<>).InheritsOrImplements( typeof(GenericBase<>) ) );
 		}
 		#endregion
 
