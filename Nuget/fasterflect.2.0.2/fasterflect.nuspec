@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<package> 
+  <metadata> 
+    <id>fasterflect</id> 
+    <version>2.0.2</version> 
+	<title>Fasterflect</title> 
+    <authors>Buu Nguyen, Morten Mertner</authors> 
+    <owners>Buu Nguyen</owners>
+    <summary>.NET reflection made fast and easy.</summary> 
+    <description>.NET library that improves your productivity and application performance when performing reflection operations. It allows you to perform metadata lookup and reflection invocation intuitively while achieving greater performance than the built-in .NET Reflection.</description> 
+    <projectUrl>http://fasterflect.codeplex.com/</projectUrl>
+    <licenseUrl>http://fasterflect.codeplex.com/license</licenseUrl>
+    <tags>reflection reflection-emit dynamic-method .net35 .net40</tags>
+    <language>en-US</language> 
+  </metadata> 
+</package>
