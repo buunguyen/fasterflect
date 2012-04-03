@@ -29,14 +29,103 @@ namespace Fasterflect
 	{
 		#region Implements
 		/// <summary>
-		/// Returns true of the supplied <paramref name="type"/> implements the given interface <typeparamref name="T"/>.
+		/// Returns true if the supplied <paramref name="type"/> implements the given interface <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">The type (interface) to check for.</typeparam>
 		/// <param name="type">The type to check.</param>
-		/// <returns>True if the given type implements the interface.</returns>
+		/// <returns>True if the given type implements the specified interface.</returns>
+		/// <remarks>This method is for interfaces only. Use <seealso cref="Inherits"/> for class types and <seealso cref="InheritsOrImplements"/> 
+		/// to check both interfaces and classes.</remarks>
 		public static bool Implements<T>( this Type type )
 		{
-			return typeof(T).IsAssignableFrom( type ) && typeof(T) != type;
+			return type.Implements( typeof(T) );
+		}
+
+		/// <summary>
+		/// Returns true of the supplied <paramref name="type"/> implements the given interface <paramref name="interfaceType"/>. If the given
+		/// interface type is a generic type definition this method will use the generic type definition of any implemented interfaces
+		/// to determine the result.
+		/// </summary>
+		/// <param name="interfaceType">The interface type to check for.</param>
+		/// <param name="type">The type to check.</param>
+		/// <returns>True if the given type implements the specified interface.</returns>
+		/// <remarks>This method is for interfaces only. Use <seealso cref="Inherits"/> for classes and <seealso cref="InheritsOrImplements"/> 
+		/// to check both interfaces and classes.</remarks>
+		public static bool Implements( this Type type, Type interfaceType )
+		{
+			if( type == null || interfaceType == null || type == interfaceType )
+				return false;
+			if( interfaceType.IsGenericTypeDefinition && type.GetInterfaces().Where( t => t.IsGenericType ).Select( t => t.GetGenericTypeDefinition() ).Any( gt => gt == interfaceType ) )
+			{
+				return true;
+			}
+			return interfaceType.IsAssignableFrom( type );
+		}
+		#endregion
+
+		#region Inherits
+		/// <summary>
+		/// Returns true if the supplied <paramref name="type"/> inherits from the given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">The type (class) to check for.</typeparam>
+		/// <param name="type">The type to check.</param>
+		/// <returns>True if the given type inherits from the specified class.</returns>
+		/// <remarks>This method is for classes only. Use <seealso cref="Implements"/> for interface types and <seealso cref="InheritsOrImplements"/> 
+		/// to check both interfaces and classes.</remarks>
+		public static bool Inherits<T>( this Type type )
+		{
+			return type.Inherits( typeof(T) );
+		}
+
+		/// <summary>
+		/// Returns true if the supplied <paramref name="type"/> inherits from the given class <paramref name="baseType"/>.
+		/// </summary>
+		/// <param name="baseType">The type (class) to check for.</param>
+		/// <param name="type">The type to check.</param>
+		/// <returns>True if the given type inherits from the specified class.</returns>
+		/// <remarks>This method is for classes only. Use <seealso cref="Implements"/> for interface types and <seealso cref="InheritsOrImplements"/> 
+		/// to check both interfaces and classes.</remarks>
+		public static bool Inherits( this Type type, Type baseType )
+		{
+			if( baseType == null || type == null || type == baseType )
+				return false;
+			var rootType = typeof(object);
+			if( baseType == rootType )
+				return true;
+			while( type != null && type != rootType )
+			{
+				var current = type.IsGenericType && baseType.IsGenericTypeDefinition ? type.GetGenericTypeDefinition() : type;
+				if( baseType == current )
+					return true;
+				type = type.BaseType;
+			}
+			return false;
+		}
+		#endregion
+
+		#region InheritsOrImplements
+		/// <summary>
+		/// Returns true if the supplied <paramref name="type"/> inherits from or implements the type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">The base type to check for.</typeparam>
+		/// <param name="type">The type to check.</param>
+		/// <returns>True if the given type inherits from or implements the specified base type.</returns>
+		public static bool InheritsOrImplements<T>( this Type type )
+		{
+			return type.InheritsOrImplements( typeof(T) );
+		}
+
+		/// <summary>
+		/// Returns true of the supplied <paramref name="type"/> inherits from or implements the type <paramref name="baseType"/>.
+		/// </summary>
+		/// <param name="baseType">The base type to check for.</param>
+		/// <param name="type">The type to check.</param>
+		/// <returns>True if the given type inherits from or implements the specified base type.</returns>
+		public static bool InheritsOrImplements( this Type type, Type baseType )
+		{
+			if( type == null || baseType == null )
+				return false;
+			return baseType.IsInterface ? type.Implements( baseType ) : type.Inherits( baseType );
 		}
 		#endregion
 

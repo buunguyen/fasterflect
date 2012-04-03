@@ -117,6 +117,9 @@
     <Compile Include="SampleModel\Animals\Interfaces\IBite.cs" />
     <Compile Include="SampleModel\Animals\Mammal.cs" />
     <Compile Include="SampleModel\Animals\Giraffe.cs" />
+    <Compile Include="SampleModel\Generics\Concrete.cs" />
+    <Compile Include="SampleModel\Generics\GenericBase.cs" />
+    <Compile Include="SampleModel\Generics\AbstractGenericBase.cs" />
     <Compile Include="SampleModel\People\Employee.cs" />
     <Compile Include="SampleModel\People\ISwimmable.cs" />
     <Compile Include="SampleModel\People\Person.cs" />
