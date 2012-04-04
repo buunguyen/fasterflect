@@ -152,7 +152,7 @@ namespace Fasterflect
             var parameters = invokeMethod.GetParameters().Select(parm =>
                 Expression.Parameter(parm.ParameterType, parm.Name)).ToArray();
             var instance = func.Target == null ? null : Expression.Constant(func.Target);
-            var convertedParameters = parameters.Select(parm => Expression.Convert(parm, typeof(object)));
+            var convertedParameters = parameters.Select(parm => Expression.Convert(parm, typeof(object))).Cast<Expression>().ToArray();
             var call = Expression.Call(instance, func.Method, Expression.NewArrayInit(typeof(object), convertedParameters));
             var body = invokeMethod.ReturnType == typeof(void)
                 ? (Expression)call
