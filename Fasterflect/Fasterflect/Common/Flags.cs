@@ -183,8 +183,19 @@ namespace Fasterflect
 		#region Common Selections
 		/// <summary>
 		/// Search criteria encompassing all public and non-public members, including base members.
+		/// Note that you also need to specify either the Instance or Static flag.
 		/// </summary>
 		public static readonly Flags AnyVisibility = Public | NonPublic;
+
+		/// <summary>
+		/// Search criteria encompassing all public instance members, including base members.
+		/// </summary>
+		public static readonly Flags InstancePublic = Public | Instance;
+
+		/// <summary>
+		/// Search criteria encompassing all non-public instance members, including base members.
+		/// </summary>
+		public static readonly Flags InstancePrivate = NonPublic | Instance;
 
 		/// <summary>
 		/// Search criteria encompassing all public and non-public instance members, including base members.
@@ -192,9 +203,29 @@ namespace Fasterflect
 		public static readonly Flags InstanceAnyVisibility = AnyVisibility | Instance;
 
 		/// <summary>
+		/// Search criteria encompassing all public static members, including base members.
+		/// </summary>
+		public static readonly Flags StaticPublic = Public | Static;
+
+		/// <summary>
+		/// Search criteria encompassing all non-public static members, including base members.
+		/// </summary>
+		public static readonly Flags StaticPrivate = NonPublic | Static;
+
+		/// <summary>
 		/// Search criteria encompassing all public and non-public static members, including base members.
 		/// </summary>
 		public static readonly Flags StaticAnyVisibility = AnyVisibility | Static;
+
+		/// <summary>
+		/// Search criteria encompassing all public instance members, excluding base members.
+		/// </summary>
+		public static readonly Flags InstancePublicDeclaredOnly = InstancePublic | DeclaredOnly;
+
+		/// <summary>
+		/// Search criteria encompassing all non-public instance members, excluding base members.
+		/// </summary>
+		public static readonly Flags InstancePrivateDeclaredOnly = InstancePrivate | DeclaredOnly;
 
 		/// <summary>
 		/// Search criteria encompassing all public and non-public instance members, excluding base members.
@@ -202,12 +233,22 @@ namespace Fasterflect
 		public static readonly Flags InstanceAnyDeclaredOnly = InstanceAnyVisibility | DeclaredOnly;
 
 		/// <summary>
+		/// Search criteria encompassing all public static members, excluding base members.
+		/// </summary>
+		public static readonly Flags StaticPublicDeclaredOnly = StaticPublic | DeclaredOnly;
+
+		/// <summary>
+		/// Search criteria encompassing all non-public static members, excluding base members.
+		/// </summary>
+		public static readonly Flags StaticPrivateDeclaredOnly = StaticPrivate | DeclaredOnly;
+
+		/// <summary>
 		/// Search criteria encompassing all public and non-public static members, excluding base members.
 		/// </summary>
 		public static readonly Flags StaticAnyDeclaredOnly = StaticAnyVisibility | DeclaredOnly;
 
 		/// <summary>
-		/// Search criteria encompassing all members, including base members.
+		/// Search criteria encompassing all members, including base and static members.
 		/// </summary>
 		public static readonly Flags StaticInstanceAnyVisibility = InstanceAnyVisibility | Static;
 		#endregion
