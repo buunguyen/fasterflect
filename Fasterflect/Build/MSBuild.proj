@@ -70,11 +70,11 @@
 		<!-- MSBuild Projects="$(RootRelativeToBuildFile)\Fasterflect.sln" Targets="Build" /-->
 		<Csc Sources="@(FasterflectSources)" DefineConstants="DOT_NET_4" Optimize="$(Optimize)"	
 			OutputAssembly="$(OutputPath)4.0\$(AssemblyName).dll" Platform="$(Platform)" TargetType="library"
-			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30128\" />
+			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30319\" />
 		<Csc Sources="@(UnitTestSources)" DefineConstants="DOT_NET_4" Optimize="$(Optimize)" 
 			OutputAssembly="$(OutputPath)4.0\$(AssemblyName)Test.dll" Platform="$(Platform)" TargetType="library"
-			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30128\"
-			AdditionalLibPaths="$(OutputPath)4.0\;c:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\PublicAssemblies"
+			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30319\"
+			AdditionalLibPaths="$(OutputPath)4.0\;c:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\PublicAssemblies"
 			References="Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll;Fasterflect.dll"	/> 
 		<!-- Copy SourceFiles="@(ProjectAssemblies)" DestinationFolder="$(OutputPath)$(ToolsVersion)\" /-->		  
 	</Target>
@@ -86,7 +86,7 @@
 		<Csc Sources="@(UnitTestSources)" DefineConstants="DOT_NET_35" Optimize="$(Optimize)" 
 			OutputAssembly="$(OutputPath)3.5\$(AssemblyName)Test.dll" Platform="$(Platform)" TargetType="library"
 			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v3.5\"
-			AdditionalLibPaths="$(OutputPath)3.5\;c:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\PublicAssemblies"
+			AdditionalLibPaths="$(OutputPath)3.5\;c:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\PublicAssemblies"
 			References="Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll;Fasterflect.dll" /> 
 	</Target>
 	<Target Name="CompileSilverlight40" DependsOnTargets="Prepare">
@@ -94,9 +94,9 @@
 		<MakeDir Directories="$(OutputPath)Silverlight\4.0"	Condition="!Exists('$(OutputPath)Silverlight\4.0')" />
 		<Csc Sources="@(FasterflectSources)" DefineConstants="DOT_NET_35" Optimize="$(Optimize)"
 			OutputAssembly="$(OutputPath)Silverlight\4.0\$(AssemblyName).dll" Platform="$(Platform)" TargetType="library"
-			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30128\"
-			NoStandardLib="true" AdditionalLibPaths="c:\Program Files\Microsoft Silverlight\4.0.50303.0" 
-			References="c:\Program Files\Microsoft Silverlight\4.0.50303.0\mscorlib.dll" />
+			TreatWarningsAsErrors="true" WarningLevel="4" ToolPath="C:\Windows\Microsoft.NET\Framework\v4.0.30319\"
+			NoStandardLib="true" AdditionalLibPaths="c:\Program Files (x86)\Microsoft Silverlight\4.1.10111.0" 
+			References="c:\Program Files (x86)\Microsoft Silverlight\4.1.10111.0\mscorlib.dll" />
 		<!--
 		<Csc Sources="@(FasterflectSources)" DefineConstants="DOT_NET_4" Optimize="$(Optimize)"	
 			OutputAssembly="$(OutputPath)Silverlight\4.0\$(AssemblyName).dll" Platform="$(Platform)" TargetType="library"
@@ -118,12 +118,12 @@
 	<Target Name="Rebuild" DependsOnTargets="Clean;Build"	/>
 
 	<Target Name="RunTests40"	DependsOnTargets="Build">  
-		<Exec Command='"c:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\mstest.exe" /testcontainer:FasterflectTest.dll'
+		<Exec Command='"c:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\mstest.exe" /testcontainer:FasterflectTest.dll'
 			WorkingDirectory="$(OutputPath)4.0"	/>
 		<Message Text="Tests ran successfully!"></Message>	
 	</Target>	   
 	<Target Name="RunTests35"	DependsOnTargets="Build">  
-		<Exec Command='"c:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\mstest.exe" /testcontainer:FasterflectTest.dll'
+		<Exec Command='"c:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\mstest.exe" /testcontainer:FasterflectTest.dll'
 			WorkingDirectory="$(OutputPath)3.5"	/>
 		<Message Text="Tests ran successfully!"></Message>	
 	</Target>	   
