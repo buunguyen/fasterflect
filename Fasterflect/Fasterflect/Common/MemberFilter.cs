@@ -23,7 +23,7 @@ using System.Reflection;
 
 namespace Fasterflect
 {
-    internal static class MemberFilter
+	internal static class MemberFilter
     {
         public static bool IsReservedName( this string name )
         {
@@ -162,15 +162,23 @@ namespace Fasterflect
             var result = new List<T>( members.Count );
         	var properties = new List<string>( members.Count );
 
+            bool excludeHidden = bindingFlags.IsSet( Flags.ExcludeHiddenMembers );
+            bool excludeBacking = bindingFlags.IsSet( Flags.ExcludeBackingMembers );
+            bool excludeExplicit = bindingFlags.IsSet( Flags.ExcludeExplicitlyImplemented );
+
             for( int i = 0; i < members.Count; i++ )
             {
                 var member = members[ i ];
-
-                bool excludeBacking = bindingFlags.IsSet( Flags.ExcludeBackingMembers );
-                bool excludeExplicit = bindingFlags.IsSet( Flags.ExcludeExplicitlyImplemented );
-
             	bool exclude = false;
-				if( excludeBacking )
+				if( excludeHidden )
+				{
+					var method = member as MethodBase;
+					// filter out anything but methods/constructors based on their name only
+					exclude |= method == null && result.Any( m => m.Name == member.Name );
+					// filter out methods that do not have a unique signature (this prevents overloads from being excluded by the ExcludeHiddenMembers flag)
+					exclude |= method != null && result.Where( m => m is MethodBase ).Cast<MethodBase>().Any( m => m.Name == member.Name && m.HasParameterSignature( method.GetParameters() ) );
+				}
+				if( !exclude && excludeBacking )
 				{
 					exclude |= member is FieldInfo && member.Name[ 0 ] == '<';
 					var method = member as MethodInfo;

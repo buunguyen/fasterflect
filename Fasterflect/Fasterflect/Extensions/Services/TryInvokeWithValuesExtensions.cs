@@ -37,6 +37,9 @@ namespace Fasterflect
 	/// <returns></returns>
 	public delegate bool ParameterConverter(Type parameterType, object target, ref object value);
 
+	/// <summary>
+	/// Container class for TryCreateInstanceWithValues and TryCallMethodWithValues extensions.
+	/// </summary>
 	public static class TryInvokeWithValuesExtensions
 	{
 		/// <summary>

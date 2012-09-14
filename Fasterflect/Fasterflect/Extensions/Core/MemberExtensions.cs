@@ -54,8 +54,7 @@ namespace Fasterflect
             }
 
             IList<MemberInfo> result = type.GetMember( name, bindingFlags );
-            bool hasSpecialFlags =
-                bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+            bool hasSpecialFlags = bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented | Flags.ExcludeHiddenMembers );
             result = hasSpecialFlags && result.Count > 0 ? result.Filter( bindingFlags ) : result;
             bool found = result.Count > 0;
 
@@ -160,8 +159,7 @@ namespace Fasterflect
 
             bool recurse = bindingFlags.IsNotSet( Flags.DeclaredOnly );
             bool hasNames = names != null && names.Length > 0;
-            bool hasSpecialFlags =
-                bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+            bool hasSpecialFlags = bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented | Flags.ExcludeHiddenMembers );
 
             if( ! recurse && ! hasNames && ! hasSpecialFlags )
             {
