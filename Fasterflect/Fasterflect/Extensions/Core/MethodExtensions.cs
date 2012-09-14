@@ -185,7 +185,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Gets a generic method.  See the overload with same arguments exception for <param name="genericTypes"/>.
+        /// Gets a generic method.  See the overload with same arguments exception for <paramref name="genericTypes"/>.
         /// </summary>
         /// <seealso cref="Method(Type,string)"/>
         public static MethodInfo Method(this Type type, Type[] genericTypes, string name)
@@ -211,7 +211,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Gets a generic method.  See the overload with same arguments exception for <param name="genericTypes"/>.
+        /// Gets a generic method.  See the overload with same arguments exception for <paramref name="genericTypes"/>.
         /// </summary>
         /// <seealso cref="Method(Type,string,Type[])"/>
         public static MethodInfo Method(this Type type, Type[] genericTypes, string name, Type[] parameterTypes)
@@ -238,7 +238,7 @@ namespace Fasterflect
         }
 
         /// <summary>
-        /// Gets a generic method.  See the overload with same arguments exception for <param name="genericTypes"/>.
+        /// Gets a generic method.  See the overload with same arguments exception for <paramref name="genericTypes"/>.
         /// </summary>
         /// <seealso cref="Method(Type,string,Flags)"/>
         public static MethodInfo Method(this Type type, Type[] genericTypes, string name, Flags bindingFlags)
@@ -308,7 +308,7 @@ namespace Fasterflect
                     return type.BaseType.Method( name, parameterTypes, bindingFlags ).MakeGeneric( genericTypes );
                 }
             }
-        	bool hasSpecialFlags = bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+        	bool hasSpecialFlags = bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented | Flags.ExcludeHiddenMembers );
             if( hasSpecialFlags )
             {
                 var methods = new List<MethodInfo> { result }.Filter( bindingFlags );
@@ -382,7 +382,7 @@ namespace Fasterflect
         }
 
     	/// <summary>
-        /// Gets all methods on the given <paramref name="type"/> that match the given lookup criteria and values.
+        /// Gets all methods on the given <paramref name="type"/> that match the given lookup criteria.
         /// </summary>
         /// <param name="type">The type on which to reflect.</param>
         /// <param name="parameterTypes">If this parameter is supplied then only methods with the same parameter signature
@@ -401,7 +401,26 @@ namespace Fasterflect
     		return type.Methods( null, parameterTypes, bindingFlags, names );
     	}
 
-    	public static IList<MethodInfo> Methods( this Type type, Type[] genericTypes, Type[] parameterTypes, Flags bindingFlags, params string[] names )
+
+    	/// <summary>
+        /// Gets all methods on the given <paramref name="type"/> that match the given lookup criteria.
+        /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="genericTypes">If this parameter is supplied then only methods with the same generic parameter 
+        /// signature will be included in the result. The default behavior is to check only for assignment compatibility,
+        /// but this can be changed to exact matching by passing <see href="Flags.ExactBinding"/>.</param>
+        /// <param name="parameterTypes">If this parameter is supplied then only methods with the same parameter signature
+        /// will be included in the result. The default behavior is to check only for assignment compatibility,
+        /// but this can be changed to exact matching by passing <see href="Flags.ExactBinding"/>.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination used to define
+        /// the search behavior and result filtering.</param>
+        /// <param name="names">The optional list of names against which to filter the result. If this parameter is
+		/// <c>null</c> or empty no name filtering will be applied. The default behavior is to check for an exact, 
+		/// case-sensitive match. Pass <see href="Flags.ExcludeExplicitlyImplemented"/> to exclude explicitly implemented 
+		/// interface members, <see href="Flags.PartialNameMatch"/> to locate by substring, and 
+		/// <see href="Flags.IgnoreCase"/> to ignore case.</param>
+        /// <returns>A list of all matching methods. This value will never be null.</returns>
+     	public static IList<MethodInfo> Methods( this Type type, Type[] genericTypes, Type[] parameterTypes, Flags bindingFlags, params string[] names )
         {
             if( type == null || type == typeof(object) )
             {
@@ -411,7 +430,7 @@ namespace Fasterflect
             bool hasNames = names != null && names.Length > 0;
             bool hasTypes = parameterTypes != null;
             bool hasGenericTypes = genericTypes != null && genericTypes.Length > 0;
-            bool hasSpecialFlags = bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented );
+            bool hasSpecialFlags = bindingFlags.IsAnySet( Flags.ExcludeBackingMembers | Flags.ExcludeExplicitlyImplemented | Flags.ExcludeHiddenMembers );
 
             if( ! recurse && ! hasNames && ! hasTypes && ! hasSpecialFlags )
             {

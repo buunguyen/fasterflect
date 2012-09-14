@@ -16,14 +16,16 @@
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
 #endregion
 
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Fasterflect
 {
-    using System;
-    using System.Linq;
-    using System.Linq.Expressions;
-
+	/// <summary>
+	/// Container class for event/delegate extensions.
+	/// </summary>
     public static class DynamicHandler
     {
         /// <summary>

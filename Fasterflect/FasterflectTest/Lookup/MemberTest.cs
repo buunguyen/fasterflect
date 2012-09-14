@@ -162,9 +162,24 @@ namespace FasterflectTest.Lookup
         }
 		#endregion
 
-		#region ExcludeBackingMembers
-		public class Person { public virtual string Name { get; protected set; } }
-		public class Employee : Person { public override string Name { get; protected set; } }		
+		#region ExcludeBackingMembers and ExcludeHiddenMembers
+		public class Person
+		{
+			public virtual string Name { get; protected set; }
+			public virtual void Foo() {}
+		}
+		public class Employee : Person
+		{
+			public override string Name { get; protected set; }
+			new public virtual void Foo() {}
+			public void Foo(int foo) {}
+		}
+		public class Manager : Employee
+		{
+			public override void Foo() {}
+			public void Foo(int foo, int bar) {}
+		}
+
 		[TestMethod]
 		public void TestWithExcludeBackingMembers()
 		{
@@ -180,12 +195,41 @@ namespace FasterflectTest.Lookup
 
 			MemberTypes memberTypes = MemberTypes.Method | MemberTypes.Field | MemberTypes.Property;
 			IList<MemberInfo> members = typeof(Employee).Members( memberTypes );
-			Assert.AreEqual( 8, members.Count );
-			Assert.AreEqual( typeof(Employee), members.First().DeclaringType );
+			Assert.AreEqual( 11, members.Count );
+			Assert.AreEqual( typeof(Employee), members.First( m => m.Name == "Foo" ).DeclaringType );
+			Assert.AreEqual( typeof(Employee), members.First( m => m.Name == "Name" ).DeclaringType );
 
 			members = typeof(Employee).Members( memberTypes, flags );
-			Assert.AreEqual( 1, members.Count );
-			Assert.AreEqual( typeof(Employee), members.First().DeclaringType );
+			Assert.AreEqual( 3, members.Count );
+			Assert.AreEqual( typeof(Employee), members.First( m => m.Name == "Name" ).DeclaringType );
+		}
+
+		[TestMethod]
+		public void TestWithExcludeHiddenMembers()
+		{
+			Flags flags = Flags.InstanceAnyVisibility | Flags.ExcludeHiddenMembers;
+
+			IList<PropertyInfo> properties = typeof(Manager).Properties( "Name" );
+			Assert.AreEqual( 2, properties.Count );
+			Assert.AreEqual( typeof(Employee), properties.First().DeclaringType );
+
+			properties = typeof(Manager).Properties( flags, "Name" );
+			Assert.AreEqual( 1, properties.Count );
+			Assert.AreEqual( typeof(Employee), properties.First().DeclaringType );
+
+			MemberTypes memberTypes = MemberTypes.Method | MemberTypes.Field | MemberTypes.Property;
+			IList<MemberInfo> members = typeof(Manager).Members( memberTypes );
+			Assert.AreEqual( 13, members.Count );
+			Assert.AreEqual( typeof(Manager), members.First().DeclaringType );
+
+			members = typeof(Manager).Members( memberTypes, flags );
+			Assert.AreEqual( 7, members.Count );
+			Assert.AreEqual( typeof(Manager), members.First().DeclaringType );
+
+			members = typeof(Manager).Members( memberTypes, flags | Flags.ExcludeBackingMembers );
+			Assert.AreEqual( 4, members.Count );
+			Assert.AreEqual( typeof(Manager), members.First().DeclaringType );
+
 		}
 		#endregion
 

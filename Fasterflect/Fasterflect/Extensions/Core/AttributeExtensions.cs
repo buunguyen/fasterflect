@@ -237,7 +237,9 @@ namespace Fasterflect
                         select m;
             return query.ToList();
         }
+        #endregion
 
+        #region FieldsAndPropertiesWith, FieldsWith, PropertiesWith
         /// <summary>
         /// Gets all public and non-public instance fields and properties on the given <paramref name="type"/>.
         /// The resulting list of members can optionally be filtered by supplying a list of 
@@ -268,10 +270,83 @@ namespace Fasterflect
         /// be decorated. If this parameter is <c>null</c> or empty then all fields and properties
         /// matching the given <paramref name="bindingFlags"/> will be included in the result.</param>
         /// <returns>A list of all matching fields and properties on the type. This value will never be null.</returns>
-		public static IList<MemberInfo> FieldsAndPropertiesWith( this Type type, Flags bindingFlags,
-																 params Type[] attributeTypes )
+		public static IList<MemberInfo> FieldsAndPropertiesWith( this Type type, Flags bindingFlags, params Type[] attributeTypes )
         {
             return type.MembersWith( MemberTypes.Field | MemberTypes.Property, bindingFlags, attributeTypes );
+        }
+
+        /// <summary>
+        /// Gets all fields on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>.
+        /// The resulting list of members can optionally be filtered by supplying a list of 
+        /// <paramref name="attributeTypes"/>, in which case only members decorated with at least one of
+        /// these will be included.
+        /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination 
+        /// used to define the search behavior and result filtering.</param>
+        /// <param name="attributeTypes">The optional list of attribute types with which members should
+        /// be decorated. If this parameter is <c>null</c> or empty then all fields matching the given 
+        /// <paramref name="bindingFlags"/> will be included in the result.</param>
+        /// <returns>A list of all matching fields on the type. This value will never be null.</returns>
+		public static IList<FieldInfo> FieldsWith( this Type type, Flags bindingFlags, params Type[] attributeTypes )
+		{
+            return type.MembersWith( MemberTypes.Field, bindingFlags, attributeTypes ).Cast<FieldInfo>().ToList();
+        }
+
+        /// <summary>
+        /// Gets all properties on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>.
+        /// The resulting list of members can optionally be filtered by supplying a list of 
+        /// <paramref name="attributeTypes"/>, in which case only members decorated with at least one of
+        /// these will be included.
+        /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination 
+        /// used to define the search behavior and result filtering.</param>
+        /// <param name="attributeTypes">The optional list of attribute types with which members should
+        /// be decorated. If this parameter is <c>null</c> or empty then all properties matching the given 
+        /// <paramref name="bindingFlags"/> will be included in the result.</param>
+        /// <returns>A list of all matching properties on the type. This value will never be null.</returns>
+		public static IList<PropertyInfo> PropertiesWith( this Type type, Flags bindingFlags, params Type[] attributeTypes )
+		{
+            return type.MembersWith( MemberTypes.Property, bindingFlags, attributeTypes ).Cast<PropertyInfo>().ToList();
+        }
+        #endregion
+
+        #region MethodsWith, ConstructorsWith
+        /// <summary>
+        /// Gets all methods on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>.
+        /// The resulting list of members can optionally be filtered by supplying a list of 
+        /// <paramref name="attributeTypes"/>, in which case only members decorated with at least one of
+        /// these will be included.
+        /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination 
+        /// used to define the search behavior and result filtering.</param>
+        /// <param name="attributeTypes">The optional list of attribute types with which members should
+        /// be decorated. If this parameter is <c>null</c> or empty then all methods matching the given 
+        /// <paramref name="bindingFlags"/> will be included in the result.</param>
+        /// <returns>A list of all matching methods on the type. This value will never be null.</returns>
+		public static IList<MethodInfo> MethodsWith( this Type type, Flags bindingFlags, params Type[] attributeTypes )
+		{
+            return type.MembersWith( MemberTypes.Method, bindingFlags, attributeTypes ).Cast<MethodInfo>().ToList();
+        }
+
+        /// <summary>
+        /// Gets all constructors on the given <paramref name="type"/> that match the specified <paramref name="bindingFlags"/>.
+        /// The resulting list of members can optionally be filtered by supplying a list of 
+        /// <paramref name="attributeTypes"/>, in which case only members decorated with at least one of
+        /// these will be included.
+        /// </summary>
+        /// <param name="type">The type on which to reflect.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> or <see cref="Flags"/> combination 
+        /// used to define the search behavior and result filtering.</param>
+        /// <param name="attributeTypes">The optional list of attribute types with which members should
+        /// be decorated. If this parameter is <c>null</c> or empty then all constructors matching the given 
+        /// <paramref name="bindingFlags"/> will be included in the result.</param>
+        /// <returns>A list of all matching constructors on the type. This value will never be null.</returns>
+		public static IList<ConstructorInfo> ConstructorsWith( this Type type, Flags bindingFlags, params Type[] attributeTypes )
+		{
+            return type.MembersWith( MemberTypes.Constructor, bindingFlags, attributeTypes ).Cast<ConstructorInfo>().ToList();
         }
         #endregion
 

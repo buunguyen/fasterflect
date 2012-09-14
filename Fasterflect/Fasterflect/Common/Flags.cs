@@ -53,6 +53,7 @@ namespace Fasterflect
 			flagNames[ ExcludeExplicitlyImplemented ] = "ExcludeExplicitlyImplemented"; // = new Flags( 1L << 34 );
 			flagNames[ ExcludeBackingMembers ] = "ExcludeBackingMembers"; // = new Flags( 1L << 35 );
 			flagNames[ IgnoreParameterModifiers ] = "IgnoreParameterModifiers"; // = new Flags( 1L << 36 );
+			flagNames[ ExcludeHiddenMembers ] = "ExcludeHiddenMembers"; // = new Flags( 1L << 37 );
 
 			// not yet supported:
 			//flagNames[ VisibilityMatch ] = "VisibilityMatch"; // = new Flags( 1L << 55 );
@@ -149,7 +150,17 @@ namespace Fasterflect
 		/// without supplying the exact details for every parameter.
 		/// </summary>
 		public static readonly Flags IgnoreParameterModifiers = new Flags( 1L << 36 );
-		
+
+		/// <summary>
+		/// If this option is specified all members that are have either an override or are being 
+		/// shadowed/hidden (by another member declared using the new keyword) will be excluded from the 
+		/// result. This is implemented by simple name matching of members, ensuring that only the first 
+		/// member with a given name is included in the result. Note that this overlaps partially with
+		/// the behavior of <see cref="ExcludeBackingMembers"/>, however, an implementation that excludes 
+		/// members based on the presence of the new keyword does not seem to be possible and would
+		/// in any case be much slower.
+		/// </summary>
+		public static readonly Flags ExcludeHiddenMembers = new Flags( 1L << 37 );
 
 		#region For The Future
 		///// <summary>

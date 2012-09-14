@@ -16,7 +16,9 @@
 // The latest version of this file can be found at http://fasterflect.codeplex.com/
 #endregion
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Fasterflect.Emitter;
 
@@ -71,5 +73,27 @@ namespace Fasterflect
             return method.GetParameters();
         }
         #endregion
+
+        #region Method Signature Comparer
+        /// <summary>
+        /// Compares the signature of the method with the given parameter types and returns true if
+        /// all method parameters have the same order and type. Parameter names are not considered.
+        /// </summary>
+        /// <returns>True if the supplied parameter type array matches the method parameters array, false otherwise.</returns>
+        public static bool HasParameterSignature( this MethodBase method, Type[] parameters )
+        {
+            return method.GetParameters().Select( p => p.ParameterType ).SequenceEqual( parameters );
+        }
+
+        /// <summary>
+        /// Compares the signature of the method with the given parameter types and returns true if
+        /// all method parameters have the same order and type. Parameter names are not considered.
+        /// </summary>
+        /// <returns>True if the supplied parameter type array matches the method parameters array, false otherwise.</returns>
+        public static bool HasParameterSignature( this MethodBase method, ParameterInfo[] parameters )
+        {
+            return method.GetParameters().Select( p => p.ParameterType ).SequenceEqual( parameters.Select( p => p.ParameterType ) );
+        }
+		#endregion
     }
 }
