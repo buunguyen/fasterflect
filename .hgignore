@@ -3,5 +3,9 @@ syntax: glob
 *.user
 bin
 obj
+Output
+Nuget/packages
+Nuget/fasterflect.*
 *.suo
 *.vs10x
+*.DotSettings
