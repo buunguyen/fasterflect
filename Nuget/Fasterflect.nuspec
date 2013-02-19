@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>fasterflect</id>
+    <version>2.1.3</version>
+    <title>Fasterflect</title>
+    <authors>Buu Nguyen, Morten Mertner</authors>
+    <owners>Buu Nguyen, Morten Mertner</owners>
+    <licenseUrl>http://fasterflect.codeplex.com/license</licenseUrl>
+    <projectUrl>http://fasterflect.codeplex.com/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>.NET library that improves your productivity and application performance when performing reflection operations. It allows you to perform metadata lookup and reflection invocation intuitively while achieving greater performance than the built-in .NET Reflection.</description>
+    <summary>.NET reflection made fast and easy.</summary>
+    <language>en-US</language>
+    <tags>reflection reflection-emit dynamic-method .net35 .net40 .net45</tags>
+  </metadata>
+</package>

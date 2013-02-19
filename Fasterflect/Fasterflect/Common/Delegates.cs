@@ -21,14 +21,20 @@ namespace Fasterflect
     /// <summary>
     /// A delegate to retrieve the value of an instance field or property of an object.
     /// </summary>
-    /// <param name="obj">The object whose field's or property's value is to be retrieved.</param>
+    /// <param name="obj">
+    /// The object whose field's or property's value is to be retrieved.
+    /// Use <c>null</c> for static field or property.
+    /// </param>
     /// <returns>The value of the instance field or property.</returns>
     public delegate object MemberGetter( object obj );
 
     /// <summary>
     /// A delegate to set the value of an instance field or property of an object.
     /// </summary>
-    /// <param name="obj">The object whose field's or property's value is to be set.</param>
+    /// <param name="obj">
+    /// The object whose field's or property's value is to be set.
+    /// Use <c>null</c> for static field or property.
+    /// </param>
     /// <param name="value">The value to be set to the field or property.</param>
     public delegate void MemberSetter( object obj, object value );
 
@@ -51,7 +57,9 @@ namespace Fasterflect
     /// <summary>
     /// A delegate to invoke an instance method or indexer of an object.
     /// </summary>
-    /// <param name="obj">The object whose method  or indexer is to be invoked on.</param>
+    /// <param name="obj">
+    /// The object whose method or indexer is to be invoked on.
+    /// Use <c>null</c> for static method.</param>
     /// <param name="parameters">The properly-ordered parameter list of the method/indexer.  
     /// For indexer-set operation, the parameter array include parameters for the indexer plus
     /// the value to be set to the indexer.</param>
