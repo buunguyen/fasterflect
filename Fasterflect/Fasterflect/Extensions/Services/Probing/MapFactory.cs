@@ -38,19 +38,18 @@ namespace Fasterflect.Probing
 		/// each with an associated MethodMap responsible for creating instances of the type using the given
 		/// constructor and parameter set.
 		/// </summary>
-		private static readonly Cache<int, MethodMap> mapCache = new Cache<int, MethodMap>();
+		private static readonly Cache<SourceInfo, MethodMap> ctorMapCache = new Cache<SourceInfo, MethodMap>();
 
 		#region Map Construction
 		public static MethodMap PrepareInvoke( Type type, string[] paramNames, Type[] parameterTypes,
 		                                       object[] sampleParamValues )
 		{
             SourceInfo sourceInfo = new SourceInfo(type, paramNames, parameterTypes);
-			int hash = sourceInfo.GetHashCode();
-			MethodMap map = mapCache.Get( hash );
+			MethodMap map = ctorMapCache.Get( sourceInfo );
 			if( map == null )
 			{
                 map = DetermineBestConstructorMatch(type, paramNames, parameterTypes, sampleParamValues);
-				mapCache.Insert( hash, map );
+				ctorMapCache.Insert( sourceInfo, map );
 			}
 			return map;
 		}

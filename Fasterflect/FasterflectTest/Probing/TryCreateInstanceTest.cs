@@ -218,10 +218,10 @@ namespace FasterflectTest.Probing
 		public void TestParameterHashGenerator_SameTypeShouldGiveIdenticalHash()
 		{
 			object source1 = new { Id = 42 };
-			SourceInfo sample1 = new SourceInfo( source1.GetType() );
+			SourceInfo sample1 = SourceInfo.CreateFromType( source1.GetType() );
 
 			object source2 = new { Id = 5 };
-			SourceInfo sample2 = new SourceInfo( source2.GetType() );
+			SourceInfo sample2 = SourceInfo.CreateFromType( source2.GetType() );
 
 			Assert.AreEqual( sample1.GetHashCode(), sample2.GetHashCode() );
 		}
@@ -243,7 +243,7 @@ namespace FasterflectTest.Probing
 			              };
 			int index = 0;
 			var infos = new SourceInfo[ sources.Length ];
-			Array.ForEach( sources, s => { infos[ index++ ] = new SourceInfo( s.GetType() ); } );
+			Array.ForEach( sources, s => { infos[ index++ ] = SourceInfo.CreateFromType( s.GetType() ); } );
 			index = 0;
 			int[] hashes = new int[ sources.Length ];
 			Array.ForEach( infos, i => { hashes[ index++ ] = i.GetHashCode(); } );
