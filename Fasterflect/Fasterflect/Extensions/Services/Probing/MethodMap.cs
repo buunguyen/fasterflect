@@ -382,11 +382,14 @@ namespace Fasterflect.Probing
 		#endregion
 
 		#region Method Invocation
+		// this method is used for invoking static methods and constructors
 		public virtual object Invoke( object[] row )
 		{
-			throw new NotImplementedException( "This method is implemented in subclasses." );
+			object[] methodParameters = isPerfectMatch ? row : PrepareParameters( row );
+			return invoker.Invoke( null, methodParameters );
 		}
 
+		// this method is used for invoking instance methods
 		public virtual object Invoke( object target, object[] row )
 		{
 			object[] methodParameters = isPerfectMatch ? row : PrepareParameters( row );

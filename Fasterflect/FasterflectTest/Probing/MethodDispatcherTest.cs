@@ -54,8 +54,50 @@ namespace FasterflectTest.Probing
 			Assert.AreEqual( 5, obj.MethodInvoked );
 			dispatcher.Invoke( obj, true, new { count=2, volume=4 } );
 			Assert.AreEqual( 11, obj.MethodInvoked );
-			//dispatcher.Invoke( obj, false, new { foo="bar", count=2, volume=4, isHay=true } );
-			//Assert.AreEqual( 11, obj.MethodInvoked );
+		}
+
+		#region Sample class with static overloads
+		internal class StaticElephant
+		{
+			#pragma warning disable 0169, 0649
+			public static int MethodInvoked { get; private set; }
+			#pragma warning restore 0169, 0649
+
+			public static void Eat()
+			{
+				MethodInvoked = 1;
+			}
+			public static void Eat( string food )
+			{
+				MethodInvoked = 2;
+			}
+			public static void Eat( int count )
+			{
+				MethodInvoked = 3;
+			}
+			public static void Eat( int count, string food )
+			{
+				MethodInvoked = 4;
+			}
+			public static void Eat( double count, string food, bool isHay )
+			{
+				MethodInvoked = 5;
+			}
+		}
+		#endregion
+
+		[TestMethod]
+		public void TestMethodDispatcherWithStaticMethods()
+		{
+			var type = typeof(StaticElephant);
+			var dispatcher = new MethodDispatcher();
+			typeof(StaticElephant).Methods( Flags.StaticAnyVisibility ).ForEach( dispatcher.AddMethod );
+			dispatcher.Invoke( type, true, new {} );
+			Assert.AreEqual( 1, StaticElephant.MethodInvoked );
+			dispatcher.Invoke( type, true, new { count=2.0, food="hay", isHay=true } );
+			Assert.AreEqual( 5, StaticElephant.MethodInvoked );
+			dispatcher.Invoke( type, false, new { count=2, volume=4 } );
+			Assert.AreEqual( 3, StaticElephant.MethodInvoked );
 		}
 	}
 }
