@@ -377,7 +377,7 @@ namespace Fasterflect
                 return type.Properties( bindingFlags, name ).FirstOrDefault();
             }
 
-            var result = type.GetProperty( name, bindingFlags );
+            var result = type.GetProperty( name, bindingFlags | Flags.DeclaredOnly );
             if( result == null && bindingFlags.IsNotSet( Flags.DeclaredOnly ) )
             {
                 if( type.BaseType != typeof(object) && type.BaseType != null )

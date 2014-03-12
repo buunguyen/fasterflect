@@ -65,6 +65,7 @@
     <Compile Include="Invocation\MethodTest.cs" />
     <Compile Include="Invocation\PropertyTest.cs" />
     <Compile Include="Common\TestUtils.cs" />
+    <Compile Include="Issues\AmbiguousMatchTest.cs" />
     <Compile Include="Lookup\AttributeTest.cs" />
     <Compile Include="Lookup\BaseLookupTest.cs" />
     <Compile Include="Lookup\ConstructorTest.cs" />
@@ -112,8 +113,8 @@
     <Compile Include="Services\MapTest.cs" />
     <Compile Include="Services\EventHandlerTest.cs" />
     <Compile Include="Invocation\GenericTest.cs" />
-    <Compile Include="_new\IssueList.cs" />
-    <Compile Include="_new\IssueList2.cs" />
+    <Compile Include="Issues\IssueList.cs" />
+    <Compile Include="Issues\IssueList2.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fasterflect\Fasterflect.csproj">

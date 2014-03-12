@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Fasterflect.Emitter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FasterflectTest.NUnit
+namespace FasterflectTest.Invocation
 {
 	[TestClass]
 	public class GenericTest

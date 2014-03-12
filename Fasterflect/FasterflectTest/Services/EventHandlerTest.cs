@@ -1,7 +1,7 @@
 ﻿using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FasterflectTest.NUnit
+namespace FasterflectTest.Services
 {
 	[TestClass]
     public class EventHandlerTest
