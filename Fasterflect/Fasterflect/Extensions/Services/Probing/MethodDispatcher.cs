@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using Fasterflect.Caching;
 
 namespace Fasterflect.Probing
@@ -38,7 +37,7 @@ namespace Fasterflect.Probing
 		/// <summary>
 		/// This field is used to cache the best match for a given parameter set (as represented by the SourceInfo class).
 		/// </summary>
-		private static readonly Cache<SourceInfo, MethodMap> mapCache = new Cache<SourceInfo, MethodMap>();
+		private readonly Cache<SourceInfo, MethodMap> mapCache = new Cache<SourceInfo, MethodMap>();
 
 		#region Constructors
 		/// <summary>
@@ -64,10 +63,10 @@ namespace Fasterflect.Probing
 		/// <param name="method">The method to add to the pool of invocation candidates.</param>
 		public void AddMethod( MethodInfo method )
 		{
-			if( method.IsStatic )
-			{
-				throw new ArgumentException( "Method dispatching currently only supports instance methods.", method.Name );
-			}
+			//if( method.IsStatic )
+			//{
+			//	throw new ArgumentException( "Method dispatching currently only supports instance methods.", method.Name );
+			//}
 			if( method.IsAbstract )
 			{
 				throw new ArgumentException( "Method dispatching does not support abstract methods.", method.Name );
@@ -86,7 +85,12 @@ namespace Fasterflect.Probing
 		/// <returns>The return value of the invocation.</returns>
 		public object Invoke( object obj, bool mustUseAllParameters, object sample )
 		{
+			if( obj == null || sample == null )
+			{
+				throw new ArgumentException( "Missing or invalid argument: " + (obj == null ? "obj" : "sample") );
+			}
 			var sourceInfo = SourceInfo.CreateFromType( sample.GetType() );
+
 			// check to see if we already have a map for best match
 			MethodMap map = mapCache.Get( sourceInfo );
 			object[] values = sourceInfo.GetParameterValues( sample );
@@ -116,10 +120,16 @@ namespace Fasterflect.Probing
 		/// <returns>The return value of the invocation.</returns>
 		public object Invoke( object obj, bool mustUseAllParameters, Dictionary<string, object> parameters )
 		{
+			if( obj == null || parameters == null )
+			{
+				throw new ArgumentException( "Missing or invalid argument: " + (obj == null ? "obj" : "parameters") );
+			}
 			string[] names = parameters.Keys.ToArray() ?? new string[0];
 			object[] values = parameters.Values.ToArray() ?? new object[0];
 			Type[] types = values.ToTypeArray() ?? new Type[0];
-			var sourceInfo = new SourceInfo( obj.GetType(), names, types );
+			bool isStatic = obj is Type;
+			var type = isStatic ? obj as Type : obj.GetType();
+			var sourceInfo = new SourceInfo( type, names, types );
 			// check to see if we already have a map for best match
 			MethodMap map = mapCache.Get( sourceInfo );
 			if( map == null )
@@ -127,7 +137,6 @@ namespace Fasterflect.Probing
 				map = MapFactory.DetermineBestMethodMatch( methodPool, mustUseAllParameters, names, types, values );
 				mapCache.Insert( sourceInfo, map );
 			}
-			bool isStatic = obj is Type;
 			return isStatic ? map.Invoke( values ) : map.Invoke( obj, values );
 		}
 	}
