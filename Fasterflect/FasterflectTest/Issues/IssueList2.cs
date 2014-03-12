@@ -3,7 +3,7 @@ using System.Collections;
 using Fasterflect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FasterflectTest.NUnit
+namespace FasterflectTest.Issues
 {
     [TestClass]
     public class IssueList2
