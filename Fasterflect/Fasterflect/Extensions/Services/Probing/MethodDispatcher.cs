@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Fasterflect.Caching;
 
 namespace Fasterflect.Probing
 {
@@ -29,8 +30,33 @@ namespace Fasterflect.Probing
 	/// </summary>
 	public class MethodDispatcher
 	{
-		//private readonly List<MethodInfo> methodPool = new List<MethodInfo>();
+		/// <summary>
+		/// The list of candidate methods for invocations through this dispatcher instance.
+		/// </summary>
 		private readonly List<MethodBase> methodPool = new List<MethodBase>();
+
+		/// <summary>
+		/// This field is used to cache the best match for a given parameter set (as represented by the SourceInfo class).
+		/// </summary>
+		private static readonly Cache<SourceInfo, MethodMap> mapCache = new Cache<SourceInfo, MethodMap>();
+
+		#region Constructors
+		/// <summary>
+		/// Use this constructor in conjuction with the AddMethod to manually populate the pool of available methods.
+		/// </summary>
+		public MethodDispatcher()
+		{
+		}
+
+		/// <summary>
+		/// Use this constructor to automatically populate the pool of available methods with all instance methods 
+		/// found on the given type.
+		/// </summary>
+		public MethodDispatcher( Type type )
+		{
+			type.Methods().ForEach( methodPool.Add );
+		}
+		#endregion
 
 		/// <summary>
 		/// Add a method to the list of available methods for this method dispatcher.
@@ -48,10 +74,10 @@ namespace Fasterflect.Probing
 			}
 			methodPool.Add( method );
 		}
-
+			
 		/// <summary>
-		/// Invoke the best available match for the supplied parameters. 
-		/// If no method can be called using the supplied parameters, an exception is thrown.
+		/// Invoke the best available match for the supplied parameters. If no method can be called 
+		/// using the supplied parameters, an exception is thrown.
 		/// </summary>
 		/// <param name="obj">The object on which to invoke a method.</param>
 		/// <param name="mustUseAllParameters">Specifies whether all supplied parameters must be used in the
@@ -60,17 +86,22 @@ namespace Fasterflect.Probing
 		/// <returns>The return value of the invocation.</returns>
 		public object Invoke( object obj, bool mustUseAllParameters, object sample )
 		{
-			Type sourceType = sample.GetType();
-			var sourceInfo = new SourceInfo( sourceType );
-			bool isStatic = obj is Type;
-			string[] names = sourceInfo.ParamNames;
-			Type[] types = sourceInfo.ParamTypes;
+			var sourceInfo = SourceInfo.CreateFromType( sample.GetType() );
+			// check to see if we already have a map for best match
+			MethodMap map = mapCache.Get( sourceInfo );
 			object[] values = sourceInfo.GetParameterValues( sample );
-			if( names.Length != values.Length || names.Length != types.Length )
+			if( map == null )
 			{
-				throw new ArgumentException( "Mismatching name, type and value arrays (must be of identical length)." );
+				string[] names = sourceInfo.ParamNames;
+				Type[] types = sourceInfo.ParamTypes;
+				if( names.Length != values.Length || names.Length != types.Length )
+				{
+					throw new ArgumentException( "Mismatching name, type and value arrays (must be of identical length)." );
+				}
+				map = MapFactory.DetermineBestMethodMatch( methodPool, mustUseAllParameters, names, types, values );
+				mapCache.Insert( sourceInfo, map );
 			}
-			MethodMap map = MapFactory.DetermineBestMethodMatch( methodPool, mustUseAllParameters, names, types, values );
+			bool isStatic = obj is Type;
 			return isStatic ? map.Invoke( values ) : map.Invoke( obj, values );
 		}
 
@@ -85,15 +116,18 @@ namespace Fasterflect.Probing
 		/// <returns>The return value of the invocation.</returns>
 		public object Invoke( object obj, bool mustUseAllParameters, Dictionary<string, object> parameters )
 		{
-			bool isStatic = obj is Type;
 			string[] names = parameters.Keys.ToArray() ?? new string[0];
 			object[] values = parameters.Values.ToArray() ?? new object[0];
 			Type[] types = values.ToTypeArray() ?? new Type[0];
-			if( names.Length != values.Length || names.Length != types.Length )
+			var sourceInfo = new SourceInfo( obj.GetType(), names, types );
+			// check to see if we already have a map for best match
+			MethodMap map = mapCache.Get( sourceInfo );
+			if( map == null )
 			{
-				throw new ArgumentException( "Mismatching name, type and value arrays (must be of identical length)." );
+				map = MapFactory.DetermineBestMethodMatch( methodPool, mustUseAllParameters, names, types, values );
+				mapCache.Insert( sourceInfo, map );
 			}
-			MethodMap map = MapFactory.DetermineBestMethodMatch( methodPool, mustUseAllParameters, names, types, values );
+			bool isStatic = obj is Type;
 			return isStatic ? map.Invoke( values ) : map.Invoke( obj, values );
 		}
 	}

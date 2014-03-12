@@ -157,8 +157,8 @@ namespace FasterflectBenchmark
                                          new[] { typeof(int), typeof(string) }, null,true );
             var callInfoOther = new CallInfo(typeof(CallInfo), null, Flags.InstanceAnyVisibility, MemberTypes.Field, "other",
                                               new[] { typeof(string) }, null, true );
-            var sourceInfo = new SourceInfo( new { ID = 42, Name = "Test" }.GetType() );
-            var sourceInfoOther = new SourceInfo( new { id = 42, Name = "Test" }.GetType() );
+            var sourceInfo = SourceInfo.CreateFromType( new { ID = 42, Name = "Test" }.GetType() );
+            var sourceInfoOther = SourceInfo.CreateFromType( new { id = 42, Name = "Test" }.GetType() );
 
             var initMap = new Dictionary<string, Action> { };
             var actionMap = new Dictionary<string, Action>
@@ -169,22 +169,10 @@ namespace FasterflectBenchmark
                                 { "SourceInfo Equals Other", () => sourceInfo.Equals( sourceInfoOther ) },
                                 { "string GetHashCode", () => "foo".GetHashCode() },
                                 { "string Equals", () => "foo".Equals( "bar" ) },
-                                {
-                                    "new CallInfo",
-                                    () =>
-                                    new CallInfo( TargetType, null,  Flags.InstanceAnyVisibility, MemberTypes.Field, "name",
-                                                  new[] { typeof(int), typeof(string) }, null, true )
-                                    },
-                                {
-                                    "new SourceInfo",
-                                    () =>
-                                    new SourceInfo( TargetType, new[] { "ID", "Name" },
-                                                    new[] { typeof(int), typeof(string) } )
-                                    },
-                                {
-                                    "new SourceInfo anon",
-                                    () => new SourceInfo( new { ID = 42, Name = "Test" }.GetType() )
-                                    },
+                                { "new CallInfo", () => new CallInfo( TargetType, null,  Flags.InstanceAnyVisibility, MemberTypes.Field, "name",
+                                                                      new[] { typeof(int), typeof(string) }, null, true ) },
+                                { "new SourceInfo", () => new SourceInfo( TargetType, new[] { "ID", "Name" }, new[] { typeof(int), typeof(string) } ) },
+                                { "new SourceInfo anon", () => SourceInfo.CreateFromType( new { ID = 42, Name = "Test" }.GetType() ) },
                             };
             Execute( "HashCode Benchmark", initMap, actionMap );
         }

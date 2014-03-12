@@ -27,30 +27,55 @@ namespace Fasterflect.Probing
 	internal class SourceInfo
 	{
 		#region Fields
-		private bool[] paramKinds;
-		private string[] paramNames;
-		private Type[] paramTypes;
+		private readonly Type type;
+		private readonly bool[] paramKinds;
+		private readonly string[] paramNames;
+		private readonly Type[] paramTypes;
 		private MemberGetter[] paramValueReaders;
-		private Type type;
 		#endregion
 
 		#region Constructors
-		public SourceInfo( Type type )
-		{
-			this.type = type;
-			ExtractParameterInfo( type );
-		}
-
 		public SourceInfo( Type type, string[] names, Type[] types )
 		{
 			this.type = type;
 			paramNames = names;
 			paramTypes = types;
 			paramKinds = new bool[names.Length];
+			// this overload assumes that all names refer to fields on the given type
 			for (int i = 0; i < paramKinds.Length; i++)
 			{
 				paramKinds[i] = true;
 			}
+		}
+
+		public SourceInfo( Type type, string[] names, Type[] types, bool[] kinds )
+		{
+			this.type = type;
+			paramNames = names;
+			paramTypes = types;
+			paramKinds = kinds;
+		}
+
+		public static SourceInfo CreateFromType( Type type )
+		{
+            IList<MemberInfo> members = type.Members(MemberTypes.Field | MemberTypes.Property, Flags.InstanceAnyVisibility);
+			var names = new List<string>(members.Count);
+			var types = new List<Type>(members.Count);
+			var kinds = new List<bool>(members.Count);
+			for (int i = 0; i < members.Count; i++)
+			{
+				MemberInfo mi = members[i];
+				bool include = mi is FieldInfo && mi.Name[0] != '<'; // exclude auto-generated backing fields
+				include |= mi is PropertyInfo && (mi as PropertyInfo).CanRead; // exclude write-only properties
+				if (include)
+				{
+					names.Add(mi.Name);
+					bool isField = mi is FieldInfo;
+					kinds.Add(isField);
+					types.Add(isField ? (mi as FieldInfo).FieldType : (mi as PropertyInfo).PropertyType);
+				}
+			}
+			return new SourceInfo( type, names.ToArray(), types.ToArray(), kinds.ToArray() );
 		}
 		#endregion
 
@@ -134,7 +159,7 @@ namespace Fasterflect.Probing
 				return false;
 			for( int i = 0; i < paramNames.Length; i++ )
 			{
-				if( paramNames[ i ] != other.ParamNames[ i ] || paramTypes[ i ] != other.ParamTypes[ i ] )
+				if( paramNames[ i ] != other.ParamNames[ i ] || paramTypes[ i ] != other.ParamTypes[ i ] || paramKinds[ i ] != other.ParamKinds[ i ] )
 					return false;
 			}
 			return true;
@@ -145,32 +170,6 @@ namespace Fasterflect.Probing
 			for( int i = 0; i < paramNames.Length; i++ )
 			    hash += (i + 31) * paramNames[ i ].GetHashCode() ^ paramTypes[ i ].GetHashCode();
 			return hash;
-		}
-		#endregion
-
-		#region Anonymous Type Helper (ExtractParameterInfo)
-		internal void ExtractParameterInfo( Type type )
-		{
-            IList<MemberInfo> members = type.Members(MemberTypes.Field | MemberTypes.Property, Flags.InstanceAnyVisibility);
-			var names = new List<string>(members.Count);
-			var types = new List<Type>(members.Count);
-			var kinds = new List<bool>(members.Count);
-			for (int i = 0; i < members.Count; i++)
-			{
-				MemberInfo mi = members[i];
-				bool include = mi is FieldInfo && mi.Name[0] != '<'; // exclude auto-generated backing fields
-				include |= mi is PropertyInfo && (mi as PropertyInfo).CanRead; // exclude write-only properties
-				if (include)
-				{
-					names.Add(mi.Name);
-					bool isField = mi is FieldInfo;
-					kinds.Add(isField);
-					types.Add(isField ? (mi as FieldInfo).FieldType : (mi as PropertyInfo).PropertyType);
-				}
-			}
-			paramNames = names.ToArray();
-			paramTypes = types.ToArray();
-			paramKinds = kinds.ToArray();
 		}
 		#endregion
 	}

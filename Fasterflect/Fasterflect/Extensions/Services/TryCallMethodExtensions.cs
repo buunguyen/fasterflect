@@ -41,7 +41,7 @@ namespace Fasterflect
         public static object TryCallMethod( this object obj, string methodName, bool mustUseAllParameters, object sample )
         {
             Type sourceType = sample.GetType();
-            var sourceInfo = new SourceInfo( sourceType );
+            var sourceInfo = SourceInfo.CreateFromType( sourceType );
             var paramValues = sourceInfo.GetParameterValues( sample );
 			return obj.TryCallMethod( methodName, mustUseAllParameters, sourceInfo.ParamNames, sourceInfo.ParamTypes, paramValues );
         }

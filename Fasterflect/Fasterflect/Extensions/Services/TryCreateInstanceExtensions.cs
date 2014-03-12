@@ -53,7 +53,7 @@ namespace Fasterflect
             SourceInfo sourceInfo = sourceInfoCache.Get( sourceType );
             if( sourceInfo == null )
             {
-                sourceInfo = new SourceInfo( sourceType );
+                sourceInfo = SourceInfo.CreateFromType( sourceType );
                 sourceInfoCache.Insert( sourceType, sourceInfo );
             }
             object[] paramValues = sourceInfo.GetParameterValues( sample );
