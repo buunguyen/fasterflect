@@ -365,7 +365,7 @@ namespace Fasterflect
 		/// </summary>
 		public override bool Equals( object obj )
 		{
-			return obj != null && obj.GetType() == typeof(Flags) && flags == ((Flags) obj).flags;
+			return obj is Flags && flags == ((Flags) obj).flags;
 		}
 
 		/// <summary>

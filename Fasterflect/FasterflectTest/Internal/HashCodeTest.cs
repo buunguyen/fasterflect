@@ -20,6 +20,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Fasterflect;
+using Fasterflect.Caching;
 using Fasterflect.Emitter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -49,7 +50,12 @@ namespace FasterflectTest.Internal
 			public int P1 { get; set; }
 			public string P2 { get; set; }
 		}
-		#endregion
+
+	  public class C
+	  {
+	    public void M( A1 arg ) {}
+	  }
+	  #endregion
 
 		[TestMethod]
 		public void TestHashCodeUniqueness()
@@ -69,7 +75,43 @@ namespace FasterflectTest.Internal
 			Assert.AreEqual( types.Length, infos.Select( ci => ci.GetHashCode() ).Distinct().Count() );
 		}
 
-		[TestMethod]
+	  [TestMethod]
+	  public void TestCallInfoEqualityForProperties()
+	  {
+			var types = new[] { typeof(A1), typeof(A1) };
+			var infos = types.Select( t => new CallInfo( t, null, Flags.StaticInstanceAnyVisibility, MemberTypes.Property, "P1", Type.EmptyTypes, null, true ) ).ToList();
+      Assert.AreEqual( infos[0].GetHashCode(), infos[1].GetHashCode() );
+      Assert.AreEqual( infos[0], infos[1] );
+      Assert.IsTrue( infos[0].Equals( infos[1] ) );
+      Assert.IsTrue( infos[0] == infos[1] );
+	  }
+
+	  [TestMethod]
+	  public void TestCallInfoEqualityForMethods()
+	  {
+	    var args = new [] { new A1() };
+			var types = new[] { typeof(C), typeof(C) };
+			var infos = types.Select( t => new CallInfo( t, null, Flags.StaticInstanceAnyVisibility, MemberTypes.Method, "M", args.ToTypeArray(), null, true ) ).ToList();
+      Assert.AreEqual( infos[0].GetHashCode(), infos[1].GetHashCode() );
+      Assert.AreEqual( infos[0], infos[1] );
+      Assert.IsTrue( infos[0].Equals( infos[1] ) );
+      Assert.IsTrue( infos[0] == infos[1] );
+	  }
+
+	  [TestMethod]
+	  public void TestCache()
+	  {
+			var types = new[] { typeof(A1), typeof(A1) };
+			var infos = types.Select( t => new CallInfo( t, null, Flags.StaticInstanceAnyVisibility, MemberTypes.Property, "P1", Type.EmptyTypes, null, true ) ).ToList();
+	    var cache = new Cache<CallInfo, object>();
+      infos.ForEach( ci => cache.Insert( ci, ci ) );
+      Assert.AreEqual( 1, cache.Count );
+	    Assert.IsNotNull( cache.Get( infos[ 0 ] ) );
+	    Assert.IsNotNull( cache.Get( infos[ 1 ] ) );
+      Assert.AreEqual( infos[0], cache.Get( infos[ 0 ] ) );
+	  }
+
+	  [TestMethod]
 		public void TestMapCallInfoHashCodeUniqueness()
 		{
 			var map1 = GetMapCallInfo( typeof(A1), typeof(A2), "P1" );
