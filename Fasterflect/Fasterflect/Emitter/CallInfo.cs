@@ -23,132 +23,163 @@ using System.Reflection;
 
 namespace Fasterflect.Emitter
 {
-    /// <summary>
-    /// Stores all necessary information to construct a dynamic method.
-    /// </summary>
-    [DebuggerStepThrough]
-    internal class CallInfo
-    {
-        public Type TargetType { get; private set; }
-        public Flags BindingFlags { get; internal set; }
-        public MemberTypes MemberTypes { get; set; }
-        public Type[] ParamTypes { get; internal set; }
-        public Type[] GenericTypes { get; private set; }
-        public string Name { get; private set; }
-        public bool IsReadOperation { get; set; }
-        public bool IsStatic { get; internal set; }
-		
-        // This field doesn't constitute CallInfo identity:
-        public MemberInfo MemberInfo { get; internal set; }
+	/// <summary>
+	/// Stores all necessary information to construct a dynamic method.
+	/// </summary>
+	[DebuggerStepThrough]
+	internal class CallInfo : IEquatable<CallInfo>
+	{
+		public Type TargetType { get; private set; }
+		public Flags BindingFlags { get; internal set; }
+		public MemberTypes MemberTypes { get; set; }
+		public Type[] ParamTypes { get; internal set; }
+		public Type[] GenericTypes { get; private set; }
+		public string Name { get; private set; }
+		public bool IsReadOperation { get; set; }
+		// these fields don't constitute CallInfo identity:
+		public bool IsStatic { get; internal set; }
+		public MemberInfo MemberInfo { get; internal set; }
+		public Type[] MethodParamTypes { get; internal set; }
 
-        public CallInfo(Type targetType, Type[] genericTypes, Flags bindingFlags, MemberTypes memberTypes, string name,
-                        Type[] parameterTypes, MemberInfo memberInfo, bool isReadOperation )
-        {
-            TargetType = targetType;
-            GenericTypes = genericTypes == null || genericTypes.Length == 0
-                             ? Type.EmptyTypes
-                             : genericTypes;
-            BindingFlags = bindingFlags;
-            MemberTypes = memberTypes;
-            Name = name;
-            ParamTypes = parameterTypes == null || parameterTypes.Length == 0
-                             ? Type.EmptyTypes
-                             : parameterTypes;
-            MemberInfo = memberInfo;
-        	IsReadOperation = isReadOperation;
-        	IsStatic = BindingFlags.IsSet( Flags.Static );
-        }
+		public CallInfo( Type targetType, Type[] genericTypes, Flags bindingFlags, MemberTypes memberTypes, string name,
+			Type[] parameterTypes, MemberInfo memberInfo, bool isReadOperation )
+		{
+			TargetType = targetType;
+			GenericTypes = genericTypes == null || genericTypes.Length == 0
+				? Type.EmptyTypes
+				: genericTypes;
+			BindingFlags = bindingFlags;
+			MemberTypes = memberTypes;
+			Name = name;
+			ParamTypes = parameterTypes == null || parameterTypes.Length == 0
+				? Type.EmptyTypes
+				: parameterTypes;
+			MemberInfo = memberInfo;
+			IsReadOperation = isReadOperation;
+			// TODO why do we set this here? it is overwritten in MethodInvocationEmitter
+			IsStatic = BindingFlags.IsSet( Flags.Static );
+		}
 
-        /// <summary>
-        /// The CIL should handle inner struct only when the target type is 
-        /// a value type or the wrapper ValueTypeHolder type.  In addition, the call 
-        /// must also be executed in the non-static context since static 
-        /// context doesn't need to handle inner struct case.
-        /// </summary>
-        public bool ShouldHandleInnerStruct
-        {
-            get { return IsTargetTypeStruct && !IsStatic; }
-        }
+		#region Helper Properties
+		/// <summary>
+		/// The CIL should handle inner struct only when the target type is 
+		/// a value type or the wrapper ValueTypeHolder type.  In addition, the call 
+		/// must also be executed in the non-static context since static 
+		/// context doesn't need to handle inner struct case.
+		/// </summary>
+		public bool ShouldHandleInnerStruct
+		{
+			get { return IsTargetTypeStruct && !IsStatic; }
+		}
 
-        public bool IsTargetTypeStruct
-        {
-            get { return TargetType.IsValueType; }
-        }
+		public bool IsTargetTypeStruct
+		{
+			get { return TargetType.IsValueType; }
+		}
 
-        public bool HasNoParam
-        {
-            get { return ParamTypes == Type.EmptyTypes; }
-        }
+		public bool HasNoParam
+		{
+			get { return ParamTypes == Type.EmptyTypes; }
+		}
 
-        public bool IsGeneric
-        {
-            get { return GenericTypes != Type.EmptyTypes; }
-        }
+		public bool IsGeneric
+		{
+			get { return GenericTypes != Type.EmptyTypes; }
+		}
 
-        public bool HasRefParam
-        {
-            get { return ParamTypes.Any( t => t.IsByRef ); }
-        }
+		public bool HasRefParam
+		{
+			get { return ParamTypes.Any( t => t.IsByRef ); }
+		}
+		#endregion
 
-        /// <summary>
-        /// Two <c>CallInfo</c> instances are considered equaled if the following properties
-        /// are equaled: <c>TargetType</c>, <c>Flags</c>, <c>IsStatic</c>, <c>MemberTypes</c>, <c>Name</c>,
-        /// <c>ParamTypes</c> and <c>GenericTypes</c>.
-        /// </summary>
-        public override bool Equals( object obj )
-        {
-            var other = obj as CallInfo;
-            if( other == null )
-            {
-                return false;
-            }
-            if( other == this )
-            {
-                return true;
-            }
+		#region Equality Methods
+		/// <summary>
+		/// Two <c>CallInfo</c> instances are considered equaled if the following properties
+		/// are equaled: <c>TargetType</c>, <c>Flags</c>, <c>IsStatic</c>, <c>MemberTypes</c>, <c>Name</c>,
+		/// <c>ParamTypes</c> and <c>GenericTypes</c>.
+		/// </summary>
+		public bool Equals( CallInfo other )
+		{
+			if( ReferenceEquals( other, null ) )
+			{
+				return false;
+			}
+			if( ReferenceEquals( other, this ) )
+			{
+				return true;
+			}
 
-            if( other.TargetType != TargetType ||
-                other.Name != Name ||
-                other.MemberTypes != MemberTypes ||
-                other.BindingFlags != BindingFlags ||
-				other.IsReadOperation != IsReadOperation ||
-                other.ParamTypes.Length != ParamTypes.Length ||
-                other.GenericTypes.Length != GenericTypes.Length)
-            {
-                return false;
-            }
+			if( other.TargetType != TargetType ||
+			    other.Name != Name ||
+			    other.MemberTypes != MemberTypes ||
+			    other.BindingFlags != BindingFlags ||
+			    other.IsReadOperation != IsReadOperation ||
+			    other.ParamTypes.Length != ParamTypes.Length ||
+			    other.GenericTypes.Length != GenericTypes.Length )
+			{
+				return false;
+			}
 
-            for( int i = 0; i < ParamTypes.Length; i++ )
-            {
-                if( ParamTypes[ i ] != other.ParamTypes[ i ] )
-                {
-                    return false;
-                }
-            }
+			for( int i = 0; i < ParamTypes.Length; i++ )
+			{
+				if( ParamTypes[ i ] != other.ParamTypes[ i ] )
+				{
+					return false;
+				}
+			}
 
-            for (int i = 0; i < GenericTypes.Length; i++)
-            {
-                if (GenericTypes[i] != other.GenericTypes[i])
-                {
-                    return false;
-                }
-            }
+			for( int i = 0; i < GenericTypes.Length; i++ )
+			{
+				if( GenericTypes[ i ] != other.GenericTypes[ i ] )
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 
-            return true;
-        }
+		/// <summary>
+		/// Two <c>CallInfo</c> instances are considered equaled if the following properties
+		/// are equaled: <c>TargetType</c>, <c>Flags</c>, <c>MemberTypes</c>, <c>Name</c>,
+		/// <c>ParamTypes</c> and <c>GenericTypes</c>.
+		/// </summary>
+		public override bool Equals( object obj )
+		{
+			return Equals( obj as CallInfo );
+		}
 
-        public override int GetHashCode()
-        {
-        	int hash = TargetType.GetHashCode() + (int) MemberTypes * Name.GetHashCode() + BindingFlags.GetHashCode() + IsReadOperation.GetHashCode();
-        	for( int i = 0; i < ParamTypes.Length; i++ )
-        	{
-        	    hash += ParamTypes[ i ].GetHashCode() * (i+1);
-        	}
-        	for (int i = 0; i < GenericTypes.Length; i++)
-        	{
-        	    hash += GenericTypes[i].GetHashCode() * (i+1);
-        	}
-        	return hash;
-        }
-    }
+		public override int GetHashCode()
+		{
+			int hash = TargetType.GetHashCode() + (int) MemberTypes * Name.GetHashCode() + BindingFlags.GetHashCode() + IsReadOperation.GetHashCode();
+			for( int i = 0; i < ParamTypes.Length; i++ )
+			{
+				hash += ParamTypes[ i ].GetHashCode() * (i + 1);
+			}
+			for( int i = 0; i < GenericTypes.Length; i++ )
+			{
+				hash += GenericTypes[ i ].GetHashCode() * (i + 1);
+			}
+			return hash;
+		}
+
+		public static bool operator ==( CallInfo left, CallInfo right )
+		{
+			if( ReferenceEquals( null, left ) )
+			{
+				return ReferenceEquals( null, right );
+			}
+			return left.Equals( right );
+		}
+
+		public static bool operator !=( CallInfo left, CallInfo right )
+		{
+			if( ReferenceEquals( null, left ) )
+			{
+				return !ReferenceEquals( null, right );
+			}
+			return !left.Equals( right );
+		}
+		#endregion
+	}
 }

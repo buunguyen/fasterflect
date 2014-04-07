@@ -35,7 +35,7 @@ namespace Fasterflect.Emitter
             if (constructor == null)
                 throw new MissingMemberException("Constructor does not exist");
 			callInfo.MemberInfo = constructor;
-        	callInfo.ParamTypes = constructor.GetParameters().ToTypeArray();
+        	callInfo.MethodParamTypes = constructor.GetParameters().ToTypeArray();
             return constructor;
         }
 
@@ -51,7 +51,7 @@ namespace Fasterflect.Emitter
 				throw new MissingMethodException( string.Format( fmt, callInfo.Name, callInfo.BindingFlags, callInfo.TargetType ) );
 			}
 			callInfo.MemberInfo = method;
-        	callInfo.ParamTypes = method.GetParameters().ToTypeArray();
+        	callInfo.MethodParamTypes = method.GetParameters().ToTypeArray();
             return method;
         }
 
