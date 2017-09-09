@@ -10,9 +10,9 @@ Fasterflect offers 3 major areas of functionality:
 * *Accessing:* Fasterflect allows you to perform reflective invocations on constructors, indexers, fields, properties and methods for both reference types (including arrays) and struct types.  Fasterflect also supports working with ref/out parameters, inferring parameter types to simplify invocations. These are backed by the dynamic code generation mechanism.
 * *Services:* Built on top of the core API for querying and accessing, Fasterflect includes several extensions at at higher level of abstraction. This includes functionality for deep object cloning, object materialization (construction) without relying on default constructors, various object mapping scenarios, XML serialization, etc.
 
-Besides being simple, Fasterflect is heavily documented and unit-tested, so you'll find it to be very easy to learn and use. Kickstart your reflection skills by downloading Fasterflect today. We recommend that you start by spending a bit of time with the extensive [documentation](http://fasterflect.codeplex.com/documentation), but the impatient need only write _using Fasterflect;_. We also recommend looking at the unit tests in case the documentation proves to be insufficient. 
+Besides being simple, Fasterflect is heavily documented and unit-tested, so you'll find it to be very easy to learn and use. Kickstart your reflection skills by downloading Fasterflect today. We recommend that you start by spending a bit of time with the extensive [documentation](https://github.com/buunguyen/fasterflect/wiki), but the impatient need only write _using Fasterflect;_. We also recommend looking at the unit tests in case the documentation proves to be insufficient. 
 
-To get a feel of what Fasterflect is like, without first having to download anything or spend time reading the [documentation](http://fasterflect.codeplex.com/documentation), below is some sample code using Fasterflect to construct objects and access members.
+To get a feel of what Fasterflect is like, without first having to download anything or spend time reading the [documentation](https://github.com/buunguyen/fasterflect/wiki), below is some sample code using Fasterflect to construct objects and access members.
 
 ```csharp
 class Person
