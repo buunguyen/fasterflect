@@ -1,3 +1,5 @@
+[![Code Shelter](https://www.codeshelter.co/static/badges/badge-flat.svg)](https://www.codeshelter.co/)
+
 #### NuGet
 Fasterflect is available on NuGet: https://www.nuget.org/packages/fasterflect/
 
