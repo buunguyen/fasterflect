@@ -198,26 +198,6 @@ namespace Fasterflect.Emitter
 		}
 
 		/// <summary>
-		/// Marks a sequence point in the Microsoft intermediate language (MSIL) stream.
-		/// </summary>
-		/// <param name="document">The document for which the sequence point is being defined.</param>
-		/// <param name="startLine">The line where the sequence point begins.</param>
-		/// <param name="startColumn">The column in the line where the sequence point begins.</param>
-		/// <param name="endLine">The line where the sequence point ends.</param>
-		/// <param name="endColumn">The column in the line where the sequence point ends.</param>
-		/// <returns>Current instance of the <see cref="EmitHelper"/>.</returns>
-		public EmitHelper MarkSequencePoint(
-			ISymbolDocumentWriter document,
-			int startLine,
-			int startColumn,
-			int endLine,
-			int endColumn )
-		{
-			_ilGenerator.MarkSequencePoint( document, startLine, startColumn, endLine, endColumn );
-			return this;
-		}
-
-		/// <summary>
 		/// Emits an instruction to throw an exception.
 		/// </summary>
 		/// <param name="exceptionType">The class of the type of exception to throw.</param>
@@ -834,22 +814,6 @@ namespace Fasterflect.Emitter
 			}
 
 			return call( methodInfo );
-		}
-
-		/// <summary>
-		/// Calls ILGenerator.EmitCalli(<see cref="OpCodes.Calli"/>, <see cref="CallingConvention"/>, Type, Type[]) that
-		/// calls the method indicated on the evaluation stack (as a pointer to an entry point) 
-		/// with arguments described by a calling convention using an unmanaged calling convention.
-		/// </summary>
-		/// <param name="unmanagedCallConv">The unmanaged calling convention to be used.</param>
-		/// <param name="returnType">The Type of the result.</param>
-		/// <param name="parameterTypes">The types of the required arguments to the instruction.</param>
-		/// <seealso cref="OpCodes.Calli">OpCodes.Calli</seealso>
-		/// <seealso cref="System.Reflection.Emit.ILGenerator.EmitCalli(OpCode,CallingConvention,Type,Type[])">ILGenerator.EmitCalli</seealso>
-		public EmitHelper calli( CallingConvention unmanagedCallConv, Type returnType, Type[] parameterTypes )
-		{
-			_ilGenerator.EmitCalli( OpCodes.Calli, unmanagedCallConv, returnType, parameterTypes );
-			return this;
 		}
 
 		/// <summary>

@@ -1,110 +1,27 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{FDF54936-A188-45B1-B482-632DA23DB0B0}</ProjectGuid>
+    <TargetFramework>netstandard20</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Fasterflect</RootNamespace>
-    <AssemblyName>Fasterflect</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject></StartupObject>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\key.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkProfile />
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DOT_NET_4</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile></DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>DOT_NET_4</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Fasterflect.XML</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Caching\CacheStrategy.cs" />
-    <Compile Include="Caching\Cache.cs" />
-    <Compile Include="Common\FormatOptions.cs" />
-    <Compile Include="DynamicReflection\DynamicWrapper.cs" />
-    <Compile Include="DynamicReflection\DynamicBuilder.cs" />
-    <Compile Include="Emitter\MapCallInfo.cs" />
-    <Compile Include="Extensions\Core\AssemblyExtensions.cs" />
-    <Compile Include="Extensions\Core\TypeExtensions.cs" />
-    <Compile Include="Extensions\Core\ParameterInfoExtensions.cs" />
-    <Compile Include="Common\MemberFilter.cs" />
-    <Compile Include="Emitter\MapEmitter.cs" />
-    <Compile Include="Emitter\EmitHelper.cs" />
-    <Compile Include="Extensions\Core\ConstructorInfoExtensions.cs" />
-    <Compile Include="Extensions\Core\ValueTypeExtensions.cs" />
-    <Compile Include="Extensions\Services\CloneExtensions.cs" />
-    <Compile Include="Common\Constants.cs" />
-    <Compile Include="Extensions\Core\ConstructorExtensions.cs" />
-    <Compile Include="Extensions\Core\AttributeExtensions.cs" />
-    <Compile Include="Extensions\Core\ArrayExtensions.cs" />
-    <Compile Include="Emitter\LookupUtils.cs" />
-    <Compile Include="Common\Flags.cs" />
-    <Compile Include="Extensions\Core\FieldInfoExtensions.cs" />
-    <Compile Include="Extensions\Core\MemberInfoExtensions.cs" />
-    <Compile Include="Extensions\Services\EventExtensions.cs" />
-    <Compile Include="Extensions\Services\TryCallMethodExtensions.cs" />
-    <Compile Include="Extensions\Services\TryCreateInstanceExtensions.cs" />
-    <Compile Include="Extensions\Services\MapExtensions.cs" />
-    <Compile Include="Extensions\Services\TryInvokeWithValuesExtensions.cs" />
-    <Compile Include="Extensions\Services\XmlTransformerExtensions.cs" />
-    <Compile Include="Extensions\Services\Probing\TypeConverter.cs" />
-    <Compile Include="Extensions\Core\PropertyInfoExtensions.cs" />
-    <Compile Include="Extensions\Core\MemberExtensions.cs" />
-    <Compile Include="Extensions\Core\PropertyExtensions.cs" />
-    <Compile Include="Extensions\Core\FieldExtensions.cs" />
-    <Compile Include="Extensions\Core\MethodExtensions.cs" />
-    <Compile Include="Common\Delegates.cs" />
-    <Compile Include="Emitter\ArrayGetEmitter.cs" />
-    <Compile Include="Emitter\ArraySetEmitter.cs" />
-    <Compile Include="Emitter\BaseEmitter.cs" />
-    <Compile Include="Emitter\CallInfo.cs" />
-    <Compile Include="Emitter\CtorInvocationEmitter.cs" />
-    <Compile Include="Emitter\InvocationEmitter.cs" />
-    <Compile Include="Emitter\MethodInvocationEmitter.cs" />
-    <Compile Include="Emitter\MemberGetEmitter.cs" />
-    <Compile Include="Emitter\MemberSetEmitter.cs" />
-    <Compile Include="Extensions\Services\Probing\ConstructorMap.cs" />
-    <Compile Include="Extensions\Services\Probing\MapFactory.cs" />
-    <Compile Include="Extensions\Services\Probing\SourceInfo.cs" />
-    <Compile Include="Extensions\Services\Probing\MethodMap.cs" />
-    <Compile Include="Common\Utils.cs" />
-    <Compile Include="Extensions\Services\Probing\MethodDispatcher.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Emitter\ValueTypeHolder.cs" />
-    <Compile Include="Extensions\Core\MethodInfoExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
@@ -114,12 +31,8 @@
       <Link>key.snk</Link>
     </None>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
+  </ItemGroup>
 </Project>
