@@ -1,3 +1,6 @@
 */.vs/*
 **/bin/*
 **/obj/*
+*.user
+nuget/package
+nuget/*.nupkg
